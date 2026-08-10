@@ -104,14 +104,7 @@ if (gnbContainer && gnbScroll && gnbLeftBtn && gnbRightBtn) {
 
 
 /* ---------------------------------------------------------
-   3. 검색창 자동완성 / 인기검색어
-   쿠팡 원본: .headerPopupWords
-   --------------------------------------------------------- */
-// TODO
-
-
-/* ---------------------------------------------------------
-   4. 맨 위로 버튼  ✅ 완성 (2026-08-05)
+   3. 맨 위로 버튼  ✅ 완성 (2026-08-05)
 
    스크롤을 300px 넘게 내리면 나타나고, 누르면 맨 위로 올라감.
 
@@ -143,5 +136,234 @@ if (gotoTop) {
   gotoTop.addEventListener('click', function () {
     // behavior:'smooth' = 뚝 끊기지 않고 스르륵 올라감
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    /* ★ 안전장치 (2026-08-08 추가)
+       일부 환경에서는 smooth 스크롤이 **아예 동작하지 않음** (실제로 이 프로젝트를
+       검증하던 브라우저가 그랬음 — behavior:'auto' 는 되는데 'smooth' 만 무시됨).
+       그러면 버튼을 눌러도 화면이 그대로라 "고장난 버튼"처럼 보임.
+
+       그래서 0.6초 뒤에도 여전히 위로 안 갔으면 즉시 이동으로 대신함.
+       smooth 가 잘 되는 환경에서는 그 사이에 이미 0 에 도착해 있으므로 아무 일도 안 일어남 */
+    setTimeout(function () {
+      if (window.scrollY > 0) {
+        window.scrollTo(0, 0);
+      }
+    }, 600);
   });
 }
+
+
+/* ---------------------------------------------------------
+   4. 검색 자동완성 / 최근검색어 (2026-08-08)
+
+   원본 구조를 그대로 씀 (2c80969368e44df3.css 977~1100줄):
+     .header-search
+       ├─ input.search-keyword
+       └─ .headerPopupWords.popularity-words   ← 이 상자가 아래로 펼쳐짐
+            ├─ .autocomplete_wrap              ← 목록이 들어갈 자리
+            └─ .history-btns                   ← 전체삭제 / 최근검색어끄기
+
+   상태 2가지 (원본과 동일):
+     ① 기본        — 최근 검색어 목록. 아래 회색 버튼줄 보임
+     ② .auto-search — 글자를 치면 추천어 목록. 버튼줄 숨김
+
+   ★ 검색폼이 PC용 / 태블릿용 두 벌이라 forEach 로 둘 다 처리함.
+     최근검색어는 localStorage 에 저장 — 새로고침해도 남아있음
+   --------------------------------------------------------- */
+
+/* 추천어 재료 (원본은 서버에서 받아옴. 나중에 JSP/DB 로 바꿀 자리) */
+const SUGGEST_WORDS = [
+  '노트북', '노트북 거치대', '노트북 파우치', '무선마우스', '무선이어폰', '모니터', '모니터암',
+  '生수', '생수 2L', '커피', '커피머신', '캡슐커피', '키보드', '기계식 키보드',
+  '선풍기', '서큘레이터', '제습기', '가습기', '공기청정기',
+  '운동화', '슬리퍼', '반팔티', '반바지', '원피스', '가방', '백팩',
+  '마스크팩', '선크림', '클렌징폼', '샴푸', '바디워시',
+  '강아지 사료', '고양이 모래', '물티슈', '휴지', '세제', '섬유유연제'
+];
+
+const HISTORY_KEY = 'coupang-clone-search-history';
+const HISTORY_OFF_KEY = 'coupang-clone-search-history-off';
+
+/* localStorage 는 문자열만 저장할 수 있어서 JSON 으로 바꿔 넣고 뺌.
+   (사생활 보호 모드 등에서 막힐 수 있어 try 로 감쌈) */
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveHistory(list) {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+  } catch (e) { /* 저장이 막혀도 화면 동작은 계속되게 무시 */ }
+}
+
+function isHistoryOff() {
+  try {
+    return localStorage.getItem(HISTORY_OFF_KEY) === '1';
+  } catch (e) {
+    return false;
+  }
+}
+
+function setHistoryOff(off) {
+  try {
+    localStorage.setItem(HISTORY_OFF_KEY, off ? '1' : '0');
+  } catch (e) { /* 무시 */ }
+}
+
+/** 검색폼 하나에 자동완성을 붙임 */
+function setupSearchAutocomplete(box) {
+  const input = box.querySelector('.search-keyword');
+  const popup = box.querySelector('.popularity-words');
+  if (!input || !popup) return;
+
+  const wrap = popup.querySelector('.autocomplete_wrap');
+  const delAll = popup.querySelector('.delete-all-kwdhistory');
+  const onOff = popup.querySelector('.history-on-off');
+
+  /* --- 최근 검색어 목록 그리기 --- */
+  function renderHistory() {
+    popup.classList.remove('auto-search');   // 버튼줄이 보이는 기본 상태
+
+    if (isHistoryOff()) {
+      wrap.innerHTML = '<p class="history-off-msg" style="display:block">최근 검색어 저장 기능이 꺼져 있습니다.</p>';
+      onOff.textContent = '최근검색어켜기';
+      return;
+    }
+    onOff.textContent = '최근검색어끄기';
+
+    const list = loadHistory();
+    if (list.length === 0) {
+      wrap.innerHTML = '<h3>최근 검색어</h3>'
+        + '<p class="history-off-msg" style="display:block">최근 검색어가 없습니다.</p>';
+      return;
+    }
+
+    /* ol > li > (a.kwd + span.delete-kwdhistory) 구조는 원본 그대로 */
+    let html = '<h3>최근 검색어</h3><ol>';
+    list.forEach(function (word, i) {
+      html += '<li>'
+        + '<a href="#" class="kwd">' + escapeHtml(word) + '</a>'
+        + '<span class="delete-kwdhistory" data-index="' + i + '" title="삭제">✕</span>'
+        + '</li>';
+    });
+    html += '</ol>';
+    wrap.innerHTML = html;
+  }
+
+  /* --- 추천어 목록 그리기 (글자를 쳤을 때) --- */
+  function renderSuggest(keyword) {
+    popup.classList.add('auto-search');   // 버튼줄 숨김 + 여백 조정
+
+    const kw = keyword.trim().toLowerCase();
+    const hits = SUGGEST_WORDS.filter(function (w) {
+      return w.toLowerCase().indexOf(kw) !== -1;
+    }).slice(0, 10);
+
+    if (hits.length === 0) {
+      wrap.innerHTML = '<p class="history-off-msg" style="display:block">추천 검색어가 없습니다.</p>';
+      return;
+    }
+
+    /* 입력한 글자와 겹치는 부분만 <strong> 로 감싸 파랗게 (원본 방식) */
+    wrap.innerHTML = hits.map(function (w) {
+      const at = w.toLowerCase().indexOf(kw);
+      const marked = escapeHtml(w.slice(0, at))
+        + '<strong>' + escapeHtml(w.slice(at, at + kw.length)) + '</strong>'
+        + escapeHtml(w.slice(at + kw.length));
+      return '<a href="#">' + marked + '</a>';
+    }).join('');
+  }
+
+  /* 사용자가 친 글자가 그대로 HTML 로 들어가지 않게 막음.
+     (예: <b> 를 치면 진짜 태그가 되어버리는 걸 방지 — XSS 라고 부름) */
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function open() {
+    if (input.value.trim() === '') renderHistory();
+    else renderSuggest(input.value);
+    popup.classList.add('is-open');
+  }
+
+  function close() {
+    popup.classList.remove('is-open');
+  }
+
+  /* --- 이벤트 --- */
+  input.addEventListener('focus', open);
+
+  input.addEventListener('input', function () {
+    open();   // 글자가 있으면 추천어, 지우면 다시 최근검색어
+  });
+
+  /* 검색을 실행하면 최근검색어에 추가 */
+  const form = box.closest('form');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();          // 아직 검색 결과 페이지가 없으므로 이동은 막음
+      const word = input.value.trim();
+      if (word && !isHistoryOff()) {
+        let list = loadHistory();
+        list = list.filter(function (w) { return w !== word; });   // 중복 제거
+        list.unshift(word);                                        // 맨 앞에 넣기
+        saveHistory(list.slice(0, 10));                            // 최대 10개
+      }
+      close();
+    });
+  }
+
+  /* 목록 안 클릭 처리 — 항목이 JS 로 계속 새로 그려지므로
+     각 항목에 직접 거는 대신 부모(wrap)에 한 번만 검 (이벤트 위임) */
+  wrap.addEventListener('click', function (e) {
+    const del = e.target.closest('.delete-kwdhistory');
+    if (del) {
+      e.preventDefault();
+      const list = loadHistory();
+      list.splice(Number(del.dataset.index), 1);
+      saveHistory(list);
+      renderHistory();
+      return;
+    }
+
+    const link = e.target.closest('a');
+    if (link) {
+      e.preventDefault();
+      input.value = link.textContent;
+      close();
+    }
+  });
+
+  if (delAll) {
+    delAll.addEventListener('click', function () {
+      saveHistory([]);
+      renderHistory();
+    });
+  }
+
+  if (onOff) {
+    onOff.addEventListener('click', function () {
+      setHistoryOff(!isHistoryOff());
+      renderHistory();
+    });
+  }
+
+  /* 바깥을 클릭하면 닫기.
+     ⚠ mousedown 을 쓰는 이유: click 은 목록 항목을 누를 때
+       "닫기" 가 먼저 실행돼서 항목 클릭이 씹힘 */
+  document.addEventListener('mousedown', function (e) {
+    if (!box.contains(e.target)) close();
+  });
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+}
+
+document.querySelectorAll('.header-search').forEach(setupSearchAutocomplete);
