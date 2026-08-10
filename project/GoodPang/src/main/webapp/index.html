@@ -1,3 +1,1122 @@
+<<<<<<< HEAD
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>달팡!</title>
+
+  <!-- ===== 웹폰트 (2026-08-04 추가) =====
+       폰트는 원래 "각자 PC에 깔린 것 중에서 찾아 쓰는" 방식이야.
+       그래서 Noto Sans KR이 없는 PC에서는 맑은 고딕으로 떨어지고,
+       글자 폭이 달라져서 → 줄바꿈이 달라지고 → 세로 간격이 전부 어긋남.
+
+       웹폰트는 그걸 막으려고 "폰트 파일 자체를 인터넷에서 받아오는" 방식이야.
+       이 줄이 있으면 폰트가 안 깔린 PC에서도 똑같이 보임.
+
+       preconnect 2줄은 "곧 이 서버에 접속할 거야"라고 브라우저에 미리 알려주는 것.
+       연결 준비를 앞당겨서 폰트가 조금 더 빨리 뜸. 없어도 동작은 함.a
+
+       wght@100..900 은 굵기 전 범위를 다 받는다는 뜻 (우리 PC에 깔린 VF 파일과 같은 범위).
+       display=swap 은 폰트를 받는 동안 글자를 숨기지 말고 일단 기본 폰트로 보여주라는 뜻.
+
+       ※ 인터넷이 없으면 이 줄은 무시되고 예전처럼 PC에 깔린 폰트를 씀 (화면이 깨지진 않음)
+       ※ 빼고 싶으면 이 3줄만 지우면 됨 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap">
+
+  <!-- CSS는 순서가 중요함! 위에서 아래로 덮어씀 -->
+  <link rel="stylesheet" href="css/reset.css"> <!-- 1. 브라우저 기본 스타일 지우기 -->
+  <link rel="stylesheet" href="css/common.css"> <!-- 2. 헤더/푸터 (모든 페이지 공통) -->
+  <link rel="stylesheet" href="css/main.css"> <!-- 3. 메인페이지 전용 -->
+</head>
+
+<body>
+
+  <!-- ==================================================
+       HEADER — 페이지 맨 위. 로고 / 검색 / 메뉴
+       쿠팡 원본: div#wa-header (높이 152px)
+       ================================================== -->
+  <header id="header">
+
+    <!-- ===== 회색 유틸바 (높이 33px, 배경 #f0f0f0) =====
+         원본: div#wa-top-bar
+         왼쪽  즐겨찾기 / 입점신청▼
+         오른쪽 로그인 / 회원가입 / 고객센터 / 판매자 가입
+         ※ 원본은 목록을 <menu> 태그로 쓰는데, <ul>과 기능이 완전히 같고
+           실무에서는 <ul>을 훨씬 많이 써서 우리는 <ul>로 만듦 -->
+    <div class="top-bar">
+      <div class="top-bar-inner">
+
+        <!-- 왼쪽 메뉴 (원본 menu#subscribeHeader) -->
+        <ul class="top-bar-left">
+          <li class="new-header">
+            <a href="#" class="bookmark">즐겨찾기</a>
+          </li>
+
+          <li class="vendor-join">
+            <!-- i.ic = 아래쪽 삼각형 ▼. 이미지가 아니라 CSS border로 그림 -->
+            <a href="#">입점신청<i class="ic"></i></a>
+
+            <!-- 마우스 올리면 나오는 드롭다운. JS 없이 CSS :hover로 처리 -->
+            <ul class="vendor-join-menu">
+              <li><a href="#">오픈마켓</a></li>
+              <li><a href="#">여행·티켓</a></li>
+              <li><a href="#">로켓배송</a></li>
+              <li><a href="#">제휴마케팅</a></li>
+              <li><a href="#">로켓그로스</a></li>
+            </ul>
+          </li>
+        </ul>
+
+        <!-- 오른쪽 메뉴 (원본 menu, 클래스 없음)
+             ★ 여기 li들은 float:right라서 "쓴 순서의 반대"로 화면에 배치됨.
+               제일 먼저 쓴 판매자 가입이 제일 오른쪽에 붙고,
+               그 다음 것들이 왼쪽으로 하나씩 밀려 들어옴.
+               → 화면에는 로그인 · 회원가입 · 고객센터 · 판매자 가입 순으로 보임 -->
+        <ul class="top-bar-right">
+          <li><a href="#">판매자 가입</a></li>
+
+          <li class="cs-center">
+            <a href="#">고객센터</a>
+            <ul class="cs-menu">
+              <li><a href="#">자주묻는 질문</a></li>
+              <li><a href="#">1:1 채팅문의</a></li>
+              <li><a href="#">고객의 소리</a></li>
+              <li><a href="#">취소 / 반품 안내</a></li>
+            </ul>
+          </li>
+
+          <li><a href="#">회원가입</a></li>
+          <li><a href="login.jsp">로그인</a></li>
+        </ul>
+
+      </div>
+    </div>
+
+    <!-- ===== 헤더 본체 (높이 119px) =====
+         ★ 구조 주의: 파란 카테고리 박스가 "로고줄 + GNB줄"을 통째로 왼쪽에서 걸침.
+           그래서 로고줄과 GNB가 형제가 아니라, 둘을 .header-col 로 한 번 묶고
+           그 묶음과 카테고리 박스를 가로로 나란히 놓는 구조야.
+
+               ┌──────────┬──────────────────────────────┐
+               │          │  로고 · 검색폼 · 아이콘 (59px) │
+               │ 카테고리  ├──────────────────────────────┤
+               │  110px   │  GNB (32px)                   │
+               └──────────┴──────────────────────────────┘
+                          ← .header-col (909px) →          -->
+    <div class="header-body">
+      <div class="header-inner">
+
+        <!-- ===== 파란 카테고리 버튼 + 펼쳐지는 대분류 패널 =====
+             ⚠ 패널(.category-layer)을 <button> 안에 넣을 수 없어서
+               (button 안에는 div 같은 걸 못 넣음 — HTML 규칙)
+               둘을 .category-wrap 으로 감쌌음.
+
+             ★ 이 패널은 JS가 없어도 동작함. CSS :hover 만으로 열림
+               (원본도 `.menu>li:hover .depth { display:block }` 방식) -->
+        <div class="category-wrap">
+
+          <!-- 파란 카테고리 버튼 110 x 119 -->
+          <button type="button" class="category-btn">
+            <!-- 햄버거 막대 3개. 이미지가 아니라 빈 태그에 배경색만 준 것 -->
+            <span class="category-bars"><i></i><i></i><i></i></span>
+            <span class="category-text">카테고리</span>
+          </button>
+
+          <!-- ⚠ 원본 HTML 에는 이 목록이 **비어 있음**.
+                 마우스를 올리는 순간 JS가 서버에서 받아와 채우는 방식이라
+                 스크래핑 시점엔 <ul class="menu"></ul> 만 있었음.
+                 그래서 CSS 는 원본 그대로 쓰되, 항목 내용은 우리가 채웠음.
+                 대분류 18개 이름은 원본에 남아있던 것(HOT!TREND 설정 목록)을 그대로 씀.
+                 세부 항목은 원본에 자료가 없어서 그럴듯하게 채운 임시 데이터. -->
+          <div class="category-layer" id="wa-pc-category">
+            <ul class="menu">
+
+              <li><a href="#">뷰티<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">스킨케어</a></li>
+                    <li><a href="#">메이크업</a></li>
+                    <li><a href="#">클렌징</a></li>
+                    <li><a href="#">헤어케어</a></li>
+                    <li><a href="#">바디케어</a></li>
+                    <li><a href="#">향수</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">여성패션<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">원피스</a></li>
+                    <li><a href="#">블라우스/셔츠</a></li>
+                    <li><a href="#">티셔츠</a></li>
+                    <li><a href="#">팬츠</a></li>
+                    <li><a href="#">스커트</a></li>
+                    <li><a href="#">아우터</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">남성패션<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">티셔츠</a></li>
+                    <li><a href="#">셔츠</a></li>
+                    <li><a href="#">팬츠</a></li>
+                    <li><a href="#">아우터</a></li>
+                    <li><a href="#">정장</a></li>
+                    <li><a href="#">언더웨어</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">식품<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">신선식품</a></li>
+                    <li><a href="#">정육/계란</a></li>
+                    <li><a href="#">쌀/잡곡</a></li>
+                    <li><a href="#">간편식</a></li>
+                    <li><a href="#">과자/간식</a></li>
+                    <li><a href="#">음료/생수</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">가구/홈인테리어<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">침대/매트리스</a></li>
+                    <li><a href="#">소파</a></li>
+                    <li><a href="#">책상/의자</a></li>
+                    <li><a href="#">수납/정리</a></li>
+                    <li><a href="#">조명</a></li>
+                    <li><a href="#">커튼/블라인드</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">가전/디지털<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">노트북</a></li>
+                    <li><a href="#">모니터</a></li>
+                    <li><a href="#">TV</a></li>
+                    <li><a href="#">냉장고</a></li>
+                    <li><a href="#">세탁기</a></li>
+                    <li><a href="#">이어폰/헤드폰</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">문구/오피스<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">노트/필기구</a></li>
+                    <li><a href="#">사무용지</a></li>
+                    <li><a href="#">파일/바인더</a></li>
+                    <li><a href="#">프린터용품</a></li>
+                    <li><a href="#">사무가구</a></li>
+                    <li><a href="#">포장용품</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">생활용품<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">화장지/물티슈</a></li>
+                    <li><a href="#">세제</a></li>
+                    <li><a href="#">청소용품</a></li>
+                    <li><a href="#">욕실용품</a></li>
+                    <li><a href="#">수납/정리</a></li>
+                    <li><a href="#">벌레퇴치</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">스포츠/레저<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">운동화</a></li>
+                    <li><a href="#">등산/캠핑</a></li>
+                    <li><a href="#">헬스/요가</a></li>
+                    <li><a href="#">자전거</a></li>
+                    <li><a href="#">골프</a></li>
+                    <li><a href="#">수영</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">헬스/건강식품<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">비타민</a></li>
+                    <li><a href="#">홍삼</a></li>
+                    <li><a href="#">유산균</a></li>
+                    <li><a href="#">오메가3</a></li>
+                    <li><a href="#">단백질보충제</a></li>
+                    <li><a href="#">다이어트</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">출산/유아동<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">기저귀</a></li>
+                    <li><a href="#">분유/이유식</a></li>
+                    <li><a href="#">물티슈</a></li>
+                    <li><a href="#">유모차</a></li>
+                    <li><a href="#">카시트</a></li>
+                    <li><a href="#">젖병/수유</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">유아동패션<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">아기옷</a></li>
+                    <li><a href="#">아동복</a></li>
+                    <li><a href="#">아동신발</a></li>
+                    <li><a href="#">내복/잠옷</a></li>
+                    <li><a href="#">외출복</a></li>
+                    <li><a href="#">모자/양말</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">주방용품<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">냄비/프라이팬</a></li>
+                    <li><a href="#">식기/그릇</a></li>
+                    <li><a href="#">컵/텀블러</a></li>
+                    <li><a href="#">조리도구</a></li>
+                    <li><a href="#">밀폐용기</a></li>
+                    <li><a href="#">주방수납</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">반려동물용품<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">강아지사료</a></li>
+                    <li><a href="#">고양이사료</a></li>
+                    <li><a href="#">간식</a></li>
+                    <li><a href="#">배변용품</a></li>
+                    <li><a href="#">장난감</a></li>
+                    <li><a href="#">미용/목욕</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">완구/취미<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">블록/조립</a></li>
+                    <li><a href="#">인형</a></li>
+                    <li><a href="#">보드게임</a></li>
+                    <li><a href="#">프라모델</a></li>
+                    <li><a href="#">악기</a></li>
+                    <li><a href="#">그림/공예</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">자동차용품<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">타이어</a></li>
+                    <li><a href="#">엔진오일</a></li>
+                    <li><a href="#">블랙박스</a></li>
+                    <li><a href="#">세차용품</a></li>
+                    <li><a href="#">방향제</a></li>
+                    <li><a href="#">실내용품</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">도서/CD/DVD<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">소설/에세이</a></li>
+                    <li><a href="#">자기계발</a></li>
+                    <li><a href="#">어린이</a></li>
+                    <li><a href="#">만화</a></li>
+                    <li><a href="#">외국어</a></li>
+                    <li><a href="#">음반/DVD</a></li>
+                  </ul>
+                </div>
+              </li>
+
+              <li><a href="#">여행<i class="si"></i></a>
+                <div class="depth">
+                  <ul>
+                    <li><a href="#">국내숙소</a></li>
+                    <li><a href="#">해외숙소</a></li>
+                    <li><a href="#">항공권</a></li>
+                    <li><a href="#">렌터카</a></li>
+                    <li><a href="#">투어/티켓</a></li>
+                    <li><a href="#">캠핑/글램핑</a></li>
+                  </ul>
+                </div>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+
+        <!-- 오른쪽 세로 묶음: 로고줄 + GNB줄 -->
+        <div class="header-col">
+
+          <!-- ----- 로고 + 검색폼 + 아이콘메뉴 (59px) ----- -->
+          <div class="header-main">
+
+            <!-- 로고: 이미지가 없어서 글자로 만듦.
+                 색은 ref/coupang_main_full.jpeg 에서 픽셀을 직접 뽑은 값 -->
+            <h1 class="logo">
+              <a href="#" title="쿠팡 홈으로">
+                <span class="l1">c</span><span class="l1">o</span><span class="l1">u</span><span
+                  class="l2">p</span><span class="l3">a</span><span class="l4">n</span><span class="l5">g</span>
+              </a>
+            </h1>
+
+            <!-- 검색폼 (높이 41px, 파란 테두리 2px) -->
+            <form class="search-form" action="#" method="get">
+
+              <!-- 왼쪽 "전체" 드롭다운 (135 x 37) -->
+              <div class="select--category">
+                <a href="#" class="select--category__current">전체</a>
+                <span class="select--category--button"></span>
+              </div>
+
+              <!-- 실제 검색창 -->
+              <div class="header-search">
+                <!-- label 은 화면엔 안 보이지만 화면낭독기가 읽어줌 -->
+                <label for="search-keyword" class="blind">상품 검색</label>
+                <input type="text" id="search-keyword" name="q" class="search-keyword" placeholder="찾고 싶은 상품을 검색해보세요!"
+                  maxlength="150" autocomplete="off">
+                <!-- TODO: 자동완성/인기검색어 목록 -->
+              </div>
+
+              <!-- 마이크는 <img> 가 아니라 배경이미지로 넣음.
+                   mic.png 한 장에 마이크가 위아래로 2개(회색/파랑) 들어있어서,
+                   그중 한 개만 잘라 보여줘야 하거든. 자세한 건 common.css 참고 -->
+              <a href="#" class="speech-mic"><span class="blind">음성검색</span></a>
+
+              <button type="submit" class="search-btn" title="검색">
+                <img src="images/icons/search.png" width="20" height="21" alt="검색">
+              </button>
+            </form>
+
+            <!-- ===== 마이쿠팡 / 장바구니 =====
+                 드롭다운 2개 다 JS 없이 CSS :hover 로 열림.
+                 원본도 같은 방식(Tailwind 의 group-hover = 부모에 마우스 올리면 자식 표시) -->
+            <ul class="icon-menus">
+              <li class="my-coupang">
+                <a href="#">
+                  <img src="images/icons/person.png" width="44" height="44" alt="">
+                  <span class="icon-label">마이쿠팡</span>
+                </a>
+
+                <!-- 마우스 올리면 뜨는 목록. i.arrow 는 위쪽을 가리키는 작은 삼각형인데
+                     이미지가 아니라 "네모를 45도 돌려서" 만든 것 -->
+                <p class="my-coupang-menu">
+                  <span class="wrapper">
+                    <i class="arrow"></i>
+                    <a href="#">주문목록</a>
+                    <a href="#">취소/반품</a>
+                    <a href="#">찜 리스트</a>
+                  </span>
+                </p>
+              </li>
+
+              <li class="cart">
+                <a href="#">
+                  <img src="images/icons/cart.png" width="44" height="44" alt="">
+                  <!-- 파란 동그라미 개수 배지. 이건 원본도 이미지가 아니라 CSS -->
+                  <em class="cart-count">0</em>
+                  <span class="icon-label">장바구니</span>
+                </a>
+
+                <!-- 장바구니 미리보기.
+                     ※ 원본은 담긴 상품을 서버에서 받아와 보여주지만,
+                       우리는 담긴 상품이 없으니 "비어있음" 화면을 씀.
+                       이 문구도 원본 HTML 에 그대로 있던 것 -->
+                <div class="cart-preview">
+                  <span class="wrapper">
+                    <i class="arrow"></i>
+                    <ul>
+                      <li class="empty-cart">장바구니에 담은 상품이 없습니다.</li>
+                    </ul>
+                    <a href="#" class="cart-btn">
+                      <span>장바구니 전체보기<i class="blue-arrow"></i></span>
+                    </a>
+                  </span>
+                </div>
+              </li>
+            </ul>
+
+          </div>
+
+          <!-- ----- GNB = Global Navigation Bar (전체 메뉴). 높이 32px -----
+               메뉴가 16개라 가로로 넘쳐서, 좌우 화살표로 밀어 보는 구조야.
+
+               핵심 장치 3개:
+                 .gnb-menu-container  실제로 보이는 창. overflow:hidden 으로 넘친 건 자름
+                 .gnb-menu-viewport   폭 0짜리 빈 상자. 아래 ul 이 여기 갇히지 않고
+                                      자유롭게 오른쪽으로 뻗어나가게 하는 용도 (원본 방식)
+                 .gnb-menu-scroll     진짜 목록. 폭을 9999px 로 크게 잡아두고
+                                      left 값을 JS로 바꿔서 좌우로 밀어냄 -->
+          <nav class="gnb">
+            <h2 class="blind">주요 서비스 바로가기</h2>
+
+            <div class="gnb-menu-container">
+
+              <!-- 처음엔 왼쪽으로 밀 데가 없으므로 active 를 빼둠(연회색).
+                   JS 가 스크롤 위치에 따라 이 클래스를 붙였다 뗐다 함 -->
+              <button type="button" class="gnb-menu-btn gnb-menu-btn-left" disabled>
+                <span class="blind">이전 메뉴 보기</span>
+              </button>
+
+              <div class="gnb-menu-viewport">
+                <ul class="gnb-menu-scroll">
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/coupang-play.png"
+                        alt=""><span>쿠팡플레이</span></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/rocket-delivery.png"
+                        alt=""><span>로켓배송</span></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/rocket-fresh.png"
+                        alt=""><span>로켓프레시</span></a></li>
+                  <!-- i.in = 빨간 N 배지. 이미지가 아니라 CSS로 그림.
+                       화면낭독기에는 "신규"로 읽히게 blind 텍스트를 같이 넣음 -->
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/fbi_icon_3x.png" alt=""><span>다시
+                        구매</span><i class="in">N<span class="blind">신규</span></i></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/biz.png" alt=""><span>쿠팡비즈</span></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/oversea-delivery.png"
+                        alt=""><span>로켓직구</span></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/gold-box.png" alt=""><span>골드박스</span></a>
+                  </li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/new-item-of-month.png" alt=""><span>이달의
+                        신상</span></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/sell-on-coupang.png"
+                        alt=""><span>입점신청</span></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/omp.png" alt=""><span>판매자특가</span></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/wow.png" alt=""><span>와우회원 할인</span></a>
+                  </li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/benefit.png" alt=""><span>이벤트/쿠폰</span></a>
+                  </li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/returned-market.png"
+                        alt=""><span>반품마켓</span></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/sustainable-market.png"
+                        alt=""><span>착한상점</span><i class="in">N<span class="blind">신규</span></i></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/event.png" alt=""><span>기획전</span></a></li>
+                  <li class="gnb-menu-item"><a href="#"><img src="images/gnb/travel.png" alt=""><span>쿠팡트래블</span><i
+                        class="in">N<span class="blind">신규</span></i></a></li>
+                </ul>
+              </div>
+
+              <button type="button" class="gnb-menu-btn gnb-menu-btn-right gnb-menu-btn-active">
+                <span class="blind">다음 메뉴 보기</span>
+              </button>
+
+            </div>
+          </nav>
+
+        </div>
+      </div>
+    </div>
+
+  </header>
+
+
+  <!-- ==================================================
+       MAIN — 이 페이지의 진짜 본문. 페이지당 딱 1개만!
+       쿠팡 원본: div.home-page (본문 컬럼 max-width 1020px)
+       ================================================== -->
+  <main class="home-page">
+
+    <!-- ===== 히어로 배너 (높이 450px) =====
+         원본: section#todaysHot.main-today
+
+         핵심 아이디어: 배경 이미지 6장을 position:absolute 로 "같은 자리에 겹쳐" 쌓아두고
+         그중 1장만 보이게 함(.is-on). 나중에 JS가 이 클래스를 옮기면 슬라이드가 됨.
+
+         폭이 두 종류라 상자가 두 겹이야:
+           .main-today               ← 화면 전체 폭 (배경이 끝에서 끝까지 깔림)
+           .main-today__selected-product ← 가운데 1020px (썸네일이 여기 오른쪽에 붙음)
+
+         ※ 원본은 좌우 화살표와 "1/6" 표시도 CSS엔 있는데 실제 HTML엔 없음.
+           안 쓰는 변형이라 우리도 안 만듦 -->
+    <section class="main-today" id="todaysHot">
+      <h2 class="blind">오늘의 추천</h2>
+
+      <div class="main-today__desktop-slide">
+
+        <!-- 배경 6장. 지금은 1번만 .is-on -->
+        <img class="main-today__bg is-on" src="images/banners/hero-bg-1.jpg" alt="">
+        <img class="main-today__bg" src="images/banners/hero-bg-2.jpg" alt="">
+        <img class="main-today__bg" src="images/banners/hero-bg-3.jpg" alt="">
+        <img class="main-today__bg" src="images/banners/hero-bg-4.jpg" alt="">
+        <img class="main-today__bg" src="images/banners/hero-bg-5.jpg" alt="">
+        <img class="main-today__bg" src="images/banners/hero-bg-6.jpg" alt="">
+
+        <div class="main-today__selected-product">
+
+          <!-- 배너를 클릭하면 이동할 투명 링크. 배경과 똑같이 6장을 겹쳐두고 1개만 활성.
+               가운데 1020px 안에서만 클릭이 먹는 건 원본도 마찬가지야 -->
+          <div class="main-today__img-container">
+            <a href="#" class="today-image is-on"><span class="blind">1번 배너 바로가기</span></a>
+            <a href="#" class="today-image"><span class="blind">2번 배너 바로가기</span></a>
+            <a href="#" class="today-image"><span class="blind">3번 배너 바로가기</span></a>
+            <a href="#" class="today-image"><span class="blind">4번 배너 바로가기</span></a>
+            <a href="#" class="today-image"><span class="blind">5번 배너 바로가기</span></a>
+            <a href="#" class="today-image"><span class="blind">6번 배너 바로가기</span></a>
+          </div>
+
+          <!-- 오른쪽 위 썸네일 6개 (180 x 60). 지금 보고 있는 것은 .today-selected -->
+          <ul class="main-today--thumb-nails">
+            <li class="todayshot-right-thumbnail first-item today-selected">
+              <a href="#"><img src="images/banners/hero-thumb-1.jpg" width="180" height="60" alt="1번 배너"><span
+                  class="mask"></span></a>
+            </li>
+            <li class="todayshot-right-thumbnail">
+              <a href="#"><img src="images/banners/hero-thumb-2.jpg" width="180" height="60" alt="2번 배너"><span
+                  class="mask"></span></a>
+            </li>
+            <li class="todayshot-right-thumbnail">
+              <a href="#"><img src="images/banners/hero-thumb-3.jpg" width="180" height="60" alt="3번 배너"><span
+                  class="mask"></span></a>
+            </li>
+            <li class="todayshot-right-thumbnail">
+              <a href="#"><img src="images/banners/hero-thumb-4.jpg" width="180" height="60" alt="4번 배너"><span
+                  class="mask"></span></a>
+            </li>
+            <li class="todayshot-right-thumbnail">
+              <a href="#"><img src="images/banners/hero-thumb-5.jpg" width="180" height="60" alt="5번 배너"><span
+                  class="mask"></span></a>
+            </li>
+            <li class="todayshot-right-thumbnail">
+              <a href="#"><img src="images/banners/hero-thumb-6.jpg" width="180" height="60" alt="6번 배너"><span
+                  class="mask"></span></a>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 오늘의 발견 (.today-discovery) =====
+         원본: div#todayDiscoveryUnit.today-discovery
+         큰 배너 2개(half-width, 468x298) + 작은 배너 4개(quarter-width, 228x298).
+         grid-template-columns: repeat(4,1fr) 라서
+         half-width(2칸)×2 = 4칸 → 1행 다 채우고, quarter-width(1칸)×4 가 2행을 채움.
+
+         ⚠ 진짜 배너 이미지가 없어서 지금은 회색 상자로 자리만 잡음.
+           이미지가 생기면 .tti-placeholder 를
+           <img class="tti-image" src="..." alt=""> 로 바꾸면 됨 -->
+    <section class="today-discovery">
+      <div class="title">
+        <h2>오늘의 발견</h2>
+        <h3>지금 가장 인기가 많은 요즘 HOT한 상품!</h3>
+      </div>
+
+      <div class="discovery-list">
+        <ul class="banner-list prod-list">
+          <li class="half-width">
+            <a href="#">
+              <span class="tti-placeholder"></span>
+              <div class="go-btn">
+                <p>구매하기</p>
+              </div>
+              <span class="mask">&nbsp;</span>
+            </a>
+          </li>
+          <li class="half-width">
+            <a href="#">
+              <span class="tti-placeholder"></span>
+              <div class="go-btn">
+                <p>구매하기</p>
+              </div>
+              <span class="mask">&nbsp;</span>
+            </a>
+          </li>
+          <li class="quarter-width">
+            <a href="#">
+              <span class="tti-placeholder"></span>
+              <div class="go-btn">
+                <p>구매하기</p>
+              </div>
+              <span class="mask">&nbsp;</span>
+            </a>
+          </li>
+          <li class="quarter-width">
+            <a href="#">
+              <span class="tti-placeholder"></span>
+              <div class="go-btn">
+                <p>구매하기</p>
+              </div>
+              <span class="mask">&nbsp;</span>
+            </a>
+          </li>
+          <li class="quarter-width">
+            <a href="#">
+              <span class="tti-placeholder"></span>
+              <div class="go-btn">
+                <p>구매하기</p>
+              </div>
+              <span class="mask">&nbsp;</span>
+            </a>
+          </li>
+          <li class="quarter-width">
+            <a href="#">
+              <span class="tti-placeholder"></span>
+              <div class="go-btn">
+                <p>구매하기</p>
+              </div>
+              <span class="mask">&nbsp;</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== HOT! TREND (.category-best) =====
+         원본: div#categoryBestUnit.category-best
+
+         ★ 원본에는 "가로 탭"이 없음. 카테고리 18개가 그냥 세로로 쭉 쌓여 있음.
+           (그래서 이 섹션 하나의 높이가 11,448px)
+           클릭해서 바꾸는 게 아니라 스크롤로 다 보는 구조야.
+           원본의 .category-menu 는 탭이 아니라 "스크롤 따라다니는 세로 아이콘 줄"인데,
+           아이콘이 SVG 스프라이트라 이미지가 없고 JS도 필요해서 우리는 안 만듦.
+
+         유닛 하나의 구조 (가로 3단):
+           ┌────────┬──────────┬─────────────────┐
+           │ .left  │.promotion│.best-product-list│
+           │ 148px  │  326px   │   나머지(547px)  │
+           │카테고리 │ 세로배너  │   상품 3열 x 2줄  │
+           │HOT키워드│          │                 │
+           └────────┴──────────┴─────────────────┘
+
+         지금은 3개(뷰티/여성패션/식품)만 샘플로 만듦. 나머지는 복사해서 늘리면 됨.
+
+         ⚠ 상품 데이터가 products.json 6개뿐이라 세 카테고리가 같은 상품을 공유함.
+           대신 카테고리에 어울리는 것부터 앞에 오도록 순서만 바꿔놨음 -->
+    <section class="category-best">
+      <h2 class="title">HOT! TREND</h2>
+      <!-- 부제목 2줄. 뒤쪽 h3만 파란색(원본 #3b7dff) -->
+      <div class="sub-title">
+        <h3>카테고리별</h3>
+        <h3>추천 인기상품</h3>
+      </div>
+
+
+      <!-- ───────────── 1. 뷰티 (보라 #7e57c2) ───────────── -->
+      <div class="category-best-unit beauty">
+        <div class="category-best-content">
+
+          <!-- 왼쪽: 카테고리명 + HOT키워드
+               ※ 원본은 <dt>/<dd>를 <dl> 없이 씀 — 문법상 틀린 HTML이야.
+                 우리는 과제 평가가 있으니 <dl>로 제대로 감쌈 -->
+          <div class="left">
+            <dl>
+              <dt class="category-title">
+                <p class="title">뷰티</p>
+                <a href="#" class="go-category">바로가기 &gt;</a>
+              </dt>
+              <dd class="hot-keyword">
+                <strong class="hot-keyword-title">HOT키워드</strong>
+                <a href="#" class="keyword">#수분토너</a>
+                <a href="#" class="keyword">#에센스/세럼/앰플</a>
+                <a href="#" class="keyword">#아이라이너</a>
+                <a href="#" class="keyword">#립틴트</a>
+                <a href="#" class="keyword">#톤업크림</a>
+                <a href="#" class="keyword">#클렌징티슈</a>
+              </dd>
+            </dl>
+          </div>
+
+          <!-- 가운데: 세로 광고배너 (원본 325x600 이미지 + 아래쪽 색 캡션) -->
+          <div class="promotion">
+            <a href="#" class="promotion-link">
+              <span class="promo-placeholder"></span>
+              <span class="caption">
+                <strong class="promotion-title">헤어&amp;바디케어 베스트템</strong>
+                <span class="promotion-description">지금 구매하기</span>
+              </span>
+            </a>
+          </div>
+
+          <!-- 오른쪽: 상품 3열 -->
+          <div class="best-product-list">
+            <ul class="prod-list">
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">글로스앤글로우 국내생산 핫컬링 뿌리볼륨 롤브러쉬 1호 16파이, 블랙, 1개</span>
+                  <div class="price"><strong>8,200원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">코멧 3겹 데코 크린 롤화장지, 30m, 30롤</span>
+                  <div class="price"><strong>15,900원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">탐사수 무라벨 生수, 500ml, 40개</span>
+                  <div class="price"><strong>7,690원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">삼다수 무라벨 生수 2L, 12개</span>
+                  <div class="price"><strong>11,900원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">곰곰 국내산 백미, 10kg, 1개</span>
+                  <div class="price"><strong>29,900원</strong><span class="badge-rocket">로켓배송</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">애플 2024 맥북 에어 13 M3, 스페이스 그레이, 256GB, 8GB</span>
+                  <div class="price"><strong>1,390,000원</strong></div>
+                </a></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ───────────── 2. 여성패션 (분홍 #f6699e) ───────────── -->
+      <div class="category-best-unit womanclothe">
+        <div class="category-best-content">
+
+          <div class="left">
+            <dl>
+              <dt class="category-title">
+                <p class="title">여성패션</p>
+                <a href="#" class="go-category">바로가기 &gt;</a>
+              </dt>
+              <dd class="hot-keyword">
+                <strong class="hot-keyword-title">HOT키워드</strong>
+                <a href="#" class="keyword">#원피스</a>
+                <a href="#" class="keyword">#블라우스/셔츠</a>
+                <a href="#" class="keyword">#티셔츠</a>
+                <a href="#" class="keyword">#스커트</a>
+                <a href="#" class="keyword">#스니커즈</a>
+                <a href="#" class="keyword">#가방</a>
+              </dd>
+            </dl>
+          </div>
+
+          <div class="promotion">
+            <a href="#" class="promotion-link">
+              <span class="promo-placeholder"></span>
+              <span class="caption">
+                <strong class="promotion-title">장마 대비 아이템 SALE</strong>
+                <span class="promotion-description">레인부츠 / 우산 / 우비 외</span>
+              </span>
+            </a>
+          </div>
+
+          <div class="best-product-list">
+            <ul class="prod-list">
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">코멧 3겹 데코 크린 롤화장지, 30m, 30롤</span>
+                  <div class="price"><strong>15,900원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">글로스앤글로우 국내생산 핫컬링 뿌리볼륨 롤브러쉬 1호 16파이, 블랙, 1개</span>
+                  <div class="price"><strong>8,200원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">애플 2024 맥북 에어 13 M3, 스페이스 그레이, 256GB, 8GB</span>
+                  <div class="price"><strong>1,390,000원</strong></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">삼다수 무라벨 生수 2L, 12개</span>
+                  <div class="price"><strong>11,900원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">탐사수 무라벨 生수, 500ml, 40개</span>
+                  <div class="price"><strong>7,690원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">곰곰 국내산 백미, 10kg, 1개</span>
+                  <div class="price"><strong>29,900원</strong><span class="badge-rocket">로켓배송</span></div>
+                </a></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ───────────── 3. 식품 (주황 #ee9200) ───────────── -->
+      <div class="category-best-unit food">
+        <div class="category-best-content">
+
+          <div class="left">
+            <dl>
+              <dt class="category-title">
+                <p class="title">식품</p>
+                <a href="#" class="go-category">바로가기 &gt;</a>
+              </dt>
+              <dd class="hot-keyword">
+                <strong class="hot-keyword-title">HOT키워드</strong>
+                <a href="#" class="keyword">#생수</a>
+                <a href="#" class="keyword">#즉석밥</a>
+                <a href="#" class="keyword">#라면</a>
+                <a href="#" class="keyword">#커피</a>
+                <a href="#" class="keyword">#과일</a>
+                <a href="#" class="keyword">#견과류</a>
+              </dd>
+            </dl>
+          </div>
+
+          <div class="promotion">
+            <a href="#" class="promotion-link">
+              <span class="promo-placeholder"></span>
+              <span class="caption">
+                <strong class="promotion-title">집으로 오는 나만의 맛집</strong>
+                <span class="promotion-description">지금 구매하기</span>
+              </span>
+            </a>
+          </div>
+
+          <div class="best-product-list">
+            <ul class="prod-list">
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">삼다수 무라벨 生수 2L, 12개</span>
+                  <div class="price"><strong>11,900원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">곰곰 국내산 백미, 10kg, 1개</span>
+                  <div class="price"><strong>29,900원</strong><span class="badge-rocket">로켓배송</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">탐사수 무라벨 生수, 500ml, 40개</span>
+                  <div class="price"><strong>7,690원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">글로스앤글로우 국내생산 핫컬링 뿌리볼륨 롤브러쉬 1호 16파이, 블랙, 1개</span>
+                  <div class="price"><strong>8,200원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">코멧 3겹 데코 크린 롤화장지, 30m, 30롤</span>
+                  <div class="price"><strong>15,900원</strong><span class="badge-rocket">로켓배송</span><span
+                      class="badge-tomorrow">내일도착</span></div>
+                </a></li>
+              <li><a href="#" class="product-unit">
+                  <span class="thumb-placeholder"></span>
+                  <span class="name">애플 2024 맥북 에어 13 M3, 스페이스 그레이, 256GB, 8GB</span>
+                  <div class="price"><strong>1,390,000원</strong></div>
+                </a></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ==================================================
+       ASIDE — 본문 옆 곁다리 내용. 없어도 페이지가 성립하는 것
+       쿠팡 원본: article#wa-sidebar (폭 102px, position:absolute)
+       ================================================== -->
+  <aside class="side-banner">
+    <!-- 화면엔 안 보이지만 화면낭독기용 제목. <aside>에도 제목이 있어야 좋음 -->
+    <h2 class="blind">추천 배너 및 최근 본 상품</h2>
+
+    <!-- 세로 광고배너 7장 (원본 이미지 크기 102 x 150) -->
+    <ul class="promotion-banner">
+      <li><a href="#" class="banner-link"><span class="wing-placeholder">분식집 맛<br>그대로</span></a></li>
+      <li><a href="#" class="banner-link"><span class="wing-placeholder">그릭요거트<br>샤베트</span></a></li>
+      <li><a href="#" class="banner-link"><span class="wing-placeholder">쿠팡 only</span></a></li>
+      <li><a href="#" class="banner-link"><span class="wing-placeholder">여행 선착순<br>반값 할인</span></a></li>
+      <li><a href="#" class="banner-link"><span class="wing-placeholder">쿠팡이 직접<br>수입했어요!</span></a></li>
+      <li><a href="#" class="banner-link"><span class="wing-placeholder">금주의<br>특가왕</span></a></li>
+      <li><a href="#" class="banner-link"><span class="wing-placeholder">쿠팡에서<br>판매시작하기</span></a></li>
+    </ul>
+
+    <!-- ===== 최근 본 상품 =====
+         ⚠ 원본도 이 영역은 기본적으로 안 보임 (height:0 + overflow:hidden).
+           본 상품이 생기면 JS가 .show 를 붙여서 펼치는 구조야.
+           지금은 JS가 없어서 계속 접혀 있는 게 정상 —
+           구조를 미리 잡아둔 거라 나중에 .show 만 붙이면 됨 -->
+    <section class="recent-view">
+      <div class="side-cart">
+        <a href="#"><span>장바구니</span><em class="cart-count">0</em></a>
+      </div>
+      <div class="recently-viewed-products">
+        <span>최근본상품</span><em class="total-element">0</em>
+      </div>
+    </section>
+  </aside>
+
+
+  <!-- 맨 위로 버튼 (스크롤 내리면 나타남) -->
+  <button type="button" id="goto-top" class="goto-top">TOP</button>
+
+
+  <!-- ==================================================
+       FOOTER — 페이지 맨 아래. 회사정보 / 약관 / 고객센터
+       쿠팡 원본: footer#wa-footer (높이 428px)
+       ================================================== -->
+  <footer id="footer">
+
+    <!-- ── 1층: 링크 13개 + 국가선택 ───────────────────────
+         href="#"인 이유: 클론이라 실제로 이동할 페이지가 없음.
+         진짜 링크를 넣으면 클릭할 때마다 쿠팡으로 나가버려서 확인이 불편함 -->
+    <div class="footer-layer1">
+      <div class="footer-links">
+        <a href="#">회사소개</a>
+        <a href="#">Investor Relations</a>
+        <a href="#">인재채용</a>
+        <a href="#">입점/제휴문의</a>
+        <a href="#">공지사항</a>
+        <a href="#">고객의 소리</a>
+        <a href="#">이용약관</a>
+        <!-- 개인정보 처리방침만 굵게 = 법적으로 강조 표시 의무가 있어서 -->
+        <a href="#"><strong>개인정보 처리방침</strong></a>
+        <a href="#">정보보호/개인정보보호 인증</a>
+        <a href="#">쿠팡페이 이용약관</a>
+        <a href="#">신뢰관리센터</a>
+        <a href="#">제휴마케팅</a>
+        <a href="#">광고안내</a>
+      </div>
+
+      <!-- 국가 선택 드롭다운.
+           JS 없이 CSS :hover 만으로 열리게 만들었음 (원본도 hover 방식) -->
+      <div class="site-picker">
+        <span class="site-picker-label">
+          <p>Global Site</p>
+          <span class="site-picker-arrow"></span>
+        </span>
+        <ul>
+          <li><a href="#">Coupang Taiwan 酷澎台灣</a></li>
+        </ul>
+      </div>
+    </div>
+
+
+    <!-- ── 2층: 회사정보 / 고객센터 / 채무지급보증 3칸 ─────── -->
+    <div class="footer-layer2">
+
+      <!-- <address> = 연락처·주소 전용 시맨틱 태그.
+           쿠팡 원본도 여기만큼은 address를 제대로 씀 -->
+      <address>
+        <!-- 로고 이미지가 아직 없어서 글자로 대체.
+             images/icons/logo-gray.png 준비되면 <img>로 바꾸면 됨 -->
+        <a href="#" class="footer-logo">coupang</a>
+        <div class="company-info">
+          상호명 및 호스팅 서비스 제공 : 쿠팡(주) <br>
+          대표이사 : 로저스 해롤드 린(Rogers Harold Lynn) <br>
+          (05050) 서울시 광진구 아차산로 412, 2층 <br>
+          사업자 등록번호 : 120-88-00767 <br>
+          통신판매업신고 : 2026-서울광진-1253 <br>
+          <a href="#" class="licensee">사업자정보 확인 &gt;</a>
+        </div>
+      </address>
+
+      <div class="contact-info">
+        <a href="#" class="call-center">
+          <strong>365고객센터</strong> | 전자금융거래분쟁처리담당 <br>
+          <em>1577-7011 (유료)</em>
+          (05050) 서울시 광진구 아차산로 412, 2층 <br>
+          <span class="contact-fax">email : help@coupang.com</span>
+        </a>
+      </div>
+
+      <p class="safe-service">
+        <strong>채무지급보증 안내</strong> <br>
+        <span>
+          당사는 고객님이 현금 결제한 금액에 대해 <br>
+          채무지급보증 계약을 체결하여 <br>
+          안전거래를 보장하고 있습니다. <br>
+        </span>
+        <a href="#" class="service-check">서비스 가입사실 확인 &gt;</a>
+      </p>
+
+    </div>
+
+
+    <!-- 가로 구분선. 내용이 없고 선만 긋는 용도라 빈 div -->
+    <div class="footer-divider"></div>
+
+    <!-- 인증마크 2줄. 이미지가 아직 없어서 점선 상자로 자리만 잡아둠.
+         자리를 비워두면 아래 저작권 영역이 52px 위로 올라와서 원본과 간격이 달라짐 -->
+    <div class="footer-awards">
+      <span class="award-placeholder" style="width: 89px;">위해상품<br>차단시스템</span>
+      <span class="award-placeholder" style="width: 55px;">PCR</span>
+    </div>
+
+
+    <!-- ── 3층: 저작권 + SNS (어두운 회색 배경) ─────────────── -->
+    <div class="footer-layer4">
+      <div class="coupang-copyright">
+        <p class="info">
+          사이버몰 내 판매되는 상품 중에는 쿠팡에 등록한 개별 판매자가 판매하는
+          마켓플레이스(오픈마켓) 상품이 포함되어 있습니다. <br>
+          마켓플레이스(오픈마켓) 상품의 경우 쿠팡은 통신판매중개자이며 통신판매의 당사자가
+          아닙니다. <br>
+          쿠팡은 마켓플레이스(오픈마켓) 상품, 거래정보 및 거래 등에 대하여 책임을 지지 않습니다. <br>
+          쿠팡은 소비자 보호와 안전거래를 위해 신뢰관리센터(CM112@coupang.com)를 운영하고
+          있으며, 관련 분쟁이 발생할 경우 별도의 분쟁 처리절차에 의거 분쟁이 처리됩니다. <br>
+          Copyright © Coupang Corp. 2010-2025 All Rights Reserved.
+        </p>
+
+        <!-- SNS 아이콘도 이미지가 없어서 CSS로 동그라미 + 글자.
+             .blind = 화면엔 안 보이지만 화면낭독기는 읽어줌 (reset.css에 있음) -->
+        <ul class="sns-link">
+          <li><a href="#" class="facebook"><span class="blind">페이스북</span></a></li>
+          <li><a href="#" class="blog"><span class="blind">블로그</span></a></li>
+          <li><a href="#" class="instagram"><span class="blind">인스타그램</span></a></li>
+        </ul>
+      </div>
+    </div>
+
+  </footer>
+
+
+  <!-- JS는 </body> 바로 앞에! HTML을 다 읽은 뒤에 실행되게 하려고 -->
+  <script src="js/header.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+
+=======
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -1115,4 +2234,5 @@
 
 </body>
 
+>>>>>>> branch 'main' of https://github.com/gmake20/sist_coupang_2026.git
 </html>
