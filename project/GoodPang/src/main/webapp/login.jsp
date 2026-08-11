@@ -115,12 +115,6 @@
 			</div>
 		</main>
 
-		<!-- 하단 푸터 -->
-		<footer class="login-footer">
-			<p>&copy;Coupang Corp. All rights reserved.</p>
-		</footer>
-	</div>
-
 	<script src="${pageContext.request.contextPath}/js/login.js"></script>
 	<!-- 하단 푸터 -->
 	<footer class="login-footer">
