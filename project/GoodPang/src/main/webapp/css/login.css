@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 /* 전역 스타일 및 box-sizing 설정 */
 * {
     box-sizing: border-box;
@@ -302,7 +302,7 @@ body {
     margin-top: 30px;
     font-size: 11px;
     color: #888;
-=======
+}
 * {
   box-sizing: border-box;
 }
@@ -359,7 +359,24 @@ body {
   transform-origin: center center;
 }
 
+/* ============================= */
 
+/* 로고 기본 스타일 및 폰트 설정 */
+.logo a {
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  font-size: 40px;       /* 필요에 따라 크기 조절 가능 */
+  font-weight: 900;      /* 굵은 글씨체 */
+  letter-spacing: -1.5px; /* 글자 간격 축소 */
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* 쿠팡 글자별 색상 지정 */
+.logo .l1 { color: #503112; } /* c, o, u : 갈색/어두운 톤 */
+.logo .l2 { color: #f43142; } /* p : 쿠팡 레드 (var(--coupang-red)) */
+.logo .l3 { color: #ffb100; } /* a : 옐로우/오렌지 */
+.logo .l4 { color: #00ca00; } /* n : 그린 */
+.logo .l5 { color: #346aff; } /* g : 쿠팡 블루 (var(--coupang-blue)) */
 /* =========================
    로그인 탭
 ========================= */
