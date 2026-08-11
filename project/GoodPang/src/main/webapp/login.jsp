@@ -13,11 +13,12 @@
 
 <body>
 	<div class="login-wrapper">
-	<!-- 상단 로고 -->
+
+<!-- 상단 로고 -->
 <header class="login-header">
     <h1 class="logo">
-        <a href="${pageContext.request.contextPath}/index.html" title="쿠팡 홈으로" style="text-decoration: none; font-size: 46px; font-weight: 900; font-family: Arial, sans-serif; letter-spacing: -2px; display: inline-block;">
-            <span style="color: #552816;">c</span><span style="color: #552816;">o</span><span style="color: #552816;">u</span><span style="color: #f43142;">p</span><span style="color: #f2aa00;">a</span><span style="color: #1ab039;">n</span><span style="color: #346aff;">g</span>
+        <a href="${pageContext.request.contextPath}/index.html" title="GoodPang 홈으로">
+            <span class="brand-goodpang">GoodPang</span>
         </a>
     </h1>
 </header>
