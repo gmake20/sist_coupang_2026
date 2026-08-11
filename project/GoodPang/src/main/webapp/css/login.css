@@ -59,7 +59,7 @@ body {
     letter-spacing: -1.5px;
     display: inline-block;
 }
-
+/* 
 /* 쿠팡 텍스트 로고 각 글자색 */
 .login-header .logo a span.l1 { color: #552816 !important; }
 .login-header .logo a span.l2 { color: #552816 !important; }
@@ -68,15 +68,60 @@ body {
 .login-header .logo a span.l5 { color: #f2aa00 !important; }
 .login-header .logo a span.l6 { color: #1ab039 !important; }
 .login-header .logo a span.l7 { color: var(--coupang-blue) !important; }
-
-/* 이미지 로고 사용 시 */
-.login-header .logo-img {
-    width: 160px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
+ */
+/* ==========================================
+   GoodPang 다크 앤 실버 메탈릭 로고 (전체 통합 적용)
+   ========================================== */
+.login-header {
+    text-align: center;
+    margin-bottom: 25px;
 }
 
+.login-header .logo {
+    display: inline-block;
+}
+
+.login-header .logo a {
+    text-decoration: none !important;
+    font-size: 40px;
+    font-weight: 900;
+    font-family: 'Montserrat', 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+    letter-spacing: -1.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+/* GoodPang 전체 메탈릭 그라데이션 및 반짝임 효과 */
+.login-header .logo a .brand-goodpang {
+    /* 흰색 배경에서 선명하게 보이도록 딥 차콜 ~ 묵직한 실버 메탈 톤으로 조정 */
+    background: linear-gradient(135deg, #0f172a 0%, #334155 25%, #94a3b8 50%, #334155 75%, #0f172a 100%);
+    background-size: 200% auto;
+    
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    
+    color: #1e293b; /* 그라데이션 미지원 브라우저 대비용 */
+    font-weight: 900;
+    
+    /* 입체감을 높이기 위해 미세한 드롭 섀도우 추가 */
+    filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.15));
+    
+    /* 은은하게 지나가는 메탈릭 애니메이션 */
+    animation: shineDarkMetal 3.5s linear infinite;
+}
+
+/* 메탈릭 반짝임 애니메이션 키프레임 */
+@keyframes shineDarkMetal {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 200% 50%;
+    }
+}
 /* ==========================================
    3. 탭 메뉴 스타일
    ========================================== */
