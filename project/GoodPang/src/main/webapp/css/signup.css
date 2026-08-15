@@ -44,7 +44,7 @@
     }
 
 
-    .logo-area {
+    /* .logo-area {
   position: relative;
 
   width: 100%;
@@ -57,10 +57,10 @@
   justify-content: center;
 
   overflow: hidden;
-}
+} */
 
 
-.logo {
+/* .logo {
   position: absolute;
 
   width: 400px;
@@ -74,7 +74,7 @@
   transform: translate(-50%, -50%);
 
   object-fit: contain;
-}
+} */
 
     /* 제목 */
 
@@ -518,6 +518,53 @@
       font-weight: 700;
     }
 
+    /* 로고 */
+/* 로고 */
+.logo {
+    width: 100%;
+    flex: none;
+    text-align: center;
+}
+
+.logo a {
+    display: inline-block;
+    width: auto;  
+    height: 36px;
+    margin-right: 25px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0;
+    font-weight: 700;
+    line-height: 36px;
+}
+
+.logo a span {
+    display: inline-block;
+    font-size: 50px;
+    line-height: 36px;
+    letter-spacing: -0.5px;
+}
+
+.logo .l1 {
+    color: #4c1314;
+}
+
+.logo .l2 {
+    color: #cd342b;
+}
+
+.logo .l3 {
+    color: #e3992c;
+}
+
+.logo .l4 {
+    color: #92b846;
+}
+
+.logo .l5 {
+    color: #53a0d0;
+}
+
     /* 모바일 */
 
     @media (max-width: 520px) {
@@ -527,14 +574,14 @@
         padding: 28px 20px 50px;
       }
 
-      .logo-area {
+      /* .logo-area {
         margin-bottom: 22px;
       }
 
       .logo {
         height: 48px;
         max-width: 260px;
-      }
+      } */
 
       .title {
         font-size: 22px;
