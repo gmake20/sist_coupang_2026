@@ -2141,3 +2141,44 @@ a.del-button:hover {
     display: none;
   }
 }
+
+/* ==========================================
+   GoodPang 공통 브랜드 로고 (트로피컬 오렌지)
+   ========================================== */
+.brand-goodpang {
+    display: inline-flex !important;
+    align-items: center;
+    width: auto !important;
+    height: 36px;
+    font-family: 'Montserrat', 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
+    font-size: 31px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.5px !important;
+    text-decoration: none !important;
+    white-space: nowrap;
+    padding-right: 10px;
+    overflow: visible !important;
+
+    /* 오렌지 트로피컬 그라데이션 */
+    background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 30%, #ff9f43 60%, #ffca5e 100%) !important;
+    background-size: 200% auto !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+
+    filter: drop-shadow(0px 1px 1px rgba(255, 107, 107, 0.3));
+    animation: summerShine 3s linear infinite;
+}
+
+@keyframes summerShine {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* <link rel="stylesheet" href="css/common.css"> // head 태그에.
+
+<h1 class="logo">
+    <a href="index.html" class="brand-goodpang">GoodPang</a>
+</h1>  //로고 위치에 */
