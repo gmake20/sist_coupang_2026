@@ -191,6 +191,9 @@
      JSON 데이터 로드 — 실제 서비스라면 이 fetch 주소가
      검색 API(예: /api/search?q=티셔츠) 로 바뀌는 자리
      나중에 restful api 만들면 이부분을 교체할것 
+     
+     public폴더 안의 data/search-products.json  이걸 
+     경로문제는 수업때 배운함수로 바꿀것
      --------------------------------------------------------- */
 
   fetch('data/search-products.json')
