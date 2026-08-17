@@ -18,18 +18,16 @@
 <div class="container">
     
     <!-- 로고 -->
-      <h1 class="logo">
-        <a href="#" title="GoodPang 홈으로">
-            <span class="l1">G</span>
-            <span class="l1">o</span>
-            <span class="l1">o</span>
-            <span class="l2">d</span>
-            <span class="l3">P</span>
-            <span class="l4">a</span>
-            <span class="l5">n</span>
-            <span class="l5">g</span>
-        </a>
-    </h1>
+    <div class="logo">
+    <span class="l1">G</span>
+    <span class="l2">o</span>
+    <span class="l3">o</span>
+    <span class="l4">d</span>
+    <span class="l5">P</span>
+    <span class="l6">a</span>
+    <span class="l7">n</span>
+    <span class="l8">g</span>
+</div>
 
     <h1 class="page-title">주문/결제</h1>
     <div class="breadcrumb">
