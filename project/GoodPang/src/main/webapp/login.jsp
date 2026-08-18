@@ -57,7 +57,7 @@
 				</div>
 
 				<button type="submit" class="btn-submit btn-blue">로그인</button>
-				<a href="#" class="btn-submit btn-outline">회원가입</a>
+				<a href="signup.html" class="btn-submit btn-outline">회원가입</a>
 
 				<div class="divider">
 					<span>패스키를 쿠팡에 이미 등록했다면</span>
@@ -78,7 +78,7 @@
 				</div>
 
 				<button type="submit" class="btn-submit btn-blue">인증번호 발송</button>
-				<a href="#" class="btn-submit btn-outline">회원가입</a>
+				<a href="signup.html" class="btn-submit btn-outline">회원가입</a>
 
 				<div class="divider">
 					<span>패스키를 쿠팡에 이미 등록했다면</span>
@@ -112,7 +112,7 @@
 					</div>
 				</div>
 
-				<a href="#" class="btn-submit btn-outline">회원가입</a>
+				<a href="signup.html" class="btn-submit btn-outline">회원가입</a>
 			</div>
 		</main>
 

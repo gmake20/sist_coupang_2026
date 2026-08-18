@@ -402,38 +402,32 @@
 							</button>
 						</form>
 
-						<!-- ===== 마이쿠팡 / 장바구니 =====
-                 드롭다운 2개 다 JS 없이 CSS :hover 로 열림.
-                 원본도 같은 방식(Tailwind 의 group-hover = 부모에 마우스 올리면 자식 표시) -->
 						<ul class="icon-menus">
 							<li class="my-coupang"><a href="#"> <img
 									src="images/icons/person.png" width="44" height="44" alt="">
 									<span class="icon-label">마이쿠팡</span>
-							</a> <!-- 마우스 올리면 뜨는 목록. i.arrow 는 위쪽을 가리키는 작은 삼각형인데
-                     이미지가 아니라 "네모를 45도 돌려서" 만든 것 -->
+							</a>
 								<p class="my-coupang-menu">
 									<span class="wrapper"> <i class="arrow"></i> <a href="#">주문목록</a>
 										<a href="#">취소/반품</a> <a href="#">찜 리스트</a>
 									</span>
 								</p></li>
 
-							<li class="cart"><a href="#"> <img
+							<li class="cart">
+								<!-- 상대경로 cart.jsp 적용 --> <a href="cart.jsp"> <img
 									src="images/icons/cart.png" width="44" height="44" alt="">
-									<!-- 파란 동그라미 개수 배지. 이건 원본도 이미지가 아니라 CSS --> <em
-									class="cart-count">0</em> <span class="icon-label">장바구니</span>
-							</a> <!-- 장바구니 미리보기.
-                     ※ 원본은 담긴 상품을 서버에서 받아와 보여주지만,
-                       우리는 담긴 상품이 없으니 "비어있음" 화면을 씀.
-                       이 문구도 원본 HTML 에 그대로 있던 것 -->
+									<em class="cart-count">0</em> <span class="icon-label">장바구니</span>
+							</a>
 								<div class="cart-preview">
 									<span class="wrapper"> <i class="arrow"></i>
 										<ul>
 											<li class="empty-cart">장바구니에 담은 상품이 없습니다.</li>
-										</ul> <a href="#" class="cart-btn"> <span>장바구니 전체보기<i
-												class="blue-arrow"></i></span>
+										</ul> <!-- 상대경로 cart.jsp 적용 --> <a href="cart.jsp" class="cart-btn">
+											<span>장바구니 전체보기<i class="blue-arrow"></i></span>
 									</a>
 									</span>
-								</div></li>
+								</div>
+							</li>
 						</ul>
 
 					</div>
