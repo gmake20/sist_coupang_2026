@@ -9,7 +9,7 @@
     <title>쿠팡 주문/결제</title>
     
     <!-- CSS 분리 -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/coupang_order_payment.css">
+    <link rel="stylesheet" href="./css/coupang_order_payment.css">
 </head>
 <body>
 
@@ -17,22 +17,16 @@
 
 <div class="container">
     
-    <!-- 로고 -->
-    <div class="logo">
-    <span class="l1">G</span>
-    <span class="l2">o</span>
-    <span class="l3">o</span>
-    <span class="l4">d</span>
-    <span class="l5">P</span>
-    <span class="l6">a</span>
-    <span class="l7">n</span>
-    <span class="l8">g</span>
-</div>
-
+    <h1 class="logo">
+                <a href="index.html" title="GoodPang 홈으로">
+                    <span class="brand-goodpang">GoodPang</span>
+                </a>
+            </h1>
     <h1 class="page-title">주문/결제</h1>
     <div class="breadcrumb">
         <span>주문결제</span> &gt; 주문완료
     </div>
+    
 
     <div class="content-wrap">
         <!-- ========== 왼쪽 영역 ========== -->
