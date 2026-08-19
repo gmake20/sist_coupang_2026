@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="./css/vendor-signup.css">
-  <title>쿠팡 비즈니스 입점 신청</title>
+  <link rel="stylesheet" href="css/common.css">
+  <title>굿팡 비즈니스 입점 신청</title>
 
 </head>
 
@@ -16,31 +18,23 @@
 
     <main class="vendor-signup">
 
-      <!-- 쿠팡 로고 -->
+      <!-- 굿팡 로고 -->
       <div class="logo-area">
-        <img
-          class="logo"
-          src="./images/gnb/coupang-bi-brand-logo.svg"
-          alt="쿠팡"
-        >
+      	<a href="index.html" class="brand-goodpang">GoodPang marketplace</a>
       </div>
 
 
       <!-- 제목 -->
       <h1 class="title">
-        쿠팡 비즈니스, 지금 시작하세요
+        굿팡 비즈니스, 지금 시작하세요
       </h1>
 
       <p class="subtitle">
-        사업자 정보를 입력하고 쿠팡 파트너로 입점 신청을 진행해주세요.
+        사업자 정보를 입력하고 굿팡 파트너로 입점 신청을 진행해주세요.
       </p>
 
 
-      <form
-        class="form"
-        id="vendorForm"
-        novalidate
-      >
+      <form class="form" id="vendorForm" novalidate>
 
         <!-- 사업자 유형 -->
 
@@ -54,13 +48,7 @@
 
             <label class="biz-type-option">
 
-              <input
-                type="radio"
-                name="bizType"
-                id="bizTypePersonal"
-                value="individual"
-                checked
-              >
+              <input type="radio" name="bizType" id="bizTypePersonal" value="individual" checked>
 
               <span class="biz-type-card">
                 <strong>개인사업자</strong>
@@ -71,12 +59,7 @@
 
             <label class="biz-type-option">
 
-              <input
-                type="radio"
-                name="bizType"
-                id="bizTypeCorp"
-                value="corporate"
-              >
+              <input type="radio" name="bizType" id="bizTypeCorp" value="corporate">
 
               <span class="biz-type-card">
                 <strong>법인사업자</strong>
@@ -106,30 +89,16 @@
 
             <div class="inline-row">
 
-              <input
-                class="input"
-                id="bizNumber"
-                name="bizNumber"
-                type="text"
-                inputmode="numeric"
-                placeholder="000-00-00000"
-                maxlength="12"
-              >
+              <input class="input" id="bizNumber" name="bizNumber" type="text" inputmode="numeric"
+                placeholder="000-00-00000" maxlength="12">
 
-              <button
-                class="check-button"
-                id="bizNumberCheck"
-                type="button"
-              >
+              <button class="check-button" id="bizNumberCheck" type="button">
                 확인
               </button>
 
             </div>
 
-            <p
-              id="bizNumberMessage"
-              class="message"
-            ></p>
+            <p id="bizNumberMessage" class="message"></p>
 
           </div>
 
@@ -139,13 +108,7 @@
               상호명 (회사명)
             </label>
 
-            <input
-              class="input"
-              id="companyName"
-              name="companyName"
-              type="text"
-              placeholder="상호명을 입력해주세요"
-            >
+            <input class="input" id="companyName" name="companyName" type="text" placeholder="상호명을 입력해주세요">
 
           </div>
 
@@ -155,14 +118,8 @@
               대표자명
             </label>
 
-            <input
-              class="input"
-              id="ceoName"
-              name="ceoName"
-              type="text"
-              placeholder="대표자 성함을 입력해주세요"
-              autocomplete="name"
-            >
+            <input class="input" id="ceoName" name="ceoName" type="text" placeholder="대표자 성함을 입력해주세요"
+              autocomplete="name">
 
           </div>
 
@@ -183,13 +140,7 @@
               담당자명
             </label>
 
-            <input
-              class="input"
-              id="managerName"
-              name="managerName"
-              type="text"
-              placeholder="담당자 이름을 입력해주세요"
-            >
+            <input class="input" id="managerName" name="managerName" type="text" placeholder="담당자 이름을 입력해주세요">
 
           </div>
 
@@ -199,19 +150,10 @@
               아이디(이메일)
             </label>
 
-            <input
-              class="input"
-              id="email"
-              name="email"
-              type="email"
-              placeholder="예) partner@company.com"
-              autocomplete="email"
-            >
+            <input class="input" id="email" name="email" type="email" placeholder="예) partner@company.com"
+              autocomplete="email">
 
-            <p
-              id="emailMessage"
-              class="message error"
-            >
+            <p id="emailMessage" class="message error">
               이메일 주소를 정확하게 입력해주세요.
             </p>
 
@@ -223,20 +165,10 @@
               비밀번호
             </label>
 
-            <input
-              class="input"
-              id="password"
-              name="password"
-              type="password"
-              placeholder="영문, 숫자 포함 8자 이상"
-              autocomplete="new-password"
-            >
+            <input class="input" id="password" name="password" type="password" placeholder="영문, 숫자 포함 8자 이상"
+              autocomplete="new-password">
 
-            <button
-              class="password-button"
-              id="passwordToggle"
-              type="button"
-            >
+            <button class="password-button" id="passwordToggle" type="button">
               보기
             </button>
 
@@ -248,27 +180,14 @@
               비밀번호 확인
             </label>
 
-            <input
-              class="input"
-              id="passwordConfirm"
-              name="passwordConfirm"
-              type="password"
-              placeholder="비밀번호를 다시 입력해주세요"
-              autocomplete="new-password"
-            >
+            <input class="input" id="passwordConfirm" name="passwordConfirm" type="password"
+              placeholder="비밀번호를 다시 입력해주세요" autocomplete="new-password">
 
-            <button
-              class="password-button"
-              id="passwordConfirmToggle"
-              type="button"
-            >
+            <button class="password-button" id="passwordConfirmToggle" type="button">
               보기
             </button>
 
-            <p
-              id="passwordMessage"
-              class="message error"
-            >
+            <p id="passwordMessage" class="message error">
               비밀번호가 일치하지 않습니다.
             </p>
 
@@ -282,52 +201,27 @@
 
             <div class="phone-row">
 
-              <select
-                class="country"
-                id="country"
-                aria-label="국가번호"
-              >
+              <select class="country" id="country" aria-label="국가번호">
                 <option value="+82">🇰🇷 +82</option>
               </select>
 
-              <input
-                class="input phone-input"
-                id="phone"
-                name="phone"
-                type="tel"
-                placeholder="휴대폰 번호"
-                autocomplete="tel"
-                maxlength="13"
-              >
+              <input class="input phone-input" id="phone" name="phone" type="tel" placeholder="휴대폰 번호"
+                autocomplete="tel" maxlength="13">
 
             </div>
 
             <div class="verification-row">
 
-              <input
-                class="input verification-input"
-                id="verification"
-                name="verification"
-                type="text"
-                placeholder="인증번호"
-                maxlength="6"
-                inputmode="numeric"
-              >
+              <input class="input verification-input" id="verification" name="verification" type="text"
+                placeholder="인증번호" maxlength="6" inputmode="numeric">
 
-              <button
-                class="verify-button"
-                id="verifyButton"
-                type="button"
-              >
+              <button class="verify-button" id="verifyButton" type="button">
                 인증번호 받기
               </button>
 
             </div>
 
-            <p
-              id="verificationMessage"
-              class="message"
-            ></p>
+            <p id="verificationMessage" class="message"></p>
 
           </div>
 
@@ -344,11 +238,7 @@
 
             <label>
 
-              <input
-                class="check"
-                id="agreeAll"
-                type="checkbox"
-              >
+              <input class="check" id="agreeAll" type="checkbox">
 
               모두 동의합니다.
 
@@ -356,18 +246,37 @@
 
           </div>
 
+          <p class="agreement-all-desc">
+            모두 동의에는 필수 및 선택 목적(광고성 정보 수신 포함)에 대한 동의가 포함되어 있으며, 선택 목적에 동의를 거부하시는 경우에도 서비스 이용이 가능합니다.
+          </p>
+
 
           <div class="agreement-list">
 
-            <!-- 입점 이용약관 -->
+            <!-- 만 19세 이상 -->
 
             <div class="agreement-item">
 
-              <input
-                class="check required-check"
-                id="agreeTerms"
-                type="checkbox"
-              >
+              <input class="check required-check" id="agreeAge" type="checkbox">
+
+              <label for="agreeAge">
+
+                <span class="required">
+                  [필수]
+                </span>
+
+                만 19세 이상입니다
+
+              </label>
+
+            </div>
+
+
+            <!-- 굿팡 서비스 이용약관 - 사업자용 -->
+
+            <div class="agreement-item">
+
+              <input class="check required-check" id="agreeTerms" type="checkbox">
 
               <label for="agreeTerms">
 
@@ -375,44 +284,10 @@
                   [필수]
                 </span>
 
-                쿠팡 비즈니스 이용약관 동의
+                굿팡 서비스 이용약관 - 사업자용
 
-                <a
-                  href="#"
-                  class="terms-link"
-                  onclick="return false;"
-                >
-                  보기
-                </a>
-
-              </label>
-
-            </div>
-
-
-            <!-- 입점 계약서 -->
-
-            <div class="agreement-item">
-
-              <input
-                class="check required-check"
-                id="agreeContract"
-                type="checkbox"
-              >
-
-              <label for="agreeContract">
-
-                <span class="required">
-                  [필수]
-                </span>
-
-                입점 계약서 동의
-
-                <a
-                  href="#"
-                  class="terms-link"
-                  onclick="return false;"
-                >
+                <a href="./sc-ui/account/privacy/termsService.html" class="terms-link" target="_blank" rel="noopener"
+                  onclick="return openTermsWindow(this.href);">
                   보기
                 </a>
 
@@ -425,11 +300,7 @@
 
             <div class="agreement-item">
 
-              <input
-                class="check required-check"
-                id="agreeFinance"
-                type="checkbox"
-              >
+              <input class="check required-check" id="agreeFinance" type="checkbox">
 
               <label for="agreeFinance">
 
@@ -437,13 +308,10 @@
                   [필수]
                 </span>
 
-                전자금융거래 이용약관 동의
+                굿팡페이(주) 전자금융거래 이용약관
 
-                <a
-                  href="#"
-                  class="terms-link"
-                  onclick="return false;"
-                >
+                <a href="./sc-ui/account/privacy/termsEft.html" class="terms-link" target="_blank" rel="noopener"
+                  onclick="return openTermsWindow(this.href);">
                   보기
                 </a>
 
@@ -452,54 +320,48 @@
             </div>
 
 
-            <!-- 개인정보 -->
+            <!-- 마케팅 목적 개인정보 -->
 
             <div class="agreement-item">
 
-              <input
-                class="check required-check"
-                id="agreePrivacy"
-                type="checkbox"
-              >
+              <input class="check" id="agreeMarketingPi" type="checkbox">
 
-              <label for="agreePrivacy">
-
-                <span class="required">
-                  [필수]
-                </span>
-
-                개인정보 수집 및 이용 동의
-
-                <a
-                  href="#"
-                  class="terms-link"
-                  onclick="return false;"
-                >
-                  보기
-                </a>
-
-              </label>
-
-            </div>
-
-
-            <!-- 마케팅 -->
-
-            <div class="agreement-item">
-
-              <input
-                class="check"
-                id="agreeMarketing"
-                type="checkbox"
-              >
-
-              <label for="agreeMarketing">
+              <label for="agreeMarketingPi">
 
                 <span class="optional">
                   [선택]
                 </span>
 
-                입점 혜택 및 마케팅 정보 수신 동의
+                마케팅 목적의 개인정보 수집 및 이용 동의
+
+                <a href="./sc-ui/account/privacy/agreePiForAd.html" class="terms-link" target="_blank" rel="noopener"
+                  onclick="return openTermsWindow(this.href);">
+                  보기
+                </a>
+
+              </label>
+
+            </div>
+
+
+            <!-- 프로모션(광고) 수신 -->
+
+            <div class="agreement-item">
+
+              <input class="check" id="agreeAd" type="checkbox">
+
+              <label for="agreeAd">
+
+                <span class="optional">
+                  [선택]
+                </span>
+
+                특별 프로모션 혜택(광고) 수신 동의
+
+                <a href="./sc-ui/account/privacy/agreeForAd.html" class="terms-link" target="_blank" rel="noopener"
+                  onclick="return openTermsWindow(this.href);">
+                  보기
+                </a>
 
               </label>
 
@@ -507,16 +369,17 @@
 
           </div>
 
+          <a href="./sc-ui/account/privacy/agreePi.html" class="privacy-guide-link" target="_blank" rel="noopener"
+            onclick="return openTermsWindow(this.href);">
+            개인정보 수집 및 이용 안내
+          </a>
+
         </section>
 
 
         <!-- 가입 버튼 -->
 
-        <button
-          class="submit"
-          id="submitButton"
-          type="submit"
-        >
+        <button class="submit" id="submitButton" type="submit">
           입점 신청하기
         </button>
 
@@ -524,7 +387,7 @@
 
 
       <p class="login-link">
-        이미 쿠팡 비즈니스 계정이 있으신가요?
+        이미 굿팡 비즈니스 계정이 있으신가요?
         <a href="./login.html">로그인</a>
       </p>
 
@@ -534,7 +397,7 @@
       <footer class="footer">
 
         <div>
-          쿠팡(주)
+          굿팡(주)
         </div>
 
         <div>
@@ -550,32 +413,19 @@
 
   <!-- 모달 -->
 
-  <div
-    class="modal-backdrop"
-    id="modalBackdrop"
-  >
+  <div class="modal-backdrop" id="modalBackdrop">
 
     <div class="modal">
 
-      <h2
-        class="modal-title"
-        id="modalTitle"
-      >
+      <h2 class="modal-title" id="modalTitle">
         안내
       </h2>
 
-      <div
-        class="modal-body"
-        id="modalBody"
-      ></div>
+      <div class="modal-body" id="modalBody"></div>
 
       <div class="modal-footer">
 
-        <button
-          class="modal-button"
-          id="modalConfirm"
-          type="button"
-        >
+        <button class="modal-button" id="modalConfirm" type="button">
           확인
         </button>
 
@@ -587,6 +437,28 @@
 
 
   <script>
+
+    /* =========================================================
+       약관 보기 — 팝업 새창
+    ========================================================= */
+
+    function openTermsWindow(url) {
+      const width = 720;
+      const height = 800;
+      const left = (window.screen.width - width) / 2;
+      const top = (window.screen.height - height) / 2;
+
+      window.open(
+        url,
+        "termsWindow",
+        "width=" + width + ",height=" + height +
+        ",left=" + left + ",top=" + top +
+        ",scrollbars=yes,resizable=yes"
+      );
+
+      return false;
+    }
+
 
     /* =========================================================
        요소
@@ -982,7 +854,7 @@
 
       /* 완료 */
 
-      showModal("입점 신청 완료", "쿠팡 비즈니스 입점 신청이 완료되었습니다.");
+      showModal("입점 신청 완료", "굿팡 비즈니스 입점 신청이 완료되었습니다.");
 
       setTimeout(function () {
         location.href = "./login.html";
@@ -1014,4 +886,5 @@
   </script>
 
 </body>
+
 </html>
