@@ -1,0 +1,204 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoodPang 주문완료</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/coupang_order_complete.css">
+</head>
+<body>
+
+<c:set var="receiverName" value="${empty orderComplete.receiverName ? '홍길동' : orderComplete.receiverName}" />
+<c:set var="receiverPhone" value="${empty orderComplete.receiverPhone ? '010****3333' : orderComplete.receiverPhone}" />
+<c:set var="zipcode" value="${empty orderComplete.zipcode ? '06678' : orderComplete.zipcode}" />
+<c:set var="address" value="${empty orderComplete.address ? '서울특별시 서초구' : orderComplete.address}" />
+<c:set var="requestMsg" value="${empty orderComplete.requestMsg ? '문 앞' : orderComplete.requestMsg}" />
+<c:set var="arrivalDate" value="${empty orderComplete.arrivalDate ? '8/21(금)' : orderComplete.arrivalDate}" />
+<c:set var="sellerName" value="${empty orderComplete.sellerName ? '주식회사 회사이름' : orderComplete.sellerName}" />
+<c:set var="orderAmount" value="${empty orderComplete.orderAmount ? 37700 : orderComplete.orderAmount}" />
+<c:set var="discountAmount" value="${empty orderComplete.discountAmount ? 17500 : orderComplete.discountAmount}" />
+<c:set var="shippingFee" value="${empty orderComplete.shippingFee ? 0 : orderComplete.shippingFee}" />
+<c:set var="paymentAmount" value="${empty orderComplete.paymentAmount ? 20200 : orderComplete.paymentAmount}" />
+
+<header class="utility-bar">
+    <div class="utility-inner">
+        <div class="utility-left">
+            <span>즐겨찾기</span>
+            <span>입점신청 ▾</span>
+        </div>
+        <div class="utility-right">
+            <strong>이름</strong>
+            <span>로그아웃</span>
+            <span>고객센터</span>
+            <span>판매자 가입</span>
+        </div>
+    </div>
+</header>
+
+<header class="main-header">
+    <div class="header-inner">
+        <div class="category-box">
+            <div class="hamburger"><span></span><span></span><span></span></div>
+            <div>카테고리</div>
+        </div>
+
+        <a class="brand" href="${pageContext.request.contextPath}/">
+            <span class="brand-c">c</span><span class="brand-o">o</span><span class="brand-u">u</span><span class="brand-p">p</span><span class="brand-a">a</span><span class="brand-n">n</span><span class="brand-g">g</span>
+        </a>
+
+        <div class="search-area">
+            <div class="search-box">
+                <select aria-label="검색 카테고리">
+                    <option>전체</option>
+                </select>
+                <input type="text" placeholder="찾고 싶은 상품을 검색해보세요!">
+                <button type="button" class="mic">●</button>
+                <button type="button" class="search-btn">⌕</button>
+            </div>
+            <nav class="quick-links">
+                <span>◀</span>
+                <span>▶ 쿠팡플레이</span>
+                <span><b>biz</b> 쿠팡비즈</span>
+                <span>🚀 로켓배송</span>
+                <span>🚀 로켓프레시</span>
+                <span>⌂ 다시 구매</span>
+                <span>🎫 골드박스</span>
+                <span>🆕 이달의신상</span>
+                <span>🎁 입점신청</span>
+            </nav>
+        </div>
+
+        <div class="header-actions">
+            <div class="header-action">
+                <div class="icon person-icon"></div>
+                <span>마이쿠팡</span>
+            </div>
+            <div class="header-action cart-action">
+                <div class="cart-icon">🛒</div>
+                <span class="cart-count">1</span>
+                <span>장바구니</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="page-bg">
+    <main class="content-wrap">
+        <section class="order-card">
+            <div class="title-row">
+                <h1>주문완료</h1>
+                <ol class="order-steps">
+                    <li>01 옵션 선택</li>
+                    <li>02 장바구니</li>
+                    <li>03 주문/결제</li>
+                    <li class="active">04 주문완료</li>
+                </ol>
+            </div>
+
+            <div class="complete-message">
+                주문이 완료되었습니다. 감사합니다!
+            </div>
+
+            <section class="delivery-section">
+                <h2>상품배송 정보</h2>
+
+                <button class="delivery-summary" type="button" onclick="toggleDelivery()">
+                    <span>
+                        <strong>${arrivalDate} 도착 예정 (상품 1개)</strong>
+                        <small>판매자 : ${sellerName}</small>
+                    </span>
+                    <span id="deliveryArrow" class="arrow">⌄</span>
+                </button>
+
+                <div id="deliveryDetail" class="info-grid">
+                    <section class="receiver-info">
+                        <h3>받는사람 정보</h3>
+                        <dl>
+                            <div>
+                                <dt>받는사람</dt>
+                                <dd><strong>${receiverName}</strong> / ${receiverPhone}</dd>
+                            </div>
+                            <div>	
+                                <dt>받는주소</dt>
+                                <dd>
+                                    <strong>${zipcode} ${address}</strong>
+                                    <a href="#">변경하기 〉</a>
+                                </dd>
+                            </div>
+                            <div>
+                                <dt>배송요청사항</dt>
+                                <dd>
+                                    <strong>${requestMsg}</strong>
+                                    <a href="#">변경하기 〉</a>
+                                </dd>
+                            </div>
+                        </dl>
+                    </section>
+
+                    <section class="payment-info">
+                        <h3>결제 정보</h3>
+                        <dl>
+                            <div>
+                                <dt>주문금액</dt>
+                                <dd><fmt:formatNumber value="${orderAmount}" pattern="#,##0"/> 원</dd>
+                            </div>
+                            <div>
+                                <dt>할인금액</dt>
+                                <dd>-<fmt:formatNumber value="${discountAmount}" pattern="#,##0"/> 원</dd>
+                            </div>
+                            <div>
+                                <dt>배송비</dt>
+                                <dd>+<fmt:formatNumber value="${shippingFee}" pattern="#,##0"/> 원</dd>
+                            </div>
+                        </dl>
+
+                        <div class="payment-total">
+                            <span>총 결제금액</span>
+                            <strong><em>쿠페이머니</em> <fmt:formatNumber value="${paymentAmount}" pattern="#,##0"/><small>원</small></strong>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <div class="button-row">
+                <a class="btn btn-outline" href="${pageContext.request.contextPath}/order/detail">주문 상세보기</a>
+                <a class="btn btn-primary" href="${pageContext.request.contextPath}/">쇼핑 계속하기</a>
+            </div>
+
+            <a class="bottom-banner" href="#">
+                <div class="snacks">
+                    <span>붕어빵</span><span>붕어빵</span><span>붕어빵</span><span>붕어빵</span>
+                </div>
+                <div class="banner-copy">
+                    <strong>겉바속촉! 오뚜기 붕어빵</strong>
+                    <span>여기가 바로 붕세권!</span>
+                </div>
+                <div class="banner-arrow">〉</div>
+            </a>
+        </section>
+
+        <aside class="right-ads">
+            <a href="#" class="ad ad1"><strong>쿠팡 only</strong><span>✓</span><small>매일 찾는<br>생활 아이템</small></a>
+            <a href="#" class="ad ad2"><strong>~5만원<br>쿠폰 할인</strong><span>›</span><small>여름맞이<br>특가혜택</small></a>
+            <a href="#" class="ad ad3"><strong>쿠팡이 직접<br>수입했어요!</strong><span>›</span><small>베스트 상품</small></a>
+            <a href="#" class="ad ad4"><strong>금주의<br>특가왕</strong><span>🔔</span><small>오늘만 특가</small></a>
+            <a href="#" class="ad ad5"><strong>쿠팡에서<br>판매시작하기</strong><span>›</span><small>판매자 모집</small></a>
+        </aside>
+    </main>
+</div>
+
+<script>
+function toggleDelivery() {
+    const detail = document.getElementById('deliveryDetail');
+    const arrow = document.getElementById('deliveryArrow');
+
+    const hidden = detail.classList.toggle('hidden');
+    arrow.textContent = hidden ? '⌃' : '⌄';
+}
+</script>
+
+</body>
+</html>

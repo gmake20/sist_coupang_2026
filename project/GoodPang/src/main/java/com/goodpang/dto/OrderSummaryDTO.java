@@ -10,11 +10,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderSummaryDTO {
-	private int totalProductPrice;
-	private int instantDiscount;
-	private int couponDiscount;
-	private int deliveryFee;
-	private int usedCash;
-	private int remainCash;
-	private int finalPrice;
+    private int totalProductPrice;
+    private int deliveryFee;
+    private int finalPrice;
+    
+    private int instantDiscount;
+    private int couponDiscount;
+    private int usedCash; 
+    private int remainCash;
 }

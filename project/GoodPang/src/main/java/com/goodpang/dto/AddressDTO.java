@@ -7,9 +7,15 @@ import lombok.Setter;
 @Setter
 public class AddressDTO {
 
-    private String name;
-    private String roadAddress;
-    private String detailAddress;
-    private String phone;
-    private boolean defaultAddress;
+	 private int addressNo;
+	    private int memberNo;
+
+	    private String receiverName;
+	    private String tel;
+	    private String zipcode;
+	    private String address;
+	    private String detailAddress;
+	    private String requestMsg;
+
+	    private boolean addressDefault;
 }
