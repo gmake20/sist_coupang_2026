@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>달팡</title>
+<title>굿팡</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet"
@@ -23,27 +22,19 @@
 			<a href="#"> <span class="top-banner-placeholder"
 				style="background: #b5f3fe; color: #0b3d5c"> 오늘 밤 12시까지 주문해도
 					로켓배송은 내일 도착! <i class="arrow"></i>
-			</span>
-			</a> <a href="#"> <span class="top-banner-placeholder"
-				style="background: #80daff; color: #0b2d45"> 김원훈의 모발관리템 <i
-					class="arrow"></i>
-			</span>
-			</a>
+			</span></a> <a href="#"> <span class="top-banner-placeholder"
+				style="background: #80daff; color: #0b2d45"> 김원훈의 모발관리템 <i	class="arrow"></i></span></a>
 		</div>
 	</div>
-
 	<!-- ==================================================
        HEADER — 페이지 맨 위. 로고 / 검색 / 메뉴
        쿠팡 원본: div#wa-header (높이 152px)
        ================================================== -->
 	<header id="header">
-
-		<!-- ===== 회색 유틸바 (높이 33px, 배경 #f0f0f0) =====
+		<!-- ===== 회색 유틸바 (높이 33px, 배경 #f0f0f0) ===== 
          원본: div#wa-top-bar
          왼쪽  즐겨찾기 / 입점신청▼
-         오른쪽 로그인 / 회원가입 / 고객센터 / 판매자 가입
-         ※ 원본은 목록을 <menu> 태그로 쓰는데, <ul>과 기능이 완전히 같고
-           실무에서는 <ul>을 훨씬 많이 써서 우리는 <ul>로 만듦 -->
+         오른쪽 로그인 / 회원가입 / 고객센터 / 판매자 가입 -->
 		<div class="top-bar">
 			<div class="top-bar-inner">
 
@@ -52,8 +43,9 @@
 					<li class="new-header"><a href="#" class="bookmark">즐겨찾기</a></li>
 
 					<li class="vendor-join">
-						<!-- i.ic = 아래쪽 삼각형 ▼. 이미지가 아니라 CSS border로 그림 --> <a href="#">입점신청<i
-							class="ic"></i></a> <!-- 마우스 올리면 나오는 드롭다운. JS 없이 CSS :hover로 처리 -->
+						<!-- i.ic = 아래쪽 삼각형 ▼. 이미지가 아니라 CSS border로 그림 --> 
+						<a href="#">입점신청<i class="ic"></i></a> 
+						<!-- 마우스 올리면 나오는 드롭다운. JS 없이 CSS :hover로 처리 -->
 						<ul class="vendor-join-menu">
 							<li><a href="#">오픈마켓</a></li>
 							<li><a href="#">여행·티켓</a></li>
@@ -66,8 +58,7 @@
 
 				<!-- 오른쪽 메뉴 (원본 menu, 클래스 없음)
              ★ 여기 li들은 float:right라서 "쓴 순서의 반대"로 화면에 배치됨.
-               제일 먼저 쓴 판매자 가입이 제일 오른쪽에 붙고,
-               그 다음 것들이 왼쪽으로 하나씩 밀려 들어옴.
+               제일 먼저 쓴 판매자 가입이 제일 오른쪽에 붙고,그 다음 것들이 왼쪽으로 하나씩 밀려 들어옴.
                → 화면에는 로그인 · 회원가입 · 고객센터 · 판매자 가입 순으로 보임 -->
 				<ul class="top-bar-right">
 					<li><a href="vendor-signup.html">판매자 가입</a></li>
@@ -90,7 +81,7 @@
 		<!-- ===== 헤더 본체 (높이 119px) =====
          ★ 구조 주의: 파란 카테고리 박스가 "로고줄 + GNB줄"을 통째로 왼쪽에서 걸침.
            그래서 로고줄과 GNB가 형제가 아니라, 둘을 .header-col 로 한 번 묶고
-           그 묶음과 카테고리 박스를 가로로 나란히 놓는 구조야.
+           그 묶음과 카테고리 박스를 가로로 나란히 놓는 구조.
 
                ┌──────────┬──────────────────────────────┐
                │          │  로고 · 검색폼 · 아이콘 (59px) │
@@ -98,6 +89,7 @@
                │  110px   │  GNB (32px)                   │
                └──────────┴──────────────────────────────┘
                           ← .header-col (909px) →          -->
+                          
 		<div class="header-body">
 			<div class="header-inner">
 
@@ -117,12 +109,7 @@
 							class="category-text">카테고리</span>
 					</button>
 
-					<!-- ⚠ 원본 HTML 에는 이 목록이 **비어 있음**.
-                 마우스를 올리는 순간 JS가 서버에서 받아와 채우는 방식이라
-                 스크래핑 시점엔 <ul class="menu"></ul> 만 있었음.
-                 그래서 CSS 는 원본 그대로 쓰되, 항목 내용은 우리가 채웠음.
-                 대분류 18개 이름은 원본에 남아있던 것(HOT!TREND 설정 목록)을 그대로 씀.
-                 세부 항목은 원본에 자료가 없어서 그럴듯하게 채운 임시 데이터. -->
+
 					<div class="category-layer" id="wa-pc-category">
 						<ul class="menu">
 
@@ -389,7 +376,7 @@
 
 							<!-- 마이크는 <img> 가 아니라 배경이미지로 넣음.
                    mic.png 한 장에 마이크가 위아래로 2개(회색/파랑) 들어있어서,
-                   그중 한 개만 잘라 보여줘야 하거든. 자세한 건 common.css 참고 -->
+                   그중 한 개만 잘라 보여줘야 함. 자세한 건 common.css 참고 -->
 							<a href="#" class="speech-mic"><span class="blind">음성검색</span></a>
 
 							<button type="submit" class="search-btn" title="검색">
@@ -567,7 +554,7 @@
            .main-today__selected-product ← 가운데 1020px (썸네일이 여기 오른쪽에 붙음)
 
          ※ 원본은 좌우 화살표와 "1/6" 표시도 CSS엔 있는데 실제 HTML엔 없음.
-           안 쓰는 변형이라 우리도 안 만듦 -->
+           안 쓰는 변형이라 안 만듦 -->
 		<section class="main-today" id="todaysHot">
 			<h2 class="blind">오늘의 추천</h2>
 
@@ -586,7 +573,7 @@
 				<div class="main-today__selected-product">
 
 					<!-- 배너를 클릭하면 이동할 투명 링크. 배경과 똑같이 6장을 겹쳐두고 1개만 활성.
-               가운데 1020px 안에서만 클릭이 먹는 건 원본도 마찬가지야 -->
+               가운데 1020px 안에서만 클릭이 먹는 건 원본도 마찬가지 -->
 					<div class="main-today__img-container">
 						<a href="#" class="today-image is-on"><span class="blind">1번
 								배너 바로가기</span></a> <a href="#" class="today-image"><span class="blind">2번
@@ -640,13 +627,7 @@
 		<div class="content-row">
 			<div class="content-col">
 
-				<!-- ===== 오늘의 발견 (.today-discovery) =====
-         원본: div#todayDiscoveryUnit.today-discovery
-
-         ★ 2026-08-06 수정 — 배너가 6개(2행)가 아니라 **9개(3행)** 였음.
-           ref/coupang_main_full.jpeg 를 실제로 보고서야 알았음(스크린샷 없이는
-           DOM 순서만 봐서는 몇 개인지 확신하기 어려웠음).
-
+				<!-- ==========
            grid-template-columns: repeat(4,1fr) 는 그대로. half-width(2칸) / quarter-width(1칸).
            원본 li 순서(실측): half, half, quarter, quarter, quarter, quarter, half, quarter, quarter
              1행 = half + half         (2+2 = 4칸, 큰 배너 2개)
@@ -725,8 +706,7 @@
 				</section>
 
 				<!-- ===== 개인화 광고 캐러셀 4개 (#personalizedGW) =====
-         원본: div#personalizedGW.full-width — Tailwind fw-* 유틸리티뿐이라 옮길 CSS가 없어서
-         우리 클래스(.ad-carousel/.ad-card)로 새로 만듦 (css/main.css "2.5" 절 참고).
+         클래스(.ad-carousel/.ad-card)로 새로 만듦 (css/main.css "2.5" 절 참고).
          ⚠ 상품명/가격/리뷰수 전부 더미 데이터 (사용자 승인함, 나중에 JSP로 교체 예정) -->
 				<section class="personalized-gw">
 
@@ -901,8 +881,7 @@
 							<span class="ad-label">광고</span>
 						</div>
 						<div class="ad-carousel-body">
-							<a href="#" class="move preview">이전 상품</a> <a href="#"
-								class="move next">다음 상품</a>
+							<a href="#" class="move preview">이전 상품</a> <a href="#" class="move next">다음 상품</a>
 							<ul class="ad-list">
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 										<span class="ad-name">휴대용 미니 가습기 350ml, 화이트</span>
@@ -1082,8 +1061,7 @@
 							<span class="ad-page"></span>
 						</div>
 						<div class="ad-carousel-body">
-							<a href="#" class="move preview">이전 상품</a> <a href="#"
-								class="move next">다음 상품</a>
+							<a href="#" class="move preview">이전 상품</a> <a href="#" class="move next">다음 상품</a>
 							<ul class="ad-list">
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
@@ -1422,14 +1400,6 @@
 				</section>
 
 				<!-- ===== HOT! TREND (.category-best) =====
-         원본: div#categoryBestUnit.category-best
-
-         ★ 원본에는 "가로 탭"이 없음. 카테고리 18개가 그냥 세로로 쭉 쌓여 있음.
-           (그래서 이 섹션 하나의 높이가 11,448px)
-           클릭해서 바꾸는 게 아니라 스크롤로 다 보는 구조야.
-           원본의 .category-menu 는 탭이 아니라 "스크롤 따라다니는 세로 아이콘 줄"인데,
-           아이콘이 SVG 스프라이트라 이미지가 없고 JS도 필요해서 우리는 안 만듦.
-
          유닛 하나의 구조 (가로 3단):
            ┌────────┬──────────┬─────────────────┐
            │ .left  │.promotion│.best-product-list│
@@ -1451,29 +1421,19 @@
 					</div>
 
 					<!-- ───────────── 세로 아이콘 레일 (.category-menu) ─────────────
-           원본: div#categoryBestMenu.category-menu — 이 섹션 왼쪽 바깥에 붙어서
-           스크롤을 따라다니는 36px 세로 줄. 아이콘에 마우스를 올리면 154px로
-           늘어나면서 카테고리 이름이 나오고, 클릭하면 그 카테고리로 이동해.
-
            아이콘은 images/icons/pc_bestcategory_v5.svg 한 장에 21개가 세로로
            들어있는 스프라이트야. 한 칸이 50px이고 오른쪽 50px에는 흰색 버전
            (마우스 올렸을 때용)이 들어있어서 background-position만 바꿔 쓰면 돼.
 
-           ⚠ 원본은 18개를 다 넣지만 우리는 만든 카테고리가 5개뿐이라 5개만 넣음.
-             카테고리를 추가하면 여기에도 <a> 한 줄씩 같이 늘릴 것.
-           ⚠ 원본 맨 아래에는 "설정"(순서 바꾸기) 버튼이 있는데,
-             기능이 커서(드래그 정렬 + 300px 레이어) 우리는 안 만듦.
-
            바깥 .category-menu-holder 는 "자리를 차지하지 않으면서 섹션 높이만큼
            길쭉한 상자"야. 이게 있어야 안쪽 레일이 position:sticky 로
-           이 섹션 안에서만 따라다닐 수 있어 (CSS 4-1절 설명 참고) -->
+           이 섹션 안에서만 따라다님 (CSS 4-1절 설명 참고) -->
 					<div class="category-menu-holder">
 						<div class="category-menu beauty" id="categoryBestMenu">
-							<a href="#cat-beauty" class="category-anchor beauty on">뷰티</a> <a
-								href="#cat-womanclothe" class="category-anchor womanclothe">여성패션</a>
-							<a href="#cat-manclothe" class="category-anchor manclothe">남성패션</a>
-							<a href="#cat-food" class="category-anchor food">식품</a> <a
-								href="#cat-digital" class="category-anchor digital">가전/디지털</a>
+							<a href="#cat-beauty" class="category-anchor beauty on">뷰티</a>
+                            <a href="#cat-womanclothe" class="category-anchor womanclothe">여성패션</a>
+                            <a href="#cat-manclothe" class="category-anchor manclothe">남성패션</a>
+                            <a href="#cat-digital" class="category-anchor digital">가전/디지털</a>
 						</div>
 					</div>
 
@@ -1482,9 +1442,7 @@
 					<div class="category-best-unit beauty" id="cat-beauty">
 						<div class="category-best-content">
 
-							<!-- 왼쪽: 카테고리명 + HOT키워드
-               ※ 원본은 <dt>/<dd>를 <dl> 없이 씀 — 문법상 틀린 HTML이야.
-                 우리는 과제 평가가 있으니 <dl>로 제대로 감쌈 -->
+							<!-- 왼쪽: 카테고리명 + HOT키워드-->
 							<div class="left">
 								<dl>
 									<dt class="category-title">
@@ -1862,8 +1820,7 @@
 
 
 					<!-- ───────────── 3. 남성패션 (파랑 #1992df) ─────────────
-           ⚠ 상품명·가격·키워드는 전부 **더미 데이터**임. 원본 HTML 에는 상품 목록이
-             서버에서 받아오는 방식이라 안 담겨 있어서 진짜 값을 알 수 없음 -->
+           ⚠ 상품명·가격·키워드는 전부 **더미 데이터** -->
 					<div class="category-best-unit manclothe" id="cat-manclothe">
 						<div class="category-best-content">
 
@@ -2052,201 +2009,6 @@
 
 						</div>
 					</div>
-
-
-					<!-- ───────────── 4. 식품 (주황 #ee9200) ───────────── -->
-					<div class="category-best-unit food" id="cat-food">
-						<div class="category-best-content">
-
-							<div class="left">
-								<dl>
-									<dt class="category-title">
-										<p class="title">식품</p>
-										<a href="#" class="go-category">바로가기 &gt;</a>
-									</dt>
-									<dd class="hot-keyword">
-										<strong class="hot-keyword-title">HOT키워드</strong> <a href="#"
-											class="keyword">#생수</a> <a href="#" class="keyword">#즉석밥</a>
-										<a href="#" class="keyword">#라면</a> <a href="#"
-											class="keyword">#커피</a> <a href="#" class="keyword">#과일</a> <a
-											href="#" class="keyword">#견과류</a>
-									</dd>
-								</dl>
-							</div>
-
-							<div class="promotion">
-								<a href="#" class="promotion-link"> <span
-									class="promo-placeholder"></span> <span class="caption">
-										<strong class="promotion-title">집으로 오는 나만의 맛집</strong> <span
-										class="promotion-description">지금 구매하기</span>
-								</span>
-								</a> <a href="#" class="promotion-link"> <span
-									class="promo-placeholder"></span> <span class="caption">
-										<strong class="promotion-title">신선식품 새벽배송</strong> <span
-										class="promotion-description">오늘 주문 내일 도착</span>
-								</span>
-								</a> <a href="#" class="promotion-link"> <span
-									class="promo-placeholder"></span> <span class="caption">
-										<strong class="promotion-title">간편식 골라담기</strong> <span
-										class="promotion-description">3만원 이상 무료배송</span>
-								</span>
-								</a>
-								<!-- 좌우 화살표 + 페이지 동그라미. 동그라미 개수는 JS 가 배너 수에 맞춰 만듦 -->
-								<a href="#" class="move preview">이전 배너</a> <a href="#"
-									class="move next">다음 배너</a>
-								<ol class="dot-navi"></ol>
-							</div>
-
-							<div class="best-product-list">
-								<!-- 좌우 화살표 — 평소엔 숨어 있다가 목록에 마우스를 올리면 나타남.
-                 글자는 CSS text-indent 로 화면 밖에 보내 숨김(화면낭독기는 읽음) -->
-								<a href="#" class="move preview">이전 상품</a> <a href="#"
-									class="move next">다음 상품</a>
-
-								<ul class="prod-list">
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">삼다수
-												무라벨 生수 2L, 12개</span>
-											<div class="price">
-												<span class="discount">18%</span><strong>11,900원</strong><span
-													class="badge-rocket">로켓배송</span><span
-													class="badge-tomorrow">내일도착</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★☆</span><span class="count">(1204)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">곰곰
-												국내산 백미, 10kg, 1개</span>
-											<div class="price">
-												<strong>29,900원</strong><span class="badge-rocket">로켓배송</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★★</span><span class="count">(890)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">탐사수
-												무라벨 生수, 500ml, 40개</span>
-											<div class="price">
-												<span class="discount">30%</span><strong>7,690원</strong><span
-													class="badge-rocket">로켓배송</span><span
-													class="badge-tomorrow">내일도착</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★☆☆</span><span class="count">(8842)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">글로스앤글로우
-												국내생산 핫컬링 뿌리볼륨 롤브러쉬 1호 16파이, 블랙, 1개</span>
-											<div class="price">
-												<strong>8,200원</strong><span class="badge-rocket">로켓배송</span><span
-													class="badge-tomorrow">내일도착</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★★</span><span class="count">(356)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">코멧
-												3겹 데코 크린 롤화장지, 30m, 30롤</span>
-											<div class="price">
-												<span class="discount">30%</span><strong>15,900원</strong><span
-													class="badge-rocket">로켓배송</span><span
-													class="badge-tomorrow">내일도착</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★☆</span><span class="count">(1204)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">애플
-												2024 맥북 에어 13 M3, 스페이스 그레이, 256GB, 8GB</span>
-											<div class="price">
-												<strong>1,390,000원</strong>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★☆</span><span class="count">(4021)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">햇반
-												210g, 24개</span>
-											<div class="price">
-												<span class="discount">30%</span><strong>26,800원</strong><span
-													class="badge-rocket">로켓배송</span><span
-													class="badge-tomorrow">내일도착</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★★</span><span class="count">(2033)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">동원
-												참치캔 100g, 10개</span>
-											<div class="price">
-												<strong>18,900원</strong><span class="badge-rocket">로켓배송</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★☆</span><span class="count">(890)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">곰곰
-												냉동 만두 1.4kg, 2봉</span>
-											<div class="price">
-												<span class="discount">12%</span><strong>15,600원</strong><span
-													class="badge-rocket">로켓배송</span><span
-													class="badge-tomorrow">내일도착</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★☆</span><span class="count">(356)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">농심
-												신라면 120g, 20개입</span>
-											<div class="price">
-												<strong>17,200원</strong><span class="badge-rocket">로켓배송</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★☆</span><span class="count">(890)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">서울우유
-												1L, 4개</span>
-											<div class="price">
-												<span class="discount">8%</span><strong>9,800원</strong><span
-													class="badge-tomorrow">내일도착</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★☆</span><span class="count">(8842)</span>
-											</div>
-									</a></li>
-									<li><a href="#" class="product-unit"> <span
-											class="thumb-placeholder"></span> <span class="name">곰곰
-												훈제 계란 20구</span>
-											<div class="price">
-												<strong>11,400원</strong><span class="badge-rocket">로켓배송</span><span
-													class="badge-tomorrow">내일도착</span>
-											</div>
-											<div class="ad-rating">
-												<span class="stars">★★★★☆</span><span class="count">(1204)</span>
-											</div>
-									</a></li>
-								</ul>
-								<!-- 페이지 동그라미 — 개수는 상품 수에 맞춰 JS 가 만들어 넣음 -->
-								<ol class="dot-navi"></ol>
-
-							</div>
-
-						</div>
-					</div>
-
-
 					<!-- ───────────── 5. 가전디지털 (남보라 #5868be) ─────────────
            ⚠ 상품명·가격·키워드 전부 더미 데이터 -->
 					<div class="category-best-unit digital" id="cat-digital">
