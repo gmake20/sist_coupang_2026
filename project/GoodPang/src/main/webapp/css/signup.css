@@ -519,51 +519,58 @@
     }
 
 /* 로고 */
-.logo {
+
+ .logo {
     width: 100%;
-    flex: none;
+    margin: 20px 0 45px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     text-align: center;
+}
+ 
+ .brand-goodpang {
+    display: inline-flex !important;
+    align-items: center;
+    width: auto !important;
+    height: 36px;
+    font-family: 'Montserrat', 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
+    font-size: 52px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.5px !important;
+    text-decoration: none !important;
+    white-space: nowrap;
+    padding-right: 10px;
+    overflow: visible !important;
+
+    /* 오렌지 트로피컬 그라데이션 */
+    background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 30%, #ff9f43 60%, #ffca5e 100%) !important;
+    background-size: 200% auto !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+
+    filter: drop-shadow(0px 1px 1px rgba(255, 107, 107, 0.3));
+    animation: summerShine 3s linear infinite;
 }
 
 .logo a {
-    display: inline-block;
-    width: auto;  
-    height: 36px;
-    margin-right: 25px;
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 0;
-    font-weight: 700;
-    line-height: 36px;
+    text-decoration: none;
+    font-size: 52px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 30%, #ff9f43 60%, #ffca5e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.logo a span {
-    display: inline-block;
-    font-size: 50px;
-    line-height: 36px;
-    letter-spacing: -0.5px;
+@keyframes summerShine {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
-
-.logo .l1 {
-    color: #4c1314;
-}
-
-.logo .l2 {
-    color: #cd342b;
-}
-
-.logo .l3 {
-    color: #e3992c;
-}
-
-.logo .l4 {
-    color: #92b846;
-}
-
-.logo .l5 {
-    color: #53a0d0;
-}
-
     /* 모바일 */
 
     @media (max-width: 520px) {
@@ -572,16 +579,6 @@
         width: 100%;
         padding: 28px 20px 50px;
       }
-
-      /* .logo-area {
-        margin-bottom: 22px;
-      }
-
-      .logo {
-        height: 48px;
-        max-width: 260px;
-      } */
-
       .title {
         font-size: 22px;
       }
