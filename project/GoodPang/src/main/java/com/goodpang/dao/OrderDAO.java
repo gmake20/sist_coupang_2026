@@ -17,63 +17,85 @@ public class OrderDAO {
     /*
      * 기본 배송지 조회
      */
-    public AddressDTO getAddress(int memberNo) {
+	public AddressDTO getAddress(int memberNo) {
 
-        AddressDTO address = null;
+	    AddressDTO address = null;
 
-        String sql = """
-                SELECT
-                    RECEIVER_NAME,
-                    ROAD_ADDRESS,
-                    DETAIL_ADDRESS,
-                    PHONE,
-                    IS_DEFAULT
-                FROM DELIVERY_ADDRESS
-                WHERE MEMBER_NO = ?
-                AND IS_DEFAULT = 1
-                """;
+	    String sql = """
+	            SELECT
+	                ADDRESS_NO,
+	                MEMBER_NO,
+	                RECEIVER_NAME,
+	                TEL,
+	                ZIPCODE,
+	                ADDRESS,
+	                DETAIL_ADDRESS,
+	                REQUEST_MSG,
+	                ADDRESS_DEFAULT
+	            FROM DELIVERY_ADDRESS
+	            WHERE MEMBER_NO = ?
+	              AND ADDRESS_DEFAULT = 'Y'
+	            """;
 
-        try (
-                Connection conn = DBConn.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)
-        ) {
+	    try (
+	        Connection conn = DBConn.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
 
-            pstmt.setInt(1, memberNo);
+	        pstmt.setInt(1, memberNo);
 
-            try (ResultSet rs = pstmt.executeQuery()) {
+	        try (ResultSet rs = pstmt.executeQuery()) {
 
-                if (rs.next()) {
+	            if (rs.next()) {
 
-                    address = new AddressDTO();
+	                address = new AddressDTO();
 
-                    address.setName(
-                            rs.getString("RECEIVER_NAME")
-                    );
+	                address.setAddressNo(
+	                    rs.getInt("ADDRESS_NO")
+	                );
 
-                    address.setRoadAddress(
-                            rs.getString("ROAD_ADDRESS")
-                    );
+	                address.setMemberNo(
+	                    rs.getInt("MEMBER_NO")
+	                );
 
-                    address.setDetailAddress(
-                            rs.getString("DETAIL_ADDRESS")
-                    );
+	                address.setReceiverName(
+	                    rs.getString("RECEIVER_NAME")
+	                );
 
-                    address.setPhone(
-                            rs.getString("PHONE")
-                    );
+	                address.setTel(
+	                    rs.getString("TEL")
+	                );
 
-                    address.setDefaultAddress(
-                            rs.getBoolean("IS_DEFAULT")
-                    );
-                }
-            }
+	                address.setZipcode(
+	                    rs.getString("ZIPCODE")
+	                );
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+	                address.setAddress(
+	                    rs.getString("ADDRESS")
+	                );
 
-        return address;
-    }
+	                address.setDetailAddress(
+	                    rs.getString("DETAIL_ADDRESS")
+	                );
+
+	                address.setRequestMsg(
+	                    rs.getString("REQUEST_MSG")
+	                );
+
+	                address.setAddressDefault(
+	                    "Y".equals(
+	                        rs.getString("ADDRESS_DEFAULT")
+	                    )
+	                );
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return address;
+	}
 
 
     /*

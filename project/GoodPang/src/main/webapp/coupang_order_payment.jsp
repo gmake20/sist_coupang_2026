@@ -9,7 +9,8 @@
     <title>쿠팡 주문/결제</title>
     
     <!-- CSS 분리 -->
-    <link rel="stylesheet" href="./css/coupang_order_payment.css">
+    <link rel="stylesheet"
+      href="${pageContext.request.contextPath}/css/coupang_order_payment.css">
 </head>
 <body>
 
@@ -36,17 +37,18 @@
             <div class="section-box">
                 <div class="section-header">
                     <div>
-                        <strong>배송지</strong> | ${address.name}
+                        <strong>배송지</strong>
+            		| ${address.receiverName}
                     </div>
                     <button class="btn-outline" type="button">배송지 변경</button>
                 </div>
                 <div class="section-body">
                     <div class="address-detail">
-                        ${address.roadAddress}<br>
+                        ${address.address}<br>
                         ${address.detailAddress}<br>
-                        ${address.phone}
+                        ${address.tel}
                     </div>
-                    <c:if test="${address.defaultAddress}">
+                    <c:if test="${address.addressDefault}">
                         <span class="tag">기본배송지</span>
                     </c:if>
                 </div>
@@ -60,9 +62,9 @@
                 </div>
                 <div class="section-body">
                     <c:choose>
-                        <c:when test="${not empty deliveryRequest}">
-                            ${deliveryRequest}
-                        </c:when>
+                        <c:when test="${not empty address.requestMsg}">
+                		${address.requestMsg}
+            			</c:when>
                         <c:otherwise>
                             <span style="color:#aaa;">배송 요청사항이 없습니다.</span>
                         </c:otherwise>
@@ -178,11 +180,16 @@
                     위 주문 내용을 확인 하였으며, 회원 본인은 개인정보 이용 및 제공(해외직구의 경우 국외제공) 및 결제에 동의합니다.
                 </div>
 
-                <button class="btn-pay" type="button">결제하기</button>
+                <button class="btn-pay" type="button" onclick="dummyPay()">결제하기</button>
             </div>
         </div>
     </div>
 </div>
-
 </body>
+<script>
+    function dummyPay() {
+        // 실제 결제 처리 없이 무조건 주문완료 페이지로 이동
+        location.href = "${pageContext.request.contextPath}/coupang_order_complete.jsp";
+    }
+</script>
 </html>

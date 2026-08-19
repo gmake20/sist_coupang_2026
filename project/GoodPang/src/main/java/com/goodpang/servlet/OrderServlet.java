@@ -51,13 +51,9 @@ public class OrderServlet extends HttpServlet {
         OrderSummaryDTO summary =
                 dao.getOrderSummary(orderNo);
 
-        String deliveryRequest =
-                dao.getDeliveryRequest(orderNo);
-
         request.setAttribute("address", address);
         request.setAttribute("orderItems", orderItems);
         request.setAttribute("summary", summary);
-        request.setAttribute("deliveryRequest", deliveryRequest);
 
         request.getRequestDispatcher(
                 "/coupang_order_payment.jsp"
