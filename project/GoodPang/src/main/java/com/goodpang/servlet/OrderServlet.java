@@ -15,9 +15,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/order/payment")
+// http://localhost:8080/GoodPang/order/payment
 public class OrderServlet extends HttpServlet {
 
     private final OrderDAO orderDAO = new OrderDAO();
+
 
     @Override
     protected void doGet(
@@ -45,15 +47,17 @@ public class OrderServlet extends HttpServlet {
         AddressDTO address =
                 dao.getAddress(memberNo);
 
-        List<OrderItemDTO> orderItems =
-                dao.getOrderItems(orderNo);
-
-        OrderSummaryDTO summary =
-                dao.getOrderSummary(orderNo);
+//        List<OrderItemDTO> orderItems =
+//                dao.getOrderItems(orderNo);
+//
+//        OrderSummaryDTO summary =
+//                dao.getOrderSummary(orderNo);
 
         request.setAttribute("address", address);
-        request.setAttribute("orderItems", orderItems);
-        request.setAttribute("summary", summary);
+		/*
+		 * request.setAttribute("orderItems", orderItems);
+		 * request.setAttribute("summary", summary);
+		 */
 
         request.getRequestDispatcher(
                 "/coupang_order_payment.jsp"

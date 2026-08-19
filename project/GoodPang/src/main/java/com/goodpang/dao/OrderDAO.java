@@ -10,6 +10,7 @@ import java.util.List;
 import com.goodpang.dto.AddressDTO;
 import com.goodpang.dto.OrderItemDTO;
 import com.goodpang.dto.OrderSummaryDTO;
+import com.goodpang.util.ConnectionProvider;
 import com.goodpang.util.DBConn;
 
 public class OrderDAO {
@@ -38,7 +39,7 @@ public class OrderDAO {
 	            """;
 
 	    try (
-	        Connection conn = DBConn.getConnection();
+	        Connection conn = ConnectionProvider.getConnection();
 	        PreparedStatement pstmt = conn.prepareStatement(sql)
 	    ) {
 
@@ -121,7 +122,7 @@ public class OrderDAO {
                 """;
 
         try (
-                Connection conn = DBConn.getConnection();
+                Connection conn = ConnectionProvider.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
 
@@ -188,7 +189,7 @@ public class OrderDAO {
                 """;
 
         try (
-                Connection conn = DBConn.getConnection();
+                Connection conn = ConnectionProvider.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
 
@@ -250,7 +251,7 @@ public class OrderDAO {
                 """;
 
         try (
-                Connection conn = DBConn.getConnection();
+                Connection conn = ConnectionProvider.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
 
