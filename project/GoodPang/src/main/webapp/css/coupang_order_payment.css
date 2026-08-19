@@ -484,6 +484,278 @@ body {
 }
 
 
+/* ========================================
+   결제수단
+======================================== */
+
+.payment-section {
+    overflow: hidden;
+}
+
+
+/* 결제수단 전체 */
+.payment-method {
+    padding: 22px 20px 20px;
+    background: #fff;
+}
+
+
+/* 라디오 한 줄 */
+.pay-radio-row {
+    display: flex;
+    align-items: center;
+
+    min-height: 40px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+    color: #111;
+}
+
+
+/* 기본 radio 크기 */
+.pay-radio-row input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 20px;
+    height: 20px;
+
+    margin: 0 10px 0 0;
+
+    border: 1px solid #c8c8c8;
+    border-radius: 50%;
+
+    background: #fff;
+
+    cursor: pointer;
+
+    position: relative;
+}
+
+
+/* 선택된 radio */
+.pay-radio-row input[type="radio"]:checked {
+    border: 6px solid #4285f4;
+}
+
+
+/* 결제수단 글자 */
+.pay-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* 최대 캐시적립 */
+.badge-red {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 23px;
+
+    margin-left: 10px;
+
+    padding: 0 8px;
+
+    border: 1px solid #e72222;
+    border-radius: 12px;
+
+    color: #e72222;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    background: #fff;
+}
+
+
+/* 계좌이체 */
+.account-row {
+    margin-top: 3px;
+}
+
+
+/* ========================================
+   계좌 설정
+======================================== */
+
+.bank-setting {
+    display: flex;
+    align-items: center;
+
+    margin-left: 30px;
+    margin-top: 3px;
+    margin-bottom: 28px;
+
+    gap: 12px;
+}
+
+
+/* 은행 선택 */
+.bank-select {
+    width: 320px;
+    height: 40px;
+
+    padding: 0 40px 0 12px;
+
+    border: 1px solid #c8c8c8;
+    border-radius: 4px;
+
+    background: #fff;
+
+    color: #333;
+
+    font-size: 14px;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+
+.bank-select:focus {
+    border-color: #4285f4;
+}
+
+
+/* 기본 결제수단 */
+.default-payment {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+
+/* checkbox */
+.default-payment input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 20px;
+    height: 20px;
+
+    margin: 0;
+
+    border: 1px solid #bcbcbc;
+    border-radius: 4px;
+
+    background: #fff;
+
+    cursor: pointer;
+
+    position: relative;
+}
+
+
+/* 체크됐을 때 */
+.default-payment input[type="checkbox"]:checked {
+    background: #4285f4;
+    border-color: #4285f4;
+}
+
+
+/* 체크 표시 */
+.default-payment input[type="checkbox"]:checked::after {
+    content: "";
+
+    position: absolute;
+
+    left: 6px;
+    top: 2px;
+
+    width: 5px;
+    height: 10px;
+
+    border: solid #fff;
+
+    border-width: 0 2px 2px 0;
+
+    transform: rotate(45deg);
+}
+
+
+/* 구분선 */
+.payment-divider {
+    height: 1px;
+
+    background: #e5e5e5;
+
+    margin: 0 0 20px;
+}
+
+
+/* ========================================
+   다른 결제수단
+======================================== */
+
+.other-payment-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    padding: 0;
+
+    border: none;
+
+    background: none;
+
+    color: #111;
+
+    cursor: pointer;
+
+    text-align: left;
+}
+
+
+.other-payment-title strong {
+    font-size: 16px;
+}
+
+
+/* 화살표 */
+#paymentArrow {
+    font-size: 15px;
+
+    color: #555;
+}
+
+
+/* 다른 결제수단 목록 */
+.other-payment-list {
+    margin-top: 15px;
+}
+
+
+/* 다른 결제 수단 radio */
+.other-radio {
+    min-height: 40px;
+}
+
+
+.other-radio .pay-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* 숨김 */
+.other-payment-list.hidden {
+    display: none;
+}
+
 /* ===== 반응형 ===== */
 @media (max-width: 900px) {
     .container {
