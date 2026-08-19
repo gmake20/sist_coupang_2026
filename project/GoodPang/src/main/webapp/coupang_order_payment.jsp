@@ -266,6 +266,24 @@
 	</div>
 </body>
 <script>
+function toggleOtherPayment() {
+
+    const paymentList =
+        document.getElementById("otherPaymentList");
+
+    const paymentArrow =
+        document.getElementById("paymentArrow");
+
+    paymentList.classList.toggle("hidden");
+
+    // 닫혀있으면 아래 화살표
+    if (paymentList.classList.contains("hidden")) {
+        paymentArrow.innerHTML = "﹀";
+    } else {
+        paymentArrow.innerHTML = "︿";
+    }
+}
+
     function dummyPay() {
         // 실제 결제 처리 없이 무조건 주문완료 페이지로 이동
         location.href = "${pageContext.request.contextPath}/coupang_order_complete.jsp";

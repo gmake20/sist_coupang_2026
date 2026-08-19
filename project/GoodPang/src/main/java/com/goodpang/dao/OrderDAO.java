@@ -98,7 +98,6 @@ public class OrderDAO {
 	    return address;
 	}
 
-
     /*
      * 주문 상품 조회
      */
@@ -172,25 +171,50 @@ public class OrderDAO {
      */
     public OrderSummaryDTO getOrderSummary(int orderNo) {
 
-        OrderSummaryDTO summary =
-                new OrderSummaryDTO();
+        OrderSummaryDTO summary = null;
 
         String sql = """
                 SELECT
-                    TOTAL_PRODUCT_PRICE,
-                    INSTANT_DISCOUNT,
-                    COUPON_DISCOUNT,
-                    DELIVERY_FEE,
-                    USED_CASH,
-                    REMAIN_CASH,
-                    FINAL_PRICE
-                FROM ORDERS
-                WHERE ORDER_NO = ?
+                    o.order_no,
+
+                    NVL(
+                        SUM(od.price * od.order_qty),
+                        0
+                    ) AS total_product_price,
+
+                    NVL(
+                        o.delivery_fee,
+                        0
+                    ) AS delivery_fee,
+
+                    NVL(
+                        SUM(od.price * od.order_qty),
+                        0
+                    )
+                    +
+                    NVL(
+                        o.delivery_fee,
+                        0
+                    ) AS final_price
+
+                FROM orders o
+
+                LEFT JOIN order_detail od
+                       ON o.order_no = od.order_no
+
+                WHERE o.order_no = ?
+
+                GROUP BY
+                    o.order_no,
+                    o.delivery_fee
                 """;
 
         try (
-                Connection conn = ConnectionProvider.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)
+            Connection conn =
+                    ConnectionProvider.getConnection();
+
+            PreparedStatement pstmt =
+                    conn.prepareStatement(sql)
         ) {
 
             pstmt.setInt(1, orderNo);
@@ -199,32 +223,25 @@ public class OrderDAO {
 
                 if (rs.next()) {
 
+                    summary =
+                            new OrderSummaryDTO();
+
                     summary.setTotalProductPrice(
-                            rs.getInt("TOTAL_PRODUCT_PRICE")
-                    );
-
-                    summary.setInstantDiscount(
-                            rs.getInt("INSTANT_DISCOUNT")
-                    );
-
-                    summary.setCouponDiscount(
-                            rs.getInt("COUPON_DISCOUNT")
+                            rs.getInt(
+                                    "total_product_price"
+                            )
                     );
 
                     summary.setDeliveryFee(
-                            rs.getInt("DELIVERY_FEE")
-                    );
-
-                    summary.setUsedCash(
-                            rs.getInt("USED_CASH")
-                    );
-
-                    summary.setRemainCash(
-                            rs.getInt("REMAIN_CASH")
+                            rs.getInt(
+                                    "delivery_fee"
+                            )
                     );
 
                     summary.setFinalPrice(
-                            rs.getInt("FINAL_PRICE")
+                            rs.getInt(
+                                    "final_price"
+                            )
                     );
                 }
             }
@@ -234,41 +251,5 @@ public class OrderDAO {
         }
 
         return summary;
-    }
-
-
-    /*
-     * 배송 요청사항 조회
-     */
-    public String getDeliveryRequest(int orderNo) {
-
-        String deliveryRequest = null;
-
-        String sql = """
-                SELECT DELIVERY_REQUEST
-                FROM ORDERS
-                WHERE ORDER_NO = ?
-                """;
-
-        try (
-                Connection conn = ConnectionProvider.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)
-        ) {
-
-            pstmt.setInt(1, orderNo);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-
-                if (rs.next()) {
-                    deliveryRequest =
-                            rs.getString("DELIVERY_REQUEST");
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return deliveryRequest;
     }
 }
