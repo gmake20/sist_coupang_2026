@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="./css/vendor-login.css">
+  <link rel="stylesheet" href="css/common.css">	
+  <title>굿팡 비즈니스 판매자 로그인</title>
+
+</head>
+
+<body>
+
+  <div class="wing-bg">
+
+    <!-- 뒤로가기 -->
+    <a href="index.html" class="back-button" aria-label="이전으로">
+      <span class="back-arrow"></span>
+    </a>
+
+    <!-- 배경 장식 아이콘 -->
+    <div class="wing-deco" aria-hidden="true"></div>
+
+    <main class="vendor-login">
+
+      <!-- 로고 -->
+      
+      <div class="logo-area">
+		<a href="index.html" class="brand-goodpang">GoodPang</a>
+      </div>
+
+      <h1 class="title">
+        판매자 로그인
+      </h1>
+
+      <form class="form" id="loginForm" novalidate>
+
+        <div class="field">
+          <input class="input" id="loginId" name="loginId" type="text" placeholder="아이디를 입력해주세요"
+            autocomplete="username">
+        </div>
+
+        <div class="field">
+          <input class="input" id="loginPw" name="loginPw" type="password" placeholder="비밀번호를 입력해주세요"
+            autocomplete="current-password">
+        </div>
+
+        <p id="loginMessage" class="message error"></p>
+
+        <button class="submit" id="submitButton" type="submit">
+          로그인
+        </button>
+
+        <div class="find-links">
+          <a href="#" class="find-link">아이디 찾기</a>
+          <span class="find-divider">|</span>
+          <a href="#" class="find-link">비밀번호 찾기</a>
+        </div>
+
+      </form>
+
+      <div class="divider">
+        <span>판매자가 아니신가요?</span>
+      </div>
+
+      <a href="./vendor-signup.html" class="signup-button">
+        판매자 회원가입
+      </a>
+
+      <footer class="footer">
+
+        <p class="cs-line">
+          판매자 콜센터 <strong>1600-9879</strong>
+        </p>
+
+        <a href="./sc-ui/account/privacy/agreePi.html" class="privacy-link" target="_blank" rel="noopener">
+          판매자 개인정보 처리방침
+        </a>
+
+        <div class="lang-select">
+          <span class="lang-icon" aria-hidden="true">&#127760;</span>
+          한국어
+          <span class="lang-caret" aria-hidden="true"></span>
+        </div>
+
+      </footer>
+
+    </main>
+
+  </div>
+
+
+  <script>
+
+    const form = document.getElementById("loginForm");
+    const loginId = document.getElementById("loginId");
+    const loginPw = document.getElementById("loginPw");
+    const loginMessage = document.getElementById("loginMessage");
+
+
+    function showError(message) {
+      loginMessage.textContent = message;
+      loginMessage.classList.add("show");
+    }
+
+    function clearError() {
+      loginMessage.textContent = "";
+      loginMessage.classList.remove("show");
+    }
+
+    [loginId, loginPw].forEach(function (input) {
+      input.addEventListener("input", function () {
+        input.classList.remove("invalid");
+        clearError();
+      });
+    });
+
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      if (!loginId.value.trim()) {
+        loginId.classList.add("invalid");
+        showError("아이디를 입력해주세요.");
+        loginId.focus();
+        return;
+      }
+
+      if (!loginPw.value) {
+        loginPw.classList.add("invalid");
+        showError("비밀번호를 입력해주세요.");
+        loginPw.focus();
+        return;
+      }
+
+      location.href = "index.html";
+    });
+
+  </script>
+
+</body>
+
+</html>
