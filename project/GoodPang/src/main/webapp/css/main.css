@@ -1689,3 +1689,282 @@
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
+
+/* ==========================================
+   상품 이미지 (2026-08-20 추가)
+   HTML 은 안 고침. .thumb-placeholder / .ad-thumb 의 회색 배경 위에
+   background-image 만 얹는 방식.
+   교체하려면 images/products/pNNN.jpg 를 같은 이름으로 덮어쓰면 됨
+   ========================================== */
+.product-unit .thumb-placeholder,
+.ad-card .ad-thumb {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.category-best-unit.beauty .prod-list > li:nth-child(1) .thumb-placeholder { background-image: url(../images/products/p001.jpg); }  /* 글로스앤글로우 국내생산 핫컬링 뿌리볼륨 롤브러쉬 1호 16파이 */
+.category-best-unit.beauty .prod-list > li:nth-child(2) .thumb-placeholder { background-image: url(../images/products/p002.jpg); }  /* 코멧 3겹 데코 크린 롤화장지, 30m, 30롤 */
+.category-best-unit.beauty .prod-list > li:nth-child(3) .thumb-placeholder { background-image: url(../images/products/p003.jpg); }  /* 탐사수 무라벨 生수, 500ml, 40개 */
+.category-best-unit.beauty .prod-list > li:nth-child(4) .thumb-placeholder { background-image: url(../images/products/p004.jpg); }  /* 삼다수 무라벨 生수 2L, 12개 */
+.category-best-unit.beauty .prod-list > li:nth-child(5) .thumb-placeholder { background-image: url(../images/products/p005.jpg); }  /* 곰곰 국내산 백미, 10kg, 1개 */
+.category-best-unit.beauty .prod-list > li:nth-child(6) .thumb-placeholder { background-image: url(../images/products/p006.jpg); }  /* 애플 2024 맥북 에어 13 M3, 스페이스 그레이, 256 */
+.category-best-unit.beauty .prod-list > li:nth-child(7) .thumb-placeholder { background-image: url(../images/products/p007.jpg); }  /* 메디힐 티트리 진정 마스크팩 10매 */
+.category-best-unit.beauty .prod-list > li:nth-child(8) .thumb-placeholder { background-image: url(../images/products/p008.jpg); }  /* 보습 히알루론산 수분크림 50ml, 2개 */
+.category-best-unit.beauty .prod-list > li:nth-child(9) .thumb-placeholder { background-image: url(../images/products/p009.jpg); }  /* 데일리 클렌징 폼 150ml, 3개입 */
+.category-best-unit.beauty .prod-list > li:nth-child(10) .thumb-placeholder { background-image: url(../images/products/p010.jpg); }  /* 무향 저자극 선크림 SPF50+ 50ml */
+.category-best-unit.beauty .prod-list > li:nth-child(11) .thumb-placeholder { background-image: url(../images/products/p011.jpg); }  /* 픽싱 파우더 팩트 12g, 21호 */
+.category-best-unit.beauty .prod-list > li:nth-child(12) .thumb-placeholder { background-image: url(../images/products/p012.jpg); }  /* 손상모발 케어 헤어 에센스 100ml */
+.category-best-unit.womanclothe .prod-list > li:nth-child(1) .thumb-placeholder { background-image: url(../images/products/p002.jpg); }  /* 코멧 3겹 데코 크린 롤화장지, 30m, 30롤 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(2) .thumb-placeholder { background-image: url(../images/products/p001.jpg); }  /* 글로스앤글로우 국내생산 핫컬링 뿌리볼륨 롤브러쉬 1호 16파이 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(3) .thumb-placeholder { background-image: url(../images/products/p006.jpg); }  /* 애플 2024 맥북 에어 13 M3, 스페이스 그레이, 256 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(4) .thumb-placeholder { background-image: url(../images/products/p004.jpg); }  /* 삼다수 무라벨 生수 2L, 12개 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(5) .thumb-placeholder { background-image: url(../images/products/p003.jpg); }  /* 탐사수 무라벨 生수, 500ml, 40개 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(6) .thumb-placeholder { background-image: url(../images/products/p005.jpg); }  /* 곰곰 국내산 백미, 10kg, 1개 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(7) .thumb-placeholder { background-image: url(../images/products/p013.jpg); }  /* 여름 냉감 카라 반팔 니트, 아이보리 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(8) .thumb-placeholder { background-image: url(../images/products/p014.jpg); }  /* 하이웨스트 와이드 슬랙스, 블랙 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(9) .thumb-placeholder { background-image: url(../images/products/p015.jpg); }  /* 플리츠 롱스커트, 베이지, 1개 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(10) .thumb-placeholder { background-image: url(../images/products/p016.jpg); }  /* 린넨 셔츠 원피스, 스카이블루 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(11) .thumb-placeholder { background-image: url(../images/products/p017.jpg); }  /* 쿠션 스니커즈 데일리 운동화, 화이트, 235 */
+.category-best-unit.womanclothe .prod-list > li:nth-child(12) .thumb-placeholder { background-image: url(../images/products/p018.jpg); }  /* 여성 크로스백 미니 숄더백, 브라운 */
+.category-best-unit.manclothe .prod-list > li:nth-child(1) .thumb-placeholder { background-image: url(../images/products/p019.jpg); }  /* 무형광 남성 반팔 라운드 티셔츠 3종 세트, 화이트/그레이/블 */
+.category-best-unit.manclothe .prod-list > li:nth-child(2) .thumb-placeholder { background-image: url(../images/products/p020.jpg); }  /* 쿨링 스판 남성 밴딩 슬랙스, 블랙, 1개 */
+.category-best-unit.manclothe .prod-list > li:nth-child(3) .thumb-placeholder { background-image: url(../images/products/p021.jpg); }  /* 데일리 남성 옥스포드 긴팔 셔츠, 라이트블루 */
+.category-best-unit.manclothe .prod-list > li:nth-child(4) .thumb-placeholder { background-image: url(../images/products/p022.jpg); }  /* 경량 남성 러닝화 운동화, 다크그레이, 265 */
+.category-best-unit.manclothe .prod-list > li:nth-child(5) .thumb-placeholder { background-image: url(../images/products/p023.jpg); }  /* 남성 여름 린넨 반바지, 베이지, 1개 */
+.category-best-unit.manclothe .prod-list > li:nth-child(6) .thumb-placeholder { background-image: url(../images/products/p024.jpg); }  /* 대용량 남성 노트북 백팩 15.6인치, 블랙 */
+.category-best-unit.manclothe .prod-list > li:nth-child(7) .thumb-placeholder { background-image: url(../images/products/p025.jpg); }  /* 남성 무지 맨투맨 기모, 차콜, 1개 */
+.category-best-unit.manclothe .prod-list > li:nth-child(8) .thumb-placeholder { background-image: url(../images/products/p026.jpg); }  /* 스판 치노 팬츠 여름용, 베이지 */
+.category-best-unit.manclothe .prod-list > li:nth-child(9) .thumb-placeholder { background-image: url(../images/products/p027.jpg); }  /* 남성 카라 피케 티셔츠 2종, 네이비/화이트 */
+.category-best-unit.manclothe .prod-list > li:nth-child(10) .thumb-placeholder { background-image: url(../images/products/p028.jpg); }  /* 가벼운 남성 여름 자켓, 라이트그레이 */
+.category-best-unit.manclothe .prod-list > li:nth-child(11) .thumb-placeholder { background-image: url(../images/products/p029.jpg); }  /* 남성 5족 세트 발목 양말, 블랙 */
+.category-best-unit.manclothe .prod-list > li:nth-child(12) .thumb-placeholder { background-image: url(../images/products/p030.jpg); }  /* 가죽 벨트 자동버클, 브라운 */
+.category-best-unit.digital .prod-list > li:nth-child(1) .thumb-placeholder { background-image: url(../images/products/p031.jpg); }  /* 노이즈캔슬링 블루투스 무선 이어폰, 화이트 */
+.category-best-unit.digital .prod-list > li:nth-child(2) .thumb-placeholder { background-image: url(../images/products/p032.jpg); }  /* 27인치 QHD 75Hz 컴퓨터 모니터, 블랙 */
+.category-best-unit.digital .prod-list > li:nth-child(3) .thumb-placeholder { background-image: url(../images/products/p033.jpg); }  /* 저소음 BLDC 에어서큘레이터 선풍기, 아이보리 */
+.category-best-unit.digital .prod-list > li:nth-child(4) .thumb-placeholder { background-image: url(../images/products/p034.jpg); }  /* 10000mAh 고속충전 보조배터리 C타입, 그레이 */
+.category-best-unit.digital .prod-list > li:nth-child(5) .thumb-placeholder { background-image: url(../images/products/p035.jpg); }  /* 물걸레 겸용 로봇청소기, 화이트, 1개 */
+.category-best-unit.digital .prod-list > li:nth-child(6) .thumb-placeholder { background-image: url(../images/products/p036.jpg); }  /* 전자동 캡슐 커피머신, 블랙 */
+.category-best-unit.digital .prod-list > li:nth-child(7) .thumb-placeholder { background-image: url(../images/products/p037.jpg); }  /* 가정용 미니 제습기 2L, 화이트 */
+.category-best-unit.digital .prod-list > li:nth-child(8) .thumb-placeholder { background-image: url(../images/products/p038.jpg); }  /* USB C타입 65W 고속 충전기 */
+.category-best-unit.digital .prod-list > li:nth-child(9) .thumb-placeholder { background-image: url(../images/products/p039.jpg); }  /* 게이밍 기계식 키보드 적축, 블랙 */
+.category-best-unit.digital .prod-list > li:nth-child(10) .thumb-placeholder { background-image: url(../images/products/p040.jpg); }  /* 무선 마우스 저소음 블루투스, 그레이 */
+.category-best-unit.digital .prod-list > li:nth-child(11) .thumb-placeholder { background-image: url(../images/products/p041.jpg); }  /* 휴대용 블루투스 스피커 방수, 네이비 */
+.category-best-unit.digital .prod-list > li:nth-child(12) .thumb-placeholder { background-image: url(../images/products/p042.jpg); }  /* 스마트폰 거치대 겸용 무선충전 패드 */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(1) .ad-thumb { background-image: url(../images/products/p043.jpg); }  /* 저자극 약산성 폼클렌저 300ml, 1개 */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(2) .ad-thumb { background-image: url(../images/products/p044.jpg); }  /* 보습 크림 앰플 세럼 50ml, 2개 */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(3) .ad-thumb { background-image: url(../images/products/p045.jpg); }  /* 진정 판테놀 수딩젤 300ml, 1개 */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(4) .ad-thumb { background-image: url(../images/products/p046.jpg); }  /* 콜라겐 리프팅 마스크팩 10매, 1box */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(5) .ad-thumb { background-image: url(../images/products/p010.jpg); }  /* 무향 저자극 선크림 SPF50+ 50ml */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(6) .ad-thumb { background-image: url(../images/products/p047.jpg); }  /* 브라이트닝 앰플 세트 3종 */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(7) .ad-thumb { background-image: url(../images/products/p048.jpg); }  /* 수분 진정 토너패드 70매 */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(8) .ad-thumb { background-image: url(../images/products/p049.jpg); }  /* 탄력 넥크림 목주름 케어 50ml */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(9) .ad-thumb { background-image: url(../images/products/p050.jpg); }  /* 저자극 클렌징 오일 200ml */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(10) .ad-thumb { background-image: url(../images/products/p051.jpg); }  /* 비타민C 브라이트닝 세럼 30ml */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(11) .ad-thumb { background-image: url(../images/products/p052.jpg); }  /* 모공 케어 클레이 마스크 100ml */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(12) .ad-thumb { background-image: url(../images/products/p053.jpg); }  /* 약산성 바디워시 500ml, 2개 */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(13) .ad-thumb { background-image: url(../images/products/p054.jpg); }  /* 데일리 립밤 3종 세트 */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(14) .ad-thumb { background-image: url(../images/products/p055.jpg); }  /* 각질 제거 필링 젤 150ml */
+.personalized-gw > div:nth-of-type(1) .ad-list > li:nth-child(15) .ad-thumb { background-image: url(../images/products/p056.jpg); }  /* 수분 아이크림 30ml, 1개 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(1) .ad-thumb { background-image: url(../images/products/p057.jpg); }  /* 휴대용 미니 가습기 350ml, 화이트 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(2) .ad-thumb { background-image: url(../images/products/p058.jpg); }  /* 저소음 탁상용 선풍기, 그레이 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(3) .ad-thumb { background-image: url(../images/products/p059.jpg); }  /* 무선 충전 마우스패드 세트 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(4) .ad-thumb { background-image: url(../images/products/p060.jpg); }  /* 스탠드형 전신 거울 40x150cm */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(5) .ad-thumb { background-image: url(../images/products/p061.jpg); }  /* 접이식 캠핑 테이블 미니, 카키 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(6) .ad-thumb { background-image: url(../images/products/p062.jpg); }  /* 실리콘 다회용 지퍼백 5종 세트 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(7) .ad-thumb { background-image: url(../images/products/p063.jpg); }  /* USB 미니 청소기 무선 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(8) .ad-thumb { background-image: url(../images/products/p064.jpg); }  /* 휴대용 보조배터리 10000mAh */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(9) .ad-thumb { background-image: url(../images/products/p065.jpg); }  /* 원목 트레이 수납함 대형 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(10) .ad-thumb { background-image: url(../images/products/p066.jpg); }  /* 전기 요거트 메이커 1L */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(11) .ad-thumb { background-image: url(../images/products/p067.jpg); }  /* 접이식 빨래 건조대 대형 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(12) .ad-thumb { background-image: url(../images/products/p068.jpg); }  /* LED 스탠드 조명 3단계 밝기 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(13) .ad-thumb { background-image: url(../images/products/p069.jpg); }  /* 욕실 코너 선반 2단 흡착식 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(14) .ad-thumb { background-image: url(../images/products/p070.jpg); }  /* 차량용 컵홀더 확장 트레이 */
+.personalized-gw > div:nth-of-type(2) .ad-list > li:nth-child(15) .ad-thumb { background-image: url(../images/products/p071.jpg); }  /* 발수 코팅 현관 매트 60x40 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(1) .ad-thumb { background-image: url(../images/products/p072.jpg); }  /* 상덕 반려동물 높이조절 2구 식기 스테인리스 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(2) .ad-thumb { background-image: url(../images/products/p073.jpg); }  /* 냉동 오징어링 4kg 소사이즈 튀김 짬뽕 절단 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(3) .ad-thumb { background-image: url(../images/products/p074.jpg); }  /* 라프레슈 카이막 200g 천상의 맛 수제 디저트 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(4) .ad-thumb { background-image: url(../images/products/p075.jpg); }  /* 갈치 튀김용 10마리 1kg 국내산 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(5) .ad-thumb { background-image: url(../images/products/p076.jpg); }  /* 한입 콩가루 크레페 인절미 과자 개별포장 100개 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(6) .ad-thumb { background-image: url(../images/products/p077.jpg); }  /* 국내산 손질 오징어 1kg 냉동 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(7) .ad-thumb { background-image: url(../images/products/p078.jpg); }  /* 제주 감귤 5kg 가정용 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(8) .ad-thumb { background-image: url(../images/products/p079.jpg); }  /* 수제 떡갈비 800g 냉동 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(9) .ad-thumb { background-image: url(../images/products/p080.jpg); }  /* 건조 미역 300g 국내산 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(10) .ad-thumb { background-image: url(../images/products/p081.jpg); }  /* 냉동 만두 왕교자 1.4kg 2봉 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(11) .ad-thumb { background-image: url(../images/products/p082.jpg); }  /* 무항생제 계란 30구 특란 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(12) .ad-thumb { background-image: url(../images/products/p083.jpg); }  /* 수제 유과 선물세트 1kg */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(13) .ad-thumb { background-image: url(../images/products/p084.jpg); }  /* 훈제오리 슬라이스 500g 2팩 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(14) .ad-thumb { background-image: url(../images/products/p085.jpg); }  /* 국산 콩 두부 5모 세트 */
+.personalized-gw > div:nth-of-type(3) .ad-list > li:nth-child(15) .ad-thumb { background-image: url(../images/products/p086.jpg); }  /* 생연어 슬라이스 500g 냉동 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(1) .ad-thumb { background-image: url(../images/products/p087.jpg); }  /* 로지텍 마우스 장패드, 2개, 블랙 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(2) .ad-thumb { background-image: url(../images/products/p088.jpg); }  /* Siemzon 반영구 스텐 수세미 주방 청소 걸레 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(3) .ad-thumb { background-image: url(../images/products/p089.jpg); }  /* SMABAT 무선 블루투스 이어폰 타입C 노이즈캔슬링 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(4) .ad-thumb { background-image: url(../images/products/p090.jpg); }  /* ROUJUN 남여공용 접이식 편광선글라스 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(5) .ad-thumb { background-image: url(../images/products/p091.jpg); }  /* Tiger Pavilion 3단4단5단원터치 접이식 철제 스탠 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(6) .ad-thumb { background-image: url(../images/products/p092.jpg); }  /* 무선 게이밍 키보드 마우스 세트 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(7) .ad-thumb { background-image: url(../images/products/p093.jpg); }  /* 접이식 우산 자동 3단 방풍 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(8) .ad-thumb { background-image: url(../images/products/p094.jpg); }  /* 스마트워치 방수 심박측정 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(9) .ad-thumb { background-image: url(../images/products/p095.jpg); }  /* 차량용 무선충전 거치대 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(10) .ad-thumb { background-image: url(../images/products/p096.jpg); }  /* 휴대용 미니 프린터 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(11) .ad-thumb { background-image: url(../images/products/p097.jpg); }  /* USB C타입 멀티허브 7in1 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(12) .ad-thumb { background-image: url(../images/products/p098.jpg); }  /* 블루투스 스피커 방수 IPX7 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(13) .ad-thumb { background-image: url(../images/products/p099.jpg); }  /* 노트북 파우치 15.6인치 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(14) .ad-thumb { background-image: url(../images/products/p100.jpg); }  /* 무선 이어폰 케이스 실리콘 */
+.personalized-gw > div:nth-of-type(4) .ad-list > li:nth-child(15) .ad-thumb { background-image: url(../images/products/p101.jpg); }  /* 접이식 캠핑 의자 초경량 */
+
+
+/* ==========================================
+   배너 이미지 (2026-08-20)
+   HTML 은 안 고침. 회색/색상자 자리표시 위에 background-image 만 얹음.
+   !important 가 붙은 곳 = HTML 에 인라인 style 이 있어서 그걸 이겨야 하는 자리
+   ========================================== */
+.today-discovery .tti-placeholder,
+.promotion .promo-placeholder,
+.side-banner .wing-placeholder,
+.coupang-top-banner .top-banner-placeholder,
+.gw-line-banners .line-banner,
+.bottom-cta-banner {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 자리표시용 글자·테두리 숨김 — 진짜 배너에는 글자가 이미 그려져 있음 */
+.side-banner .wing-placeholder { color: transparent; border: 0; }
+.coupang-top-banner .top-banner-placeholder { color: transparent !important; }
+.coupang-top-banner .top-banner-placeholder .arrow { display: none; }
+.gw-line-banners .line-banner > strong,
+.gw-line-banners .line-banner > .desc,
+.bottom-cta-banner > span { display: none; }
+
+/* --- 최상단 띠광고 2 (인라인 style 을 이겨야 해서 !important) --- */
+.coupang-top-banner .banner-middle > a:nth-of-type(1) .top-banner-placeholder { background-image: url(../images/banners/top-1.jpg) !important; }
+.coupang-top-banner .banner-middle > a:nth-of-type(2) .top-banner-placeholder { background-image: url(../images/banners/top-2.jpg) !important; }
+
+/* --- 오늘의 발견 9 (큰 3 + 작은 6) --- */
+.today-discovery .banner-list > li:nth-child(1) .tti-placeholder { background-image: url(../images/banners/disc-h1.jpg); }
+.today-discovery .banner-list > li:nth-child(2) .tti-placeholder { background-image: url(../images/banners/disc-h2.jpg); }
+.today-discovery .banner-list > li:nth-child(3) .tti-placeholder { background-image: url(../images/banners/disc-q1.jpg); }
+.today-discovery .banner-list > li:nth-child(4) .tti-placeholder { background-image: url(../images/banners/disc-q2.jpg); }
+.today-discovery .banner-list > li:nth-child(5) .tti-placeholder { background-image: url(../images/banners/disc-q3.jpg); }
+.today-discovery .banner-list > li:nth-child(6) .tti-placeholder { background-image: url(../images/banners/disc-q4.jpg); }
+.today-discovery .banner-list > li:nth-child(7) .tti-placeholder { background-image: url(../images/banners/disc-h3.jpg); }
+.today-discovery .banner-list > li:nth-child(8) .tti-placeholder { background-image: url(../images/banners/disc-q5.jpg); }
+.today-discovery .banner-list > li:nth-child(9) .tti-placeholder { background-image: url(../images/banners/disc-q6.jpg); }
+
+/* --- HOT!TREND 세로배너 11 --- */
+.category-best-unit.beauty .promotion > a.promotion-link:nth-of-type(1) .promo-placeholder { background-image: url(../images/banners/promo-beauty-1.jpg); }
+.category-best-unit.beauty .promotion > a.promotion-link:nth-of-type(2) .promo-placeholder { background-image: url(../images/banners/promo-beauty-2.jpg); }
+.category-best-unit.beauty .promotion > a.promotion-link:nth-of-type(3) .promo-placeholder { background-image: url(../images/banners/promo-beauty-3.jpg); }
+.category-best-unit.womanclothe .promotion > a.promotion-link:nth-of-type(1) .promo-placeholder { background-image: url(../images/banners/promo-womanclothe-1.jpg); }
+.category-best-unit.womanclothe .promotion > a.promotion-link:nth-of-type(2) .promo-placeholder { background-image: url(../images/banners/promo-womanclothe-2.jpg); }
+.category-best-unit.manclothe .promotion > a.promotion-link:nth-of-type(1) .promo-placeholder { background-image: url(../images/banners/promo-manclothe-1.jpg); }
+.category-best-unit.manclothe .promotion > a.promotion-link:nth-of-type(2) .promo-placeholder { background-image: url(../images/banners/promo-manclothe-2.jpg); }
+.category-best-unit.manclothe .promotion > a.promotion-link:nth-of-type(3) .promo-placeholder { background-image: url(../images/banners/promo-manclothe-3.jpg); }
+.category-best-unit.digital .promotion > a.promotion-link:nth-of-type(1) .promo-placeholder { background-image: url(../images/banners/promo-digital-1.jpg); }
+.category-best-unit.digital .promotion > a.promotion-link:nth-of-type(2) .promo-placeholder { background-image: url(../images/banners/promo-digital-2.jpg); }
+.category-best-unit.digital .promotion > a.promotion-link:nth-of-type(3) .promo-placeholder { background-image: url(../images/banners/promo-digital-3.jpg); }
+
+/* --- 띠배너 3 (앞의 a 2개는 화살표라 nth-of-type 은 3부터) --- */
+.gw-line-banners > a.line-banner:nth-of-type(3) { background-image: url(../images/banners/line-1.jpg) !important; }
+.gw-line-banners > a.line-banner:nth-of-type(4) { background-image: url(../images/banners/line-2.jpg) !important; }
+.gw-line-banners > a.line-banner:nth-of-type(5) { background-image: url(../images/banners/line-3.jpg) !important; }
+
+/* --- 맨 아래 CTA 배너 1 --- */
+.bottom-cta-banner { background-image: url(../images/banners/cta-1.jpg); }
+
+/* --- 날개배너 7 (전부 다른 그림) --- */
+.side-banner .promotion-banner > li:nth-child(1) .wing-placeholder { background-image: url(../images/banners/wing-1.jpg); }
+.side-banner .promotion-banner > li:nth-child(2) .wing-placeholder { background-image: url(../images/banners/wing-2.jpg); }
+.side-banner .promotion-banner > li:nth-child(3) .wing-placeholder { background-image: url(../images/banners/wing-3.jpg); }
+.side-banner .promotion-banner > li:nth-child(4) .wing-placeholder { background-image: url(../images/banners/wing-4.jpg); }
+.side-banner .promotion-banner > li:nth-child(5) .wing-placeholder { background-image: url(../images/banners/wing-5.jpg); }
+.side-banner .promotion-banner > li:nth-child(6) .wing-placeholder { background-image: url(../images/banners/wing-6.jpg); }
+.side-banner .promotion-banner > li:nth-child(7) .wing-placeholder { background-image: url(../images/banners/wing-7.jpg); }
+
+
+/* ==========================================
+   푸터 인증마크 (2026-08-20)
+   HTML 은 안 고침. 점선 자리표시 위에 진짜 마크를 얹음
+   ========================================== */
+.footer-awards .award-placeholder {
+  border: 0;                                    /* 점선 테두리 제거 */
+  color: transparent;                           /* "위해상품 차단시스템" 글자 제거 */
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: contain;
+}
+.footer-awards .award-placeholder:nth-of-type(1) { background-image: url(../images/icons/award-safe.png); }
+.footer-awards .award-placeholder:nth-of-type(2) { background-image: url(../images/icons/award-pcr.png); }
+
+/* ------------------------------------------------------------------
+   ⏸ 보류 — 2026-08-20 사용자 판단으로 뺌 (이미지는 남겨둠, 나중에 다시)
+
+   1) 카테고리 패널 오른쪽 배너  → 그냥 "배너 영역" 회색 상자로 둠
+      images/banners/gnb-banner.jpg  (590x413) 는 그대로 있음
+   2) 푸터 SNS 3개               → 그냥 컬러 동그라미로 둠
+      images/icons/sns-facebook.png / sns-blog.png / sns-instagram.png 는 그대로 있음
+
+   다시 켜려면 아래 주석을 풀면 됨:
+
+.category-layer .depth::after {
+  content: "";
+  background: #fff url(../images/banners/gnb-banner.jpg) no-repeat center / cover;
+  border-left: 0;
+}
+
+.sns-link a::before {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.sns-link .facebook::before  { background-image: url(../images/icons/sns-facebook.png); }
+.sns-link .blog::before      { background-image: url(../images/icons/sns-blog.png); }
+.sns-link .instagram::before { background-image: url(../images/icons/sns-instagram.png); }
+   ------------------------------------------------------------------ */
+
+
+/* --- 카테고리 패널 왼쪽 아이콘 18개 (원본 스프라이트 icons.03b3790b.png) --- */
+.category-layer .menu > li > a::before {
+  background: url(../images/icons/category-icons.png) no-repeat;
+  border-radius: 0;
+}
+.category-layer .menu > li:nth-child(1) > a::before { background-position: -28px -179px; }  /* 뷰티 */
+.category-layer .menu > li:nth-child(2) > a::before { background-position: -28px -95px; }  /* 여성패션 */
+.category-layer .menu > li:nth-child(3) > a::before { background-position: -28px -137px; }  /* 남성패션 */
+.category-layer .menu > li:nth-child(4) > a::before { background-position: -28px -263px; }  /* 식품 */
+.category-layer .menu > li:nth-child(5) > a::before { background-position: -28px -432px; }  /* 가구/홈인테리어 */
+.category-layer .menu > li:nth-child(6) > a::before { background-position: -28px -474px; }  /* 가전/디지털 */
+.category-layer .menu > li:nth-child(7) > a::before { background-position: -28px -559px; }  /* 문구/오피스 */
+.category-layer .menu > li:nth-child(8) > a::before { background-position: -28px -390px; }  /* 생활용품 */
+.category-layer .menu > li:nth-child(9) > a::before { background-position: -28px -516px; }  /* 스포츠/레저 */
+.category-layer .menu > li:nth-child(10) > a::before { background-position: -28px -937px; }  /* 헬스/건강식품 */
+.category-layer .menu > li:nth-child(11) > a::before { background-position: -28px -221px; }  /* 출산/유아동 */
+.category-layer .menu > li:nth-child(12) > a::before { background-position: -28px -1104px; }  /* 유아동패션 */
+.category-layer .menu > li:nth-child(13) > a::before { background-position: -28px -348px; }  /* 주방용품 */
+.category-layer .menu > li:nth-child(14) > a::before { background-position: -28px -600px; }  /* 반려동물용품 */
+.category-layer .menu > li:nth-child(15) > a::before { background-position: -28px -768px; }  /* 완구/취미 */
+.category-layer .menu > li:nth-child(16) > a::before { background-position: -28px -852px; }  /* 자동차용품 */
+.category-layer .menu > li:nth-child(17) > a::before { background-position: -28px -642px; }  /* 도서/CD/DVD */
+.category-layer .menu > li:nth-child(18) > a::before { background-position: -28px -684px; }  /* 여행 */
+
+/* 마우스 올리면 파란 아이콘으로 (스프라이트 오른쪽 열, +192px) */
+.category-layer .menu > li:nth-child(1):hover > a::before { background-position: -220px -179px; }
+.category-layer .menu > li:nth-child(2):hover > a::before { background-position: -220px -95px; }
+.category-layer .menu > li:nth-child(3):hover > a::before { background-position: -220px -137px; }
+.category-layer .menu > li:nth-child(4):hover > a::before { background-position: -220px -263px; }
+.category-layer .menu > li:nth-child(5):hover > a::before { background-position: -220px -432px; }
+.category-layer .menu > li:nth-child(6):hover > a::before { background-position: -220px -474px; }
+.category-layer .menu > li:nth-child(7):hover > a::before { background-position: -220px -559px; }
+.category-layer .menu > li:nth-child(8):hover > a::before { background-position: -220px -390px; }
+.category-layer .menu > li:nth-child(9):hover > a::before { background-position: -220px -516px; }
+.category-layer .menu > li:nth-child(10):hover > a::before { background-position: -220px -937px; }
+.category-layer .menu > li:nth-child(11):hover > a::before { background-position: -220px -221px; }
+.category-layer .menu > li:nth-child(12):hover > a::before { background-position: -220px -1104px; }
+.category-layer .menu > li:nth-child(13):hover > a::before { background-position: -220px -348px; }
+.category-layer .menu > li:nth-child(14):hover > a::before { background-position: -220px -600px; }
+.category-layer .menu > li:nth-child(15):hover > a::before { background-position: -220px -768px; }
+.category-layer .menu > li:nth-child(16):hover > a::before { background-position: -220px -852px; }
+.category-layer .menu > li:nth-child(17):hover > a::before { background-position: -220px -642px; }
+.category-layer .menu > li:nth-child(18):hover > a::before { background-position: -220px -684px; }
+
