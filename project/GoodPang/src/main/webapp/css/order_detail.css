@@ -1,0 +1,738 @@
+@charset "UTF-8";
+
+/* =========================================
+   기본 설정
+========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family:
+        Arial,
+        "Malgun Gothic",
+        "맑은 고딕",
+        sans-serif;
+
+    color: #111;
+    background: #fff;
+    font-size: 13px;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+
+/* =========================================
+   전체 영역
+========================================= */
+
+.order-detail-wrap {
+
+    width: 1024px;
+
+    margin: 15px auto 50px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+}
+
+/* =========================================
+   왼쪽 MY쿠팡
+========================================= */
+
+.mycoupang-side {
+    width: 135px;
+    flex-shrink: 0;
+
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.side-title {
+    height: 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #2673b9;
+    color: #fff;
+
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.side-section {
+    padding: 20px 15px 17px;
+    border-bottom: 1px solid #ddd;
+}
+
+.side-section h3 {
+    margin: 0 0 12px;
+
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.side-section a {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #222;
+    text-decoration: none;
+
+    line-height: 1.25;
+    font-size: 11px;
+}
+
+.side-section a:hover {
+    text-decoration: underline;
+}
+
+.side-section a.active {
+    color: #1675d1;
+}
+
+.new {
+    display: inline-flex;
+    width: 12px;
+    height: 12px;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #e5003d;
+    color: #fff;
+
+    font-size: 8px;
+    font-weight: bold;
+
+    margin-left: 2px;
+}
+
+
+/* =========================================
+   왼쪽 고객센터
+========================================= */
+
+.side-help {
+    margin-top: 9px;
+    border: 1px solid #ddd;
+}
+
+.side-help a {
+    min-height: 62px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 8px 7px;
+
+    border-bottom: 1px solid #ddd;
+
+    text-decoration: none;
+    color: #2673b9;
+
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.side-help a:last-child {
+    border-bottom: 0;
+}
+
+.help-icon {
+    width: 35px;
+
+    margin-right: 4px;
+
+    font-size: 23px;
+    text-align: center;
+}
+
+.side-help small {
+    font-size: 9px;
+    font-weight: normal;
+}
+
+
+/* =========================================
+   가운데 본문
+========================================= */
+
+.order-content {
+    width: 720px;
+
+    margin-left: 27px;
+    margin-right: 13px;
+}
+
+
+/* =========================================
+   주문 헤더
+========================================= */
+
+.order-header {
+    margin-bottom: 25px;
+}
+
+.order-header h1 {
+    margin: 0 0 10px;
+
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.order-info {
+    color: #777;
+    font-size: 13px;
+}
+
+.order-info strong {
+    color: #111;
+}
+
+.dot {
+    margin: 0 7px;
+}
+
+.order-number {
+    color: #777;
+}
+
+
+/* =========================================
+   배송 상품 영역
+========================================= */
+
+.delivery-box {
+    width: 100%;
+
+    min-height: 158px;
+
+    display: flex;
+
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+.delivery-main {
+    flex: 1;
+
+    padding: 19px 20px;
+}
+
+.delivery-title {
+    margin-bottom: 16px;
+
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.delivery-title span {
+    margin: 0 4px;
+    color: #555;
+}
+
+.delivery-title strong {
+    color: #00a63c;
+    font-weight: normal;
+}
+
+
+/* 상품 */
+
+.product-row {
+    display: flex;
+    align-items: center;
+}
+
+.product-image {
+    width: 72px;
+    height: 72px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 13px;
+}
+
+.clothes-icon {
+    width: 58px;
+    height: 62px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #d7e9f8;
+    border-radius: 5px;
+
+    font-size: 39px;
+}
+
+.product-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-name {
+    margin-bottom: 10px;
+
+    font-size: 13px;
+    line-height: 1.4;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rocket {
+    color: #1595d1;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.product-price {
+    color: #555;
+    margin-bottom: 7px;
+}
+
+.product-price span {
+    margin: 0 4px;
+}
+
+.product-option {
+    color: #777;
+}
+
+.product-option span {
+    margin: 0 5px;
+}
+
+
+/* 장바구니 */
+
+.cart-btn {
+    width: 103px;
+    height: 32px;
+
+    margin-left: 10px;
+
+    background: #fff;
+
+    border: 1px solid #ddd;
+    border-radius: 3px;
+
+    font-size: 12px;
+}
+
+.cart-btn:hover {
+    background: #f7f7f7;
+}
+
+
+/* 배송 버튼 */
+
+.delivery-buttons {
+    width: 180px;
+
+    padding: 21px 18px;
+
+    border-left: 1px solid #eee;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.delivery-btn {
+    width: 100%;
+    height: 34px;
+
+    background: #fff;
+
+    border: 1px solid #ddd;
+    border-radius: 3px;
+
+    font-size: 12px;
+}
+
+.delivery-btn.primary {
+    border-color: #315eff;
+    color: #315eff;
+}
+
+.delivery-btn:hover {
+    background: #f8f8f8;
+}
+
+
+/* =========================================
+   공통 상세 영역
+========================================= */
+
+.detail-section {
+    margin-top: 34px;
+}
+
+.detail-section h2 {
+    margin: 0 0 11px;
+
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.section-line {
+    height: 1px;
+    background: #333;
+}
+
+
+/* =========================================
+   받는 사람 정보
+========================================= */
+
+.info-table {
+    padding: 10px 0 6px;
+
+    border-bottom: 1px solid #ccc;
+}
+
+.info-row {
+    display: flex;
+
+    min-height: 25px;
+
+    line-height: 25px;
+}
+
+.info-title {
+    width: 95px;
+    color: #777;
+}
+
+.info-value {
+    flex: 1;
+    color: #222;
+}
+
+
+/* =========================================
+   결제 정보
+========================================= */
+
+.payment-section {
+    margin-top: 32px;
+}
+
+.payment-box {
+    min-height: 67px;
+
+    display: flex;
+
+    border-bottom: 1px solid #ddd;
+}
+
+.payment-method {
+    flex: 1;
+
+    padding-top: 18px;
+
+    font-size: 14px;
+}
+
+.payment-price {
+    width: 305px;
+
+    padding: 10px 15px;
+
+    background: #f8f8f8;
+}
+
+.price-row {
+    height: 25px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-row span {
+    color: #777;
+}
+
+.price-row strong {
+    font-size: 12px;
+}
+
+
+.payment-total {
+    min-height: 63px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 15px 0 420px;
+
+    background: #fafafa;
+}
+
+.payment-total > div:first-child {
+    color: #777;
+}
+
+.payment-total > div:last-child {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.payment-total span {
+    font-size: 12px;
+}
+
+.payment-total strong {
+    font-size: 17px;
+}
+
+
+/* =========================================
+   영수증
+========================================= */
+
+.receipt-section {
+    margin-top: 34px;
+}
+
+.receipt-row {
+    min-height: 61px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #ddd;
+
+    color: #777;
+}
+
+.receipt-btn {
+    width: 65px;
+    height: 31px;
+
+    background: #fff;
+
+    border: 1px solid #ccc;
+    border-radius: 3px;
+
+    font-size: 11px;
+}
+
+.receipt-btn:hover {
+    background: #f5f5f5;
+}
+
+
+/* =========================================
+   오른쪽 광고
+========================================= */
+
+.right-banner {
+    width: 92px;
+    flex-shrink: 0;
+}
+
+.banner {
+    position: relative;
+
+    width: 92px;
+    height: 134px;
+
+    margin-bottom: 9px;
+
+    border-radius: 3px;
+
+    overflow: hidden;
+
+    padding: 14px 8px;
+
+    color: #fff;
+}
+
+.banner strong {
+    position: relative;
+    z-index: 2;
+
+    display: block;
+
+    font-size: 14px;
+    line-height: 1.25;
+}
+
+.banner span {
+    position: absolute;
+
+    left: 8px;
+    top: 49px;
+
+    z-index: 3;
+
+    width: 16px;
+    height: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.9);
+
+    color: #276fe5;
+
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.banner-product,
+.banner-character,
+.banner-bell,
+.banner-shop {
+    position: absolute;
+
+    right: 5px;
+    bottom: 2px;
+
+    font-size: 52px;
+}
+
+.banner-1 {
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #2875db;
+}
+
+.banner-1 strong {
+    font-size: 17px;
+}
+
+.banner-2 {
+    background: #b9e4f5;
+    color: #222;
+}
+
+.banner-3 {
+    background: #f5a7c5;
+    color: #222;
+}
+
+.banner-3 em {
+    color: #ff0066;
+    font-style: normal;
+}
+
+.banner-4 {
+    background: #3339ef;
+}
+
+.banner-5 {
+    background: #ef4a3b;
+}
+
+.banner-bell {
+    font-size: 52px;
+}
+
+.banner-shop {
+    font-size: 48px;
+}
+
+.badge {
+    position: absolute;
+
+    right: 7px;
+    top: 54px;
+
+    width: 18px;
+    height: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #e60012;
+
+    border-radius: 50%;
+
+    font-size: 10px;
+}
+
+
+/* =========================================
+   오른쪽 미니 메뉴
+========================================= */
+
+.side-mini-menu {
+    border: 1px solid #ddd;
+}
+
+.side-mini-menu div {
+    height: 30px;
+
+    padding: 0 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #34405c;
+
+    color: #fff;
+
+    font-size: 10px;
+}
+
+.side-mini-menu div + div {
+    border-top: 1px solid #566078;
+}
+
+.side-mini-menu strong {
+    color: #39a5ff;
+    font-size: 11px;
+}
+
+
+/* 최근 상품 */
+
+.recent-product {
+    height: 78px;
+
+    margin-top: 0;
+
+    border: 1px solid #ddd;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 42px;
+}
+
