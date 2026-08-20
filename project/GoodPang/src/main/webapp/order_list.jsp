@@ -6,69 +6,11 @@
     <title>GoodPang | 주문목록</title>
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/order_list.css">
+    <link rel="stylesheet" href="css/reset.css">
 </head>
 <body>
-    <!-- 1. 홈페이지 상단 풍성한 헤더 (카테고리 + 서비스 퀵메뉴) -->
-    <header class="order-header">
-        <!-- 최상단 유틸 메뉴 -->
-        <div class="top-util-bar">
-            <div class="util-inner">
-                <a href="#">즐겨찾기</a>
-                <a href="#">입점신청</a>
-                <div class="util-right">
-                    <span>오*빈님</span>
-                    <a href="#">로그아웃</a>
-                    <a href="#">고객센터</a>
-                    <a href="#">판매자 가입</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- 메인 헤더 영역 (로고 + 검색창 + 마이쿠팡/장바구니) -->
-        <div class="header-inner">
-            <div class="category-btn">
-                <span class="menu-icon">☰</span>
-                <span class="menu-text">카테고리</span>
-            </div>
-            
-            <h1 class="logo">
-                <a href="index.html" class="brand-goodpang">GoodPang</a>
-            </h1>
-            
-            <div class="search-bar">
-                <select class="search-select">
-                    <option>전체</option>
-                </select>
-                <input type="text" placeholder="찾고 싶은 상품을 검색해보세요!">
-                <button type="button" class="btn-search">🔍</button>
-            </div>
-            
-            <div class="header-right">
-                <a href="order_list.jsp" class="hdr-icon-btn">
-                    <span class="icon">👤</span>
-                    <span>마이쿠팡</span>
-                </a>
-                <a href="cart.jsp" class="hdr-icon-btn">
-                    <span class="icon">🛒<em class="cart-badge">2</em></span>
-                    <span>장바구니</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- 아이콘 퀵 서비스 서비스 뱃지 메뉴 -->
-        <nav class="service-nav" >
-           <div class="service-inner" style="display: flex; justify-content: center; align-items: center; gap: 20px; height: 40px;">
-                <a href="#" class="svc-item"><span class="badge play">쿠팡플레이</span></a>
-                <a href="#" class="svc-item"><span class="badge rocket">🚀 로켓배송</span></a>
-                <a href="#" class="svc-item"><span class="badge fresh">🌱 로켓프레시</span></a>
-                <a href="#" class="svc-item"><span class="badge retry">🔄 다시 구매</span></a>
-                <a href="#" class="svc-item"><span class="badge biz">biz 쿠팡비즈</span></a>
-                <a href="#" class="svc-item"><span class="badge direct">✈️ 로켓직구</span></a>
-                <a href="#" class="svc-item"><span class="badge gold">📦 골드박스</span></a>
-                <a href="#" class="svc-item"><span class="badge new">✨ 이달의신상</span></a>
-            </div>
-        </nav>
-    </header>
+  
+  <jsp:include page="/inc/header.jsp" />
 
     <!-- 2. 메인 3열 레이아웃 -->
     <div class="mypage-wrapper">
@@ -179,5 +121,7 @@
     </div>
 
     <script src="js/order_list.js"></script>
+    
+    <jsp:include page="/inc/footer.jsp" />
 </body>
 </html>
