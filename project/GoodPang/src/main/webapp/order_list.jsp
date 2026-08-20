@@ -105,7 +105,7 @@
             <div class="sidebar-group">
                 <h3>MY 정보</h3>
                 <ul>
-                    <li><a href="#">개인정보확인/수정</a></li>
+                    <li><a href="userModify.jsp">개인정보확인/수정</a></li>
                     <li><a href="#">결제수단·쿠페이 관리</a></li>
                     <li><a href="#">배송지 관리</a></li>
                     <li><a href="#">패스키 관리</a></li>
