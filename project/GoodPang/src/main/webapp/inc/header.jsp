@@ -357,7 +357,7 @@
 					</form>
 
 					<ul class="icon-menus">
-						<li class="my-coupang"><a href="#"> <img
+						<li class="my-coupang"><a href="order_list.jsp"> <img
 								src="images/icons/person.png" width="44" height="44" alt="">
 								<span class="icon-label">마이쿠팡</span>
 						</a>
