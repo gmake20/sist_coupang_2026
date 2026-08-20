@@ -35,7 +35,7 @@ public class OrderDAO {
 	                ADDRESS_DEFAULT
 	            FROM DELIVERY_ADDRESS
 	            WHERE MEMBER_NO = ?
-	              AND ADDRESS_DEFAULT = 'Y'
+	              AND ADDRESS_DEFAULT = 'Y'	
 	            """;
 
 	    try (
@@ -96,6 +96,104 @@ public class OrderDAO {
 	    }
 
 	    return address;
+	}
+	
+	public List<AddressDTO> getAddressList(
+	        int memberNo) {
+
+	    List<AddressDTO> list =
+	        new ArrayList<>();
+
+	    String sql = """
+	            SELECT
+	                ADDRESS_NO,
+	                RECEIVER_NAME,
+	                ADDRESS,
+	                DETAIL_ADDRESS,
+	                TEL,
+	                REQUEST_MSG,
+	                ADDRESS_DEFAULT
+	            FROM DELIVERY_ADDRESS
+	            WHERE MEMBER_NO = ?
+	            ORDER BY
+	                ADDRESS_DEFAULT DESC,
+	                ADDRESS_NO DESC
+	            """;
+
+	    try (
+	        Connection conn =
+	        		ConnectionProvider.getConnection();
+
+	        PreparedStatement pstmt =
+	            conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setInt(
+	            1,
+	            memberNo
+	        );
+
+	        try (
+	            ResultSet rs =
+	                pstmt.executeQuery()
+	        ) {
+
+	            while (rs.next()) {
+
+	                AddressDTO dto =
+	                    new AddressDTO();
+
+	                dto.setAddressNo(
+	                    rs.getInt(
+	                        "ADDRESS_NO"
+	                    )
+	                );
+
+	                dto.setReceiverName(
+	                    rs.getString(
+	                        "RECEIVER_NAME"
+	                    )
+	                );
+
+	                dto.setAddress(
+	                    rs.getString(
+	                        "ADDRESS"
+	                    )
+	                );
+
+	                dto.setDetailAddress(
+	                    rs.getString(
+	                        "DETAIL_ADDRESS"
+	                    )
+	                );
+
+	                dto.setTel(
+	                    rs.getString(
+	                        "TEL"
+	                    )
+	                );
+
+	                dto.setRequestMsg(
+	                    rs.getString(
+	                        "REQUEST_MSG"
+	                    )
+	                );
+
+	                dto.setAddressDefault(
+		                    "Y".equals(
+		                        rs.getString("ADDRESS_DEFAULT")
+		                    )
+	                );
+
+	                list.add(dto);
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return list;
 	}
 
     /*
@@ -176,37 +274,14 @@ public class OrderDAO {
         String sql = """
                 SELECT
                     o.order_no,
-
-                    NVL(
-                        SUM(od.price * od.order_qty),
-                        0
-                    ) AS total_product_price,
-
-                    NVL(
-                        o.delivery_fee,
-                        0
-                    ) AS delivery_fee,
-
-                    NVL(
-                        SUM(od.price * od.order_qty),
-                        0
-                    )
-                    +
-                    NVL(
-                        o.delivery_fee,
-                        0
-                    ) AS final_price
-
+                    NVL(o.product_amount, 0) AS total_product_price,
+                    NVL(o.delivery_fee, 0) AS delivery_fee,
+                    NVL(o.instant_discount, 0) AS instant_discount,
+                    NVL(o.coupon_discount, 0) AS coupon_discount,
+                    NVL(o.cash_used, 0) AS cash_used,
+                    NVL(o.total_price, 0) AS final_price
                 FROM orders o
-
-                LEFT JOIN order_detail od
-                       ON o.order_no = od.order_no
-
                 WHERE o.order_no = ?
-
-                GROUP BY
-                    o.order_no,
-                    o.delivery_fee
                 """;
 
         try (
@@ -243,6 +318,10 @@ public class OrderDAO {
                                     "final_price"
                             )
                     );
+                    summary.setInstantDiscount(rs.getInt("instant_discount"));
+                    summary.setCouponDiscount(rs.getInt("coupon_discount"));
+                    summary.setCashUsed(rs.getInt("cash_used"));
+                    
                 }
             }
 

@@ -2,6 +2,8 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -38,20 +40,30 @@
 				<div class="section-box">
 					<div class="section-header">
 						<div>
-							<strong>배송지</strong> | ${address.receiverName}
+							<strong>배송지</strong> | <span id="currentReceiverName">${address.receiverName}</span>
 						</div>
-						<button class="btn-outline" type="button">배송지 변경</button>
+
+						<button class="btn-outline" type="button"
+							onclick="openAddressModal()">배송지 변경</button>
 					</div>
+
 					<div class="section-body">
+
 						<div class="address-detail">
-							${address.address}<br> ${address.detailAddress}<br>
-							${address.tel}
+							<span id="currentAddress">${address.address}</span><br> <span
+								id="currentDetailAddress">${address.detailAddress}</span><br>
+							휴대폰 : <span id="currentTel">${address.tel}</span>
 						</div>
+
 						<c:if test="${address.addressDefault}">
-							<span class="tag">기본배송지</span>
+							<span class="tag" id="currentDefaultTag"> 기본배송지 </span>
 						</c:if>
+
 					</div>
 				</div>
+
+				<input type="hidden" id="selectedAddressNo" name="addressNo"
+					value="${address.addressNo}">
 
 				<!-- 배송 요청사항 -->
 				<div class="section-box">
@@ -59,15 +71,17 @@
 						<strong>배송 요청사항</strong>
 						<button class="btn-outline" type="button">변경</button>
 					</div>
+
 					<div class="section-body">
-						<c:choose>
-							<c:when test="${not empty address.requestMsg}">
-                		${address.requestMsg}
-            			</c:when>
-							<c:otherwise>
-								<span style="color: #aaa;">배송 요청사항이 없습니다.</span>
-							</c:otherwise>
-						</c:choose>
+						<span id="currentRequestMessage"> <c:choose>
+								<c:when test="${not empty address.requestMsg}">
+                				${address.requestMsg}
+            					</c:when>
+								<c:otherwise>
+				                배송 요청사항이 없습니다.
+				            </c:otherwise>
+							</c:choose>
+						</span>
 					</div>
 				</div>
 
@@ -84,7 +98,7 @@
 						<label class="pay-radio-row"> <input type="radio"
 							name="payMethod" value="coupayMoney"> <span
 							class="pay-title"> 쿠페이 머니 : <strong> <fmt:formatNumber
-										value="${summary.usedCash}" pattern="#,###" />원
+										value="${summary.cashUsed}" pattern="#,###" />원
 							</strong>
 						</span> <span class="badge-red"> 최대 캐시적립 </span>
 						</label>
@@ -228,7 +242,7 @@
 						<span>쿠팡캐시</span>
 						<div class="cash-input">
 							<button type="button">전액사용</button>
-							<input type="text" value="${summary.usedCash}"> 원
+							<input type="text" value="${summary.cashUsed}"> 원
 						</div>
 					</div>
 					<div
@@ -264,6 +278,109 @@
 			</div>
 		</div>
 	</div>
+	<!-- ===================================== -->
+	<!-- 배송지 선택 모달 -->
+	<!-- ===================================== -->
+	<div id="addressModalOverlay" class="address-modal-overlay">
+
+		<div class="address-modal" onclick="event.stopPropagation();">
+
+			<!-- 상단 -->
+			<div class="address-modal-header">
+
+				<h2>배송지 선택</h2>
+
+				<button type="button" class="address-modal-close"
+					onclick="closeAddressModal()">&times;</button>
+
+			</div>
+
+
+			<!-- 배송지 목록 -->
+			<div class="address-modal-body">
+
+				<c:forEach var="addr" items="${addressList}">
+
+					<div
+						class="address-card
+                    ${addr.addressNo == address.addressNo ? 'selected-address-card' : ''}">
+
+						<!-- 이름 -->
+						<div class="address-card-name">${addr.receiverName}</div>
+
+
+						<!-- 태그 -->
+						<div class="address-tags">
+
+							<c:if test="${addr.addressDefault}">
+								<span class="address-tag default"> 기본배송지 </span>
+							</c:if>
+
+							<span class="address-tag fresh"> 로켓프레시 가능 </span> <span
+								class="address-tag rocket"> 로켓와우 가능 </span>
+
+						</div>
+
+
+						<!-- 주소 -->
+						<div class="address-card-detail">
+
+							<div class="address-text">
+    							${addr.address}&nbsp;${addr.detailAddress}
+							</div>
+
+							<div>${addr.tel}</div>
+
+							<c:choose>
+
+								<c:when test="${not empty addr.requestMsg}">
+									<div class="address-request">${addr.requestMsg}</div>
+								</c:when>
+
+								<c:otherwise>
+									<div class="address-request">배송 요청사항 없음</div>
+								</c:otherwise>
+
+							</c:choose>
+
+						</div>
+
+
+						<!-- 하단 버튼 -->
+						<div class="address-card-buttons">
+
+							<button type="button" class="address-edit-btn">수정</button>
+
+
+							<button type="button" class="address-select-btn"
+								data-address-no="${addr.addressNo}"
+								data-receiver-name="${fn:escapeXml(addr.receiverName)}"
+								data-address="${fn:escapeXml(addr.address)}"
+								data-detail-address="${fn:escapeXml(addr.detailAddress)}"
+								data-tel="${fn:escapeXml(addr.tel)}"
+								data-request-msg="${fn:escapeXml(addr.requestMsg)}"
+								data-default="${addr.addressDefault}"
+								onclick="selectAddress(this)">선택</button>
+
+						</div>
+
+					</div>
+
+				</c:forEach>
+
+
+				<!-- 배송지 추가 -->
+				<button type="button" class="address-add-btn" onclick="addAddress()">
+
+					<span class="plus-icon">＋</span> 배송지 추가
+
+				</button>
+
+			</div>
+
+		</div>
+
+	</div>
 </body>
 <script>
 function toggleOtherPayment() {
@@ -288,5 +405,182 @@ function toggleOtherPayment() {
         // 실제 결제 처리 없이 무조건 주문완료 페이지로 이동
         location.href = "${pageContext.request.contextPath}/coupang_order_complete.jsp";
     }
+    
+    function openAddressModal() {
+
+        const modal =
+            document.getElementById("addressModalOverlay");
+
+        modal.classList.add("show");
+
+        document.body.classList.add("modal-open");
+    }
+
+
+    function closeAddressModal() {
+
+        const modal =
+            document.getElementById("addressModalOverlay");
+
+        modal.classList.remove("show");
+
+        document.body.classList.remove("modal-open");
+    }
+
+
+    /*
+     * 배송지 선택
+     */
+    function selectAddress(button) {
+
+        const addressNo =
+            button.dataset.addressNo;
+
+        const receiverName =
+            button.dataset.receiverName;
+
+        const address =
+            button.dataset.address;
+
+        const detailAddress =
+            button.dataset.detailAddress;
+
+        const tel =
+            button.dataset.tel;
+
+        const requestMsg =
+            button.dataset.requestMsg;
+
+        const isDefault =
+            button.dataset.default === "true";
+
+
+        /*
+         * 주문페이지 배송지 변경
+         */
+        document.getElementById(
+            "currentReceiverName"
+        ).textContent = receiverName;
+
+
+        document.getElementById(
+            "currentAddress"
+        ).textContent = address;
+
+
+        document.getElementById(
+            "currentDetailAddress"
+        ).textContent = detailAddress;
+
+
+        document.getElementById(
+            "currentTel"
+        ).textContent = tel;
+
+
+        /*
+         * 실제 주문 때 사용할 ADDRESS_NO
+         */
+        document.getElementById(
+            "selectedAddressNo"
+        ).value = addressNo;
+
+
+        /*
+         * 배송 요청사항도 변경
+         */
+        const requestArea =
+            document.getElementById(
+                "currentRequestMessage"
+            );
+
+        if (requestArea) {
+
+            if (
+                requestMsg !== null &&
+                requestMsg.trim() !== ""
+            ) {
+
+                requestArea.textContent =
+                    requestMsg;
+
+                requestArea.style.color =
+                    "#333";
+
+            } else {
+
+                requestArea.textContent =
+                    "배송 요청사항이 없습니다.";
+
+                requestArea.style.color =
+                    "#aaa";
+            }
+        }
+
+
+        /*
+         * 선택된 카드 파란 테두리
+         */
+        document
+            .querySelectorAll(".address-card")
+            .forEach(card => {
+
+                card.classList.remove(
+                    "selected-address-card"
+                );
+
+            });
+
+
+        button
+            .closest(".address-card")
+            .classList.add(
+                "selected-address-card"
+            );
+
+
+        /*
+         * 모달 닫기
+         */
+        closeAddressModal();
+    }
+
+
+    /*
+     * 배송지 추가
+     */
+    function addAddress() {
+
+        location.href =
+            "${pageContext.request.contextPath}/address/add";
+    }
+
+
+    /*
+     * 모달의 어두운 배경 클릭 시 닫기
+     */
+    document
+        .getElementById("addressModalOverlay")
+        .addEventListener(
+            "click",
+            closeAddressModal
+        );
+
+
+    /*
+     * ESC로 닫기
+     */
+    document.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Escape") {
+
+                closeAddressModal();
+
+            }
+
+        }
+    );
 </script>
 </html>

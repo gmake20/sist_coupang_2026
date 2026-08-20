@@ -47,13 +47,23 @@ public class OrderServlet extends HttpServlet {
         AddressDTO address =
                 dao.getAddress(memberNo);
         
+        List<AddressDTO> addressList =
+        	    orderDAO.getAddressList(memberNo);
+        
         OrderSummaryDTO summary =
                 orderDAO.getOrderSummary(orderNo);
+        
+        System.out.println(summary);
 
 //        List<OrderItemDTO> orderItems =
 //                dao.getOrderItems(orderNo);
 
         request.setAttribute("address", address);
+        
+        request.setAttribute(
+        	    "addressList",
+        	    addressList
+        	);
 		/*
 		 * request.setAttribute("orderItems", orderItems);
 		 */

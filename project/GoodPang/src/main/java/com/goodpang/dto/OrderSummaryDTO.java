@@ -16,6 +16,6 @@ public class OrderSummaryDTO {
     
     private int instantDiscount;
     private int couponDiscount;
-    private int usedCash; 
+    private int cashUsed; 
     private int remainCash;
 }
