@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="order-card">
                 <div class="card-header">
                     <span class="order-date">${item.date} 주문</span>
-                    <a href="/order_detail.jsp" class="link-detail">주문 상세보기 &gt;</a>
+                    <a href="/GoodPang/order_detail.jsp" class="link-detail">주문 상세보기 &gt;</a>
                 </div>
                 <div class="card-body">
                     <div class="delivery-status">

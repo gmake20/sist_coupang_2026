@@ -21,7 +21,7 @@
                 <h3>MY 쇼핑</h3>
                 <ul>
                     <li class="active"><a href="order_list.jsp">주문목록/배송조회</a></li>
-                    <li><a href="#">취소/반품/교환/환불 내역</a></li>
+                    <li><a href="cancel_history.jsp">취소/반품/교환/환불 내역</a></li>
                     <li><a href="#">와우 멤버십</a></li>
                     <li><a href="#">구독 서비스 <span class="badge-n">N</span></a></li>
                     <li><a href="#">로켓프레시 프레시백 <span class="badge-n">N</span></a></li>
