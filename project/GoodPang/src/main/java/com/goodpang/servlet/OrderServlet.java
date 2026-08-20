@@ -53,8 +53,6 @@ public class OrderServlet extends HttpServlet {
         OrderSummaryDTO summary =
                 orderDAO.getOrderSummary(orderNo);
         
-        System.out.println(summary);
-
 //        List<OrderItemDTO> orderItems =
 //                dao.getOrderItems(orderNo);
 
