@@ -13,5 +13,11 @@
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
+    
+    
+    <!-- 세션 유지 시간 -->
+    <session-config>
+    <session-timeout>30</session-timeout>
+	</session-config>
 
 </web-app>
