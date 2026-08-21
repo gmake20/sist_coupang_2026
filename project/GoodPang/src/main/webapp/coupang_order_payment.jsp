@@ -22,7 +22,7 @@
 	<div class="container">
 
 		<h1 class="logo">
-			<a href="index.html" title="GoodPang 홈으로"> <span
+			<a href="${pageContext.request.contextPath}/" title="GoodPang 홈으로"> <span
 				class="brand-goodpang">GoodPang</span>
 			</a>
 		</h1>
@@ -62,8 +62,8 @@
 					</div>
 				</div>
 
-				<input type="hidden" id="selectedAddressNo" name="addressNo"
-					value="${address.addressNo}">
+				<%-- <input type="hidden" id="selectedAddressNo" name="addressNo"
+					value="${address.addressNo}"> --%>
 
 				<!-- 배송 요청사항 -->
 				<div class="section-box">
@@ -273,7 +273,26 @@
 					<div class="final-agree">위 주문 내용을 확인 하였으며, 회원 본인은 개인정보 이용 및
 						제공(해외직구의 경우 국외제공) 및 결제에 동의합니다.</div>
 
-					<button class="btn-pay" type="button" onclick="dummyPay()">결제하기</button>
+
+
+					<!-- <button class="btn-pay" type="button" onclick="dummyPay()">결제하기</button> -->
+					
+					<form id="paymentForm"
+						action="${pageContext.request.contextPath}/order/checkout"
+						method="post">
+
+						<!-- 현재 주문번호 -->
+						<input type="hidden" name="orderNo" value="${orderNo}">
+
+						<!-- 선택한 배송지 -->
+						<input type="hidden" id="selectedAddressNo" name="addressNo"
+							value="${address.addressNo}">
+
+						<button class="btn-pay" type="submit">결제하기</button>
+
+					</form>
+
+
 				</div>
 			</div>
 		</div>
@@ -282,76 +301,54 @@
 	<!-- 배송지 선택 모달 -->
 	<!-- ===================================== -->
 	<div id="addressModalOverlay" class="address-modal-overlay">
-
 		<div class="address-modal" onclick="event.stopPropagation();">
-
 			<!-- 상단 -->
 			<div class="address-modal-header">
-
 				<h2>배송지 선택</h2>
-
 				<button type="button" class="address-modal-close"
 					onclick="closeAddressModal()">&times;</button>
-
 			</div>
-
 
 			<!-- 배송지 목록 -->
 			<div class="address-modal-body">
-
 				<c:forEach var="addr" items="${addressList}">
-
 					<div
 						class="address-card
                     ${addr.addressNo == address.addressNo ? 'selected-address-card' : ''}">
-
 						<!-- 이름 -->
 						<div class="address-card-name">${addr.receiverName}</div>
 
 
 						<!-- 태그 -->
 						<div class="address-tags">
-
 							<c:if test="${addr.addressDefault}">
 								<span class="address-tag default"> 기본배송지 </span>
 							</c:if>
-
 							<span class="address-tag fresh"> 로켓프레시 가능 </span> <span
 								class="address-tag rocket"> 로켓와우 가능 </span>
-
 						</div>
 
 
 						<!-- 주소 -->
 						<div class="address-card-detail">
-
 							<div class="address-text">
-    							${addr.address}&nbsp;${addr.detailAddress}
-							</div>
+								${addr.address}&nbsp;${addr.detailAddress}</div>
 
 							<div>${addr.tel}</div>
-
 							<c:choose>
-
 								<c:when test="${not empty addr.requestMsg}">
 									<div class="address-request">${addr.requestMsg}</div>
 								</c:when>
-
 								<c:otherwise>
 									<div class="address-request">배송 요청사항 없음</div>
 								</c:otherwise>
-
 							</c:choose>
-
 						</div>
 
 
 						<!-- 하단 버튼 -->
 						<div class="address-card-buttons">
-
 							<button type="button" class="address-edit-btn">수정</button>
-
-
 							<button type="button" class="address-select-btn"
 								data-address-no="${addr.addressNo}"
 								data-receiver-name="${fn:escapeXml(addr.receiverName)}"
@@ -361,25 +358,128 @@
 								data-request-msg="${fn:escapeXml(addr.requestMsg)}"
 								data-default="${addr.addressDefault}"
 								onclick="selectAddress(this)">선택</button>
-
 						</div>
-
 					</div>
-
 				</c:forEach>
 
 
 				<!-- 배송지 추가 -->
-				<button type="button" class="address-add-btn" onclick="addAddress()">
-
+				<button type="button" class="address-add-btn"
+					onclick="openAddAddressModal()">
 					<span class="plus-icon">＋</span> 배송지 추가
-
 				</button>
 
 			</div>
 
 		</div>
 
+	</div>
+	<!-- ===================================== -->
+	<!-- 배송지 추가 모달 -->
+	<!-- ===================================== -->
+	<div id="addAddressModalOverlay" class="address-add-modal-overlay">
+
+		<div class="address-add-modal" onclick="event.stopPropagation();">
+
+			<!-- 상단 -->
+			<div class="address-add-header">
+				<h2>배송지 선택</h2>
+
+				<button type="button" class="address-add-close"
+					onclick="closeAddAddressModal()">×</button>
+			</div>
+
+			<!-- 실제 저장 FORM -->
+			<form id="addAddressForm"
+				action="${pageContext.request.contextPath}/address/add"
+				method="post">
+
+				<div class="address-add-body">
+
+					<!-- 받는 사람 -->
+					<div class="add-address-row">
+						<div class="add-address-icon">♙</div>
+
+						<input type="text" name="receiverName" id="newReceiverName"
+							placeholder="받는 사람" autocomplete="off">
+					</div>
+
+
+					<!-- 우편번호 -->
+					<div class="add-address-row postcode-row">
+
+						<div class="add-address-icon">◉</div>
+
+						<button type="button" class="postcode-search-btn"
+							onclick="findPostcode()">우편번호 찾기</button>
+
+						<input type="hidden" name="zipcode" id="newZipcode">
+					</div>
+
+
+					<!-- 주소 -->
+					<div class="add-address-row address-input-row">
+
+						<div class="add-address-icon">⌂</div>
+
+						<input type="text" name="address" id="newAddress" placeholder="주소"
+							readonly>
+					</div>
+
+
+					<!-- 상세주소 -->
+					<div class="add-address-row">
+
+						<div class="add-address-icon">⌂</div>
+
+						<input type="text" name="detailAddress" id="newDetailAddress"
+							placeholder="상세주소">
+					</div>
+
+
+					<!-- 휴대폰 -->
+					<div class="add-address-row phone-row">
+
+						<div class="add-address-icon">▣</div>
+
+						<input type="text" name="tel" id="newTel" placeholder="휴대폰 번호">
+
+						<span class="phone-plus">＋</span>
+					</div>
+
+
+					<!-- 일반배송 -->
+					<button type="button" class="delivery-option-row">
+
+						<div class="delivery-option-icon">▦</div>
+
+						<span> 일반배송 정보를 선택해 주세요. </span> <strong>〉</strong>
+					</button>
+
+
+					<!-- 새벽배송 -->
+					<button type="button" class="delivery-option-row">
+
+						<div class="delivery-option-icon">▦</div>
+
+						<span> 새벽배송 정보를 선택해 주세요. </span> <strong>〉</strong>
+					</button>
+
+
+					<!-- 기본 배송지 -->
+					<label class="default-address-check"> <input
+						type="checkbox" name="addressDefault" value="Y"> <span
+						class="custom-check"></span> 기본 배송지로 선택
+					</label>
+
+
+					<!-- 저장 -->
+					<button type="submit" class="address-save-btn">저장</button>
+
+				</div>
+			</form>
+
+		</div>
 	</div>
 </body>
 <script>
@@ -401,10 +501,10 @@ function toggleOtherPayment() {
     }
 }
 
-    function dummyPay() {
+    /* function dummyPay() {
         // 실제 결제 처리 없이 무조건 주문완료 페이지로 이동
         location.href = "${pageContext.request.contextPath}/coupang_order_complete.jsp";
-    }
+    } */
     
     function openAddressModal() {
 
@@ -549,12 +649,56 @@ function toggleOtherPayment() {
     /*
      * 배송지 추가
      */
-    function addAddress() {
+     /*
+      * 배송지 추가 모달 열기
+      */
+     function openAddAddressModal() {
 
-        location.href =
-            "${pageContext.request.contextPath}/address/add";
-    }
+         // 기존 배송지 선택 모달 닫기
+         const selectModal =
+             document.getElementById("addressModalOverlay");
 
+         selectModal.classList.remove("show");
+
+
+         // 배송지 추가 모달 열기
+         const addModal =
+             document.getElementById("addAddressModalOverlay");
+
+         addModal.classList.add("show");
+
+         document.body.classList.add("modal-open");
+     }
+
+
+     /*
+      * 배송지 추가 모달 닫기
+      */
+     function closeAddAddressModal() {
+
+         const addModal =
+             document.getElementById("addAddressModalOverlay");
+
+         addModal.classList.remove("show");
+
+
+         // 다시 배송지 선택 모달 보여주기
+         const selectModal =
+             document.getElementById("addressModalOverlay");
+
+         selectModal.classList.add("show");
+     }
+
+
+     /*
+      * 우편번호 찾기
+      * 나중에 다음 우편번호 API 연결
+      */
+     function findPostcode() {
+
+         alert("우편번호 검색 API를 연결하면 됩니다.");
+
+     }
 
     /*
      * 모달의 어두운 배경 클릭 시 닫기
@@ -582,5 +726,39 @@ function toggleOtherPayment() {
 
         }
     );
+    
+    document
+    .getElementById("addAddressModalOverlay")
+    .addEventListener("click", function(event) {
+
+        if (event.target === this) {
+            closeAddAddressModal();
+        }
+
+    });
+    
+    document.addEventListener(
+    	    "keydown",
+    	    function(event) {
+
+    	        if (event.key === "Escape") {
+
+    	            const addModal =
+    	                document.getElementById(
+    	                    "addAddressModalOverlay"
+    	                );
+
+    	            if (addModal.classList.contains("show")) {
+
+    	                closeAddAddressModal();
+
+    	            } else {
+
+    	                closeAddressModal();
+
+    	            }
+    	        }
+    	    }
+    	);
 </script>
 </html>

@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoodPang 주문완료</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/coupang_order_complete.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reset.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
 </head>
 <body>
 
@@ -23,67 +25,7 @@
 <c:set var="shippingFee" value="${empty orderComplete.shippingFee ? 0 : orderComplete.shippingFee}" />
 <c:set var="paymentAmount" value="${empty orderComplete.paymentAmount ? 20200 : orderComplete.paymentAmount}" />
 
-<header class="utility-bar">
-    <div class="utility-inner">
-        <div class="utility-left">
-            <span>즐겨찾기</span>
-            <span>입점신청 ▾</span>
-        </div>
-        <div class="utility-right">
-            <strong>이름</strong>
-            <span>로그아웃</span>
-            <span>고객센터</span>
-            <span>판매자 가입</span>
-        </div>
-    </div>
-</header>
-
-<header class="main-header">
-    <div class="header-inner">
-        <div class="category-box">
-            <div class="hamburger"><span></span><span></span><span></span></div>
-            <div>카테고리</div>
-        </div>
-
-        <a class="brand" href="${pageContext.request.contextPath}/">
-            <span class="brand-c">c</span><span class="brand-o">o</span><span class="brand-u">u</span><span class="brand-p">p</span><span class="brand-a">a</span><span class="brand-n">n</span><span class="brand-g">g</span>
-        </a>
-
-        <div class="search-area">
-            <div class="search-box">
-                <select aria-label="검색 카테고리">
-                    <option>전체</option>
-                </select>
-                <input type="text" placeholder="찾고 싶은 상품을 검색해보세요!">
-                <button type="button" class="mic">●</button>
-                <button type="button" class="search-btn">⌕</button>
-            </div>
-            <nav class="quick-links">
-                <span>◀</span>
-                <span>▶ 쿠팡플레이</span>
-                <span><b>biz</b> 쿠팡비즈</span>
-                <span>🚀 로켓배송</span>
-                <span>🚀 로켓프레시</span>
-                <span>⌂ 다시 구매</span>
-                <span>🎫 골드박스</span>
-                <span>🆕 이달의신상</span>
-                <span>🎁 입점신청</span>
-            </nav>
-        </div>
-
-        <div class="header-actions">
-            <div class="header-action">
-                <div class="icon person-icon"></div>
-                <span>마이쿠팡</span>
-            </div>
-            <div class="header-action cart-action">
-                <div class="cart-icon">🛒</div>
-                <span class="cart-count">1</span>
-                <span>장바구니</span>
-            </div>
-        </div>
-    </div>
-</header>
+<jsp:include page="/inc/header.jsp" />
 
 <div class="page-bg">
     <main class="content-wrap">
@@ -189,6 +131,8 @@
         </aside>
     </main>
 </div>
+
+<jsp:include page="/inc/footer.jsp" />
 
 <script>
 function toggleDelivery() {
