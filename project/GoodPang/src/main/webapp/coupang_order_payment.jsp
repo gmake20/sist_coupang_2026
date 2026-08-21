@@ -62,8 +62,8 @@
 					</div>
 				</div>
 
-				<input type="hidden" id="selectedAddressNo" name="addressNo"
-					value="${address.addressNo}">
+				<%-- <input type="hidden" id="selectedAddressNo" name="addressNo"
+					value="${address.addressNo}"> --%>
 
 				<!-- 배송 요청사항 -->
 				<div class="section-box">
@@ -273,7 +273,26 @@
 					<div class="final-agree">위 주문 내용을 확인 하였으며, 회원 본인은 개인정보 이용 및
 						제공(해외직구의 경우 국외제공) 및 결제에 동의합니다.</div>
 
-					<button class="btn-pay" type="button" onclick="dummyPay()">결제하기</button>
+
+
+					<!-- <button class="btn-pay" type="button" onclick="dummyPay()">결제하기</button> -->
+					
+					<form id="paymentForm"
+						action="${pageContext.request.contextPath}/order/checkout"
+						method="post">
+
+						<!-- 현재 주문번호 -->
+						<input type="hidden" name="orderNo" value="${orderNo}">
+
+						<!-- 선택한 배송지 -->
+						<input type="hidden" id="selectedAddressNo" name="addressNo"
+							value="${address.addressNo}">
+
+						<button class="btn-pay" type="submit">결제하기</button>
+
+					</form>
+
+
 				</div>
 			</div>
 		</div>
@@ -482,10 +501,10 @@ function toggleOtherPayment() {
     }
 }
 
-    function dummyPay() {
+    /* function dummyPay() {
         // 실제 결제 처리 없이 무조건 주문완료 페이지로 이동
         location.href = "${pageContext.request.contextPath}/coupang_order_complete.jsp";
-    }
+    } */
     
     function openAddressModal() {
 

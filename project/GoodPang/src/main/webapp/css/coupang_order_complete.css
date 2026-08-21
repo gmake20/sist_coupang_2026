@@ -225,13 +225,24 @@ button, input, select {
 }
 
 .content-wrap {
-    width: 1040px;
+    width: 1100px;
+
     margin: 0 auto;
+
     display: grid;
-    grid-template-columns: 890px 96px;
-    column-gap: 14px;
+
+    /* 기존 890px → 960px */
+    grid-template-columns: 1020px 110px;
+
+    column-gap: 16px;
+
     align-items: start;
+
+    /* 이전에 적용한 오른쪽 이동 */
+    position: relative;
+    left: 35px;
 }
+
 
 .order-card {
     background: #fff;

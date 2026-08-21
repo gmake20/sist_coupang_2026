@@ -29,19 +29,7 @@ public class OrderServlet extends HttpServlet {
 
         int memberNo = 1;
         int orderNo = 100;
-		/*
-		 * AddressDTO address = orderDAO.getAddress(memberNo);
-		 * 
-		 * List<OrderItemDTO> orderItems = orderDAO.getOrderItems(orderNo);
-		 * 
-		 * OrderSummaryDTO summary = orderDAO.getOrderSummary(orderNo);
-		 * 
-		 * request.setAttribute("address", address); request.setAttribute("orderItems",
-		 * orderItems); request.setAttribute("summary", summary);
-		 * 
-		 * request.getRequestDispatcher( "/coupang_order_payment.jsp" ).forward(request,
-		 * response);
-		 */
+		
         OrderDAO dao = new OrderDAO();
 
         AddressDTO address =
@@ -66,6 +54,8 @@ public class OrderServlet extends HttpServlet {
 		 * request.setAttribute("orderItems", orderItems);
 		 */
         request.setAttribute("summary", summary);
+        
+        request.setAttribute("orderNo", orderNo);
 
         request.getRequestDispatcher(
                 "/coupang_order_payment.jsp"
