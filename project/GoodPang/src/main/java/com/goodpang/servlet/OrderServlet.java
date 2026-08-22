@@ -92,7 +92,7 @@ public class OrderServlet extends HttpServlet {
         request.setAttribute("orderNo", orderNo);
 
         request.getRequestDispatcher(
-                "/coupang_order_payment.jsp"
+                "/goodpang_order_payment.jsp"
         ).forward(request, response);
     }
 }

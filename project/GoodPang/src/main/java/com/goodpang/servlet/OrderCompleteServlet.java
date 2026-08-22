@@ -74,7 +74,7 @@ public class OrderCompleteServlet extends HttpServlet {
 
         request
             .getRequestDispatcher(
-                "/coupang_order_complete.jsp"
+                "/goodpang_order_complete.jsp"
             )
             .forward(
                 request,
