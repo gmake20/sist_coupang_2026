@@ -6,6 +6,8 @@
 <link rel="stylesheet"
 
 	href="${pageContext.request.contextPath}/css/common.css">
+	
+	
 
 <header id="header">
 
