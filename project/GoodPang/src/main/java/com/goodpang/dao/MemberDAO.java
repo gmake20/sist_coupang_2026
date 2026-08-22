@@ -155,6 +155,7 @@ public class MemberDAO {
 	    return null;
 	}
 	
+	
 	public boolean existsByMemberId(String memberId) {
 
 	    String sql = """
@@ -252,4 +253,55 @@ public class MemberDAO {
 	}
 	
 	
+	public MemberDTO getMember(int memberNo) throws Exception {
+
+        MemberDTO member = null;
+
+        String sql = """
+                SELECT
+                    MEMBER_NO,
+                    EMAIL,
+                    MEMBER_NAME,
+                    PHONE
+                FROM MEMBER
+                WHERE MEMBER_NO = ?
+                """;
+
+        try (
+            Connection conn =
+                    ConnectionProvider.getConnection();
+
+            PreparedStatement pstmt =
+                    conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setInt(1, memberNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                if (rs.next()) {
+
+                    member = new MemberDTO();
+
+                    member.setMemberNo(
+                            rs.getInt("MEMBER_NO")
+                    );
+
+                    member.setEmail(
+                            rs.getString("EMAIL")
+                    );
+
+                    member.setMemberName(
+                            rs.getString("MEMBER_NAME")
+                    );
+
+                    member.setPhone(
+                            rs.getString("PHONE")
+                    );
+                }
+            }
+        }
+
+        return member;
+    }
 }

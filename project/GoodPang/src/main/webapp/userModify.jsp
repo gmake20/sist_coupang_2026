@@ -59,7 +59,7 @@
 
                 <div class="info-content">
                     <strong class="member-value">
-                        <c:out value="${member.name}" />
+                        <c:out value="${member.memberName}" />
                     </strong>
 
                     <button type="button" class="small-btn">

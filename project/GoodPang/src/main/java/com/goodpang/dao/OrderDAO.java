@@ -85,9 +85,7 @@ public class OrderDAO {
 							);
 
 					address.setAddressDefault(
-							"Y".equals(
 									rs.getString("ADDRESS_DEFAULT")
-									)
 							);
 				}
 			}
@@ -181,9 +179,7 @@ public class OrderDAO {
 							);
 
 					dto.setAddressDefault(
-							"Y".equals(
 									rs.getString("ADDRESS_DEFAULT")
-									)
 							);
 
 					list.add(dto);
