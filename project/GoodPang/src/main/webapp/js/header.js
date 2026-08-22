@@ -8,15 +8,156 @@
 
 
 /* ---------------------------------------------------------
-   1. 카테고리 메뉴 — 마우스 올리면 펼쳐지기
-   쿠팡 원본: #wa-pc-category (평소엔 display:none)
+   1. 카테고리 메뉴 — /category/getinfo?ctype=main 결과로 채우기
+   쿠팡 원본: #wa-pc-category (평소엔 display:none, CSS :hover로 펼쳐짐)
+
+   서버(CategoryInfo 서블릿)가 ctype=main 일 때 레벨별로 묶어서 줌:
+     { "1": [{categoryNo, categoryName, parentCategoryNo, categoryLevel}, ...],
+       "2": [...], "3": [...] }
+
+   3단(대분류>중분류>소분류) 구조:
+     대분류(li)  → :hover 로 열림 (CSS만으로 처리, 기존 방식 그대로)
+     중분류(depth ul li) → 여러 개 중 하나만 소분류를 보여줘야 해서
+       CSS :hover 형제선택자만으로는 표현이 번거로워, mouseover 이벤트로 처리
+     소분류(depth2) → 중분류 li 하나당 하나씩, .active 클래스가 붙은 것만 보임
    --------------------------------------------------------- */
-// TODO
-// const categoryBtn = document.querySelector('.category-btn');
-// const categoryPanel = document.querySelector('.category-panel');
-// categoryBtn.addEventListener('mouseenter', function () {
-//   categoryPanel.style.display = 'block';
-// });
+
+const categoryMenu = document.querySelector('#wa-pc-category .menu');
+
+if (categoryMenu) {
+  fetch('category/getinfo?ctype=main')
+    .then(function (res) { return res.json(); })
+    .then(renderCategoryMenu)
+    .catch(function (e) {
+      console.error('카테고리 메뉴를 불러오지 못했습니다.', e);
+    });
+}
+
+function renderCategoryMenu(data) {
+	console.log("call renderCategoryMenu");
+  const mainList = data['1'] || [];
+  const midList = data['2'] || [];
+  const subList = data['3'] || [];
+
+  categoryMenu.innerHTML = mainList.map(function (main) {
+    const children = midList.filter(function (mid) {
+      return mid.parentCategoryNo === main.categoryNo;
+    });
+
+    const iconHtml = getCategoryIconHtml(main.categoryName);
+
+    // 하위 항목(중분류)이 있을 때만 ▶ 표시와 depth 패널을 붙임
+    if (children.length === 0) {
+      return '<li><a href="#">' + iconHtml + escapeCategoryHtml(main.categoryName) + '</a></li>';
+    }
+
+    return '<li><a href="#">' + iconHtml + escapeCategoryHtml(main.categoryName) + '<i class="si"></i></a>'
+      + renderMidPanel(children, subList)
+      + '</li>';
+  }).join('');
+}
+
+/* ---------------------------------------------------------
+   대분류 왼쪽 아이콘 — 진짜 스프라이트 이미지가 없어서
+   카테고리명 기준으로 간단한 인라인 SVG를 직접 그려 넣음.
+   지도에 없는 이름이 오면 기본 아이콘(태그 모양)으로 대체.
+   --------------------------------------------------------- */
+
+const CATEGORY_ICON_PATHS = {
+  '패션의류/잡화': '<circle cx="12" cy="4.5" r="1.3"/><path d="M12 5.8 V7.2"/><path d="M12 7.2 L3 13 Q2 13.6 3 14 H21 Q22 13.6 21 13 Z"/>',
+  '뷰티': '<path d="M9 3 H15 L14 9 H10 Z"/><path d="M10 9 H14 V19 A2 2 0 0 1 12 21 A2 2 0 0 1 10 19 Z"/>',
+  '출산/유아동': '<path d="M9 3 H15 V6 H9 Z"/><path d="M9.5 6 H14.5 L15 9 V19 A2 2 0 0 1 13 21 H11 A2 2 0 0 1 9 19 V9 Z"/><path d="M9 13 H15"/>',
+  '식품': '<path d="M6 3 V11 M4 3 V8 A2 2 0 0 0 6 10 A2 2 0 0 0 8 8 V3"/><path d="M17 3 C15 5 15 9 17 11 V21"/>',
+  '주방용품': '<path d="M4 9 H20 V15 A4 4 0 0 1 16 19 H8 A4 4 0 0 1 4 15 Z"/><path d="M2 9 H6 M18 9 H22"/><path d="M10 5 H14 V9 H10 Z"/>',
+  '생활용품': '<path d="M10 3 H14 V5 H10 Z"/><path d="M9 5 H15 L16 8 V20 A2 2 0 0 1 14 22 H10 A2 2 0 0 1 8 20 V8 Z"/>',
+  '홈인테리어': '<path d="M12 2 L18 9 H6 Z"/><path d="M12 9 V17"/><path d="M8 21 H16"/><path d="M10 17 H14 L15 21 H9 Z"/>',
+  '가전디지털': '<rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20 H16 M12 16 V20"/>',
+  '스포츠/레저': '<rect x="2" y="9" width="3" height="6"/><rect x="19" y="9" width="3" height="6"/><path d="M5 11 H8 M16 11 H19 M5 13 H8 M16 13 H19"/><rect x="8" y="10" width="8" height="4"/>',
+  '자동차용품': '<path d="M3 15 L5 9 H19 L21 15"/><path d="M3 15 H21 V18 H3 Z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>',
+  '도서/음반/DVD': '<path d="M4 4 H12 V20 H4 Z"/><path d="M12 4 H20 V20 H12 Z"/><path d="M12 4 V20"/>',
+  '완구/취미': '<path d="M9 4 H12 A1.5 1.5 0 0 1 12 7 H15 V10 A1.5 1.5 0 0 0 15 13 V16 H12 A1.5 1.5 0 0 1 12 19 H9 V16 A1.5 1.5 0 0 0 9 13 H6 V10 A1.5 1.5 0 0 1 9 10 Z"/>',
+  '문구/오피스': '<path d="M4 20 L5 16 L16 5 L19 8 L8 19 Z"/><path d="M14 7 L17 10"/>',
+  '반려동물용품': '<circle cx="7" cy="9" r="1.6"/><circle cx="11" cy="6.5" r="1.6"/><circle cx="15" cy="6.5" r="1.6"/><circle cx="18" cy="9.5" r="1.6"/><path d="M12 12 C8 12 6 15 7 18 C7.5 20 9.5 20.5 12 19.5 C14.5 20.5 16.5 20 17 18 C18 15 16 12 12 12 Z"/>',
+  '헬스/건강식품': '<rect x="4" y="9" width="16" height="6" rx="3"/><path d="M12 9 V15"/>'
+};
+
+/* 지도에 없는 카테고리(새로 추가됐는데 아이콘이 아직 없는 경우)용 기본 태그 아이콘 */
+const CATEGORY_ICON_DEFAULT = '<path d="M12 3 L20 3 L20 11 L13 20 L4 11 L4 4 Z"/><circle cx="8" cy="8" r="1.4"/>';
+
+function getCategoryIconHtml(categoryName) {
+  const iconPath = CATEGORY_ICON_PATHS[categoryName] || CATEGORY_ICON_DEFAULT;
+  return '<span class="cat-icon"><svg viewBox="0 0 24 24">' + iconPath + '</svg></span>';
+}
+
+/** 중분류 목록(depth)과 그 오른쪽에 겹쳐지는 소분류 패널들(depth2)을 함께 만듦 */
+function renderMidPanel(midItems, subList) {
+  let firstWithSub = null;   // 패널이 열리자마자 기본으로 보여줄 소분류 (첫 번째 것)
+
+  const midHtml = midItems.map(function (mid) {
+    const subItems = subList.filter(function (sub) {
+      return sub.parentCategoryNo === mid.categoryNo;
+    });
+
+    if (subItems.length > 0 && firstWithSub === null) {
+      firstWithSub = mid.categoryNo;
+    }
+
+    if (subItems.length === 0) {
+      return '<li><a href="#">' + escapeCategoryHtml(mid.categoryName) + '</a></li>';
+    }
+
+    const isActive = mid.categoryNo === firstWithSub;
+    return '<li data-mid="' + mid.categoryNo + '"' + (isActive ? ' class="is-active"' : '') + '>'
+      + '<a href="#">' + escapeCategoryHtml(mid.categoryName) + '<i class="si"></i></a>'
+      + '</li>';
+  }).join('');
+
+  const depth2Html = midItems.map(function (mid) {
+    const subItems = subList.filter(function (sub) {
+      return sub.parentCategoryNo === mid.categoryNo;
+    });
+    if (subItems.length === 0) return '';
+
+    const isActive = mid.categoryNo === firstWithSub;
+    const subHtml = subItems.map(function (sub) {
+      return '<li><a href="#">' + escapeCategoryHtml(sub.categoryName) + '</a></li>';
+    }).join('');
+
+    return '<div class="depth2' + (isActive ? ' active' : '') + '" data-mid="' + mid.categoryNo + '">'
+      + '<ul>' + subHtml + '</ul>'
+      + '</div>';
+  }).join('');
+
+  return '<div class="depth"><ul>' + midHtml + '</ul>' + depth2Html + '</div>';
+}
+
+/* 중분류 위에 마우스를 올리면 그 항목의 소분류(depth2)만 보이게 전환
+   (이벤트 위임: menu 전체가 fetch 때마다 통째로 다시 그려지므로,
+    각 li에 직접 리스너를 다는 대신 categoryMenu 하나에만 걸어둠) */
+if (categoryMenu) {
+  categoryMenu.addEventListener('mouseover', function (event) {
+    const midItem = event.target.closest('li[data-mid]');
+    if (!midItem) return;
+
+    const depthPanel = midItem.closest('.depth');
+    if (!depthPanel) return;
+
+    depthPanel.querySelectorAll('li[data-mid]').forEach(function (li) {
+      li.classList.toggle('is-active', li === midItem);
+    });
+
+    depthPanel.querySelectorAll('.depth2').forEach(function (panel) {
+      panel.classList.toggle('active', panel.dataset.mid === midItem.dataset.mid);
+    });
+  });
+}
+
+/* 카테고리명이 그대로 HTML로 들어가지 않게 막음 (검색 자동완성 쪽과 같은 목적) */
+function escapeCategoryHtml(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
 
 
 /* ---------------------------------------------------------
