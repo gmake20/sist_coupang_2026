@@ -12,7 +12,7 @@
     <header class="cart-header">
         <div class="header-inner">
             <h1 class="logo">
-                <a href="index.html" title="GoodPang 홈으로">
+                <a href="${pageContext.request.contextPath}/" title="GoodPang 홈으로">
                     <span class="brand-goodpang">GoodPang</span>
                 </a>
             </h1>
