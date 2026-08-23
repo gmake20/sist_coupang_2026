@@ -1,4 +1,121 @@
 -- =========================================================
+-- 1단계 (대분류) — 좌측 아이콘 메뉴 15개, 스크린샷 순서 그대로
+-- =========================================================
+INSERT INTO CATEGORY VALUES (1,  '패션의류/잡화', NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (2,  '뷰티',          NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (3,  '출산/유아동',    NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (4,  '식품',          NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (5,  '주방용품',       NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (6,  '생활용품',       NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (7,  '홈인테리어',     NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (8,  '가전디지털',     NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (9,  '스포츠/레저',    NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10, '자동차용품',     NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (11, '도서/음반/DVD',  NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (12, '완구/취미',      NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (13, '문구/오피스',    NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (14, '반려동물용품',   NULL, 1, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (15, '헬스/건강식품',  NULL, 1, SYSDATE, 1);
+
+
+-- =========================================================
+-- 2단계 (중분류) — 패션의류/잡화(1) 하위
+-- =========================================================
+INSERT INTO CATEGORY VALUES (101, '여성패션',      1, 2, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102, '남성패션',      1, 2, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (103, '남녀 공용 의류', 1, 2, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (104, '속옷/잠옷',      1, 2, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (105, '유아동패션',     1, 2, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (106, '럭셔리패션',     1, 2, SYSDATE, 1);
+
+
+-- =========================================================
+-- 3단계 (소분류)
+-- =========================================================
+
+-- 여성패션(101) 하위
+INSERT INTO CATEGORY VALUES (10101, '의류',      101, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10102, '신발',      101, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10103, '가방/잡화',  101, 3, SYSDATE, 1);
+
+-- 남성패션(102) 하위
+INSERT INTO CATEGORY VALUES (10201, '의류',      102, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10202, '신발',      102, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10203, '가방/잡화',  102, 3, SYSDATE, 1);
+
+-- 남녀 공용 의류(103) 하위 — 전부 리프
+INSERT INTO CATEGORY VALUES (10301, '티셔츠',        103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10302, '맨투맨/후드티',  103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10303, '셔츠',          103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10304, '바지',          103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10305, '트레이닝복',     103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10306, '후드집업/집업류', 103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10307, '니트류/조끼',    103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10308, '아우터',        103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10309, '테마의류',      103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10310, '커플룩/패밀리룩', 103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10311, '빅사이즈',      103, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10312, '스포츠의류',     103, 3, SYSDATE, 1);
+
+-- 속옷/잠옷(104) 하위 — 전부 리프
+INSERT INTO CATEGORY VALUES (10401, '여성 속옷',      104, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10402, '남성 속옷',      104, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10403, '기타 속옷 용품', 104, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10404, '잠옷/파자마',    104, 3, SYSDATE, 1);
+
+-- 유아동패션(105) 하위 — 전부 리프
+INSERT INTO CATEGORY VALUES (10501, '베이비',     105, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10502, '여아/주니어', 105, 3, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (10503, '남아/주니어', 105, 3, SYSDATE, 1);
+
+
+-- =========================================================
+-- 4단계 (세분류) — 가방/잡화 하위의 '가방'
+-- =========================================================
+INSERT INTO CATEGORY VALUES (1010301, '가방', 10103, 4, SYSDATE, 1);  -- 여성패션 > 가방/잡화 > 가방
+INSERT INTO CATEGORY VALUES (1020301, '가방', 10203, 4, SYSDATE, 1);  -- 남성패션 > 가방/잡화 > 가방
+
+
+-- =========================================================
+-- 5단계 — '가방' 하위 14개 (여성/남성 동일 구성으로 미러링)
+-- =========================================================
+
+-- 여성패션 > 가방/잡화 > 가방(1010301) 하위
+INSERT INTO CATEGORY VALUES (101030101, '백팩',        1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030102, '크로스백',     1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030103, '숄더백',       1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030104, '토트백',       1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030105, '서류가방',     1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030106, '노트북가방',   1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030107, '클러치백',     1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030108, '힙색/슬링백',   1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030109, '캔버스/에코백', 1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030110, '기타캐주얼가방', 1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030111, '파우치/이너백', 1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030112, '스포츠가방',    1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030113, '가방액세서리',  1010301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (101030114, '여행가방/소품', 1010301, 5, SYSDATE, 1);
+
+-- 남성패션 > 가방/잡화 > 가방(1020301) 하위 (캡처 원본)
+INSERT INTO CATEGORY VALUES (102030101, '백팩',        1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030102, '크로스백',     1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030103, '숄더백',       1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030104, '토트백',       1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030105, '서류가방',     1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030106, '노트북가방',   1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030107, '클러치백',     1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030108, '힙색/슬링백',   1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030109, '캔버스/에코백', 1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030110, '기타캐주얼가방', 1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030111, '파우치/이너백', 1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030112, '스포츠가방',    1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030113, '가방액세서리',  1020301, 5, SYSDATE, 1);
+INSERT INTO CATEGORY VALUES (102030114, '여행가방/소품', 1020301, 5, SYSDATE, 1);
+
+
+
+
+-- =========================================================
 -- 2단계 (중분류) — 뷰티(2) 하위, 캡처에 보이는 순서 그대로
 -- =========================================================
 INSERT INTO CATEGORY VALUES (201, '신상관',       2, 2, SYSDATE, 1);
