@@ -1173,18 +1173,35 @@ a.del-button:hover {
   color: #4285f4;
 }
 
-/* ★ 임시 ★ 원본은 왼쪽 51px 자리에 스프라이트 아이콘을 깔지만
-   그 이미지(icons.03b3790b.png)가 없어서 회색 네모로 자리만 표시.
-   아이콘이 생기면 이 규칙을 지우고 background-image 를 쓰면 됨 */
-.category-layer .menu > li > a::before {
-  content: "";
+/* 원본은 왼쪽 51px 자리에 스프라이트 이미지(icons.03b3790b.png)를 깔지만
+   그 이미지가 없어서, header.js가 카테고리명 기준으로 직접 그린 인라인 SVG
+   아이콘을 .cat-icon 안에 넣어줌 (renderCategoryMenu / getCategoryIconSvg 참고).
+   지도에 없는 새 카테고리는 기본 아이콘(태그 모양)으로 대체됨 */
+.category-layer .menu > li > a .cat-icon {
   position: absolute;
   left: 16px;
   top: 4px;
   width: 22px;
   height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
-  background: #e8e8ea;
+  background: #eef1f6;
+}
+
+.category-layer .menu > li > a .cat-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.category-layer .menu > li:hover > a .cat-icon svg {
+  stroke: #4285f4;
 }
 
 /* 오른쪽 ▶ 삼각형. 이미지가 아니라 border 로 그림 (유틸바 ▼와 같은 방식) */
@@ -1255,27 +1272,63 @@ a.del-button:hover {
   font-weight: 700;
 }
 
-/* ★ 임시 ★ 원본은 세부목록(157px) 오른쪽 남는 자리에 광고 배너가 들어감
-   (.category-layer .depth .gnb-banner — 폭 591px 이미지).
-   그 이미지가 없어서 지금은 흰 공백이라 미완성처럼 보임 → 자리만 표시.
-   HTML 을 18곳 고치지 않아도 되게 ::after 로 처리했음.
-   진짜 배너를 넣을 땐 이 규칙을 지우고 각 .depth 안에
-   <div class="gnb-banner"><img ...></div> 를 추가하면 됨 */
-.category-layer .depth::after {
-  content: "배너 영역";
+/* ---------------------------------------------------------
+   1-4-b. 소분류 3번째 컬럼 (.depth2)
+
+   중분류(157px) 오른쪽 남는 자리에 소분류 목록을 띄움.
+   예전엔 실제 데이터가 없어서 "배너 영역" 자리만 표시하는 ::after 였는데,
+   CATEGORY 테이블 3단계(소분류) 데이터가 생겨서 진짜 목록으로 교체함.
+
+   .depth 처럼 :hover 만으로 열리는 게 아니라, header.js 가 중분류 li 에
+   mouseover 이벤트를 걸어서 .active 클래스를 붙였다 뗌 (renderCategoryMenu 참고).
+   중분류 li 마다 독립적으로 열고 닫아야 해서 순수 CSS :hover 로는
+   (형제 선택자만으로) 표현이 번거로워 JS로 처리함.
+   --------------------------------------------------------- */
+.category-layer .depth2 {
+  display: none;
   position: absolute;
   top: 0;
   left: 157px;
   right: 0;
   height: 100%;
-  background: #fafafa;
+  padding-top: 12px;
   border-left: 1px solid #eee;
-  color: #bbb;
+  overflow: hidden;
+}
+
+.category-layer .depth2.active {
+  display: block;
+}
+
+.category-layer .depth2 li {
+  width: 157px;
+  height: 28px;
+  overflow: hidden;
+}
+
+.category-layer .depth2 li a {
+  position: relative;
+  width: 137px;
+  height: 28px;
+  padding: 9px 0 0 20px;
   font-size: 12px;
-  /* 글자를 한가운데 놓기 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  letter-spacing: -1px;
+  white-space: nowrap;
+}
+
+.category-layer .depth2 li a:hover {
+  color: #4285f4;
+  font-weight: 700;
+}
+
+/* 지금 소분류가 열려 있는 중분류 항목은 hover 하지 않아도 강조 표시 */
+.category-layer .depth li.is-active > a {
+  color: #4285f4;
+  font-weight: 700;
+}
+
+.category-layer .depth li.is-active > a > .si {
+  display: block;
 }
 
 
