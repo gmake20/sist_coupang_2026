@@ -6,6 +6,7 @@ import java.util.List;
 import com.goodpang.dao.OrderDAO;
 import com.goodpang.dto.AddressDTO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,20 +28,16 @@ public class AddressListServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        HttpSession session = request.getSession(false);
-
-        // 로그인 여부 확인
-        if (session == null || session.getAttribute("loginMember") == null) {
-            response.sendRedirect(
-                    request.getContextPath() + "/login"
-            );
+        MemberDTO loginMember =
+                LoginUtil.requireLogin(
+                        request,
+                        response
+                );
+        
+        if (loginMember == null) {
             return;
         }
-
-        // 로그인 회원 정보
-        MemberDTO loginMember =
-                (MemberDTO) session.getAttribute("loginMember");
-
+    	
         int memberNo = loginMember.getMemberNo();
 
         try {

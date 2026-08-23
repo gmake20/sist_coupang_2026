@@ -104,9 +104,15 @@ public class LoginServlet extends HttpServlet {
             30 * 60
         );
 
-        response.sendRedirect(
-            request.getContextPath()
-            + "/"
-        );
+        String redirectUrl =
+                (String) session.getAttribute("redirectAfterLogin");
+
+        session.removeAttribute("redirectAfterLogin");
+
+        if (redirectUrl != null && !redirectUrl.isBlank()) {
+            response.sendRedirect(redirectUrl);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/");
+        }
     }
 }

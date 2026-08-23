@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.goodpang.dao.AddressDAO;
 import com.goodpang.dto.AddressDTO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,17 +26,16 @@ public class AddressAddServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-
-        if (session == null
-                || session.getAttribute("loginMember") == null) {
-
-            response.sendRedirect(
-                    request.getContextPath() + "/login"
-            );
-            return;
-        }
-
+    	 MemberDTO loginMember =
+                 LoginUtil.requireLogin(
+                         request,
+                         response
+                 );
+         
+         if (loginMember == null) {
+             return;
+         }
+     	
         request.getRequestDispatcher(
                 "/address_add.jsp"
         ).forward(request, response);
@@ -51,20 +51,16 @@ public class AddressAddServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        HttpSession session = request.getSession(false);
-
-        if (session == null
-                || session.getAttribute("loginMember") == null) {
-
-            response.sendRedirect(
-                    request.getContextPath() + "/login"
-            );
+        MemberDTO loginMember =
+                LoginUtil.requireLogin(
+                        request,
+                        response
+                );
+        
+        if (loginMember == null) {
             return;
         }
-
-        MemberDTO loginMember =
-                (MemberDTO) session.getAttribute("loginMember");
-
+    	
         int memberNo = loginMember.getMemberNo();
 
         String receiverName =

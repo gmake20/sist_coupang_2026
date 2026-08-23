@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.goodpang.dao.MemberDAO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -26,26 +27,16 @@ public class ModifyServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-
-        // 1. 로그인 여부 확인
-        if (session == null) {
-            response.sendRedirect(
-                    request.getContextPath() + "/login"
-            );
-            return;
-        }
-
         MemberDTO loginMember =
-                (MemberDTO) session.getAttribute("loginMember");
-
+                LoginUtil.requireLogin(
+                        request,
+                        response
+                );
+        
         if (loginMember == null) {
-            response.sendRedirect(
-                    request.getContextPath() + "/login"
-            );
             return;
         }
-
+    	
         try {
 
             // 2. 로그인 회원 번호

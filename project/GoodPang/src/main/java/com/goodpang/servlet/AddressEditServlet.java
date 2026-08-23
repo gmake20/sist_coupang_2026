@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.goodpang.dao.AddressDAO;
 import com.goodpang.dto.AddressDTO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,16 +26,16 @@ public class AddressEditServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-
-        if (session == null
-                || session.getAttribute("loginMember") == null) {
-
-            response.sendRedirect(
-                    request.getContextPath() + "/login"
-            );
+        MemberDTO loginMember =
+                LoginUtil.requireLogin(
+                        request,
+                        response
+                );
+        
+        if (loginMember == null) {
             return;
         }
+    	
 
         String addressNoParam =
                 request.getParameter("addressNo");
@@ -53,10 +54,6 @@ public class AddressEditServlet extends HttpServlet {
 
             int addressNo =
                     Integer.parseInt(addressNoParam);
-
-            MemberDTO loginMember =
-                    (MemberDTO) session
-                            .getAttribute("loginMember");
 
             int memberNo =
                     loginMember.getMemberNo();
@@ -113,22 +110,18 @@ public class AddressEditServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        HttpSession session = request.getSession(false);
 
-        if (session == null
-                || session.getAttribute("loginMember") == null) {
-
-            response.sendRedirect(
-                    request.getContextPath() + "/login"
-            );
+         MemberDTO loginMember =
+                LoginUtil.requireLogin(
+                        request,
+                        response
+                );
+        
+         if (loginMember == null) {
             return;
-        }
-
+         }
+    	
         try {
-
-            MemberDTO loginMember =
-                    (MemberDTO) session
-                            .getAttribute("loginMember");
 
             int memberNo =
                     loginMember.getMemberNo();
