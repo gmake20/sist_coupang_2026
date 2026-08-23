@@ -205,7 +205,6 @@ public class PasswordChangeServlet extends HttpServlet {
 
             throw new ServletException(
                     "비밀번호 변경 중 오류가 발생했습니다.",
-                    e
             );
         }
     }

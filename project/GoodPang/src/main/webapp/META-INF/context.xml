@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Context>
-	<!-- 로컬 DB 사용시
+		<!-- 로컬 DB 사용시
  		url= "jdbc:oracle:thin:@localhost:1521/XEPDB1" 
  		-->
-        
+
+ 		<!-- 공용 DB 
+ 		url ="jdbc:oracle:thin:@scym3.cafe24.com/XEPDB1"
+         -->
     <Resource
         name="jdbc/myoracle"
         auth="Container"
@@ -12,7 +15,7 @@
 
         driverClassName="oracle.jdbc.OracleDriver"
 
-		 url ="jdbc:oracle:thin:@scym3.cafe24.com/XEPDB1"
+		 url ="jdbc:oracle:thin:@localhost:1521/XEPDB1"
        
         username="scott"
         password="tiger"
