@@ -262,6 +262,7 @@ public class MemberDAO {
                     MEMBER_NO,
                     EMAIL,
                     MEMBER_NAME,
+                    MEMBER_PW,
                     PHONE
                 FROM MEMBER
                 WHERE MEMBER_NO = ?
@@ -290,6 +291,10 @@ public class MemberDAO {
                     member.setEmail(
                             rs.getString("EMAIL")
                     );
+                    
+                    member.setMemberPw(
+                            rs.getString("MEMBER_PW")
+                    );
 
                     member.setMemberName(
                             rs.getString("MEMBER_NAME")
@@ -304,4 +309,110 @@ public class MemberDAO {
 
         return member;
     }
+	
+	public int updateEmail(
+	        int memberNo,
+	        String newEmail) throws Exception {
+
+	    String sql = """
+	            UPDATE MEMBER
+	            SET EMAIL = ?
+	            WHERE MEMBER_NO = ?
+	            """;
+
+	    int result = 0;
+
+	    try (
+	        Connection conn =
+	                ConnectionProvider.getConnection();
+
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setString(
+	                1,
+	                newEmail
+	        );
+
+	        pstmt.setInt(
+	                2,
+	                memberNo
+	        );
+
+	        result =
+	                pstmt.executeUpdate();
+	    }
+
+	    return result;
+	}
+	
+	public int updatePhone(
+	        int memberNo,
+	        String newPhone) throws Exception {
+
+	    String sql = """
+	            UPDATE MEMBER
+	            SET PHONE = ?
+	            WHERE MEMBER_NO = ?
+	            """;
+
+	    int result = 0;
+
+	    try (
+	        Connection conn =
+	                ConnectionProvider.getConnection();
+
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setString(
+	                1,
+	                newPhone
+	        );
+
+	        pstmt.setInt(
+	                2,
+	                memberNo
+	        );
+
+	        result =
+	                pstmt.executeUpdate();
+	    }
+
+	    return result;
+	}
+	
+	public int updatePassword(
+	        int memberNo,
+	        String newPassword) throws Exception {
+
+	    String sql = """
+	            UPDATE MEMBER
+	            SET MEMBER_PW = ?
+	            WHERE MEMBER_NO = ?
+	            """;
+
+	    try (
+	        Connection conn =
+	                ConnectionProvider.getConnection();
+
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setString(
+	                1,
+	                newPassword
+	        );
+
+	        pstmt.setInt(
+	                2,
+	                memberNo
+	        );
+
+	        return pstmt.executeUpdate();
+	    }
+	}
 }
