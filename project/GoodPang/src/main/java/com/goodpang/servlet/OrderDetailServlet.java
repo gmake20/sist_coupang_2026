@@ -1,21 +1,29 @@
-package com.goodpang.command;
+package com.goodpang.servlet;
 
-
+import java.io.IOException;
 import java.util.List;
 
 import com.goodpang.dao.OrderDetailDAO;
 import com.goodpang.dto.OrderDetailDTO;
-import com.goodpang.servlet.CommandHandler;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@WebServlet("/order/order_detail")
+// http://localhost:8080/GoodPang/order/order_detail
+public class OrderDetailServlet extends HttpServlet {
+   
+    @Override
+    protected void doGet(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
 
-public class OrderDetailHandler implements CommandHandler {
-
-    public String process(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        // 1. 파라미터 수신 (주문번호)
-        String orderNoParam = request.getParameter("orderNo");
+      // String orderNoParam = request.getParameter("orderNo");
+    	String orderNoParam ="1001";
         
         System.out.println("[DEBUG OrderDetailHandler] === 주문 상세 정보 조회 시작 ===");
         System.out.println("[DEBUG OrderDetailHandler] 전달받은 orderNoParam: " + orderNoParam);
@@ -43,8 +51,9 @@ public class OrderDetailHandler implements CommandHandler {
 	        System.err.println("[ERROR] DB 조회 중 예외 발생: " + e.getMessage());
 	        e.printStackTrace();
 	    }
-
-        // 4. 이동할 View(JSP) 경로 반환
-        return "/WEB-INF/views/order/orderDetail.jsp";
+    
+        request.getRequestDispatcher(
+                "/order_detail.jsp"
+        ).forward(request, response);
     }
 }

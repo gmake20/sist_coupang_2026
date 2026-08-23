@@ -56,12 +56,14 @@ public class OrderDetailDAO {
                         dto.setOptionId(null);
                         dto.setOptionName("선택 옵션 없음");
                     }
-
+                    System.out.println("[DEBUG OrderDetailDAO] 주문상세 "+rs.getInt("ORDER_DETAIL_NO"));
                     list.add(dto);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+        	DBConn.close(); 
         }
 
         return list;
