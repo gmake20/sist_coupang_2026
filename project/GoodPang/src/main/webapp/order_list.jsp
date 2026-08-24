@@ -1,18 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>GoodPang | 주문목록</title>
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/order_list.css">
-    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/order_list.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reset.css">
 </head>
 <body>
   
   <jsp:include page="/inc/header.jsp" />
 
-    <!-- 2. 메인 3열 레이아웃 -->
+    <!-- 메인 3열 레이아웃 -->
     <div class="mypage-wrapper">
         
         <!-- [좌측] 사이드바 메뉴 -->
@@ -20,8 +22,8 @@
             <div class="sidebar-group">
                 <h3>MY 쇼핑</h3>
                 <ul>
-                    <li class="active"><a href="order_list.jsp">주문목록/배송조회</a></li>
-                    <li><a href="cancel_history.jsp">취소/반품/교환/환불 내역</a></li>
+                    <li class="active"><a href="${pageContext.request.contextPath}/order/order_list">주문목록/배송조회</a></li>
+                    <li><a href="#">취소/반품/교환/환불 내역</a></li>
                     <li><a href="#">와우 멤버십</a></li>
                     <li><a href="#">구독 서비스 <span class="badge-n">N</span></a></li>
                     <li><a href="#">로켓프레시 프레시백 <span class="badge-n">N</span></a></li>
@@ -47,9 +49,11 @@
             <div class="sidebar-group">
                 <h3>MY 정보</h3>
                 <ul>
-                    <li><a href="userModify.jsp">개인정보확인/수정</a></li>
+                    <li><a href="#">개인정보확인/수정</a></li>
+                    <li><a href="${pageContext.request.contextPath}/member/modify">개인정보확인/수정</a></li>
+
                     <li><a href="#">결제수단·쿠페이 관리</a></li>
-                    <li><a href="#">배송지 관리</a></li>
+                    <li><a href="${pageContext.request.contextPath}/address/list">배송지 관리</a></li>
                     <li><a href="#">패스키 관리</a></li>
                     <li><a href="#">회원 탈퇴</a></li>
                 </ul>
@@ -77,14 +81,46 @@
                     <button type="button" class="btn-period" data-year="2026">2026</button>
                     <button type="button" class="btn-period" data-year="2025">2025</button>
                     <button type="button" class="btn-period" data-year="2024">2024</button>
-                    
-                  
                 </div>
             </div>
 
-            <!-- 동적으로 변경될 주문 카드 컨테이너 -->
+            <!-- 동적으로 출력될 주문 카드 컨테이너 -->
             <div id="order-card-list">
-                <!-- JS로 자동 생성 및 필터링됩니다 -->
+                <c:choose>
+                    <c:when test="${not empty orderList}">
+                        <c:forEach var="item" items="${orderList}">
+                            <div class="order-card" style="border: 1px solid #e0e0e0; margin-bottom: 20px; padding: 15px; border-radius: 8px;">
+                                <div class="order-header" style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                                    <span class="order-no" style="font-weight: bold;">주문번호: ${item.orderNo}</span>
+                                    <a href="${pageContext.request.contextPath}/order/order_detail?orderNo=${item.orderNo}" class="link-detail" style="color: #0073e9; text-decoration: none;">
+                                        주문 상세보기 &gt;
+                                    </a>
+                                </div>
+                                <div class="order-body" style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="item-info">
+                                        <h4 class="product-name" style="margin: 0 0 5px 0; font-size: 16px;">${item.productName}</h4>
+                                        <c:if test="${not empty item.optionName}">
+                                            <p class="option-name" style="margin: 0 0 5px 0; color: #666; font-size: 14px;">옵션: ${item.optionName}</p>
+                                        </c:if>
+                                        <p class="price-qty" style="margin: 0; font-size: 14px; font-weight: bold;">
+                                            <fmt:formatNumber value="${item.salePrice}" pattern="#,###"/>원 · ${item.quantity}개
+                                        </p>
+                                    </div>
+                                    <div class="delivery-status">
+                                        <c:if test="${item.freeDelivery}">
+                                            <span style="background: #e7f4e8; color: #2e7d32; padding: 3px 8px; border-radius: 4px; font-size: 12px;">무료배송</span>
+                                        </c:if>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="empty-list" style="text-align: center; padding: 50px 0; color: #888;">
+                            주문 내역이 없습니다.
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </main>
 
@@ -120,7 +156,7 @@
 
     </div>
 
-    <script src="js/order_list.js"></script>
+    <script src="${pageContext.request.contextPath}/js/order_list.js"></script>
     
     <jsp:include page="/inc/footer.jsp" />
 </body>

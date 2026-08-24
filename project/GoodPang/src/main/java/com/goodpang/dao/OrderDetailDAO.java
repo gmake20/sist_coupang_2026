@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.goodpang.dto.OrderDetailDTO;
+import com.goodpang.util.ConnectionProvider;
 import com.goodpang.util.DBConn;
 
 
@@ -31,7 +32,7 @@ public class OrderDetailDAO {
                      "LEFT JOIN PRODUCT_OPTION opt ON od.OPTION_ID = opt.OPTION_ID " +
                      "WHERE od.ORDER_NO = ?";
 
-        try (Connection conn = DBConn.getConnection();
+        try (Connection conn = ConnectionProvider.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, orderNo);

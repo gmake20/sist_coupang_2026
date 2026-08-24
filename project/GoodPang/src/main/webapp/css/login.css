@@ -369,3 +369,19 @@ body {
     font-size: 11px;
     color: #999;
 }
+
+
+
+.login-error {
+    margin-bottom: 14px;
+    padding: 12px 14px;
+
+    border: 1px solid #e7223d;
+    border-radius: 4px;
+
+    background-color: #fff5f6;
+
+    color: #e7223d;
+    font-size: 13px;
+    line-height: 1.4;
+}

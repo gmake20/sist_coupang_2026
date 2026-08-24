@@ -16,5 +16,5 @@ public class AddressDTO {
      private String detailAddress;
      private String requestMsg;
 
-     private boolean addressDefault;
+     private String addressDefault;
 }
