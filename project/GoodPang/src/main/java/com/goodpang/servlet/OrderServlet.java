@@ -8,6 +8,7 @@ import com.goodpang.dto.AddressDTO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.OrderItemDTO;
 import com.goodpang.dto.OrderSummaryDTO;
+import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -32,34 +33,15 @@ public class OrderServlet extends HttpServlet {
 		/* int memberNo = 1; */
         int orderNo = 100;
         
-        HttpSession session =
-                request.getSession(false);
-
-            if (session == null) {
-
-                response.sendRedirect(
-                    request.getContextPath()
-                    + "/login"
+        MemberDTO member =
+                LoginUtil.requireLogin(
+                        request,
+                        response
                 );
-
-                return;
-            }
-
-            MemberDTO member =
-                (MemberDTO)
-                session.getAttribute(
-                    "loginMember"
-                );
-
-            if (member == null) {
-
-                response.sendRedirect(
-                    request.getContextPath()
-                    + "/login"
-                );
-
-                return;
-            }
+        
+        if ( member == null) {
+            return;
+        }
 
             int memberNo =
                 member.getMemberNo();

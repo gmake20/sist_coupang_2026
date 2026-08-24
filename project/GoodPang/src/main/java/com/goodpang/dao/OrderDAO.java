@@ -466,7 +466,7 @@ public class OrderDAO {
             int addressNo) throws Exception {
 
         String sql = """
-                INSERT INTO ORDER_DELIVERY (
+                INSERT INTO ORDER_ADDRESS (
                     ORDER_NO,
                     RECEIVER_NAME,
                     TEL,
@@ -498,4 +498,59 @@ public class OrderDAO {
             return pstmt.executeUpdate();
         }
     }
+	
+	public List<OrderItemDTO> getOrderListByMemberNo(int memberNo) {
+
+	    List<OrderItemDTO> list = new ArrayList<>();
+
+	    // ORDERS 테이블 단독 조회
+	    String sql = """
+	            SELECT 
+	                ORDER_NO,
+	                ORDER_DATE,
+	                TOTAL_PRICE,
+	                ORDER_STATUS,
+	                PAYMENT_METHOD
+	            FROM ORDERS
+	            WHERE MEMBER_NO = ?
+	            ORDER BY ORDER_NO DESC
+	            """;
+
+	    try (
+	        Connection conn = ConnectionProvider.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setInt(1, memberNo);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+
+	            while (rs.next()) {
+
+	                OrderItemDTO item = new OrderItemDTO();
+	                
+	                // orderNo 세팅
+	                item.setOrderNo(rs.getInt("ORDER_NO"));
+	                
+	                // 상품명이 별도 테이블에 없으므로 주문 대표 타이틀로 대체
+	                item.setProductName("주문번호 " + rs.getInt("ORDER_NO") + "번 (" + rs.getString("ORDER_STATUS") + ")");
+	                
+	                // 옵션명 대신 결제 수단 표기 (선택사항)
+	                item.setOptionName("결제수단: " + rs.getString("PAYMENT_METHOD"));
+	                
+	                // 총 결제 금액 및 수량
+	                item.setSalePrice(rs.getInt("TOTAL_PRICE"));
+	                item.setQuantity(1);
+	                item.setFreeDelivery(true);
+
+	                list.add(item);
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return list;
+	}
 }
