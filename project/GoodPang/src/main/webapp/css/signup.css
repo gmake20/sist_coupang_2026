@@ -519,8 +519,7 @@
     }
 
 /* 로고 */
-
- .logo {
+.logo {
     width: 100%;
     margin: 20px 0 45px;
 
@@ -531,39 +530,93 @@
     text-align: center;
 }
  
- .brand-goodpang {
-    display: inline-flex !important;
-    align-items: center;
+.brand-goodpang {
+    display: inline-block !important;
+
     width: auto !important;
-    height: 36px;
-    font-family: 'Montserrat', 'Pretendard', 'Apple SD Gothic Neo', sans-serif !important;
+
+    /* height: 36px; 삭제 */
+    height: auto !important;
+
+    padding: 5px 10px 10px;
+
+    font-family:
+        'Montserrat',
+        'Pretendard',
+        'Apple SD Gothic Neo',
+        sans-serif !important;
+
     font-size: 52px !important;
     font-weight: 900 !important;
-    line-height: 1 !important;
+
+    /* g 아래쪽 공간 확보 */
+    line-height: 1.15 !important;
+
     letter-spacing: -0.5px !important;
+
     text-decoration: none !important;
     white-space: nowrap;
-    padding-right: 10px;
+
     overflow: visible !important;
 
-    /* 오렌지 트로피컬 그라데이션 */
-    background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 30%, #ff9f43 60%, #ffca5e 100%) !important;
+    background: linear-gradient(
+        135deg,
+        #ff9f43 0%,
+        #ff6b6b 30%,
+        #ff9f43 60%,
+        #ffca5e 100%
+    ) !important;
+
     background-size: 200% auto !important;
+
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
 
-    filter: drop-shadow(0px 1px 1px rgba(255, 107, 107, 0.3));
+    filter:
+        drop-shadow(
+            0 1px 1px rgba(255, 107, 107, 0.3)
+        );
+
     animation: summerShine 3s linear infinite;
 }
 
 .logo a {
+    display: inline-block;
+
+    padding-bottom: 5px;
+
     text-decoration: none;
+
     font-size: 52px;
     font-weight: 900;
-    background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 30%, #ff9f43 60%, #ffca5e 100%);
+
+    line-height: 1.15;
+
+    background: linear-gradient(
+        135deg,
+        #ff9f43 0%,
+        #ff6b6b 30%,
+        #ff9f43 60%,
+        #ffca5e 100%
+    );
+
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+@keyframes summerShine {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 @keyframes summerShine {
