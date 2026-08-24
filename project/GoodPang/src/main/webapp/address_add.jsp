@@ -229,9 +229,37 @@
 <jsp:include page="/inc/footer.jsp" />
 
 
+<script src="//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 <script>
 document.getElementById("zipcodeButton").addEventListener("click", function () {
-    alert("우편번호 검색 API를 연결하면 됩니다.");
+
+    new kakao.Postcode({
+
+        oncomplete: function(data) {
+
+            let addr = "";
+
+            // 사용자가 도로명 주소를 선택한 경우
+            if (data.userSelectedType === "R") {
+                addr = data.roadAddress;
+            } else {
+                // 지번 주소를 선택한 경우
+                addr = data.jibunAddress;
+            }
+
+            // 우편번호
+            document.getElementById("zipcode").value = data.zonecode;
+
+            // 기본 주소
+            document.getElementById("address").value = addr;
+
+            // 상세주소 입력창으로 이동
+            document.getElementById("detailAddress").focus();
+        }
+
+    }).open();
+
 });
 </script>
 

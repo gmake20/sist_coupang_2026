@@ -61,6 +61,7 @@ public class AddressAddServlet extends HttpServlet {
             return;
         }
     	
+        
         int memberNo = loginMember.getMemberNo();
 
         String receiverName =
