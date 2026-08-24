@@ -1299,6 +1299,88 @@
   transform: rotate(45deg);
 }
 
+/* 펼쳐졌을 때는 화살표를 위로 뒤집음 (∨ → ∧).
+   -135deg = 45deg 에서 180도 돌린 것. margin 도 같이 손봐야 글자와 눈높이가 맞음 */
+.product-page .survey-more.is-open::after {
+  margin: 3px 0 0 4px;
+  transform: rotate(-135deg);
+}
+
+
+/* ── 5-2-2. "자세히 보기" 로 열리는 설문 상세 (2026-08-24) ──
+   원본을 실제로 열어서 잰 값 그대로. 평소엔 감춰두고 .is-open 일 때만 보여줌.
+   ★ display:none 으로 감추는 이유: max-height 로 접으면 항목 수가 상품마다 달라서
+     높이를 미리 정할 수 없음(JSP 로 가면 더 심해짐). 애니메이션을 포기하고 확실한 쪽을 택함 */
+.product-page .survey-detail {
+  display: none;
+  margin-top: 24px;
+}
+
+.product-page .survey-detail.is-open {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;              /* 그룹(사이즈/색상) 사이 */
+}
+
+.product-page .survey-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;               /* 그룹 안 줄 사이 */
+}
+
+.product-page .survey-group__title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 17px;
+  color: #212b36;
+}
+
+.product-page .survey-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 항목명 — 원본이 110px 고정. flex:none 이 없으면 글자가 길 때 찌그러짐 */
+.product-page .survey-opt .name {
+  flex: none;
+  width: 110px;
+  font-size: 14px;
+  line-height: 17px;
+  color: #212b36;
+}
+
+/* 막대 트랙 — 별점 분포 막대와 같은 모양(8px / radius 4px)이지만
+   색이 달라서(아래 참고) 규칙을 따로 둠 */
+.product-page .survey-opt .bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: #eaedf0;
+  overflow: hidden;
+}
+
+.product-page .survey-opt .bar i {
+  display: block;
+  height: 100%;
+  background: #919eab;    /* 기본은 회색 */
+}
+
+/* ★ 1등 항목만 시안색. 원본이 "가장 많이 고른 답"을 이렇게 강조함 */
+.product-page .survey-opt.is-top .bar i {
+  background: #34cae2;
+}
+
+.product-page .survey-opt .pct {
+  flex: none;
+  width: 38px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 17px;
+  color: #212b36;
+  text-align: right;
+}
+
 .product-page .review-notice {
   margin-top: 20px;
   padding-top: 16px;
@@ -2422,4 +2504,411 @@
   font-size: 16px;
   font-weight: 700;
   cursor: default;
+}
+
+
+/* ============================================================
+   10. 리뷰 사진 갤러리 — 2단 모달 (2026-08-24)
+
+   원본을 Playwright 로 직접 열어서 잰 값:
+     덮개   rgba(17,17,17,0.87) / z-index 9999 / 열려있는 동안 body{overflow:hidden}
+     ① 갤러리 패널  흰 배경, 폭 982px, 썸네일 140x140 radius 4px
+     ② 사진 뷰어    어두운 배경 rgb(34,34,34), 폭 982px
+
+   ★ 이 절의 규칙만 `.product-page` 로 시작하지 않음.
+     모달을 <body> 끝(= .product-page 밖)에 뒀기 때문 — 화면 전체를 덮는 요소를
+     본문 안에 두면 부모의 overflow/z-index 에 갇혀서 잘림.
+     대신 이름이 충분히 고유해서(gallery-/viewer-) index.html 과 부딪히지 않음
+     — CLAUDE.md 8장 "흔한 단어" 목록에 없는 이름들임
+   ============================================================ */
+
+/* 공통 덮개 — 두 단 모두 같은 방식 */
+.review-gallery-modal,
+.photo-viewer {
+  position: fixed;
+  inset: 0;                 /* top/right/bottom/left 를 한 번에 0 으로 */
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(17, 17, 17, 0.87);
+  overflow: auto;
+}
+
+/* 사진 뷰어는 갤러리 위에 한 겹 더 올라감 */
+.photo-viewer {
+  z-index: 10000;
+}
+
+/* HTML 의 hidden 속성만으로는 위 display:flex 를 못 이겨서 명시적으로 꺼줌
+   (hidden 의 기본값 display:none 보다 클래스 선택자가 우선순위가 높기 때문) */
+.review-gallery-modal[hidden],
+.photo-viewer[hidden] {
+  display: none;
+}
+
+/* 모달이 열려 있는 동안 뒤 페이지가 스크롤되지 않게 (원본도 같은 처리) */
+body.is-modal-open {
+  overflow: hidden;
+}
+
+
+/* ── ① 갤러리 패널 ───────────────────────── */
+.gallery-panel {
+  width: 982px;
+  max-width: 100%;
+  background: #fff;
+  padding: 0 40px 40px;
+}
+
+.gallery-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 40px 0 16px;
+  border-bottom: 1px solid #333;
+}
+
+.gallery-title {
+  font-size: 30px;
+  font-weight: 400;
+  color: #111;
+}
+
+.gallery-sub {
+  flex: 1;
+  font-size: 13px;
+  color: #767676;
+}
+
+/* X 버튼 — 이미지 없이 선 2개를 겹쳐 그림 (본문 아이콘들과 같은 기법) */
+.gallery-close,
+.viewer-close {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.gallery-close::before, .gallery-close::after,
+.viewer-close::before, .viewer-close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  width: 24px;
+  height: 1px;
+  background: #111;
+}
+
+.gallery-close::before, .viewer-close::before { transform: rotate(45deg); }
+.gallery-close::after,  .viewer-close::after  { transform: rotate(-45deg); }
+
+.gallery-body {
+  padding-top: 24px;
+}
+
+.gallery-count {
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #111;
+}
+
+.gallery-count strong {
+  font-weight: 700;
+}
+
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* 썸네일 — 원본 실측 140x140.
+   position:relative 는 오른쪽 아래 말풍선 배지의 기준 상자를 만들기 위한 것 */
+.gallery-grid li {
+  position: relative;
+  flex: none;
+  width: 140px;
+  height: 140px;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.gallery-grid img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 말풍선 배지 — 원본은 아이콘 이미지지만 우리는 CSS 로 그림.
+   네모 + 아래쪽 꼬리(::after) + 안에 흰 줄 2개(background 로 그은 선) */
+.gallery-grid .photo-badge {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 14px;
+  height: 12px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.gallery-grid .photo-badge::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 8px;
+  height: 1px;
+  background: #fff;
+  box-shadow: 0 3px 0 #fff;   /* 두 번째 줄을 그림자로 한 줄 더 */
+}
+
+/* 꼬리 — 삼각형(테두리로 그리는 기법. 본문 ▼ 아이콘과 같음) */
+.gallery-grid .photo-badge::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 3px;
+  border-width: 3px 3px 0 0;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.5) transparent transparent;
+}
+
+
+/* ── ② 사진 뷰어 ───────────────────────── */
+.viewer-panel {
+  width: 982px;
+  max-width: 100%;
+  padding: 20px 24px 24px;
+  background: #222;
+  color: #fff;
+}
+
+.viewer-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ★ 클래스 이름을 .review-avatar 로 쓰지 않는 이유:
+   리뷰 카드의 아바타는 50px, 뷰어의 아바타는 40px 인데 같은 이름을 쓰면
+   "이 이름은 전부 같은 크기" 라는 약속이 깨짐 (검사기가 실제로 잡아냈음).
+   CLAUDE.md 8장 "클래스 이름 충돌" 과 같은 종류의 문제 */
+.viewer-head .viewer-avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #4a4a4a;
+}
+
+.viewer-writer {
+  flex: 1;
+  min-width: 0;
+}
+
+.viewer-writer .name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.viewer-writer .meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.viewer-writer .stars {
+  font-size: 13px;
+  color: #ff9d5c;      /* 별 색은 본문 리뷰와 같게 */
+  letter-spacing: -1px;
+}
+
+.viewer-writer .date {
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* 뷰어의 X 는 흰색이어야 하므로 색만 덮어씀 */
+.viewer-close::before,
+.viewer-close::after {
+  background: #fff;
+}
+
+/* 큰 사진 무대 — 사진을 가운데 두고 좌우에 화살표.
+   높이를 고정해야 사진마다 세로 크기가 달라도 화살표가 안 움직임 */
+.viewer-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 660px;
+  margin-top: 16px;
+  background: #1a1a1a;
+}
+
+/* contain = 비율 유지하면서 상자 안에 "전부 들어가게" (cover 와 반대로 안 잘림).
+   리뷰 사진은 세로형·가로형이 섞여 있어서 잘리면 안 됨 */
+.viewer-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* 좌우 화살표 — 원본처럼 얇은 꺾쇠. 테두리 2개만 남기고 45도 회전 */
+.viewer-prev,
+.viewer-next {
+  position: absolute;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.viewer-prev { left: 8px; }
+.viewer-next { right: 8px; }
+
+.viewer-prev::before,
+.viewer-next::before {
+  content: '';
+  position: absolute;
+  top: 11px;
+  left: 14px;
+  width: 20px;
+  height: 20px;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
+}
+
+.viewer-prev::before { transform: rotate(-135deg); }
+.viewer-next::before { transform: rotate(45deg); }
+
+/* 사진이 1장뿐이면 화살표를 감춤 (넘길 데가 없음) */
+.viewer-prev[hidden],
+.viewer-next[hidden] {
+  display: none;
+}
+
+/* 아래 썸네일 줄 */
+.viewer-thumbs {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.viewer-thumbs li {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+/* 지금 보고 있는 사진 — 파란 테두리 (원본과 동일) */
+.viewer-thumbs li.is-on {
+  border-color: var(--coupang-blue);
+  opacity: 1;
+}
+
+.viewer-thumbs img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 맨 아래: 옵션 + 리뷰 글 + 전체보기 */
+.viewer-foot {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.viewer-text-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.viewer-option {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* 리뷰 글은 2줄까지만 보이고 나머지는 … 로 자름.
+   -webkit-line-clamp 는 "몇 줄까지 보여줄지" 를 정하는 것 — 크롬/엣지/사파리에서 동작함 */
+.viewer-text {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 19px;
+  color: #ddd;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.viewer-all {
+  flex: none;
+  border: 0;
+  background: none;
+  color: #6ba8ff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+
+/* ── 갤러리 반응형 ── 좁은 화면에서 썸네일을 줄임 */
+@media (max-width: 768px) {
+  .gallery-panel {
+    padding: 0 20px 24px;
+  }
+
+  .gallery-head {
+    padding-top: 24px;
+  }
+
+  .gallery-title {
+    font-size: 22px;
+  }
+
+  /* 부제는 좁으면 자리만 차지해서 숨김 (원본도 좁은 화면에선 안 보임) */
+  .gallery-sub {
+    display: none;
+  }
+
+  .gallery-grid li {
+    width: 100px;
+    height: 100px;
+  }
+
+  .viewer-panel {
+    padding: 16px;
+  }
+
+  .viewer-stage {
+    height: 380px;
+  }
+
+  .viewer-thumbs li {
+    width: 44px;
+    height: 44px;
+  }
 }
