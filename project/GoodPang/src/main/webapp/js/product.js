@@ -5,9 +5,6 @@
      1. 수량 + / - 버튼
      2. 썸네일을 누르면 큰 이미지가 바뀌는 것
 
-   ※ index.html 이 쓰는 main.js 는 여기서 안 불러옴.
-     main.js 는 히어로 슬라이드·상품 캐러셀처럼 메인페이지에만 있는 요소를 찾는데,
-     이 페이지엔 그 요소가 없어서 불러봐야 하는 일이 없음.
      header.js 는 헤더/맨위로 버튼용이라 이 페이지에도 그대로 필요함.
    ============================================================ */
 
@@ -185,6 +182,13 @@ function setupColorChips() {
       const color   = li.dataset.color;
       const chipImg = li.querySelector('img');
       if (label && color) label.textContent = color;
+
+      /* 장바구니/바로구매 폼의 hidden input 에도 같이 반영 (2026-08-24).
+         아래 mainImg/chipImg 체크보다 위에 두는 이유: 그 체크에 걸려 함수가
+         일찍 끝나도 색상 값은 항상 갱신되게 하려는 것 */
+      const colorInput = document.getElementById('selectedColor');
+      if (colorInput && color) colorInput.value = color;
+
       if (!mainImg || !chipImg || !thumbs.length) return;
 
       const isWhite = (color === '화이트');
@@ -220,6 +224,25 @@ function setupItemBriefMore() {
     btn.classList.toggle('is-open', open);
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     btn.firstChild.nodeValue = open ? '필수 표기 정보 접기' : '필수 표기 정보 더보기';
+  });
+}
+
+
+/* ── 5.5 리뷰 설문 "자세히 보기" ────────────────
+   2026-08-24 추가. 원본을 Playwright 로 직접 열어서 확인한 동작:
+     모달이 아니라 **왼쪽 요약 칸 안에서 아래로 펼쳐지고**, 버튼 글자가 "접기" 로 바뀜.
+   위 setupItemBriefMore 와 완전히 같은 방식이라 구조를 일부러 똑같이 맞춰둠
+   (나중에 하나를 고치면 다른 것도 같이 보게 하려고). */
+function setupSurveyMore() {
+  const btn    = document.querySelector('.survey-more');
+  const detail = document.querySelector('.survey-detail');
+  if (!btn || !detail) return;
+
+  btn.addEventListener('click', function () {
+    const open = detail.classList.toggle('is-open');
+    btn.classList.toggle('is-open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.textContent = open ? '접기' : '자세히 보기';
   });
 }
 
@@ -461,6 +484,180 @@ setupAdSlider();
 setupColorChips();
 setupReviewTools();
 setupDeliveryOption();
+/* ── 9. 리뷰 사진 갤러리 (2단 모달) ────────────────
+   2026-08-24 추가. 원본을 Playwright 로 직접 열어서 확인한 흐름 그대로:
+     ① 리뷰 사진 썸네일 클릭       → "갤러리" 모달 (사진 전체를 격자로)
+     ② 갤러리 안 썸네일 또 클릭    → "사진 뷰어" (큰 사진 + 좌우 화살표 + 그 리뷰 글)
+   뷰어의 화살표는 **갤러리 사진 전체**를 넘김 (그 리뷰 것만이 아님 — 원본이 그렇게 동작함).
+   사진이 바뀌면 위 작성자 정보와 아래 리뷰 글도 그 사진의 주인 리뷰로 같이 바뀜.
+
+   ★★ 사진 목록의 출처는 "리뷰 카드 안의 .review-photos" 하나뿐임 (2026-08-24 수정).
+     전에는 위쪽 갤러리 줄에도 사진을 손으로 적고 data-review 로 주인을 표시했는데,
+     같은 정보(어느 사진이 누구 것인지)가 두 군데에 있어서 실제로 어긋났음 —
+     갤러리는 review-4 를 최*영 것이라 했지만 최*영 카드에는 사진이 없어서
+     "전체보기로 가보면 사진이 없는" 상태가 됐음(사용자가 발견).
+     지금은 카드에서 긁어모으므로 어긋날 수가 없고, 위쪽 갤러리 줄도 JS 가 그려줌.
+     (수량↔가격, 리뷰 별점 때도 같은 원칙을 썼음: 값은 한 곳에만 둔다)
+
+   ★ 리뷰 id 로 주인을 기억하는 이유: 정렬(베스트순/최신순)을 누르면 카드의 DOM 순서가
+     바뀌므로 "몇 번째 리뷰" 로 기억하면 어긋남.
+
+   ▶JSP: 카드 안 사진만 <c:forEach> 로 찍어내면 이 JS 는 그대로 동작함. */
+function setupReviewGallery() {
+  const source = document.querySelector('.review-gallery');
+  const modal  = document.querySelector('.review-gallery-modal');
+  const viewer = document.querySelector('.photo-viewer');
+  if (!source || !modal || !viewer) return;
+
+  /* 리뷰 카드를 전부 훑어서 사진을 모음. [{ src, reviewId }, ...]
+     ⚠ 페이지네이션으로 숨겨진(.is-hidden) 카드도 DOM 에는 있으므로 같이 걷힘 —
+       원본도 갤러리에는 2페이지 사진까지 다 나오므로 이게 맞음 */
+  const photos = [];
+  document.querySelectorAll('.review-item').forEach(function (card) {
+    const id = card.dataset.reviewId || '';
+    card.querySelectorAll('.review-photos img').forEach(function (img) {
+      photos.push({ src: img.src, reviewId: id });
+    });
+  });
+
+  /* 위쪽 갤러리 줄을 모은 사진으로 그림 (HTML 에는 빈 <ul> 만 있음).
+     클릭은 아래에서 ul 에 이벤트 위임으로 한 번만 걸어둠 */
+  photos.forEach(function (p) {
+    const li = document.createElement('li');
+    const img = document.createElement('img');
+    img.src = p.src;
+    img.alt = '';
+    li.appendChild(img);
+    source.appendChild(li);
+  });
+
+  const grid      = modal.querySelector('.gallery-grid');
+  const countEl   = modal.querySelector('.gallery-count strong');
+  const stage     = viewer.querySelector('.viewer-img');
+  const thumbList = viewer.querySelector('.viewer-thumbs');
+  const prevBtn   = viewer.querySelector('.viewer-prev');
+  const nextBtn   = viewer.querySelector('.viewer-next');
+  let current = 0;
+
+  /* 열려 있는 모달이 하나라도 있으면 뒤 페이지 스크롤을 막음 */
+  function lockScroll() {
+    const open = !modal.hidden || !viewer.hidden;
+    document.body.classList.toggle('is-modal-open', open);
+  }
+
+  /* ── ① 갤러리 모달 ── */
+  function openGallery() {
+    countEl.textContent = photos.length;
+    grid.innerHTML = '';
+    photos.forEach(function (p, i) {
+      const li = document.createElement('li');
+      const img = document.createElement('img');
+      img.src = p.src;
+      img.alt = '';
+      li.appendChild(img);
+      /* 원본에 있는 오른쪽 아래 말풍선 배지 (CSS 로 그림) */
+      const badge = document.createElement('span');
+      badge.className = 'photo-badge';
+      li.appendChild(badge);
+      li.addEventListener('click', function () { openViewer(i); });
+      grid.appendChild(li);
+    });
+    modal.hidden = false;
+    lockScroll();
+  }
+
+  /* ── ② 사진 뷰어 ── */
+  function openViewer(index) {
+    current = index;
+    thumbList.innerHTML = '';
+    photos.forEach(function (p, i) {
+      const li = document.createElement('li');
+      const img = document.createElement('img');
+      img.src = p.src;
+      img.alt = '';
+      li.appendChild(img);
+      li.addEventListener('click', function () { showPhoto(i); });
+      thumbList.appendChild(li);
+    });
+    viewer.hidden = false;
+    lockScroll();
+    showPhoto(index);
+  }
+
+  /* 사진 한 장을 화면에 올림 + 그 사진 주인 리뷰의 정보로 위아래를 채움 */
+  function showPhoto(index) {
+    current = (index + photos.length) % photos.length;   // 끝에서 넘기면 처음으로 돌아감
+    const p = photos[current];
+    stage.src = p.src;
+
+    [].slice.call(thumbList.children).forEach(function (li, i) {
+      li.classList.toggle('is-on', i === current);
+    });
+
+    /* 사진이 1장뿐이면 화살표를 감춤 */
+    prevBtn.hidden = nextBtn.hidden = (photos.length <= 1);
+
+    /* 이 사진이 달린 리뷰 카드를 id 로 찾아서 글자를 그대로 가져옴.
+       리뷰 내용을 뷰어에 또 적어두지 않는 이유: 같은 글이 두 군데 있으면
+       한쪽만 고쳤을 때 어긋남 (수량→가격 만들 때 겪은 것과 같은 종류의 실수) */
+    const card = document.querySelector('.review-item[data-review-id="' + p.reviewId + '"]');
+    const pick = function (sel) {
+      const el = card && card.querySelector(sel);
+      return el ? el.textContent.trim() : '';
+    };
+    viewer.querySelector('.viewer-writer .name').textContent  = pick('.name');
+    viewer.querySelector('.viewer-writer .stars').textContent = pick('.stars');
+    viewer.querySelector('.viewer-writer .date').textContent  = pick('.date');
+    viewer.querySelector('.viewer-option').textContent        = pick('.review-option');
+    viewer.querySelector('.viewer-text').textContent          = pick('.review-text');
+    viewer.dataset.reviewId = p.reviewId;
+  }
+
+  function closeViewer() { viewer.hidden = true; lockScroll(); }
+  function closeAll()    { viewer.hidden = true; modal.hidden = true; lockScroll(); }
+
+  /* 리뷰 사진 썸네일 → 갤러리 열기.
+     각 li 가 아니라 부모(ul)에 이벤트를 거는 이유(이벤트 위임): 나중에 JSP 가
+     사진을 몇 장 찍어낼지 모르므로, 목록이 바뀌어도 코드를 안 고치게 하려고 */
+  source.addEventListener('click', function (e) {
+    const li = e.target.closest('li');
+    if (li) { e.preventDefault(); openGallery(); }
+  });
+
+  modal.querySelector('.gallery-close').addEventListener('click', closeAll);
+  viewer.querySelector('.viewer-close').addEventListener('click', closeViewer);
+  prevBtn.addEventListener('click', function () { showPhoto(current - 1); });
+  nextBtn.addEventListener('click', function () { showPhoto(current + 1); });
+
+  /* "전체보기" → 모달을 다 닫고 그 리뷰 카드로 이동 */
+  viewer.querySelector('.viewer-all').addEventListener('click', function () {
+    const id = viewer.dataset.reviewId;
+    closeAll();
+    const card = document.querySelector('.review-item[data-review-id="' + id + '"]');
+    if (card) window.scrollTo({ top: card.offsetTop - 120, behavior: 'smooth' });
+  });
+
+  /* 어두운 배경(덮개)을 직접 눌렀을 때만 닫음.
+     e.target === 덮개 를 확인하는 이유: 안쪽 패널을 눌렀을 때도 클릭이 부모로
+     올라와서(버블링) 같이 닫혀버리기 때문 */
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeAll(); });
+  viewer.addEventListener('click', function (e) { if (e.target === viewer) closeViewer(); });
+
+  /* 키보드 — ESC 로 닫기, 좌우 화살표로 사진 넘기기 (뷰어가 열려 있을 때만) */
+  document.addEventListener('keydown', function (e) {
+    if (!viewer.hidden) {
+      if (e.key === 'Escape')     closeViewer();
+      if (e.key === 'ArrowLeft')  showPhoto(current - 1);
+      if (e.key === 'ArrowRight') showPhoto(current + 1);
+    } else if (!modal.hidden && e.key === 'Escape') {
+      closeAll();
+    }
+  });
+}
+
+
 setupItemBriefMore();
+setupSurveyMore();
 setupTabSpy();
 setupSoldout();
+setupReviewGallery();
