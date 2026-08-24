@@ -770,7 +770,7 @@
 
 						<li class="my-coupang"><a
 
-							href="${pageContext.request.contextPath}/order_list.jsp"> <img
+							href="${pageContext.request.contextPath}/order/order_list "> <img
 
 								src="${pageContext.request.contextPath}/images/icons/person.png"
 
@@ -786,7 +786,7 @@
 
 								<span class="wrapper"> <i class="arrow"></i> <a
 
-									href="${pageContext.request.contextPath}/order_list.jsp">
+									href="${pageContext.request.contextPath}/order/order_list">
 
 										주문목록 </a> <a href="#"> 취소/반품 </a> <a href="#"> 찜 리스트 </a>
 
