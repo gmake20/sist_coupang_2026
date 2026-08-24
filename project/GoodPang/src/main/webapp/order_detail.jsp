@@ -1,5 +1,10 @@
+
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
+<%
+    String orderNo = "1001";
+%>
+<!--위의 문장을 바꿉니다...OSB String orderNo = request.getParameter("orderNo");-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -48,10 +53,11 @@
 			<div class="side-section">
 				<h3>MY 쇼핑</h3>
 
-				<a href="#" class="active">주문목록/배송조회</a> <a href="cancel_history.jsp">취소/반품/교환/환불
-					내역</a> <a href="#">와우 멤버십</a> <a href="#">구독 서비스 <span class="new">N</span></a>
-				<a href="#">로켓프레시 프레시백 <span class="new">N</span></a> <a href="#">영수증
-					조회/출력</a>
+				<a href="#" class="active">주문목록/배송조회</a> <a
+					href="cancel_history.jsp">취소/반품/교환/환불 내역</a> <a href="#">와우 멤버십</a>
+				<a href="#">구독 서비스 <span class="new">N</span></a> <a href="#">로켓프레시
+					프레시백 <span class="new">N</span>
+				</a> <a href="#">영수증 조회/출력</a>
 			</div>
 
 			<div class="side-section">
@@ -103,138 +109,85 @@
 
 				<div class="order-info">
 					<strong>2026. 8. 12</strong> 주문 <span class="dot">·</span> 주문번호 <span
-						class="order-number">5102232456789</span>
+						class="order-number"><%= orderNo %></span>
 				</div>
 
 			</section>
 
+			<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+			<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
-			<!-- =========================
-             배송 상품
-        ========================== -->
-			<section class="delivery-box">
+<!-- =========================
+     배송 상품 리스트 (JSTL 반복문)
+========================== -->
+			<c:forEach var="item" items="${detailList}">
+				<section class="delivery-box">
 
-				<div class="delivery-main">
+					<div class="delivery-main">
 
-					<div class="delivery-title">
-						배송완료 <span>·</span> <strong>8/13(목) 도착</strong>
-					</div>
-
-					<div class="product-row">
-
-						<!-- 상품 이미지 -->
-						<div class="product-image">
-							<div class="clothes-icon">👕</div>
+						<div class="delivery-title">
+							배송완료 <span>·</span> <strong>8/13(목) 도착</strong>
 						</div>
 
+						<div class="product-row">
 
-						<!-- 상품 정보 -->
-						<div class="product-info">
+							<!-- 상품 이미지 -->
+							<div class="product-image">
+								<%--<c:choose>
+                        <c:when test="${not empty item.productImg}">
+                           img src="${item.productImg}" alt="${item.productName}"
+                        </c:when>
+                        <c:otherwise>
+                            <div class="clothes-icon">👕</div>
+                        </c:otherwise>
+                    </c:choose>--%>
+								<div class="clothes-icon">👕</div>
+							</div>
 
-							<div class="product-name">
+							<!-- 상품 정보 -->
+							<div class="product-info">
 
-								<span class="rocket">🚀 로켓배송</span> 남녀공용 오버핏 레터링 반팔 티셔츠 (블루)
+								<div class="product-name">
+									<%--c:if test="${item.isRocket}">
+                            <span class="rocket">🚀 로켓배송</span>
+                        </c:if--%>
+									<span class="rocket">🚀 로켓배송</span> ${item.productName}
+								</div>
+
+								<div class="product-price">
+									<fmt:formatNumber value="${item.price}" pattern="#,###" />
+									원 <span>·</span> ${item.orderQty}개
+								</div>
+
+								<div class="product-option">
+									<span>사이즈 / 색상: </span> ${item.optionName}
+								</div>
 
 							</div>
 
-							<div class="product-price">
-								19,800 원 <span>·</span> 1개
-							</div>
-
-							<div class="product-option">
-								사이즈: L <span>/</span> 색상: 블루
-							</div>
-
-						</div>
-
-
-						<button type="button" class="cart-btn" id="cartBtn">장바구니
-							담기</button>
-
-					</div>
-
-				</div>
-
-
-				<!-- 오른쪽 버튼 -->
-				<div class="delivery-buttons">
-
-					<button type="button" class="delivery-btn primary" id="deliveryBtn">
-						배송 조회</button>
-
-					<button type="button" class="delivery-btn" id="exchangeBtn">
-						교환, 반품 신청</button>
-
-					<button type="button" class="delivery-btn" id="reviewBtn">
-						리뷰 작성하기</button>
-
-				</div>
-
-			</section>
-			<br>
-
-			<!-- =========================
-             배송 상품 2
-        ========================== -->
-			<section class="delivery-box">
-
-				<div class="delivery-main">
-
-					<div class="delivery-title">
-						배송완료 <span>·</span> <strong>8/29(목) 도착</strong>
-					</div>
-
-					<div class="product-row">
-
-						<!-- 상품 이미지 -->
-						<div class="product-image">
-							<div class="clothes-icon">👕</div>
-						</div>
-
-
-						<!-- 상품 정보 -->
-						<div class="product-info">
-
-							<div class="product-name">
-
-								<span class="rocket">🚀 로켓배송</span> 시원한 면 티
-
-
-							</div>
-
-							<div class="product-price">
-								20,000 원 <span>·</span> 1개
-							</div>
-
-							<div class="product-option">
-								사이즈: M <span>/</span> 색상: 아이보리
-							</div>
+							<button type="button" class="cart-btn"
+								onclick="addCart('${item.productNo}')">장바구니 담기</button>
 
 						</div>
 
+					</div>
 
-						<button type="button" class="cart-btn" id="cartBtn">장바구니
-							담기</button>
+
+					<div class="delivery-buttons">
+
+						<button type="button" class="delivery-btn primary"
+							id="deliveryBtn">배송 조회</button>
+
+						<button type="button" class="delivery-btn" id="exchangeBtn">
+							교환, 반품 신청</button>
+
+						<button type="button" class="delivery-btn" id="reviewBtn">
+							리뷰 작성하기</button>
 
 					</div>
 
-				</div>
-
-
-				<!-- 오른쪽 버튼 -->
-				<div class="delivery-buttons">
-
-					<button type="button" class="delivery-btn primary" id="deliveryBtn">
-						배송 조회</button>
-
-					<button type="button" class="delivery-btn" id="cancelBtn"
-						onclick="location.href='${pageContext.request.contextPath}/order_cancel.jsp'">
-						주문취소</button>
-
-				</div>
-
-			</section>
-
+				</section>
+			</c:forEach>
 
 
 			<!-- =========================
