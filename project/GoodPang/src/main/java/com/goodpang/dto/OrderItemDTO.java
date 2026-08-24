@@ -10,7 +10,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItemDTO {
-
+    
+	private int orderNo; // <-- 추가
     private String productName;
     private String optionName;
     private int salePrice;

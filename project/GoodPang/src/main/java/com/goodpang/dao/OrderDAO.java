@@ -1,7 +1,6 @@
 package com.goodpang.dao;
 
 import java.sql.Connection;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import com.goodpang.dto.OrderCompleteDTO;
 import com.goodpang.dto.OrderItemDTO;
 import com.goodpang.dto.OrderSummaryDTO;
 import com.goodpang.util.ConnectionProvider;
-import com.goodpang.util.DBConn;
 
 public class OrderDAO {
 
@@ -463,43 +461,99 @@ public class OrderDAO {
 
 		return dto;
 	}
-	
+
 	public int insertOrderDelivery(
-            Connection conn,
-            int orderNo,
-            int addressNo) throws Exception {
+			Connection conn,
+			int orderNo,
+			int addressNo) throws Exception {
 
-        String sql = """
-                INSERT INTO ORDER_DELIVERY (
-                    ORDER_NO,
-                    RECEIVER_NAME,
-                    TEL,
-                    ZIPCODE,
-                    ADDRESS,
-                    DETAIL_ADDRESS,
-                    REQUEST_MSG
-                )
-                SELECT
-                    ?,
-                    RECEIVER_NAME,
-                    TEL,
-                    ZIPCODE,
-                    ADDRESS,
-                    DETAIL_ADDRESS,
-                    REQUEST_MSG
-                FROM DELIVERY_ADDRESS
-                WHERE ADDRESS_NO = ?
-                """;
+		String sql = """
+				INSERT INTO ORDER_DELIVERY (
+				    ORDER_NO,
+				    RECEIVER_NAME,
+				    TEL,
+				    ZIPCODE,
+				    ADDRESS,
+				    DETAIL_ADDRESS,
+				    REQUEST_MSG
+				)
+				SELECT
+				    ?,
+				    RECEIVER_NAME,
+				    TEL,
+				    ZIPCODE,
+				    ADDRESS,
+				    DETAIL_ADDRESS,
+				    REQUEST_MSG
+				FROM DELIVERY_ADDRESS
+				WHERE ADDRESS_NO = ?
+				""";
 
-        try (
-            PreparedStatement pstmt =
-                conn.prepareStatement(sql)
-        ) {
+		try (
+				PreparedStatement pstmt =
+				conn.prepareStatement(sql)
+				) {
 
-            pstmt.setInt(1, orderNo);
-            pstmt.setInt(2, addressNo);
+			pstmt.setInt(1, orderNo);
+			pstmt.setInt(2, addressNo);
 
-            return pstmt.executeUpdate();
-        }
-    }
+			return pstmt.executeUpdate();
+		}
+
+
+	}
+	/*
+	 * 회원번호(memberNo)로 주문 내역 조회
+	 */
+	public List<OrderItemDTO> getOrderListByMemberNo(int memberNo) {
+
+		List<OrderItemDTO> list = new ArrayList<>();
+
+		String sql = """
+										-- DAO의 SQL을 MEMBER_ID로 조회하도록 변경할 때
+						SELECT 
+						    O.ORDER_NO,
+						    P.PRODUCT_NAME,
+						    OI.OPTION_NAME,
+						    OI.SALE_PRICE,
+						    OI.QUANTITY,
+						    OI.FREE_DELIVERY
+						FROM ORDERS O
+						JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO  -- MEMBER 테이블 조인 추가
+						JOIN ORDER_ITEM OI ON O.ORDER_NO = OI.ORDER_NO
+						JOIN PRODUCT P ON OI.PRODUCT_NO = P.PRODUCT_NO
+						WHERE M.MEMBER_ID = ?                       -- MEMBER_ID로 조건 변경
+						ORDER BY O.ORDER_NO DESC, OI.ORDER_ITEM_NO ASC
+				""";
+
+		try (
+				Connection conn = ConnectionProvider.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql)
+				) {
+
+			// WHERE 절의 ? 위치에 memberNo 전달
+			pstmt.setInt(1, memberNo);
+
+			try (ResultSet rs = pstmt.executeQuery()) {
+
+				while (rs.next()) {
+
+					OrderItemDTO item = new OrderItemDTO();
+					item.setOrderNo(rs.getInt("ORDER_NO"));
+					item.setProductName(rs.getString("PRODUCT_NAME"));
+					item.setOptionName(rs.getString("OPTION_NAME"));
+					item.setSalePrice(rs.getInt("SALE_PRICE"));
+					item.setQuantity(rs.getInt("QUANTITY"));
+					item.setFreeDelivery(rs.getBoolean("FREE_DELIVERY"));
+
+					list.add(item);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return list;
+	}
 }
