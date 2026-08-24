@@ -1,0 +1,2425 @@
+@charset "UTF-8";
+
+/* ============================================================
+   product.css — 상품 상세 페이지 전용
+
+   ★ 이 파일의 모든 규칙은 `.product-page` 로 시작함.
+     이유: CSS 규칙은 페이지 전체에 적용되니까, 여기서 만든 `.price-container`
+     같은 이름이 나중에 index.html 쪽 이름과 부딪힐 수 있음.
+     `.product-page` 를 앞에 붙이면 "이 페이지 안에서만" 이 되어 절대 안 부딪힘.
+     (CLAUDE.md 7장 "클래스 이름 충돌 — 접두사로 범위 주기" 규칙)
+
+   ★ 여기 적힌 숫자·색은 전부 쿠팡 원본에서 getComputedStyle 로 실측한 값임.
+     눈으로 보고 옮겨적은 값이 아님 (CLAUDE.md 6장 규칙).
+     원본 표: ref/product/원본_실측값.md
+
+   ✅ 해결된 문제 — 날개배너(어사이드)
+     2026-08-19 에 "날개배너가 푸터 아래로 428px 삐져나옴" 문제가 있었음.
+     원인은 배너가 아니라 페이지가 짧았던 것 (.side-banner 는 absolute + 높이 고정이라
+     끝이 항상 1822px 인데, absolute 라도 문서 스크롤 영역에는 포함되기 때문).
+     → 섹션을 다 붙이면서 사라졌고, 2026-08-20 에 **어사이드 자체를 뺐음**.
+       원본 상세페이지에도 날개배너가 안 나오기 때문 (product.html 주석 참고).
+       그래서 이 문제는 이제 구조적으로 생길 수 없음.
+
+   차례
+     1. 페이지 틀 / 빵부스러기
+     2. 왼쪽 — 상품 이미지
+     3. 오른쪽 — 구매박스
+        3-1 머리(브랜드/상품명/별점)  3-2 가격  3-3 배송
+        3-4 옵션  3-5 적립  3-6 수량+버튼  3-7 작은 글씨
+     4. 반응형
+   ============================================================ */
+
+
+/* ============================================================
+   0. 페이지 폭 — 상세페이지만 넓게   (2026-08-20)
+
+   ★ 원본 쿠팡은 메인과 상세의 본문 폭이 다름:
+       메인페이지  1,020px
+       상세페이지  1,295px   ← 상품 사진이 주인공인 페이지라 더 넓게 씀
+     (원본 계산: .sdp-content max-width 1500 - 좌우 padding 40 - 오른쪽 레일 165 = 1295)
+
+   우리는 처음에 index.html 의 1020 을 그대로 따랐는데,
+   그래서 원본보다 79% 크기로 축소돼 보였음 (사용자 지적, 2026-08-20).
+
+   ★ common.css 를 안 고치고 넓히는 방법
+     common.css 가 폭을 CSS 변수로 잡아둔 덕분에, <body class="page-product"> 에서
+     변수만 덮어쓰면 됨. 변수는 자식에게 물려지므로 헤더·푸터까지 같이 넓어짐.
+     index.html 은 이 클래스가 없으니 1020 그대로 유지됨.
+
+   되돌리려면 이 두 줄만 지우면 됨.
+   ============================================================ */
+
+.page-product {
+  /* ★★ 2026-08-21 세션의 결론이 틀렸었음 — 2026-08-21(재검증) 정정 ★★
+     그때는 뷰포트 1440px 한 폭에서만 쟀는데, 문서폭이 1425px(<1500)라서
+     캡에 안 걸려 "max-width 없음"으로 보인 것뿐이었음.
+
+     실제 원본 DOM(Playwright 로 재확인)에는 헤더 로고/검색 줄을 감싸는
+     div 에 정확히 이 클래스가 있음:
+       fw-mx-auto fw-flex fw-w-full fw-items-center fw-pr-[5px]
+       → computed max-width: 1500px, margin: 0 auto
+     즉 원본 헤더는 "화면 꽉 채움"이 아니라 **1500px 에서 멈추고 가운데 정렬**됨.
+     화면이 1500px 보다 넓어지면(노트북 큰 화면 등) 원본은 거기서 안 늘어나는데
+     우리는 none 이라 화면 끝까지 계속 늘어났던 것 — 이게 "화면에 꽉 차있다" 는
+     사용자 지적의 실제 원인.
+
+     검증(1440px, Playwright 실측): 검색창 좌456~우1200(폭744) 그대로 일치 확인. */
+  --header-width:  1500px;
+  --content-width: 1300px;
+}
+
+/* 헤더가 화면 끝까지 가면 글자가 모서리에 붙으므로 좌우 여백만 줌.
+   원본도 카테고리 버튼이 x=0 에 붙고 오른쪽 아이콘까지 꽉 채움 */
+/* ★ 헤더 각 부분을 원본 위치에 맞춤 (2026-08-21, 실제 페이지 1440px 실측)
+
+   원본 1440px:
+     카테고리 버튼  좌   0   폭 110
+     로고          좌 140   폭 154
+     검색 상자      좌 456 ~ 우끝 1200  (폭 744)
+     장바구니       좌 1362 ~ 우끝 1410  (화면 끝에서 15px)
+
+   우리 로고는 "GoodPang" 글자라 193px 로 원본(154px)보다 39px 넓음.
+   로고 크기는 팀이 정한 브랜드라 안 건드리고, **좌우 여백으로 위치만 맞춤.** */
+@media (min-width: 1025px) {
+  .page-product #header .header-inner {
+    padding-left: 0;      /* 카테고리 버튼을 화면 왼쪽 끝(0)에 붙임 */
+    padding-right: 5px;   /* 장바구니 우끝 1410 = 화면(1425) - 15 */
+  }
+}
+
+/* 유틸바(즐겨찾기·로그인 줄)는 원본이 좌우 20px 여백을 둠 */
+.page-product #header .top-bar-inner {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* ★ 로고 — 2026-08-24 에 이 절을 통째로 지웠음. 사연을 남겨둠.
+
+   전에는 여기에 `.page-product #header .logo a { font-size: 27px }` 가 있었음.
+   그때 로고가 span 8개짜리 옛날 방식이라 193px 로 넓어서, 상세페이지에서만 줄여 쓴 것.
+
+   그 뒤 팀원이 index.html 의 로고를 `.brand-goodpang` 한 줄로 바꿨고(2026-08-24),
+   그 규칙이 common.css 2148줄에 `font-size: 31px !important` 로 들어있음.
+   → !important 라서 우리 27px 은 아예 안 먹음. **있으나 마나 한 죽은 코드**가 됐음.
+     남겨두면 다음에 보고 "왜 안 먹지?" 하고 헤맬 자리라 지움.
+
+   지금 실측(1425px 기준): 로고 160px — 원본 쿠팡 로고 154px 과 6px 차이라 그대로 씀.
+   (전에 쓰던 27px 방식은 133px 이라 오히려 21px 더 멀었음) */
+
+/* 검색 상자 위치 — 로고가 39px 넓은 만큼 왼쪽 여백을 줄여서
+   시작점(456)과 끝점(1200)을 원본과 같게 맞춤.
+
+   ⚠ 데스크톱에서만 적용. 이 여백(123+74=197)을 좁은 화면에도 주면 가로로 넘침.
+     실제로 360px 에서 40px 넘쳤고 검사기가 잡아냈음 (2026-08-21).
+     원본도 좁은 화면에서는 헤더 배치가 통째로 달라짐 */
+@media (min-width: 1025px) {
+  .page-product #header .search-form {
+    /* 원본 검색창(FORM, 파란 테두리 2px): 좌 319 ~ 우끝 1266, 폭 947, 높이 41
+
+       ⚠ 2026-08-24 — 여기 있던 `margin-left: 25px` 를 지웠음. 25px 이 두 번 들어가고 있었음:
+           common.css 379줄  .logo a      { margin-right: 25px }   ← 원본이 주는 간격
+           product.css (여기) .search-form { margin-left:  25px }   ← 내가 또 준 것
+         그래서 로고와 검색창 사이가 50px 이 됐음(원본 25px).
+         로고가 옛날 방식(133px)일 땐 로고가 좁은 만큼 우연히 상쇄돼서 안 보였는데,
+         로고를 .brand-goodpang(160px)로 바꾸니 27px 이 그대로 튀어나왔음.
+       → 지금은 common.css 의 25px 하나만 쓰고, 검색창 시작 325 (원본 319, 6px 차 = 로고 폭 차이).
+
+       margin-right 8px 은 남겨둠 — 오른쪽 끝을 원본과 같은 1266 에 맞추는 값 */
+    margin-right: 8px;
+  }
+}
+
+/* 푸터도 같은 이유 — 푸터 안쪽 폭은 common.css 가 정함 */
+.page-product #footer > div {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+
+/* ============================================================
+   1. 페이지 틀
+   ============================================================ */
+
+.product-page {
+  padding-bottom: 40px;
+}
+
+/* 본문 가운데 정렬 — index.html 과 같은 1020px 를 씀
+   (common.css 의 --content-width 변수를 그대로 재사용) */
+.product-page__inner {
+  /* ★ 원본 구조를 실제 페이지에서 재서 그대로 옮긴 것 (2026-08-21, Playwright 실측)
+
+     원본:
+       .sdp-content   max-width 1500 + 좌우 padding 20
+         └ .twc-flex  (가로 배치)
+             ├ <main>   flex-1            ← 본문. 남는 만큼 다 차지
+             └ <aside>  오른쪽 레일        ← 뷰포트에 따라 크기가 변함
+                  ~1279       : 0
+                  1280~1535   : 0 + 왼쪽여백 20  =  20
+                  1536~       : 125 + 왼쪽여백 20 = 145
+
+     그래서 본문 폭이 뷰포트마다 다름:
+       1440 → 1365   /   1536 → 1315   (둘 다 실측으로 확인함)
+
+     ⚠ 원본에 `xl:twc-w-[calc(100%-165px)]` 라는 클래스가 있지만 **작동하지 않는 코드**임.
+       calc 는 빼기 앞뒤에 공백이 있어야 하는데 `100%-165px` 라 문법 오류로 무시됨.
+       처음에 이걸 보고 "165px 를 항상 빼면 되겠다" 고 따라 썼다가
+       1440 에서 145px 이나 좁아졌었음. 죽은 코드를 근거로 삼으면 안 됨. */
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 레일 자리 — 원본 aside 의 여백 20 (Tailwind xl = 1280) */
+@media (min-width: 1280px) {
+  .product-page__inner {
+    padding-right: 40px;      /* 20(기본 여백) + 20(레일 여백) */
+  }
+}
+
+/* 레일이 실제 폭을 갖는 구간 — 원본 aside 125 + 여백 20 (Tailwind 2xl = 1536) */
+@media (min-width: 1536px) {
+  .product-page__inner {
+    padding-right: 165px;     /* 20 + 145 */
+  }
+}
+
+/* ── 빵부스러기 ─────────────────────────────
+   "굿팡 홈 > 뷰티 > 헤어스타일링" 처럼 현재 위치를 보여주는 줄.
+   > 기호는 글자로 치지 않고 CSS 로 넣음 — HTML 에는 뜻이 있는 글자만 남기려고 */
+.product-page .breadcrumb {
+  padding: 12px 0;
+  font-size: 12px;
+  color: var(--text-gray);
+}
+
+.product-page .breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.product-page .breadcrumb li + li::before {
+  content: '\003E';          /* > */
+  margin: 0 6px;
+  color: #ccc;
+}
+
+.product-page .breadcrumb a {
+  color: var(--text-gray);
+}
+
+.product-page .breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+
+/* ── ATF (Above The Fold, 스크롤 없이 보이는 윗부분) ──
+   왼쪽 사진 / 오른쪽 구매박스를 반반으로.
+   flex:1 두 개라 폭이 자동으로 반씩 나뉨 (원본도 50:50) */
+.product-page .prod-atf {
+  display: flex;
+  gap: 20px;
+}
+
+
+/* ============================================================
+   2. 왼쪽 — 상품 이미지
+   원본 실측: 썸네일 70x70 (아래 여백 4px), 큰 이미지는 정사각형
+   ============================================================ */
+
+.product-page .product-image {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;              /* flex 항목이 안 줄어드는 문제 방지 */
+
+  /* ★ align-items 를 안 주면 기본값이 stretch 라서 자식이 세로로 꽉 늘어남.
+     그러면 아래 .product-image__main 의 aspect-ratio(정사각형)가 무시됨.
+     (실제로 420 x 638 로 찌그러졌던 것을 측정해서 잡음) */
+  align-items: flex-start;
+}
+
+.product-page .product-image__thumbs {
+  width: 70px;
+  flex: none;                /* 썸네일 줄은 70px 로 고정 */
+}
+
+.product-page .product-image__thumbs li {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 4px;
+  border: 1px solid var(--line-gray);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* 지금 보고 있는 썸네일 — 파란 테두리 */
+.product-page .product-image__thumbs li.is-on {
+  border-color: var(--coupang-blue);
+}
+
+/* 네이비/블랙처럼 사진이 1장뿐인 색상일 때 남는 썸네일(2·3번째)을 감춤.
+   ⚠ 썸네일 "줄"(.product-image__thumbs) 자체는 숨기면 안 됨 —
+     70px 자리가 사라지면서 큰 사진이 600→680 으로 커져 화면이 덜컹거림.
+   (js/product.js setupColorChips 참고) */
+.product-page .product-image__thumbs li.is-hidden {
+  display: none;
+}
+
+.product-page .product-image__thumbs a {
+  display: block;
+  height: 100%;
+}
+
+/* 큰 이미지 — aspect-ratio 1/1 로 "폭이 얼마든 정사각형" 을 만듦.
+   높이를 px 로 박으면 반응형에서 찌그러짐 */
+.product-page .product-image__main {
+  flex: 1;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--line-gray);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* 사진 (2026-08-20 — 회색 네모에서 실제 사진으로 교체됨)
+   object-fit:cover = 칸 비율과 사진 비율이 달라도 **찌그러뜨리지 않고** 잘라서 꽉 채움.
+   (width/height 100% 만 주면 사진이 늘어나서 이상해짐)
+   원본 파일은 1000x1000 정사각형이라 지금은 잘릴 일이 거의 없지만,
+   나중에 다른 상품 사진이 들어와도 안 깨지게 하려고 넣어둠 */
+.product-page .product-image__main img,
+.product-page .product-image__thumbs img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+/* ============================================================
+   3. 오른쪽 — 구매박스
+   원본 기준 글자: 14px / line-height 21px / 색 #212b36
+   ============================================================ */
+
+.product-page .prod-atf-contents {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: #212b36;
+}
+
+
+/* ★★ <em> 기울임꼴 끄기 (2026-08-21) ★★
+   <em> 은 브라우저 기본이 `font-style: italic`.
+   "무료배송" "내일(목) 8/20" "최대 995원" 이 기울어 보였던 게 이 때문임.
+   원본은 전부 똑바로 서 있어서 이 페이지의 <em> 은 전부 normal 로 되돌림.
+   (강조의 뜻은 살리되 모양만 원본에 맞춤) */
+.product-page em {
+  font-style: normal;
+}
+
+
+/* ── 3-1. 머리부분 ───────────────────────── */
+
+/* 재고 경고 — 원본은 빨간 굵은 글씨 */
+.product-page .stock-warning {
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: var(--coupang-red);
+}
+
+/* 브랜드명 — 실측 14px / #346aff */
+.product-page .brand-info {
+  display: block;
+  line-height: 17px;
+  color: var(--coupang-blue);
+}
+
+.product-page .brand-info:hover {
+  text-decoration: underline;
+}
+
+/* 상품명 줄 — 왼쪽 제목, 오른쪽 찜/공유 버튼 */
+.product-page .product-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* 상품명 — 실측 16px / 굵기 400 (h1 이지만 안 굵음) / #212b36 */
+.product-page .product-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 21px;
+  color: #212b36;
+}
+
+/* 찜 / 공유 — 원본은 SVG 아이콘.
+   ★ 임시 ★ 아이콘 파일이 없어서 글자(♡ ↗)로 대신 그림.
+   아이콘이 생기면 content 를 지우고 background-image 로 바꾸면 됨 */
+.product-page .wish-and-share {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+.product-page .wish-and-share button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line-gray);
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* 찜/공유 아이콘 — 글자(♡ ↗)로 그리면 원본과 모양이 다르고 폰트마다 달라져서
+   SVG 로 바꿈 (2026-08-21). 선으로만 그림: fill 없음 + stroke 로 윤곽선 */
+.product-page .wish-and-share svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: #555;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.product-page .wish-and-share button:hover {
+  border-color: #999;
+}
+
+/* 별점 줄 */
+.product-page .review-atf {
+  margin-top: 4px;
+  line-height: 17px;
+}
+
+.product-page .review-atf .stars {
+  color: #ffa620;            /* 별 노란색 — 메인페이지 상품카드와 같은 색 */
+  letter-spacing: -1px;
+}
+
+.product-page .review-atf .count {
+  margin-left: 2px;
+  color: var(--coupang-blue);   /* 원본이 파란 링크색 (2026-08-21 확인) */
+}
+
+.product-page .review-atf .count:hover {
+  text-decoration: underline;
+}
+
+
+/* ── 3-2. 가격 ─────────────────────────────
+   실측: 영역 margin 16px 0, 기준 글자 12px/18px */
+.product-page .price-container {
+  margin: 16px 0;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.product-page .price-now {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* 할인율 — 원본은 빨강이 아니라 진회색(#212b36) 이었음.
+   메인페이지 상품카드(.product-unit .discount)는 빨강인데,
+   상세페이지 원본이 이렇게 생겨서 실측값을 따름 */
+.product-page .discount {
+  font-size: 14px;
+  color: #212b36;
+}
+
+/* 판매가 — 실측 22px / 700 */
+.product-page .total-price {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 26px;
+  color: #212b36;
+}
+
+/* 배지 2개 — 원본은 이미지(79x16 / 29x16).
+   이미지가 없어서 메인페이지 상품카드와 같은 방식으로 CSS 배지로 그림 */
+.product-page .badge-rocket,
+.product-page .badge-tomorrow {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.product-page .badge-rocket {
+  color: #fff;
+  background: var(--coupang-blue);
+}
+
+.product-page .badge-tomorrow {
+  color: var(--coupang-blue);
+  background: #eef2ff;
+}
+
+/* 원가 취소선 — 실측 14px / #768695 / line-through */
+.product-page .price-origin {
+  margin-top: 2px;
+}
+
+.product-page .price-origin {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.product-page .origin-price {
+  font-size: 14px;
+  color: #768695;
+  text-decoration: line-through;
+}
+
+/* 원가 옆 ⓘ — 원본에 있는 안내 아이콘. 이미지 없이 동그라미 + i 로 그림 */
+.product-page .price-info {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #b0b8c1;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+
+.product-page .price-info::after {
+  content: 'i';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 9px;
+  font-style: italic;
+  color: #b0b8c1;
+  line-height: 1;
+}
+
+/* 가격 아래 구분선 — 실측 1px / #dfe3e8 / margin 16px 0
+   <hr> 은 브라우저 기본 테두리가 있어서 border:0 으로 지우고 배경색으로 그림 */
+.product-page .price-bottom-divider {
+  height: 1px;
+  margin: 16px 0;
+  border: 0;
+  background: #dfe3e8;
+}
+
+
+/* ── 3-3. 배송 ─────────────────────────────
+   실측: margin 16px 0 10px, 글자 12px/18px */
+.product-page .delivery-container {
+  margin: 16px 0 10px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.product-page .shipping-fee .txt-bold {
+  font-weight: 700;
+}
+
+.product-page .delivery-date {
+  margin-top: 4px;
+}
+
+/* 도착 보장 — 실측 14px / 700 / #00891a (초록) */
+.product-page .txt-green {
+  font-size: 14px;
+  font-weight: 700;
+  color: #00891a;
+}
+
+.product-page .txt-green-normal {
+  font-size: 14px;
+  color: #00891a;
+}
+
+.product-page .txt-sub {
+  color: #212b36;
+}
+
+/* ── 배송 방법 선택 (2026-08-21 추가) ──────────────
+   원본을 Playwright 로 직접 열어서 확인한 것 — CLAUDE.md 참고.
+   진짜 <input type="radio"> 가 아니라 span 을 동그랗게 그린 커스텀 라디오.
+   (쿠팡 원본 클래스명도 정확히 radio-item / radio 임 — DOM 실측) */
+.product-page .radio-group {
+  margin-top: 10px;
+}
+
+.product-page .radio-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+/* 동그라미 — 평소엔 빈 테두리, 골랐을 때(.is-on)만 파랗게 채움.
+   원본도 18x18 짜리 span 하나로 이 두 모양을 다 그림 */
+.product-page .radio-item .radio {
+  flex: none;               /* ★ flex 안 고정폭 요소는 항상 flex:none — CLAUDE.md 7장 규칙 */
+  width: 16px;
+  height: 16px;
+  border: 1px solid #c4cdd5;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.product-page .radio-item.is-on .radio {
+  border-color: var(--coupang-blue);
+  border-width: 5px;        /* 테두리를 굵게 만들면 가운데가 채워진 것처럼 보임 (이미지 없이) */
+}
+
+.product-page .radio-text {
+  font-size: 12px;
+  color: #212b36;
+}
+
+.product-page .radio-item.is-on .radio-text {
+  color: #111;
+  font-weight: 700;
+}
+
+.product-page .radio-text .separator {
+  margin: 0 4px;
+  color: #dfe3e8;
+}
+
+/* 안내 ⓘ — 눌러도 아무 일 없는 버튼. price-info 와 같은 방식 */
+.product-page .radio-info {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #919eab;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 9px;
+  line-height: 12px;
+  color: #919eab;
+  cursor: pointer;
+}
+
+.product-page .radio-info::before {
+  content: 'i';
+}
+
+
+/* ── 3-4. 옵션 ─────────────────────────────
+   실측: 영역 위에 border-top 1px #eee, 한 줄마다 margin 10px 0 16px */
+.product-page .fashion-option {
+  border-top: 1px solid #eee;
+}
+
+.product-page .option-row {
+  margin: 10px 0 16px;
+}
+
+/* 옵션 이름 — 실측 12px / 700 */
+.product-page .option-label {
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* "색상: 블랙" 에서 값 부분만 안 굵게 */
+.product-page .option-value {
+  font-weight: 400;
+}
+
+/* 굵기 고르는 상자 — 실측 93 x 36 */
+/* 사이즈 고르는 상자 — 원본 실측 93 x 36 / 테두리 #ccc / 배경 #fafafa / 옅은 그림자
+   (원본은 <div> 로 만든 커스텀 드롭다운인데, 우리는 진짜 <select> 를 쓰고 모양만 맞춤.
+    <select> 가 키보드·화면낭독기 지원이 공짜로 따라와서 더 나음) */
+.product-page .option-select select {
+  width: 93px;
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  background: #fafafa;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* 색상 칩 — 실측 48 x 48 */
+.product-page .option-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-page .option-chips li {
+  width: 48px;
+  height: 48px;
+  border: 1px solid #bbb;
+  overflow: hidden;
+}
+
+/* 지금 고른 색 — 파란 테두리 2겹으로 도드라지게 (원본도 파란 테두리 + 체크) */
+.product-page .option-chips li.is-on {
+  border-color: var(--coupang-blue);
+  box-shadow: inset 0 0 0 1px var(--coupang-blue);
+}
+
+.product-page .option-chips a {
+  position: relative;
+  display: block;
+  height: 100%;
+}
+
+/* 고른 색에 붙는 파란 체크 — 원본은 오른쪽 아래 모서리에 있음.
+   ✓ 는 글자가 아니라 테두리 2개를 45도 돌려서 그림 */
+.product-page .option-chips li.is-on a::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  background: var(--coupang-blue);
+}
+
+.product-page .option-chips li.is-on a::after {
+  content: '';
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 4px;
+  height: 7px;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+}
+
+/* 색상 칩 사진 (200x200 을 48x48 칸에 넣음) */
+.product-page .option-chips img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+/* ── 3-5. 적립 ─────────────────────────────
+   실측: 위에 border-top 1px #dfe3e8 */
+.product-page .conditional-benefits {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #dfe3e8;
+}
+
+/* 적립 줄 아래 구분선 — 원본에 있는데 빠져 있었음 (2026-08-21) */
+.product-page .conditional-benefits .benefit-row:first-child {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dfe3e8;
+}
+
+.product-page .benefit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.product-page .benefit-label {
+  flex: none;
+  width: 40px;
+  color: #768695;
+}
+
+.product-page .benefit-text em {
+  font-weight: 700;
+}
+
+/* "혜택보기 >" — 오른쪽 끝으로 밀기. margin-left:auto 가 남는 공간을 다 먹음 */
+.product-page .benefit-more {
+  margin-left: auto;
+  flex: none;
+  color: var(--coupang-blue);   /* 원본이 파란색 */
+  font-weight: 700;
+}
+
+/* > 화살표는 이미지가 아니라 CSS 로 그림
+   (테두리 2개만 남기고 45도 회전 — index.html 의 "맨 위로" 와 같은 기법) */
+.product-page .benefit-more::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 4px;
+  border-top: 1px solid var(--coupang-blue);
+  border-right: 1px solid var(--coupang-blue);
+  transform: rotate(45deg);
+  vertical-align: 1px;
+}
+
+/* 결제수단 줄 */
+.product-page .pay-methods {
+  justify-content: center;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.product-page .pay-chip {
+  padding: 1px 6px;
+  border: 1px solid var(--line-gray);
+  border-radius: 2px;
+}
+
+
+/* ── 3-6. 수량 + 구매 버튼 ──────────────────
+   실측: 전부 높이 42px, 수량박스 83px, 버튼 각 169px
+   우리는 본문이 1020px 라 원본보다 넓음 → 버튼은 flex:1 로 남는 폭을 나눠 가짐 */
+.product-page .prod-buy-quantity-and-footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* 수량 — 원본은 [숫자][위/아래 화살표 세로 2단] 구조 (2026-08-21 원본 확대해 확인).
+   예전엔 [- 숫자 +] 가로 배치였는데 원본과 달라서 바꿈 */
+.product-page .product-quantity {
+  display: flex;
+  flex: none;
+  width: 83px;
+  height: 42px;
+  border: 1px solid var(--line-gray);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.product-page .qty-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  padding-left: 12px;
+  background: #fff;
+  font-size: 14px;
+}
+
+/* 위/아래 버튼을 세로로 쌓는 칸 */
+.product-page .qty-spin {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  width: 26px;
+  border-left: 1px solid var(--line-gray);
+}
+
+.product-page .qty-spin button {
+  position: relative;
+  flex: 1;
+  border: 0;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* 아래 버튼 위에만 선 — 두 버튼 사이 구분 */
+.product-page .qty-minus {
+  border-top: 1px solid var(--line-gray) !important;
+}
+
+/* 화살표(∧ ∨)는 이미지가 아니라 CSS 로 그림 —
+   테두리 2개만 남기고 45도 회전 (다른 화살표들과 같은 기법) */
+.product-page .qty-spin button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-top: 1px solid #666;
+  border-right: 1px solid #666;
+}
+
+.product-page .qty-plus::after  { transform: translate(-50%, -20%) rotate(-45deg); }
+.product-page .qty-minus::after { transform: translate(-50%, -70%) rotate(135deg); }
+
+.product-page .qty-spin button:disabled::after {
+  border-color: #ccc;
+}
+
+.product-page .qty-spin button:disabled {
+  cursor: default;
+}
+
+
+/* 두 버튼 공통 — 실측 높이 42 / 16px / 700 */
+.product-page .prod-cart-btn,
+.product-page .prod-buy-btn {
+  flex: 1;
+  height: 42px;
+  border: 1px solid var(--coupang-blue);
+  border-radius: 2px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.product-page .prod-cart-btn {
+  color: var(--coupang-blue);
+  background: #fff;
+}
+
+.product-page .prod-cart-btn:hover {
+  background: #f4f7ff;
+}
+
+.product-page .prod-buy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #fff;
+  background: var(--coupang-blue);
+}
+
+/* 바로구매 옆 > — 원본에 있음. 테두리 2개 45도 회전 */
+.product-page .arrow-right {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
+  transform: rotate(45deg);
+}
+
+.product-page .prod-buy-btn:hover {
+  background: #2b5ae0;
+}
+
+/* "무료배송+무료반품(로켓와우)" 라디오를 고르면 위 두 버튼 대신 이거 하나만 보임.
+   flex:1 이라 [장바구니 담기]+[바로구매]가 있던 자리를 그대로 채움 —
+   같은 flex 줄 안이라 둘을 굳이 감싸는 wrapper 없이 CSS 만으로 자리가 맞음 */
+.product-page .prod-wow-btn {
+  display: none;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 42px;
+  border: 0;
+  border-radius: 2px;
+  color: #fff;
+  background: var(--coupang-blue);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.product-page .prod-wow-btn:hover {
+  background: #2b5ae0;
+}
+
+/* js/product.js setupDeliveryOption() 이 붙이는 클래스 —
+   로켓와우 라디오가 선택되면 body 에 이게 붙어서 버튼 두 종류를 서로 바꿔치기함 */
+.is-wow-delivery .product-page .prod-cart-btn,
+.is-wow-delivery .product-page .prod-buy-btn {
+  display: none;
+}
+
+.is-wow-delivery .product-page .prod-wow-btn {
+  display: flex;
+}
+
+
+/* ── 3-7. 맨 아래 작은 글씨 ──────────────────
+   실측: padding-top 16, margin-bottom 16, 12px/18px */
+.product-page .product-description {
+  padding-top: 16px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+
+/* ============================================================
+   4. 탭줄 / 필수 표기 정보 / 상세설명   (2026-08-20 추가)
+   ============================================================ */
+
+/* ── 4-1. 탭줄 ──────────────────────────────
+   원본 실측: 4칸 균등 / 칸 높이 49 / 위 여백 50 / 16px·700·#555 / 테두리 1px #ccc
+   flex + flex:1 이면 칸 수가 몇 개든 알아서 균등하게 나뉨 (JSP 로 늘려도 안 깨짐) */
+/* ★ 스크롤을 내려도 화면 맨 위에 붙어 있음 (원본이 그럼, 2026-08-21).
+   position:sticky = "평소엔 제자리, 화면 위 top 까지 오면 거기 붙음".
+   z-index 를 줘야 아래 내용이 탭 위로 지나가지 않음 */
+.product-page .detail-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  margin-top: 50px;
+  background: #fff;
+}
+
+.product-page .detail-tabs a {
+  flex: 1;
+  height: 49px;
+  border: 1px solid #ccc;
+  border-left: 0;                /* 칸 사이 선이 겹쳐서 2px 로 두꺼워지는 것 방지 */
+  background: #fafafa;
+  color: #555;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 47px;             /* 높이 49 - 위아래 테두리 2 = 47 이라야 글자가 가운데 옴 */
+  text-align: center;
+}
+
+.product-page .detail-tabs a:first-child {
+  border-left: 1px solid #ccc;   /* 맨 왼쪽 칸만 왼쪽 선을 가짐 */
+}
+
+/* 지금 보고 있는 탭 — 흰 배경 + 아래 테두리 없음.
+   ★ 이 두 가지가 활성 표시의 전부임. 스크린샷 픽셀을 직접 찍어서 확인함
+     (getComputedStyle 로는 안 잡혔음 — 원본은 스크롤 위치를 따라가는 방식이라
+      페이지 맨 위에서는 활성 탭이 아예 없었기 때문) */
+.product-page .detail-tabs a.is-on {
+  border-bottom-color: transparent;
+  background: #fff;
+}
+
+.product-page .detail-tabs a:hover {
+  color: var(--coupang-blue);
+}
+
+
+/* ── 4-2. 필수 표기 정보 ─────────────────────
+   원본 실측: padding-top 30 / margin-bottom 30 / 줄 높이 43 */
+.product-page .item-brief {
+  padding-top: 30px;
+  margin-bottom: 30px;
+}
+
+.product-page .item-brief__title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 21px;
+  color: #111;
+  margin-bottom: 10px;
+}
+
+/* border-collapse:collapse — 칸마다 따로 있는 테두리를 하나로 합침.
+   이걸 안 주면 칸 사이에 선이 두 겹으로 겹쳐 보임 */
+.product-page .item-brief__table {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.product-page .item-brief__table tr {
+  height: 43px;
+}
+
+/* 라벨 칸 — 회색 배경. <th> 는 기본이 가운데+굵게라 왼쪽 정렬만 다시 지정 */
+.product-page .item-brief__table th {
+  width: 150px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  background: #fafafa;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px;
+  color: #111;
+  text-align: left;
+  vertical-align: top;
+}
+
+.product-page .item-brief__table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+  line-height: 18px;
+  color: #333;
+  vertical-align: top;
+}
+
+/* "더보기" 를 누르기 전에는 숨어 있는 줄들.
+   JS 가 .is-open 을 표에 붙이면 나타남 */
+.product-page .item-brief__table tr.is-folded {
+  display: none;
+}
+
+.product-page .item-brief__table.is-open tr.is-folded {
+  display: table-row;
+}
+
+/* 펼친 뒤에는 화살표가 위를 향하게 */
+.product-page .item-brief__more.is-open::after {
+  transform: rotate(-135deg);
+  margin-bottom: 0;
+}
+
+/* 더보기 — 가운데 파란 글씨 + 아래쪽 화살표(∨).
+   화살표는 이미지가 아니라 CSS 로 그림 (테두리 2개 + 45도 회전) */
+.product-page .item-brief__more {
+  display: block;
+  margin: 14px auto 0;
+  border: 0;
+  background: none;
+  color: var(--coupang-blue);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.product-page .item-brief__more::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 0 3px 6px;
+  border-right: 1px solid var(--coupang-blue);
+  border-bottom: 1px solid var(--coupang-blue);
+  transform: rotate(45deg);
+}
+
+
+/* ── 4-3. 사기 거래 경고 ─────────────────────
+   원본 실측: 배경 #fce9e6 / 글자 #e12705 / 14px / padding 18px 16px / 모서리 4px */
+.product-page .fraud-notice {
+  position: relative;
+  margin-bottom: 16px;
+  padding: 18px 16px 18px 42px;   /* 왼쪽은 아이콘 자리만큼 더 띄움 */
+  border-radius: 4px;
+  background: #fce9e6;
+  color: #e12705;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+/* ! 아이콘 — 빨간 동그라미 안에 흰 느낌표. 이미지 없이 CSS 로만 */
+.product-page .fraud-notice::before {
+  content: '!';
+  position: absolute;
+  top: 18px;
+  left: 16px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e12705;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+
+/* ── 4-4. 상세설명 ──────────────────────────
+   원본: 폭 780px 고정 + 가운데 정렬. 이 페이지에서 제일 길지만 구조는 제일 단순 */
+.product-page .product-detail-content {
+  margin-bottom: 70px;
+}
+
+/* 원본은 `width:780px` 고정인데, 그러면 화면이 780보다 좁을 때 가로로 삐져나감.
+   `max-width` 로 두면 데스크톱에서는 원본과 똑같이 780 이고 좁을 때만 줄어듦 */
+.product-page .detail-image {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* 이미지가 생기면 이 규칙을 쓰게 됨 — 폭 780 에 맞추고 높이는 비율대로 */
+.product-page .detail-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* 상세설명 사진은 위 `.detail-image img` 규칙이 처리함 (폭 100% / 높이 auto).
+   원본과 같은 780x3661 짜리 긴 이미지라 높이를 지정하면 안 됨 —
+   auto 여야 원래 비율대로 늘어남 */
+
+
+/* ============================================================
+   5. 상품 리뷰   (2026-08-20 추가)
+   원본 실측: 위 border-top 1px #333 / 위 여백 30
+             좌우 2단, 사이 24 — 원본은 왼쪽 360 / 오른쪽 821 (합 1205)
+             우리는 본문이 1020 이라 왼쪽 300 고정 + 오른쪽은 남는 만큼
+   ============================================================ */
+
+.product-page .product-review {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid #333;
+}
+
+.product-page .review-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 21px;
+  color: #212b36;
+}
+
+.product-page .review-body {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+
+/* ── 5-1. 왼쪽 요약 ────────────────────────── */
+
+.product-page .review-summary {
+  flex: none;
+  width: 300px;
+}
+
+.product-page .review-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.product-page .review-score .stars {
+  color: #ffa620;
+  font-size: 22px;
+  letter-spacing: -1px;
+}
+
+.product-page .review-score strong {
+  font-size: 24px;
+  font-weight: 700;
+  color: #212b36;
+}
+
+/* 별점 분포 5줄 — [라벨][막대][퍼센트] 를 flex 로 한 줄에 */
+.product-page .score-graph {
+  margin-top: 16px;
+}
+
+.product-page .score-graph li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.product-page .score-graph .label {
+  flex: none;
+  width: 28px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 15px;
+  color: #212b36;
+}
+
+/* 막대 — 실측 높이 8 / 바탕 #eaedf0 / 모서리 4 / 채움 #ff9d5c */
+.product-page .score-graph .bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: #eaedf0;
+  overflow: hidden;
+}
+
+.product-page .score-graph .bar i {
+  display: block;
+  height: 100%;
+  background: #ff9d5c;
+}
+
+.product-page .score-graph .pct {
+  flex: none;
+  width: 34px;
+  font-size: 14px;
+  color: #212b36;
+  text-align: right;
+}
+
+/* 구매자 설문 요약 */
+.product-page .review-survey {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.product-page .survey-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.product-page .survey-row dt {
+  flex: none;
+  width: 60px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 17px;
+  color: #212b36;
+}
+
+.product-page .survey-row dd {
+  flex: 1;
+  font-size: 14px;
+  line-height: 17px;
+  color: #212b36;
+}
+
+.product-page .survey-row .pct {
+  flex: none;
+  font-size: 14px;
+  color: #212b36;
+}
+
+.product-page .survey-more {
+  display: block;
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: #637381;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.product-page .survey-more::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 0 3px 4px;
+  border-right: 1px solid #637381;
+  border-bottom: 1px solid #637381;
+  transform: rotate(45deg);
+}
+
+.product-page .review-notice {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+  font-size: 12px;
+  line-height: 18px;
+  color: #637381;
+}
+
+.product-page .review-policy {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 14px;
+  color: var(--coupang-blue);
+  text-align: center;
+}
+
+
+/* ── 5-2. 오른쪽 목록 ──────────────────────── */
+
+.product-page .review-list {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 사진 모아보기 — 실측 100 x 100 */
+.product-page .review-gallery {
+  display: flex;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.product-page .review-gallery li {
+  flex: none;
+  width: 100px;
+  height: 100px;
+}
+
+/* 리뷰 사진 — 원본이 320x427 세로형인데 칸은 정사각형이라 object-fit 이 꼭 필요함 */
+.product-page .review-gallery img,
+.product-page .review-photos img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 정렬 / 검색 / 필터 한 줄 */
+.product-page .review-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dfe3e8;
+}
+
+.product-page .review-sort {
+  display: flex;
+  gap: 12px;
+  flex: none;
+}
+
+/* 실측: 고른 것 16px·700·#346aff / 안 고른 것 16px·400·#454f5b */
+.product-page .review-sort a {
+  font-size: 16px;
+  line-height: 20px;
+  color: #454f5b;
+}
+
+.product-page .review-sort a.is-on {
+  font-weight: 700;
+  color: var(--coupang-blue);
+}
+
+.product-page .review-search {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line-gray);
+  border-radius: 4px;
+}
+
+.product-page .review-filter {
+  flex: none;
+  width: 130px;
+  height: 40px;
+  padding: 0 8px;
+  border: 1px solid var(--line-gray);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
+
+/* ── 5-3. 리뷰 카드 ────────────────────────
+   실측: 위 padding 24 / 아래 border 1px #dfe3e8 */
+.product-page .review-item {
+  padding-top: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #dfe3e8;
+}
+
+/* 검색/별점 필터에 걸려서 화면에서 숨겨진 카드 (js/product.js setupReviewTools) */
+.product-page .review-item.is-hidden {
+  display: none;
+}
+
+/* 검색·필터 결과가 0개일 때만 보임. 평소엔 숨김 (원본엔 없는, 우리가 만든 안내문구) */
+.product-page .review-empty {
+  display: none;
+  padding: 40px 0;
+  text-align: center;
+  font-size: 14px;
+  color: #919eab;
+}
+
+
+/* ── 5-4. 리뷰 페이지네이션 ────────────────
+   원본(vp_05_review2.jpeg) 모양: 가운데 정렬로 "‹ (1) 2 ›",
+   지금 페이지만 파란 동그라미 테두리, 나머지는 그냥 회색 숫자 */
+.product-page .review-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 24px 0;
+}
+
+/* 페이지가 1개뿐이면 통째로 숨김 — 버튼만 덩그러니 있으면 이상함.
+   JS 가 이 클래스를 붙였다 뗐다 함 */
+.product-page .review-pagination.is-hidden {
+  display: none;
+}
+
+.product-page .page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 화살표와 숫자 버튼을 같은 크기(28x28 원)로 맞춤.
+   flex: none 을 준 이유 — flex 안에서 고정 크기여야 하는 것은 기본값(1)이면 찌그러짐
+   (이 프로젝트에서 GNB 화살표·날개배너 등으로 이미 네 번 겪은 함정) */
+.product-page .review-pagination button {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 13px;
+  color: #454f5b;
+  cursor: pointer;
+}
+
+.product-page .review-pagination button:hover:not(:disabled) {
+  background: #f4f6f8;
+}
+
+/* 첫/마지막 페이지에서 화살표를 흐리게 + 클릭 안 되게 */
+.product-page .review-pagination button:disabled {
+  color: #dfe3e8;
+  cursor: default;
+}
+
+/* 지금 보고 있는 페이지 번호 */
+.product-page .page-numbers button.is-on {
+  border-color: var(--coupang-blue);
+  color: var(--coupang-blue);
+  font-weight: 700;
+}
+
+.product-page .review-head {
+  display: flex;
+  gap: 12px;
+}
+
+/* 프로필 동그라미 — 실측 50 x 50. 사진이 없어서 회색 원 */
+.product-page .review-avatar {
+  flex: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--bg-gray);
+}
+
+.product-page .review-writer .name {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19px;
+  color: #212b36;
+}
+
+.product-page .review-writer .meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.product-page .review-writer .stars {
+  color: #ffa620;
+  letter-spacing: -1px;
+}
+
+.product-page .review-writer .date {
+  font-size: 14px;
+  line-height: 15px;
+  color: #637381;
+}
+
+.product-page .review-writer .seller {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: #637381;
+}
+
+/* 구매한 옵션 */
+.product-page .review-option {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #637381;
+}
+
+/* 리뷰에 붙은 사진 — 실측 99 x 99 (모아보기와 거의 같음) */
+.product-page .review-photos {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.product-page .review-photos li {
+  width: 99px;
+  height: 99px;
+}
+
+.product-page .review-headline {
+  display: block;
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 19px;
+  color: #212b36;
+}
+
+/* 본문 — 원본에서 정확히 재지 못해 구매박스 기준값(14/21)을 그대로 씀.
+   나중에 어긋나 보이면 여기부터 확인할 것 */
+.product-page .review-text {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 21px;
+  color: #212b36;
+}
+
+/* 작성자가 고른 항목들 (평소 사이즈 / 키 / 색상 / 사이즈) */
+.product-page .review-attr {
+  margin-top: 14px;
+}
+
+.product-page .review-attr > div {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.product-page .review-attr dt {
+  flex: none;
+  width: 80px;
+  font-size: 13px;
+  color: #637381;
+}
+
+.product-page .review-attr dd {
+  font-size: 13px;
+  color: #212b36;
+}
+
+.product-page .review-foot {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+}
+
+/* 도움이 돼요 — 실측 104 x 32 / 13px / 파란 글씨·테두리 / 모서리 4 */
+.product-page .btn-helpful {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--coupang-blue);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--coupang-blue);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.product-page .btn-helpful:hover {
+  background: #f4f7ff;
+}
+
+.product-page .btn-report {
+  margin-left: auto;
+  font-size: 13px;
+  color: #637381;
+}
+
+.product-page .btn-report:hover {
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   6. 상품문의 / 배송·교환·반품 안내 / 판매자 정보   (2026-08-20 추가)
+   ============================================================ */
+
+/* ── 6-1. 상품문의 ──────────────────────────
+   실측: 사방 테두리 1px #e5e7eb / 위아래 여백 26 / 안쪽 30px 16px */
+.product-page .prod-qna {
+  margin: 26px 0;
+  padding: 30px 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.product-page .qna-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.product-page .qna-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 31px;
+  color: #111;
+}
+
+/* 문의하기 버튼 — 실측 86 x 37 / 14px / #3369ff / 모서리 2 */
+.product-page .btn-ask {
+  width: 86px;
+  height: 37px;
+  border: 1px solid #3369ff;
+  border-radius: 2px;
+  background: #fff;
+  color: #3369ff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.product-page .btn-ask:hover {
+  background: #f4f7ff;
+}
+
+/* 안내 5줄 — 실측 13px / #555 / line-height 19.5 */
+.product-page .qna-guide {
+  margin-top: 12px;
+}
+
+.product-page .qna-guide li {
+  position: relative;
+  padding-left: 12px;
+  font-size: 13px;
+  line-height: 19.5px;
+  color: #555;
+}
+
+/* 불릿(•)은 list-style 대신 ::before 로 — reset.css 가 list-style 을 지워놨고,
+   들여쓰기를 정확히 맞추려면 이 방법이 편함 */
+.product-page .qna-guide li::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 3px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #555;
+}
+
+.product-page .qna-guide strong {
+  font-weight: 700;
+  color: #111;
+}
+
+/* 검색창 — 원본은 테두리가 유난히 진하고 두꺼움 */
+.product-page .qna-search {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin-top: 20px;
+  padding: 0 12px;
+  border: 2px solid #212b36;
+}
+
+.product-page .qna-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  font-size: 14px;
+}
+
+/* 돋보기 — 이미지 없이 CSS 로. 동그라미(테두리) + 45도 손잡이(::after) */
+.product-page .btn-search-qna {
+  position: relative;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.product-page .btn-search-qna::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 13px;
+  height: 13px;
+  border: 2px solid #212b36;
+  border-radius: 50%;
+}
+
+.product-page .btn-search-qna::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 7px;
+  height: 2px;
+  background: #212b36;
+  transform: rotate(45deg);
+}
+
+.product-page .qna-empty {
+  padding: 30px 0;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.product-page .qna-report {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fafafa;
+  font-size: 13px;
+  color: #555;
+}
+
+.product-page .btn-report-qna {
+  flex: none;
+  margin-left: auto;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--line-gray);
+  border-radius: 2px;
+  background: #fff;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
+
+/* ── 6-2. 안내 소제목 / 문단 / 목록 ───────────
+   실측: 소제목 14px·700 / line-height 21 */
+.product-page .etc-title {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 21px;
+  color: #111;
+}
+
+.product-page .etc-note {
+  margin-bottom: 10px;
+  font-size: 12px;
+  line-height: 20px;
+  color: #555;
+}
+
+.product-page .etc-list {
+  margin-bottom: 12px;
+}
+
+.product-page .etc-list li {
+  position: relative;
+  padding-left: 10px;
+  font-size: 12px;
+  line-height: 20px;
+  color: #555;
+}
+
+.product-page .etc-list li::before {
+  content: '·';
+  position: absolute;
+  left: 2px;
+}
+
+.product-page .etc-footnote {
+  margin-top: 24px;
+  padding-bottom: 40px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #888;
+}
+
+
+/* ── 6-3. 정책 표 ──────────────────────────
+   실측: 위아래 테두리 1px #eee / 아래 여백 40 / 줄 높이 40
+         칸 12px·#454f5b / line-height 21 / padding 10px 13px
+         라벨칸(th) 회색 #fafafa
+   ※ 필수 표기 정보 표(.item-brief__table)와 생김새가 거의 같지만
+     글자색·padding 이 조금 달라서 따로 둠 (원본이 그렇게 되어 있음) */
+.product-page .policy-table {
+  width: 100%;
+  margin-bottom: 40px;
+  border-collapse: collapse;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.product-page .policy-table th,
+.product-page .policy-table td {
+  padding: 10px 13px;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 21px;
+  color: #454f5b;
+  text-align: left;
+  vertical-align: top;
+}
+
+.product-page .policy-table th {
+  width: 150px;
+  background: #fafafa;
+}
+
+/* 표 안의 작은 회색 보조 문구 */
+.product-page .policy-table .sub {
+  color: #888;
+}
+
+.product-page .policy-table .link {
+  color: var(--coupang-blue);
+}
+
+
+/* ============================================================
+   7. 광고 캐러셀 2개   (2026-08-20 추가)
+   구매박스와 탭줄 사이에 들어가는 광고 영역.
+
+   ★ 메인페이지의 .ad-carousel 을 재사용하지 않은 이유
+     생김새가 비슷해 보이지만 카드 폭(140 vs 188)과 넘기는 방식이 다름.
+     그리고 재사용하려면 css/main.css 를 불러와야 하는데, 거기엔 히어로·상품카드 등
+     메인 본문 전용 CSS 가 58KB 딸려옴. 상세페이지엔 필요 없어서 새로 만듦.
+   ============================================================ */
+
+/* ── 7-1. 함께 비교하면 좋을 상품 ───────────
+   실측: 위 padding 35 / 아래 margin 40 / 제목 22px·700·#111 / 카드 140 + 오른쪽 16 */
+.product-page .sdp-ads {
+  padding-top: 35px;
+  margin-bottom: 40px;
+}
+
+.product-page .sdp-ads__head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.product-page .sdp-ads__head h2 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 33px;
+  color: #111;
+}
+
+/* "광고" 라벨은 오른쪽 끝으로 */
+.product-page .sdp-ads__head .ad-label {
+  margin-left: auto;
+  font-size: 12px;
+  color: #999;
+}
+
+/* 넘치는 카드를 잘라내는 상자.
+   원본도 카드가 오른쪽 끝에서 반쯤 잘린 채 보임 (더 있다는 신호) */
+.product-page .sdp-ads__body {
+  position: relative;
+  overflow: hidden;
+}
+
+/* flex + width:max-content = 카드 개수만큼 가로로 쭉 늘어남.
+   부모가 overflow:hidden 이라 넘치는 만큼 잘림 */
+.product-page .sdp-ads__list {
+  display: flex;
+  width: max-content;
+  transition: transform .3s;
+}
+
+.product-page .ad-item {
+  width: 140px;
+  margin-right: 16px;
+  flex: none;
+}
+
+.product-page .ad-item a {
+  display: block;
+  color: #212b36;
+}
+
+.product-page .ad-item__thumb {
+  display: block;
+  width: 140px;
+  height: 140px;
+  overflow: hidden;
+}
+
+.product-page .ad-item__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 상품명은 2줄까지만 보이고 넘치면 ... 으로.
+   -webkit-line-clamp 는 "몇 줄까지 보여줄지" 를 정하는 속성 */
+.product-page .ad-item__name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 18px;
+  height: 36px;
+}
+
+.product-page .ad-item__price {
+  display: block;
+  margin-top: 6px;
+}
+
+.product-page .ad-item__price .was {
+  display: block;
+  font-size: 12px;
+  color: #888;
+}
+
+.product-page .ad-item__price .now {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.product-page .ad-item__price .rate {
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: var(--coupang-red);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.product-page .ad-item__price strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.product-page .ad-item__tag {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: #eef2ff;
+  color: var(--coupang-blue);
+  font-size: 11px;
+}
+
+.product-page .ad-item__ship {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #00891a;
+}
+
+.product-page .ad-item__rating {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #888;
+}
+
+.product-page .ad-item__rating .stars,
+.product-page .gw-card__rating .stars {
+  margin-right: 2px;
+  color: #ffa620;
+  font-style: normal;
+  letter-spacing: -1px;
+}
+
+/* 다음 버튼 — 원본은 동그란 흰 버튼이 오른쪽 가운데에 떠 있음.
+   화살표는 이미지가 아니라 CSS 로 그림 (테두리 2개 + 45도 회전) */
+.product-page .sdp-ads__next {
+  position: absolute;
+  top: 50px;
+  right: 4px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .15);
+  cursor: pointer;
+}
+
+.product-page .sdp-ads__next::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 11px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #666;
+  border-right: 2px solid #666;
+  transform: rotate(45deg);
+}
+
+.product-page .sdp-ads__next:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+
+/* ── 7-2. 오늘의 판매자 특가 ────────────────
+   실측: 카드 225 / 사진 160x160 / 제목 가운데 */
+.product-page .gw-deal {
+  margin-bottom: 40px;
+}
+
+.product-page .gw-deal__head {
+  position: relative;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.product-page .gw-deal__head h2 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 33px;
+  color: #111;
+}
+
+.product-page .gw-deal__head h2 em {
+  color: var(--coupang-red);
+  font-style: normal;
+}
+
+/* "1/5" 는 제목 줄 오른쪽 끝에 (제목이 가운데라 absolute 로 띄움) */
+.product-page .gw-deal__page {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  font-size: 13px;
+  color: #888;
+}
+
+/* 카드 5개가 폭을 똑같이 나눠 가짐 (원본은 225 고정, 우리는 본문이 1020 이라 나눠씀) */
+.product-page .gw-deal__list {
+  display: flex;
+  gap: 10px;
+}
+
+.product-page .gw-card {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-page .gw-card a {
+  display: block;
+  color: #212b36;
+}
+
+.product-page .gw-card__thumb {
+  display: block;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.product-page .gw-card__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-page .gw-card__tag {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: var(--coupang-red);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.product-page .gw-card__name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 6px;
+  height: 36px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.product-page .gw-card__was {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #888;
+}
+
+.product-page .gw-card__was em {
+  color: var(--coupang-red);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.product-page .gw-card__price {
+  display: block;
+  margin-top: 2px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.product-page .gw-card__ship {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #00891a;
+}
+
+.product-page .gw-card__rating {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #888;
+}
+
+/* 재고 게이지 — 회색 트랙(.bar) 위에 남은 만큼 진한 막대(i).
+   ★ 트랙을 별도 요소로 둔 이유: i 의 width:99% 는 "부모 폭의 99%" 인데
+     부모가 글자까지 포함한 넓은 상자면 엉뚱한 길이가 됨.
+     56px 짜리 트랙을 부모로 두어야 99% 가 의도한 길이가 됨.
+     (리뷰의 별점 분포 막대와 같은 구조) */
+.product-page .gw-card__stock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 12px;
+  color: #888;
+}
+
+.product-page .gw-card__stock .bar {
+  flex: none;
+  width: 56px;
+  height: 8px;
+  border-radius: 4px;
+  background: #eaedf0;
+  overflow: hidden;
+}
+
+.product-page .gw-card__stock .bar i {
+  display: block;
+  height: 100%;
+  background: #8a94a0;
+}
+
+
+
+
+/* ============================================================
+   8. 반응형 — index.html 과 같은 데스크톱 퍼스트(max-width) 방식,
+      분기점도 같은 값을 씀 (1024 / 768 / 600)
+   ============================================================ */
+
+/* (예전 1024 분기의 좌우 여백 규칙은 위 0장에서 "항상 적용"으로 바뀌어 삭제됨) */
+
+/* 태블릿 — 사진과 구매박스를 위아래로 쌓음 */
+@media (max-width: 768px) {
+  .product-page .prod-atf {
+    display: block;
+  }
+
+  .product-page .prod-atf-contents {
+    margin-top: 20px;
+  }
+
+  /* 탭 글자가 4칸에 안 들어가서 조금 줄임 */
+  .product-page .detail-tabs a {
+    font-size: 14px;
+  }
+
+  /* 리뷰도 좌우 2단이 좁아서 위아래로 쌓음 */
+  .product-page .review-body {
+    display: block;
+  }
+
+  .product-page .review-summary {
+    width: auto;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #dfe3e8;
+  }
+
+  .product-page .review-list {
+    margin-top: 24px;
+  }
+
+  /* 특가 카드 5개가 한 줄에 안 들어감 → 가로 스크롤로 */
+  .product-page .gw-deal__list {
+    overflow-x: auto;
+  }
+
+  .product-page .gw-card {
+    flex: none;
+    width: 160px;
+  }
+}
+
+/* 모바일 — 썸네일을 사진 아래 가로줄로 옮김 */
+@media (max-width: 600px) {
+  .product-page .product-image {
+    display: block;
+  }
+
+  .product-page .product-image__thumbs {
+    display: flex;
+    gap: 4px;
+    width: auto;
+    margin-top: 8px;
+  }
+
+  .product-page .product-image__thumbs li {
+    margin-bottom: 0;
+  }
+
+  /* 버튼이 좁아지면 글자가 눌리니 수량박스를 한 줄 위로 뺌 */
+  .product-page .prod-buy-quantity-and-footer {
+    flex-wrap: wrap;
+  }
+
+  .product-page .product-quantity {
+    width: 100%;
+  }
+
+  .product-page .qty-input {
+    flex: 1;
+    width: auto;
+  }
+
+  /* 탭 4칸이 한 줄에 안 들어감 → 2칸씩 두 줄로 접음 */
+  .product-page .detail-tabs {
+    flex-wrap: wrap;
+  }
+
+  .product-page .detail-tabs a {
+    flex: 0 0 50%;
+    font-size: 13px;
+  }
+
+  /* 두 줄이 되면 "맨 왼쪽 칸만 왼쪽 선" 규칙이 3번째 칸에서 깨짐 →
+     두 줄 다 왼쪽 칸이 선을 갖도록 다시 지정 */
+  .product-page .detail-tabs a:nth-child(odd) {
+    border-left: 1px solid #ccc;
+  }
+
+  .product-page .item-brief__table th {
+    width: 110px;
+  }
+
+  /* 정렬·검색·필터가 한 줄에 안 들어감 → 검색창을 아랫줄로 */
+  .product-page .review-tools {
+    flex-wrap: wrap;
+  }
+
+  .product-page .review-search {
+    order: 3;
+    flex: 0 0 100%;
+  }
+
+  /* 정책 표의 라벨칸이 150px 이면 값이 들어갈 자리가 안 남음 */
+  .product-page .policy-table th {
+    width: 90px;
+    padding: 10px 8px;
+  }
+
+  .product-page .policy-table td {
+    padding: 10px 8px;
+  }
+
+  /* 문의 신고 줄이 한 줄에 안 들어감 */
+  .product-page .qna-report {
+    flex-wrap: wrap;
+  }
+
+  /* 광고 제목이 22px 이면 너무 큼 */
+  .product-page .sdp-ads__head h2,
+  .product-page .gw-deal__head h2 {
+    font-size: 18px;
+  }
+}
+
+
+/* ============================================================
+   9. 품절 상태   (2026-08-21 추가)
+
+   원본 상세페이지를 실제로 열어보니 그 상품이 품절이었고, 화면이 이렇게 바뀌었음:
+     · 가격(할인율·판매가·원가)이 전부 회색 rgb(170,181,192)
+     · 가격 아래 "품절" 글자 (14px / 700 / 같은 회색)
+     · 배송 문구가 회색 rgb(204,204,204) 로 흐려지고, "도착 보장" 줄은 아예 사라짐
+     · 수량이 0 이고 못 바꿈
+     · [장바구니 담기][바로구매] 대신 **회색 "품절" 한 칸**
+
+   쓰는 법 — <body> 에 is-soldout 을 붙이면 위 상태가 됨:
+     <body class="page-product is-soldout">
+
+   ▶JSP: <body class="page-product ${p.stock == 0 ? 'is-soldout' : ''}">
+     즉 재고가 0이면 클래스 하나만 붙으면 화면이 알아서 바뀜.
+     지금은 확인용으로 주소 뒤에 ?soldout=1 을 붙여도 됨 (js/product.js 가 처리)
+   ============================================================ */
+
+/* 평소에는 품절 관련 요소를 감춰둠 */
+.product-page .soldout-text,
+.product-page .prod-soldout-btn {
+  display: none;
+}
+
+/* ── 여기부터 품절일 때 ───────────────────── */
+
+/* 가격 전부 회색 */
+.is-soldout .product-page .discount,
+.is-soldout .product-page .total-price,
+.is-soldout .product-page .origin-price {
+  color: #aab5c0;
+}
+
+.is-soldout .product-page .soldout-text {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #aab5c0;
+}
+
+/* 배송 문구는 흐리게, 도착보장 줄은 숨김 (원본이 그럼) */
+.is-soldout .product-page .shipping-fee,
+.is-soldout .product-page .shipping-fee .txt-bold {
+  color: #ccc;
+}
+
+.is-soldout .product-page .delivery-date,
+.is-soldout .product-page .radio-group {
+  display: none;
+}
+
+/* 배지도 회색으로 — 품절인데 "내일도착" 이 파랗게 남아 있으면 어색함 */
+.is-soldout .product-page .badge-rocket,
+.is-soldout .product-page .badge-tomorrow {
+  background: #eaedf0;
+  color: #aab5c0;
+}
+
+/* 수량은 못 바꿈 */
+.is-soldout .product-page .product-quantity {
+  background: #fafafa;
+}
+
+.is-soldout .product-page .qty-input {
+  background: #fafafa;
+  color: #aab5c0;
+}
+
+.is-soldout .product-page .qty-spin button {
+  pointer-events: none;
+}
+
+.is-soldout .product-page .qty-spin button::after,
+.is-soldout .product-page .qty-plus::before {
+  border-color: #ccc;
+  background: #ccc;
+}
+
+/* 구매 버튼 두 개를 감추고 회색 품절 한 칸만 */
+.is-soldout .product-page .prod-cart-btn,
+.is-soldout .product-page .prod-buy-btn,
+.is-soldout .product-page .prod-wow-btn {
+  display: none;
+}
+
+.is-soldout .product-page .prod-soldout-btn {
+  display: block;
+  flex: 1;
+  height: 42px;
+  border: 0;
+  border-radius: 2px;
+  background: #eaedf0;
+  color: #aab5c0;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: default;
+}
