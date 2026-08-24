@@ -13,7 +13,7 @@
 
 <!-- CSS 분리 -->
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/coupang_order_payment.css">
+	href="${pageContext.request.contextPath}/css/goodpang_order_payment.css">
 </head>
 <body>
 

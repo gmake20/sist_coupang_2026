@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.goodpang.dao.OrderDAO;
 import com.goodpang.dto.AddressDTO;
+import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.OrderItemDTO;
 import com.goodpang.dto.OrderSummaryDTO;
 
@@ -13,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/order/payment")
 // http://localhost:8080/GoodPang/order/payment
@@ -27,9 +29,41 @@ public class OrderServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        int memberNo = 1;
+		/* int memberNo = 1; */
         int orderNo = 100;
-		
+        
+        HttpSession session =
+                request.getSession(false);
+
+            if (session == null) {
+
+                response.sendRedirect(
+                    request.getContextPath()
+                    + "/login"
+                );
+
+                return;
+            }
+
+            MemberDTO member =
+                (MemberDTO)
+                session.getAttribute(
+                    "loginMember"
+                );
+
+            if (member == null) {
+
+                response.sendRedirect(
+                    request.getContextPath()
+                    + "/login"
+                );
+
+                return;
+            }
+
+            int memberNo =
+                member.getMemberNo();
+        
         OrderDAO dao = new OrderDAO();
 
         AddressDTO address =
@@ -58,7 +92,7 @@ public class OrderServlet extends HttpServlet {
         request.setAttribute("orderNo", orderNo);
 
         request.getRequestDispatcher(
-                "/coupang_order_payment.jsp"
+                "/goodpang_order_payment.jsp"
         ).forward(request, response);
     }
 }

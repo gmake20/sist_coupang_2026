@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import com.goodpang.dao.OrderDAO;
+import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.OrderItemDTO;
+import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,7 +22,7 @@ public class OrderListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
     	
-    	int memberNo = 1;
+		/* int memberNo = 1; */
          
         HttpSession session = request.getSession();
         
@@ -32,13 +34,27 @@ public class OrderListServlet extends HttpServlet {
 //          response.sendRedirect(request.getContextPath() + "/member/login.do");
 //            return;
 //        }
+        
+        MemberDTO loginMember =
+                LoginUtil.requireLogin(
+                        request,
+                        response
+                );
+        
+        if (loginMember == null) {
+            return;
+        }
+    	
+        int memberNo = loginMember.getMemberNo();
 
+        
         // DAO 호출 시 세션에서 꺼낸 memberNo 전달
         OrderDAO dao = new OrderDAO();
         List<OrderItemDTO> orderList = dao.getOrderListByMemberNo(memberNo);
 
         request.setAttribute("orderList", orderList);
-        request.getRequestDispatcher("/WEB-INF/views/order/orderList.jsp")
+        request.getRequestDispatcher("/order_list.jsp")
                .forward(request, response);
+        
     }
 }
