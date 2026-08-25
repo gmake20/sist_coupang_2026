@@ -42,25 +42,28 @@
     <span class="topbar-divider"></span>
 
     <div class="user-menu" id="userMenu">
-
+<%
+    String topbarStoreName = (String) session.getAttribute("storeName");
+    String topbarDisplayName = (topbarStoreName != null ? topbarStoreName : "판매자") + "님";
+%>
       <button class="user-menu-trigger" id="userMenuTrigger" type="button">
         <span class="avatar">
           <svg class="icon"><use href="#ic-user" /></svg>
         </span>
 <% if (sellerGrade != null) { %>
         <span class="user-name-group">
-          <span class="user-name">판매자님</span>
+          <span class="user-name"><%= topbarDisplayName %></span>
           <span class="user-grade"><%= sellerGrade %></span>
         </span>
 <% } else { %>
-        <span class="user-name">판매자님</span>
+        <span class="user-name"><%= topbarDisplayName %></span>
 <% } %>
         <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
       </button>
 
       <div class="user-menu-panel" id="userMenuPanel">
         <a href="./vendor-signup.html">판매자 정보 관리</a>
-        <a href="./vendor-login.html">로그아웃</a>
+        <a href="<%= request.getContextPath() %>/vendor/logout">로그아웃</a>
       </div>
 
     </div>
