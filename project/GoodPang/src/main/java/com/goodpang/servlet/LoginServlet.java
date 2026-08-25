@@ -25,6 +25,31 @@ public class LoginServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session =
+                request.getSession();
+
+        String redirectAfterLogin =
+                (String) session.getAttribute(
+                    "redirectAfterLogin"
+                );
+
+        if (redirectAfterLogin == null
+                || redirectAfterLogin.isBlank()) {
+
+            String referer =
+                    request.getHeader("Referer");
+
+            if (referer != null
+                    && !referer.isBlank()
+                    && !referer.contains("/login")) {
+
+                session.setAttribute(
+                    "redirectAfterLogin",
+                    referer
+                );
+            }
+        }
+
         request.getRequestDispatcher("/login.jsp")
                .forward(request, response);
     }

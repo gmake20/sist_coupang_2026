@@ -49,7 +49,6 @@
             <div class="sidebar-group">
                 <h3>MY 정보</h3>
                 <ul>
-                    <li><a href="#">개인정보확인/수정</a></li>
                     <li><a href="${pageContext.request.contextPath}/member/modify">개인정보확인/수정</a></li>
 
                     <li><a href="#">결제수단·쿠페이 관리</a></li>

@@ -2,10 +2,11 @@ package com.goodpang.servlet;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLIntegrityConstraintViolationException;
 
 import com.goodpang.dao.OrderDAO;
+import com.goodpang.dto.MemberDTO;
 import com.goodpang.util.ConnectionProvider;
+import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -26,104 +27,212 @@ public class OrderPaymentServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        String orderNoParam = request.getParameter("orderNo");
-        String addressNoParam = request.getParameter("addressNo");
+        MemberDTO member =
+                LoginUtil.requireLogin(
+                        request,
+                        response
+                );
 
-        if (orderNoParam == null
-                || orderNoParam.isBlank()
+        if (member == null) {
+            return;
+        }
+
+        int memberNo =
+                member.getMemberNo();
+
+        String checkoutNoParam =
+                request.getParameter("checkoutNo");
+
+        String addressNoParam =
+                request.getParameter("addressNo");
+
+		/*
+		 * String paymentMethod = request.getParameter("payMethod");
+		 */
+        
+        String paymentMethod = "BANK";
+
+        if (checkoutNoParam == null
+                || checkoutNoParam.isBlank()
                 || addressNoParam == null
-                || addressNoParam.isBlank()) {
+                || addressNoParam.isBlank()
+		/*
+		 * || paymentMethod == null || paymentMethod.isBlank()
+		 */) {
 
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
-                    "주문번호 또는 배송지번호가 없습니다."
+                    "결제 정보가 올바르지 않습니다."
             );
 
             return;
         }
 
+
         Connection conn = null;
 
         try {
+            int checkoutNo =
+                    Integer.parseInt(
+                            checkoutNoParam
+                    );
+            int addressNo =
+                    Integer.parseInt(
+                            addressNoParam
+                    );
 
-            int orderNo = Integer.parseInt(orderNoParam);
-            int addressNo = Integer.parseInt(addressNoParam);
+            conn =
+                    ConnectionProvider
+                            .getConnection();
 
-            conn = ConnectionProvider.getConnection();
-
-            // 트랜잭션 시작
             conn.setAutoCommit(false);
 
-            OrderDAO dao = new OrderDAO();
 
-            int result = dao.insertOrderDelivery(
-                    conn,
-                    orderNo,
-                    addressNo
-            );
-            if (result != 1) {
-                throw new RuntimeException("배송지 저장 실패");
+            OrderDAO dao =
+                    new OrderDAO();
+
+            boolean checkoutExists =
+                    dao.existsCheckout(
+                            conn,
+                            checkoutNo,
+                            memberNo
+                    );
+
+            if (!checkoutExists) {
+
+                throw new Exception(
+                        "존재하지 않거나 접근할 수 없는 checkout입니다."
+                );
             }
+
+            boolean addressExists =
+                    dao.existsAddress(
+                            conn,
+                            addressNo,
+                            memberNo
+                    );
+
+            if (!addressExists) {
+
+                throw new Exception(
+                        "잘못된 배송지입니다."
+                );
+            }
+
+
+            int orderAddressNo =
+                    dao.insertOrderAddress(
+                            conn,
+                            addressNo,
+                            memberNo
+                    );
+
+            int orderNo =
+                    dao.insertOrderFromCheckout(
+                            conn,
+                            checkoutNo,
+                            memberNo,
+                            orderAddressNo,
+                            paymentMethod
+                    );
+
+
+            if (orderNo <= 0) {
+
+                throw new Exception(
+                        "주문 생성 실패"
+                );
+            }
+
+
+            int detailCount =
+                    dao.insertOrderDetailsFromCheckout(
+                            conn,
+                            checkoutNo,
+                            orderNo
+                    );
+
+            if (detailCount <= 0) {
+
+                throw new Exception(
+                        "주문 상품 저장 실패"
+                );
+            }
+
+
+            dao.deleteCheckoutItems(
+                    conn,
+                    checkoutNo
+            );
+
+
+            dao.deleteCheckout(
+                    conn,
+                    checkoutNo,
+                    memberNo
+            );
 
             conn.commit();
 
+
             response.sendRedirect(
                     request.getContextPath()
-                    + "/order/complete?orderNo="
-                    + orderNo
+                            + "/order/complete?orderNo="
+                            + orderNo
             );
 
-        } catch (SQLIntegrityConstraintViolationException e) {
-            e.printStackTrace();
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (Exception rollbackException) {
-                rollbackException.printStackTrace();
-            }
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/order/already-completed"
-            );
-            return;
 
         } catch (NumberFormatException e) {
-            e.printStackTrace();
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (Exception rollbackException) {
-                rollbackException.printStackTrace();
-            }
+
+            rollback(conn);
+
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
-                    "잘못된 주문번호 또는 배송지번호입니다."
+                    "잘못된 checkout 번호 또는 배송지 번호입니다."
             );
-            
-            return;
-            
+
+
         } catch (Exception e) {
+
+            rollback(conn);
+
             e.printStackTrace();
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (Exception rollbackException) {
-                rollbackException.printStackTrace();
-            }
+
             throw new ServletException(
                     "결제 처리 중 오류가 발생했습니다.",
                     e
             );
+
+
         } finally {
-            try {
-                if (conn != null) {
+
+            if (conn != null) {
+
+                try {
+
                     conn.setAutoCommit(true);
                     conn.close();
+
+                } catch (Exception e) {
+
+                    e.printStackTrace();
                 }
+            }
+        }
+    }
+
+
+    private void rollback(
+            Connection conn) {
+
+        if (conn != null) {
+
+            try {
+
+                conn.rollback();
+
             } catch (Exception e) {
+
                 e.printStackTrace();
             }
         }

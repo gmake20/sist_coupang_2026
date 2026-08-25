@@ -34,7 +34,7 @@
 
        ★ 이 페이지는 "틀 하나 + 상품 데이터 N개" 구조를 염두에 두고 만듦.
          지금은 값을 직접 써넣었지만, 나중에 JSP 로 바꿀 때
-         값이 들어갈 자리만 ${p.name} 같은 걸로 갈아끼우면 됨.
+         값이 들어갈 자리만 {p.name} 같은 걸로 갈아끼우면 됨.
          그래서 값이 들어가는 자리마다 ▶JSP 주석을 달아둠.
 
        ★ 클래스 이름은 전부 .product-page 안에서만 쓰도록 CSS 를 잡았음.
@@ -123,7 +123,7 @@
 						</div>
 
 						<!-- 별점 + 리뷰수. 리뷰 영역으로 이동하는 링크(#reviews)
-                 ▶JSP: 별은 평점으로 계산, 숫자는 ${p.reviewCount} -->
+                 ▶JSP: 별은 평점으로 계산, 숫자는 {p.reviewCount} -->
 						<div class="review-atf">
 							<span class="stars">★★★★☆</span> <a href="#reviews" class="count">(2,033)</a>
 						</div>
@@ -183,7 +183,7 @@
 					</div>
 
 					<!-- ④ 옵션 — 원본은 section 을 옵션 종류만큼 반복함
-               ▶JSP: &lt;c:forEach items="${p.options}"&gt; 로 감쌀 자리.
+               ▶JSP: &lt;c:forEach items="{p.options}"&gt; 로 감쌀 자리.
                  그래서 두 덩어리를 일부러 똑같은 모양으로 만들어둠 -->
 					<div class="fashion-option">
 
@@ -248,24 +248,24 @@
 						</div>
 						<button type="submit" class="prod-cart-btn">장바구니 담기</button>
 						<button type="submit" class="prod-buy-btn"
-							formaction="${pageContext.request.contextPath}/coupang_order_payment.jsp">
+							formaction="${pageContext.request.contextPath}/goodpang_order_payment.jsp">
 							바로구매<i class="arrow-right"></i>
 						</button>
 						<!-- 위 배송방법에서 "무료배송+무료반품(로켓와우)"을 고르면 위 두 칸 대신 이거 하나만 보임
 						     (원본을 직접 클릭해서 확인함 — js/product.js setupDeliveryOption) -->
 						<button type="submit" class="prod-wow-btn"
-							formaction="${pageContext.request.contextPath}/coupang_order_payment.jsp">
+							formaction="${pageContext.request.contextPath}/goodpang_order_payment.jsp">
 							로켓와우로 무료배송<i class="arrow-right"></i>
 						</button>
 						<!-- 품절일 때 위 두 버튼 대신 이것만 보임 (원본도 회색 한 칸으로 바뀜) -->
 						<button type="button" class="prod-soldout-btn" disabled>품절</button>
 					</form>
 
-					<!-- ⑦ 맨 아래 작은 글씨 -->
+					<!-- ⑦ 맨 아래 작은 글씨 색상계열, 굿팡상품번호 텍스트만 삭제, 통째로 삭제하면 배치 달라짐-->
 					<div class="product-description">
 						<ul>
-							<li>색상계열: 화이트계열</li>
-							<li>굿팡상품번호: 25 - 100025</li>
+							<li></li>
+							<li></li>
 						</ul>
 					</div>
 
@@ -402,7 +402,7 @@
 							<strong class="gw-card__price">8,550원</strong>
 							<span class="gw-card__ship">내일(목) 도착 보장</span>
 							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(60)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
+							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:{d.left}%%" -->
 							<span class="gw-card__stock"><span class="bar"><i style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
 					<li class="gw-card"><a href="#">
@@ -536,7 +536,7 @@
            ★ 임시 ★ 이미지가 없어서 회색 상자로 대신함.
              원본 이미지는 780 x 3661 / 780 x 3661 / 780 x 2818 이었음.
              우리 상자는 780 x 1200 으로 잡아둠 (그대로 흉내내면 화면이 너무 길어져서 확인이 힘듦)
-             ▶JSP: &lt;c:forEach items="${p.detailImages}"&gt; 로 감쌀 자리 —
+             ▶JSP: &lt;c:forEach items="{p.detailImages}"&gt; 로 감쌀 자리 —
                    상세설명 이미지는 상품마다 장수가 다름 -->
 			<div class="product-detail-content">
 				<div class="detail-image">
@@ -577,7 +577,7 @@
 						<!-- 별점 분포 막대
                  ★ 막대 길이를 style="width:78%" 처럼 인라인으로 준 이유:
                    이 값만 데이터에 따라 매번 달라지기 때문. CSS 파일에는 못 적음.
-                   ▶JSP 로 가면 style="width:${r.percent}%" 가 될 자리 -->
+                   ▶JSP 로 가면 style="width:{r.percent}%" 가 될 자리 -->
 						<ul class="score-graph">
 							<li><span class="label">최고</span> <span class="bar"><i
 									style="width: 78%"></i></span> <span class="pct">78%</span></li>
@@ -612,8 +612,8 @@
 						     ★ 1등 항목만 막대가 시안색(#34CAE2), 나머지는 회색 — 원본이 그렇게 구분함
 						       (그래서 클래스 .is-top 을 1등에만 붙임)
 						     평소엔 CSS 가 감춰두고, .is-open 이 붙으면 나타남 (js/product.js setupSurveyMore)
-						     ▶JSP: &lt;c:forEach items="${survey}"&gt; 로 감쌀 자리 — 설문 항목 수가 카테고리마다 다름
-						       (의류는 사이즈·색상, 식품은 맛·양 …). 퍼센트는 style="width:${o.percent}%" -->
+						     ▶JSP: &lt;c:forEach items="{survey}"&gt; 로 감쌀 자리 — 설문 항목 수가 카테고리마다 다름
+						       (의류는 사이즈·색상, 식품은 맛·양 …). 퍼센트는 style="width:{o.percent}%" -->
 						<div class="survey-detail">
 							<div class="survey-group">
 								<p class="survey-group__title">사이즈</p>
@@ -691,7 +691,7 @@
 						</div>
 
 						<!-- 리뷰 카드
-                 ▶JSP: &lt;c:forEach items="${reviews}" var="r"&gt; 로 감쌀 자리.
+                 ▶JSP: &lt;c:forEach items="{reviews}" var="r"&gt; 로 감쌀 자리.
                    그래서 3개를 **완전히 같은 구조**로 만들어둠 (안에 든 글자만 다름)
                    
                  ★ 원본은 리뷰 카드가 10개라 이 영역이 3,320px 인데 우리는 3개라 1,447px (44%).
@@ -969,7 +969,7 @@
            ★ 여기 글은 거의 전부 **모든 상품이 똑같이 쓰는 고정 문구**임.
              상품마다 달라지는 건 맨 아래 "판매자 정보" 표뿐.
              ▶JSP 로 가면 이 절 전체를 &lt;jsp:include page="/WEB-INF/views/etc-policy.jsp"/&gt;
-               로 빼고, 판매자 정보만 ${seller.xxx} 로 채우면 됨 -->
+               로 빼고, 판매자 정보만 {seller.xxx} 로 채우면 됨 -->
 			<section class="prod-etc" id="delivery">
 
 				<!-- ── 배송정보 ───────────────────────── -->
@@ -1070,7 +1070,7 @@
 
 				<!-- ── 판매자 정보 ────────────────────
              ★ 이 표만 상품(정확히는 판매자)마다 달라짐. 나머지는 전부 고정 문구.
-               ▶JSP: ${seller.name} ${seller.tel} … 로 바뀔 자리 -->
+               ▶JSP: {seller.name} {seller.tel} … 로 바뀔 자리 -->
 				<h3 class="etc-title">판매자 정보</h3>
 				<table class="policy-table">
 					<tbody>

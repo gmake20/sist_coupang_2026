@@ -35,10 +35,17 @@
 </head>
 
 <body>
-
+<!-- 최상단 배너 -->
+	<div class="coupang-top-banner">
+		<div class="banner-middle">
+			<a href="#"> <span class="top-banner-placeholder"
+				style="background: #b5f3fe; color: #0b3d5c"> 오늘 밤 12시까지 주문해도 로켓배송은 내일 도착! <i class="arrow"></i>
+			</span></a> <a href="#"> <span class="top-banner-placeholder"
+				style="background: #80daff; color: #0b2d45"> <i	class="arrow"></i></span></a>
+		</div>
+	</div>
+	 <!-- HEADER — 페이지 맨 위. 로고 / 검색 / 메뉴 -->
 		<jsp:include page="/inc/header.jsp" />
-
-
 
 	<!-- ==================================================
 
@@ -1690,11 +1697,7 @@
 
 				</section>
 
-				<!-- ===== 띠배너 (.gw-line-banners) =====
-
-         원본: Swiper 로 1020px 짜리 배너를 자동으로 넘김(4초).
-
-         진짜 배너 이미지가 없어서 색깔 상자 + 글자로 대체 -->
+				<!-- ===== 띠배너 (.gw-line-banners) =====-->
 
 				<section class="gw-line-banners">
 
