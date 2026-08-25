@@ -266,67 +266,87 @@ public class OrderDAO {
 	 */
 	public OrderSummaryDTO getOrderSummary(int orderNo) {
 
-		OrderSummaryDTO summary = null;
+	    OrderSummaryDTO summary = null;
 
-		String sql = """
-				SELECT
-				    o.order_no,
-				    NVL(o.product_amount, 0) AS total_product_price,
-				    NVL(o.delivery_fee, 0) AS delivery_fee,
-				    NVL(o.instant_discount, 0) AS instant_discount,
-				    NVL(o.coupon_discount, 0) AS coupon_discount,
-				    NVL(o.cash_used, 0) AS cash_used,
-				    NVL(o.total_price, 0) AS final_price
-				FROM orders o
-				WHERE o.order_no = ?
-				""";
+	    String sql = """
+	            SELECT
+	                o.order_no,
 
-		try (
-				Connection conn =
-				ConnectionProvider.getConnection();
+	                NVL(o.product_amount, 0)
+	                    AS total_product_price,
 
-				PreparedStatement pstmt =
-						conn.prepareStatement(sql)
-				) {
+	                NVL(o.delivery_fee, 0)
+	                    AS delivery_fee,
 
-			pstmt.setInt(1, orderNo);
+	                NVL(o.instant_discount, 0)
+	                    AS instant_discount,
 
-			try (ResultSet rs = pstmt.executeQuery()) {
+	                NVL(o.coupon_discount, 0)
+	                    AS coupon_discount,
 
-				if (rs.next()) {
+	                NVL(o.cash_used, 0)
+	                    AS cash_used,
 
-					summary =
-							new OrderSummaryDTO();
+	                GREATEST(
+	                    0,
+	                    NVL(o.product_amount, 0)
+	                    - NVL(o.instant_discount, 0)
+	                    - NVL(o.coupon_discount, 0)
+	                    - NVL(o.cash_used, 0)
+	                    + NVL(o.delivery_fee, 0)
+	                ) AS final_price
 
-					summary.setTotalProductPrice(
-							rs.getInt(
-									"total_product_price"
-									)
-							);
+	            FROM orders o
+	            WHERE o.order_no = ?
+	            """;
 
-					summary.setDeliveryFee(
-							rs.getInt(
-									"delivery_fee"
-									)
-							);
+	    try (
+	        Connection conn =
+	                ConnectionProvider.getConnection();
 
-					summary.setFinalPrice(
-							rs.getInt(
-									"final_price"
-									)
-							);
-					summary.setInstantDiscount(rs.getInt("instant_discount"));
-					summary.setCouponDiscount(rs.getInt("coupon_discount"));
-					summary.setCashUsed(rs.getInt("cash_used"));
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
 
-				}
-			}
+	        pstmt.setInt(1, orderNo);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	        try (ResultSet rs = pstmt.executeQuery()) {
 
-		return summary;
+	            if (rs.next()) {
+
+	                summary = new OrderSummaryDTO();
+
+	                summary.setTotalProductPrice(
+	                        rs.getInt("total_product_price")
+	                );
+
+	                summary.setDeliveryFee(
+	                        rs.getInt("delivery_fee")
+	                );
+
+	                summary.setInstantDiscount(
+	                        rs.getInt("instant_discount")
+	                );
+
+	                summary.setCouponDiscount(
+	                        rs.getInt("coupon_discount")
+	                );
+
+	                summary.setCashUsed(
+	                        rs.getInt("cash_used")
+	                );
+
+	                summary.setFinalPrice(
+	                        rs.getInt("final_price")
+	                );
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return summary;
 	}
 
 	public OrderCompleteDTO getOrderComplete(int orderNo) {
@@ -355,7 +375,7 @@ public class OrderDAO {
 
 				FROM ORDERS o
 
-				JOIN ORDER_DELIVERY d
+				JOIN ORDER_ADDRESS d
 				  ON o.ORDER_NO = d.ORDER_NO
 
 				WHERE o.ORDER_NO = ?
@@ -366,9 +386,6 @@ public class OrderDAO {
 				PreparedStatement pstmt = conn.prepareStatement(sql)
 				) {
 
-			/*
-			 * ORDER_NO
-			 */
 			pstmt.setInt(1, orderNo);
 
 			try (ResultSet rs = pstmt.executeQuery()) {
@@ -552,5 +569,93 @@ public class OrderDAO {
 	    }
 
 	    return list;
+	}
+	
+	public int updateTotalPrice(
+	        Connection conn,
+	        int orderNo) throws Exception {
+
+	    String sql = """
+	            UPDATE orders
+	            SET total_price =
+	                GREATEST(
+	                    0,
+	                    NVL(product_amount, 0)
+	                    - NVL(instant_discount, 0)
+	                    - NVL(coupon_discount, 0)
+	                    - NVL(cash_used, 0)
+	                    + NVL(delivery_fee, 0)
+	                )
+	            WHERE order_no = ?
+	            """;
+
+	    int rowCount = 0;
+
+	    try (
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setInt(1, orderNo);
+
+	        rowCount =
+	                pstmt.executeUpdate();
+	    }
+
+	    return rowCount;
+	}
+	
+	public int updateOrderStatus(
+	        Connection conn,
+	        int orderNo,
+	        String orderStatus)
+	        throws Exception {
+
+	    String sql = """
+	            UPDATE orders
+	            SET order_status = ?
+	            WHERE order_no = ?
+	            """;
+
+	    try (
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setString(
+	                1,
+	                orderStatus
+	        );
+
+	        pstmt.setInt(
+	                2,
+	                orderNo
+	        );
+
+	        return pstmt.executeUpdate();
+	    }
+	}
+	
+	public int updateOrderAddress(
+	        Connection conn,
+	        int orderNo,
+	        int addressNo) throws Exception {
+
+	    String sql = """
+	            UPDATE orders
+	            SET order_address_no = ?
+	            WHERE order_no = ?
+	            """;
+
+	    try (
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setInt(1, addressNo);
+	        pstmt.setInt(2, orderNo);
+
+	        return pstmt.executeUpdate();
+	    }
 	}
 }

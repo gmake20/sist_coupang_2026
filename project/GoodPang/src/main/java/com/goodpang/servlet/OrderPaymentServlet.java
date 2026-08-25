@@ -18,6 +18,7 @@ public class OrderPaymentServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    
     @Override
     protected void doPost(
             HttpServletRequest request,
@@ -26,46 +27,103 @@ public class OrderPaymentServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        String orderNoParam = request.getParameter("orderNo");
-        String addressNoParam = request.getParameter("addressNo");
+        String orderNoParam =
+                request.getParameter("orderNo");
+
+        String addressNoParam =
+                request.getParameter("addressNo");
 
         if (orderNoParam == null
                 || orderNoParam.isBlank()
                 || addressNoParam == null
                 || addressNoParam.isBlank()) {
 
-            response.sendError(
-                    HttpServletResponse.SC_BAD_REQUEST,
-                    "주문번호 또는 배송지번호가 없습니다."
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/order/payment"
             );
 
             return;
         }
 
+
         Connection conn = null;
 
         try {
 
-            int orderNo = Integer.parseInt(orderNoParam);
-            int addressNo = Integer.parseInt(addressNoParam);
+            int orderNo =
+                    Integer.parseInt(orderNoParam);
 
-            conn = ConnectionProvider.getConnection();
+            int addressNo =
+                    Integer.parseInt(addressNoParam);
 
-            // 트랜잭션 시작
+
+            conn =
+                    ConnectionProvider.getConnection();
+
             conn.setAutoCommit(false);
 
-            OrderDAO dao = new OrderDAO();
 
-            int result = dao.insertOrderDelivery(
-                    conn,
-                    orderNo,
-                    addressNo
-            );
-            if (result != 1) {
-                throw new RuntimeException("배송지 저장 실패");
+            OrderDAO dao =
+                    new OrderDAO();
+
+            int priceResult =
+                    dao.updateTotalPrice(
+                            conn,
+                            orderNo
+                    );
+
+            if (priceResult != 1) {
+
+                throw new Exception(
+                        "주문 금액 수정 실패"
+                );
+            }
+
+            int addressResult =
+                    dao.updateOrderAddress(
+                            conn,
+                            orderNo,
+                            addressNo
+                    );
+
+            if (addressResult != 1) {
+
+                throw new Exception(
+                        "배송지 번호 저장 실패"
+                );
+            }
+
+            int deliveryResult =
+                    dao.insertOrderDelivery(
+                            conn,
+                            orderNo,
+                            addressNo
+                    );
+
+            if (deliveryResult != 1) {
+
+                throw new Exception(
+                        "주문 배송지 저장 실패"
+                );
+            }
+
+            int statusResult =
+                    dao.updateOrderStatus(
+                            conn,
+                            orderNo,
+                            "PAID"
+                    );
+
+            if (statusResult != 1) {
+
+                throw new Exception(
+                        "주문 상태 변경 실패"
+                );
             }
 
             conn.commit();
+
 
             response.sendRedirect(
                     request.getContextPath()
@@ -73,56 +131,65 @@ public class OrderPaymentServlet extends HttpServlet {
                     + orderNo
             );
 
-        } catch (SQLIntegrityConstraintViolationException e) {
-            e.printStackTrace();
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (Exception rollbackException) {
-                rollbackException.printStackTrace();
-            }
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/order/already-completed"
-            );
-            return;
 
         } catch (NumberFormatException e) {
-            e.printStackTrace();
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (Exception rollbackException) {
-                rollbackException.printStackTrace();
-            }
+
+            rollback(conn);
+
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
                     "잘못된 주문번호 또는 배송지번호입니다."
             );
-            
-            return;
-            
-        } catch (Exception e) {
+
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+
+            rollback(conn);
+
             e.printStackTrace();
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                }
-            } catch (Exception rollbackException) {
-                rollbackException.printStackTrace();
-            }
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/order/already-completed"
+            );
+
+
+        } catch (Exception e) {
+
+            rollback(conn);
+
+            e.printStackTrace();
+
             throw new ServletException(
                     "결제 처리 중 오류가 발생했습니다.",
                     e
             );
+
+
         } finally {
-            try {
-                if (conn != null) {
+
+            if (conn != null) {
+
+                try {
+
                     conn.setAutoCommit(true);
+
                     conn.close();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    private void rollback(Connection conn) {
+
+        if (conn != null) {
+
+            try {
+                conn.rollback();
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -52,7 +52,7 @@ public class OrderCompleteServlet extends HttpServlet {
 
         OrderCompleteDTO orderComplete =
             dao.getOrderComplete(orderNo);
-
+        
         if (orderComplete == null) {
 
             response.sendError(
