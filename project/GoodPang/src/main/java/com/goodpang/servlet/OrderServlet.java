@@ -48,9 +48,6 @@ public class OrderServlet extends HttpServlet {
         int memberNo =
                 member.getMemberNo();
 
-        
-        // 바로 구매시 checkout 테이블 생성 후 PARAM으로 checkoutNo가 
-	
 		String checkoutNoParam = request.getParameter("checkoutNo");
 		 
         if (checkoutNoParam == null

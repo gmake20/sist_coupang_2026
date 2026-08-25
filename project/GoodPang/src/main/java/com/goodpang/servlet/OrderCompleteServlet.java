@@ -3,7 +3,9 @@ package com.goodpang.servlet;
 import java.io.IOException;
 
 import com.goodpang.dao.OrderDAO;
+import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.OrderCompleteDTO;
+import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,6 +23,17 @@ public class OrderCompleteServlet extends HttpServlet {
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
+    	
+    	
+    	MemberDTO loginMember =
+                LoginUtil.requireLogin(
+                        request,
+                        response
+                );
+
+        if (loginMember == null) {
+            return;
+        }
 
         String orderNoParam =
             request.getParameter("orderNo");
