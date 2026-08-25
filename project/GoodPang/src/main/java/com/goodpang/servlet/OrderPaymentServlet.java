@@ -41,24 +41,27 @@ public class OrderPaymentServlet extends HttpServlet {
                 member.getMemberNo();
 
         String checkoutNoParam =
-                request.getParameter("checkoutNo");
+        		request.getParameter("checkoutNo");
 
         String addressNoParam =
-                request.getParameter("addressNo");
+        		request.getParameter("addressNo");
 
-		/*
-		 * String paymentMethod = request.getParameter("payMethod");
-		 */
-        
-        String paymentMethod = "BANK";
+        String paymentMethod =
+        		request.getParameter("paymentMethod");
+
+        String bankCode =
+        		request.getParameter("bankCode");
+
+        String cardCompany =
+        		request.getParameter("cardCompany");
+
 
         if (checkoutNoParam == null
                 || checkoutNoParam.isBlank()
                 || addressNoParam == null
                 || addressNoParam.isBlank()
-		/*
-		 * || paymentMethod == null || paymentMethod.isBlank()
-		 */) {
+                || paymentMethod == null || paymentMethod.isBlank()
+		 ) {
 
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
