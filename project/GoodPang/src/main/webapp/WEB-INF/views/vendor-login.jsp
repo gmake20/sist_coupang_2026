@@ -31,7 +31,7 @@
       <!-- 로고 -->
       
       <div class="logo-area">
-		<a href="index.html" class="brand-goodpang">GoodPang</a>
+		<a href="${pageContext.request.contextPath}/index.jsp" class="brand-goodpang">GoodPang</a>
       </div>
 
       <h1 class="title">

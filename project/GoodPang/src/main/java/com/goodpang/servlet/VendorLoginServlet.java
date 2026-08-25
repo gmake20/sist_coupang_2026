@@ -51,34 +51,8 @@ public class VendorLoginServlet extends HttpServlet {
 			return;
 		}
 
-		// 입점심사 상태 확인 - 승인된 판매자만 로그인 허용
-		String approvalStatus = seller.getApprovalStatus();
-
-		if (!"승인".equals(approvalStatus)) {
-
-			String message;
-
-			switch (approvalStatus) {
-				case "입점 대기":
-					message = "아직 입점 절차가 완료되지 않았습니다. 사업자 정보 및 서류 제출을 완료해주세요.";
-					break;
-				case "심사 중":
-					message = "입점 심사가 진행 중입니다. 승인 완료 후 로그인하실 수 있습니다.";
-					break;
-				case "반려":
-					message = "입점 신청이 반려되었습니다."
-							+ (seller.getRejectReason() != null ? " 사유: " + seller.getRejectReason() : "");
-					break;
-				default:
-					message = "현재 로그인할 수 없는 상태입니다.";
-			}
-
-			request.setAttribute("error", message);
-			request.getRequestDispatcher("/WEB-INF/views/vendor-login.jsp")
-				   .forward(request, response);
-			return;
-		}
-
+		// 입점심사 상태(입점 대기/심사 중/승인/반려)와 무관하게 로그인은 허용하고,
+		// 상태별 안내는 대시보드(vendor_dashboard.jsp)에서 분기 처리한다.
 		HttpSession session = request.getSession();
 
 		session.setAttribute("loginSeller", seller);
