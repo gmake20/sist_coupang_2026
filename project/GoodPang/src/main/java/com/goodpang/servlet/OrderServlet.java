@@ -31,7 +31,7 @@ public class OrderServlet extends HttpServlet {
             throws ServletException, IOException {
 
 		/* int memberNo = 1; */
-        int orderNo = 100;
+        int orderNo = 35;
         
         MemberDTO member =
                 LoginUtil.requireLogin(
