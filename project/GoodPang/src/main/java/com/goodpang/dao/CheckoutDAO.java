@@ -285,4 +285,235 @@ public class CheckoutDAO {
 
 	    return list;
 	}
+	
+	public int getProductPrice(
+	        Connection conn,
+	        int productNo)
+	        throws Exception {
+
+	    String sql = """
+	            SELECT PRODUCT_PRICE
+	            FROM PRODUCT
+	            WHERE PRODUCT_NO = ?
+	            """;
+
+	    try (
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setInt(
+	                1,
+	                productNo
+	        );
+
+	        try (
+	            ResultSet rs =
+	                    pstmt.executeQuery()
+	        ) {
+
+	            if (rs.next()) {
+
+	                return rs.getInt(
+	                        "PRODUCT_PRICE"
+	                );
+	            }
+	        }
+	    }
+
+	    return -1;
+	}
+	
+	public int insertCheckout(
+	        Connection conn,
+	        int memberNo,
+	        int productAmount,
+	        int instantDiscount,
+	        int couponDiscount,
+	        int cashUsed,
+	        int deliveryFee,
+	        int totalPrice)
+	        throws Exception {
+
+	    int checkoutNo;
+
+	    String seqSql = """
+	            SELECT SEQ_CHECKOUT_NO.NEXTVAL
+	            FROM DUAL
+	            """;
+
+	    try (
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(seqSql);
+
+	        ResultSet rs =
+	                pstmt.executeQuery()
+	    ) {
+
+	        if (!rs.next()) {
+
+	            throw new Exception(
+	                    "CHECKOUT_NO 생성 실패"
+	            );
+	        }
+
+	        checkoutNo =
+	                rs.getInt(1);
+	    }
+
+	    String sql = """
+	            INSERT INTO CHECKOUT (
+	                CHECKOUT_NO,
+	                MEMBER_NO,
+	                CREATED_AT,
+	                PRODUCT_AMOUNT,
+	                INSTANT_DISCOUNT,
+	                COUPON_DISCOUNT,
+	                CASH_USED,
+	                DELIVERY_FEE,
+	                TOTAL_PRICE
+	            )
+	            VALUES (
+	                ?,
+	                ?,
+	                SYSDATE,
+	                ?,
+	                ?,
+	                ?,
+	                ?,
+	                ?,
+	                ?
+	            )
+	            """;
+
+	    try (
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setInt(
+	                1,
+	                checkoutNo
+	        );
+
+	        pstmt.setInt(
+	                2,
+	                memberNo
+	        );
+
+	        pstmt.setInt(
+	                3,
+	                productAmount
+	        );
+
+	        pstmt.setInt(
+	                4,
+	                instantDiscount
+	        );
+
+	        pstmt.setInt(
+	                5,
+	                couponDiscount
+	        );
+
+	        pstmt.setInt(
+	                6,
+	                cashUsed
+	        );
+
+	        pstmt.setInt(
+	                7,
+	                deliveryFee
+	        );
+
+	        pstmt.setInt(
+	                8,
+	                totalPrice
+	        );
+
+
+	        int result =
+	                pstmt.executeUpdate();
+
+
+	        if (result != 1) {
+
+	            throw new Exception(
+	                    "CHECKOUT INSERT 실패"
+	            );
+	        }
+	    }
+	    return checkoutNo;
+	}
+	
+	public int insertCheckoutItem(
+	        Connection conn,
+	        int checkoutNo,
+	        int productNo,
+	        Integer optionId,
+	        int quantity,
+	        int price)
+	        throws Exception {
+
+	    String sql = """
+	            INSERT INTO CHECKOUT_ITEM (
+	                CHECKOUT_ITEM_NO,
+	                CHECKOUT_NO,
+	                PRODUCT_NO,
+	                OPTION_ID,
+	                ORDER_QTY,
+	                PRICE
+	            )
+	            VALUES (
+	                SEQ_CHECKOUT_ITEM_NO.NEXTVAL,
+	                ?,
+	                ?,
+	                ?,
+	                ?,
+	                ?
+	            )
+	            """;
+
+	    try (
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setInt(
+	                1,
+	                checkoutNo
+	        );
+
+	        pstmt.setInt(
+	                2,
+	                productNo
+	        );
+
+	        if (optionId == null) {
+
+	            pstmt.setNull(
+	                    3,
+	                    java.sql.Types.NUMERIC
+	            );
+
+	        } else {
+
+	            pstmt.setInt(
+	                    3,
+	                    optionId
+	            );
+	        }
+
+	        pstmt.setInt(
+	                4,
+	                quantity
+	        );
+
+	        pstmt.setInt(
+	                5,
+	                price
+	        );
+	        return pstmt.executeUpdate();
+	    }
+	}
 }
