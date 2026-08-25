@@ -22,7 +22,7 @@ public class OrderListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
     	
-		/* int memberNo = 1; */
+		 int memberNo = 1; 
          
         HttpSession session = request.getSession();
         
@@ -45,7 +45,7 @@ public class OrderListServlet extends HttpServlet {
             return;
         }
     	
-        int memberNo = loginMember.getMemberNo();
+      //  int memberNo = loginMember.getMemberNo();
 
         
         // DAO 호출 시 세션에서 꺼낸 memberNo 전달

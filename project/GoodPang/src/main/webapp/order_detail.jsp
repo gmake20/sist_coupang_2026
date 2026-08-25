@@ -54,7 +54,7 @@
 				<h3>MY 쇼핑</h3>
 
 				<a href="#" class="active">주문목록/배송조회</a> <a
-					href="order_cancel_complete.jsp">취소/반품/교환/환불 내역</a> <a href="#">와우 멤버십</a>
+					href="cancel_history.jsp">취소/반품/교환/환불 내역</a> <a href="#">와우 멤버십</a>
 				<a href="#">구독 서비스 <span class="new">N</span></a> <a href="#">로켓프레시
 					프레시백 <span class="new">N</span>
 				</a> <a href="#">영수증 조회/출력</a>
@@ -88,7 +88,7 @@
 				</a> <a href="#"> <span class="help-icon">📢</span> <span>
 						고객의 소리<br> <small>제안·칭찬·불편신고</small>
 				</span>
-				</a> <a href="/order_cancel.jsp"> <span class="help-icon">📦</span> <span>취소/반품
+				</a> <a href="#"> <span class="help-icon">📦</span> <span>취소/반품
 						안내</span>
 				</a>
 
@@ -368,6 +368,7 @@
 
 	</div>
 	<jsp:include page="/inc/footer.jsp" />
+	<script src="${pageContext.request.contextPath}/js/header.js"></script>
 
 </body>
 </html>

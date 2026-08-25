@@ -1,163 +1,304 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>GoodPang | 주문목록</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/order_list.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reset.css">
+
+<meta charset="UTF-8">
+<title>주문리스트</title>
+
+<!-- 기본 초기화 CSS -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/reset.css">
+
+<!-- 공통 CSS -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
+
+<!-- 주문상세/리스트 전용 CSS -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/order_list.css">
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<!-- JSP → JS 로 contextPath 전달 -->
+<script>
+    var contextPath = "${pageContext.request.contextPath}";
+</script>
+
+<!-- 주문상세 전용 JS -->
+<script src="${pageContext.request.contextPath}/order/order_list"></script>
+
 </head>
+
 <body>
+	<jsp:include page="/inc/header.jsp" />
+	
   
-  <jsp:include page="/inc/header.jsp" />
+	<!-- =========================
+     마이페이지 3단 레이아웃 (좌: 메뉴 / 중: 본문 / 우: 배너)
+    ========================== -->
+	<div class="mypage-container">
 
-    <!-- 메인 3열 레이아웃 -->
-    <div class="mypage-wrapper">
-        
-        <!-- [좌측] 사이드바 메뉴 -->
-        <aside class="mypage-sidebar">
-            <div class="sidebar-group">
-                <h3>MY 쇼핑</h3>
-                <ul>
-                    <li class="active"><a href="${pageContext.request.contextPath}/order/order_list">주문목록/배송조회</a></li>
-                    <li><a href="#">취소/반품/교환/환불 내역</a></li>
-                    <li><a href="#">와우 멤버십</a></li>
-                    <li><a href="#">구독 서비스 <span class="badge-n">N</span></a></li>
-                    <li><a href="#">로켓프레시 프레시백 <span class="badge-n">N</span></a></li>
-                    <li><a href="#">영수증 조회/출력</a></li>
-                </ul>
-            </div>
-            <div class="sidebar-group">
-                <h3>MY 혜택</h3>
-                <ul>
-                    <li><a href="#">쿠폰 · 이용권</a></li>
-                    <li><a href="#">쿠팡캐시/기프트카드</a></li>
-                </ul>
-            </div>
-            <div class="sidebar-group">
-                <h3>MY 활동</h3>
-                <ul>
-                    <li><a href="#">문의하기</a></li>
-                    <li><a href="#">문의내역 확인</a></li>
-                    <li><a href="#">리뷰 관리</a></li>
-                    <li><a href="#">찜 리스트</a></li>
-                </ul>
-            </div>
-            <div class="sidebar-group">
-                <h3>MY 정보</h3>
-                <ul>
-                    <li><a href="#">개인정보확인/수정</a></li>
-                    <li><a href="${pageContext.request.contextPath}/member/modify">개인정보확인/수정</a></li>
+		<!-- =========================
+         [1열] 왼쪽 MY쿠팡 메뉴
+    ========================== -->
+		<aside class="mycoupang-side">
 
-                    <li><a href="#">결제수단·쿠페이 관리</a></li>
-                    <li><a href="${pageContext.request.contextPath}/address/list">배송지 관리</a></li>
-                    <li><a href="#">패스키 관리</a></li>
-                    <li><a href="#">회원 탈퇴</a></li>
-                </ul>
-            </div>
-        </aside>
+			<div class="side-title">MY쿠팡</div>
 
-        <!-- [중앙] 메인 본문 -->
-        <main class="mypage-main">
-            <!-- 쿠페이/쿠팡캐시 배너 -->
-            <div class="cash-banner">
-                <div class="cash-item">쿠페이 머니 <span class="price">0원</span></div>
-                <div class="cash-item">쿠팡캐시 <span class="price">0원</span></div>
-            </div>
+			<div class="side-section">
+				<h3>MY 쇼핑</h3>
+				<li class="active"><a href="${pageContext.request.contextPath}/order_list">주문목록/배송조회</a></li> 
+				<a href="${pageContext.request.contextPath}/cancel_history.jsp">취소/반품/교환/환불 내역</a> 
+				<a href="#">와우 멤버십</a>
+				<a href="#">구독 서비스 <span class="new">N</span></a> 
+				<a href="#">로켓프레시 프레시백 <span class="new">N</span></a> 
+				<a href="#">영수증 조회/출력</a>
+			</div>
 
-            <h2 class="page-title">주문목록</h2>
+			<div class="side-section">
+				<h3>MY 혜택</h3>
+				<a href="#">쿠폰 · 이용권</a> 
+				<a href="#">쿠팡캐시/기프트카드</a>
+			</div>
 
-            <!-- 검색 및 연도/기간 선택 필터 -->
-            <div class="search-filter-box">
-                <div class="order-search">
-                    <input type="text" placeholder="주문한 상품을 검색할 수 있어요!">
-                    <button type="button" class="btn-order-search">🔍</button>
-                </div>
-                <div class="period-buttons">
-                    <button type="button" class="btn-period active" data-year="recent">최근 6개월</button>
-                    <button type="button" class="btn-period" data-year="2026">2026</button>
-                    <button type="button" class="btn-period" data-year="2025">2025</button>
-                    <button type="button" class="btn-period" data-year="2024">2024</button>
-                </div>
-            </div>
+			<div class="side-section">
+				<h3>MY 활동</h3>
+				<a href="#">문의하기</a> 
+				<a href="#">문의내역 확인</a> 
+				<a href="#">리뷰관리</a> 
+				<a href="#">찜 리스트</a>
+			</div>
 
-            <!-- 동적으로 출력될 주문 카드 컨테이너 -->
-            <div id="order-card-list">
-                <c:choose>
-                    <c:when test="${not empty orderList}">
-                        <c:forEach var="item" items="${orderList}">
-                            <div class="order-card" style="border: 1px solid #e0e0e0; margin-bottom: 20px; padding: 15px; border-radius: 8px;">
-                                <div class="order-header" style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
-                                    <span class="order-no" style="font-weight: bold;">주문번호: ${item.orderNo}</span>
-                                    <a href="${pageContext.request.contextPath}/order/order_detail?orderNo=${item.orderNo}" class="link-detail" style="color: #0073e9; text-decoration: none;">
-                                        주문 상세보기 &gt;
-                                    </a>
-                                </div>
-                                <div class="order-body" style="display: flex; justify-content: space-between; align-items: center;">
-                                    <div class="item-info">
-                                        <h4 class="product-name" style="margin: 0 0 5px 0; font-size: 16px;">${item.productName}</h4>
-                                        <c:if test="${not empty item.optionName}">
-                                            <p class="option-name" style="margin: 0 0 5px 0; color: #666; font-size: 14px;">옵션: ${item.optionName}</p>
-                                        </c:if>
-                                        <p class="price-qty" style="margin: 0; font-size: 14px; font-weight: bold;">
-                                            <fmt:formatNumber value="${item.salePrice}" pattern="#,###"/>원 · ${item.quantity}개
-                                        </p>
-                                    </div>
-                                    <div class="delivery-status">
-                                        <c:if test="${item.freeDelivery}">
-                                            <span style="background: #e7f4e8; color: #2e7d32; padding: 3px 8px; border-radius: 4px; font-size: 12px;">무료배송</span>
-                                        </c:if>
-                                    </div>
-                                </div>
-                            </div>
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="empty-list" style="text-align: center; padding: 50px 0; color: #888;">
-                            주문 내역이 없습니다.
-                        </div>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-        </main>
+			<div class="side-section">
+				<h3>MY 정보</h3>
+				<a href="${pageContext.request.contextPath}/member/modify">개인정보확인/수정</a> 
+				<a href="#">결제수단·쿠페이 관리</a> 
+				<a href="#">배송지 관리</a> 
+				<a href="#">패스키 관리</a> 
+				<a href="#">회원 탈퇴</a>
+			</div>
 
-        <!-- [우측] 고정형(Sticky) 세로 긴 배너 -->
-        <aside class="right-banner-aside">
-            <div class="sticky-banner-container">
-                <div class="banner-box ad-card">
-                    <span class="tag-only">GoodPang Only</span>
-                    <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=120" alt="추천의류">
-                    <p class="banner-desc">기획전 특가 의류</p>
-                </div>
+			<!-- 고객센터 메뉴 -->
+			<div class="side-help">
+				<a href="#">
+					<span class="help-icon">📝</span> 
+					<span>쿠팡문의</span>
+				</a> 
+				<a href="#">
+					<span class="help-icon">📢</span> 
+					<span>고객의 소리<br><small>제안·칭찬·불편신고</small></span>
+				</a> 
+				<a href="#">
+					<span class="help-icon">📦</span> 
+					<span>취소/반품 안내</span>
+				</a>
+			</div>
+
+		</aside>
+
+
+		<!-- =========================
+         [2열] 중앙 메인 본문
+    ========================== -->
+		<main class="mypage-main">
+
+			<!-- 쿠페이/쿠팡캐시 배너 -->
+			<div class="mypage-cash-bar">
+				<div class="cash-col">
+					쿠페이 머니 <span class="cash-val">0원</span>
+				</div>
+				<div class="cash-divider"></div>
+				<div class="cash-col">
+					쿠팡캐시 <span class="cash-val">0원</span>
+				</div>
+			</div>
+
+			<h2 class="content-heading">주문목록</h2>
+
+			<!-- 검색 및 연도/기간 선택 필터 -->
+			<div class="order-filter-container">
+				<div class="search-input-wrap">
+					<input type="text" placeholder="주문한 상품을 검색할 수 있어요!">
+					<button type="button" class="btn-search-icon">🔍</button>
+				</div>
+				<div class="year-filter-list">
+					<button type="button" class="btn-year btn-period active" data-year="recent">최근 6개월</button>
+					<button type="button" class="btn-year btn-period" data-year="2026">2026</button>
+					<button type="button" class="btn-year btn-period" data-year="2025">2025</button>
+					<button type="button" class="btn-year btn-period" data-year="2024">2024</button>
+				</div>
+			</div>
+
+			<!-- 동적으로 출력될 주문 카드 컨테이너 -->
+<div id="order-card-list">
+    <c:choose>
+        <c:when test="${not empty orderList}">
+            <c:forEach var="item" items="${orderList}">
                 
-                <div class="banner-box sale-card">
-                    <p class="sale-title">~5만원<br>쿠폰 할인!</p>
-                    <div class="sale-bg">여름맞이<br>옷장세일</div>
-                </div>
+                <!-- 카드 1개 단위 -->
+                <section class="delivery-box" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 20px; background: #fff;">
+                    
+                    <!-- 상단 헤더: 주문 날짜 및 상세보기 -->
+                    <div class="card-header" style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                        <div class="order-info">
+                         
+                            주문번호 <span class="order-number">${item.orderNo}</span>
+                        </div>
+                        <a href="${pageContext.request.contextPath}/order/order_detail?orderNo=${item.orderNo}" class="link-detail" style="color: #0073e9; text-decoration: none; font-size: 12px;">
+                            주문 상세보기 &gt;
+                        </a>
+                    </div>
 
-                <div class="banner-box import-card">
-                    <p class="import-title">직수입 브랜드<br>단독 특가</p>
-                    <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=120" alt="브랜드상품">
-                </div>
+                    <!-- 카드 본문 (시작 태그 보완) -->
+                    <div class="delivery-main">
+                        <div class="product-row" style="display: flex; align-items: center; justify-content: space-between;">
+                            
+                        <%--     <!-- 의류 이미지 / 아이콘 -->
+                            <div class="product-image" style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 6px; font-size: 32px; margin-right: 15px;">
+                                <c:choose>
+                                    <c:when test="${not empty item.productImg}">
+                                        <img src="${item.productImg}" alt="${item.productName}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="clothes-icon">👕</div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div> --%>
+<%-- 
+                            <!-- 의류 상품 정보 명세 -->
+                            <div class="product-info" style="flex: 1;">
+                                <div class="product-name" style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">
+                                    <span class="rocket" style="color: #0073e9;">🚀 로켓배송</span> ${item.productName}
+                                </div>
+                                <div class="product-price" style="font-size: 13px; color: #333; margin-bottom: 4px;">
+                                    <fmt:formatNumber value="${item.salePrice}" pattern="#,###" />원 <span>·</span> ${item.quantity}개
+                                </div>
+                                <c:if test="${not empty item.optionName}">
+                                    <div class="product-option" style="font-size: 12px; color: #666;">
+                                        <span>옵션: </span> ${item.optionName}
+                                    </div>
+                                </c:if>
+                            </div> --%>
 
-                <div class="banner-box yellow-card">
-                    <div class="bell-icon">🔔<span>1</span></div>
-                    <p>금주의<br>의류 특가왕</p>
-                </div>
+                         
 
-                <div class="banner-box app-down-card">
-                    <p>GoodPang 앱<br>다운로드 시<br><strong>3,000p 지급</strong></p>
-                </div>
+                    <!-- 3종 하단 액션 버튼 그룹 -->
+                    <div class="delivery-buttons" style="display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
+                        <button type="button" class="delivery-btn btn-action primary" onclick="location.href='${pageContext.request.contextPath}/order/tracking?orderNo=${item.orderNo}'" style="flex: 1; padding: 8px; border: 1px solid #0073e9; color: #0073e9; background: #fff; border-radius: 4px;">
+                            배송 조회
+                        </button>
+                        <button type="button" class="delivery-btn btn-action" onclick="location.href='${pageContext.request.contextPath}/order/claim?orderNo=${item.orderNo}'" style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px;">
+                            교환, 반품 신청
+                        </button>
+               <%--          <button type="button" class="delivery-btn btn-action" onclick="location.href='${pageContext.request.contextPath}/review/write?productNo=${item.productNo}'" style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px;">
+                            리뷰 작성하기
+                        </button> --%>
+                    </div>
+                    </div>
+
+                </section>
+
+            </c:forEach>
+        </c:when>
+
+        <c:otherwise>
+            <div class="empty-order-container">
+                <div class="empty-icon">!</div>
+                <h3>주문 내역이 없습니다.</h3>
             </div>
-        </aside>
+        </c:otherwise>
+    </c:choose>
+</div>
+			<!-- 페이지 이동 버튼 -->
+			<div class="pager-box">
+				<button type="button" id="btn-page-prev" class="btn-pager">&lt; 이전</button>
+				<button type="button" id="btn-page-next" class="btn-pager">다음 &gt;</button>
+			</div>
 
-    </div>
+			<!-- 배송상품 주문상태 안내 -->
+			<div class="delivery-step-box">
+				<div class="step-head">
+					<span>배송상품 주문상태 안내</span>
+					<a href="#" class="link-more">자세한 내용 더보기 &gt;</a>
+				</div>
+				<div class="step-flow">
+					<div class="step-item">
+						<div class="icon-circle">💳</div>
+						<strong>결제완료</strong>
+						<p>주문·결제 확인이 완료되었습니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">📦</div>
+						<strong>상품준비중</strong>
+						<p>판매자가 발송할 상품을 준비중입니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">🚚</div>
+						<strong>배송시작</strong>
+						<p>상품준비가 완료되어 곧 배송될 예정입니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">🚛</div>
+						<strong>배송중</strong>
+						<p>상품이 고객님께 배송중입니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">🎁</div>
+						<strong>배송완료</strong>
+						<p>상품이 주문자에게 전달완료되었습니다.</p>
+					</div>
+				</div>
+			</div>
 
-    <script src="${pageContext.request.contextPath}/js/order_list.js"></script>
-    
-    <jsp:include page="/inc/footer.jsp" />
-</body>
-</html>
+			<!-- 취소/반품/교환 안내 -->
+			<div class="notice-info-box">
+				<p class="notice-title">⚠ 취소/반품/교환 신청전 확인해주세요!</p>
+
+				<div class="notice-sec">
+					<h4>취소</h4>
+					<ul>
+						<li>여행/레저/숙박 상품은 취소 시 수수료가 발생할 수 있으며,</li>
+						<li>취소수수료를 확인하여 2일 이내(주말,공휴일 제외 처리결과)를 문자로 안내드립니다.(당일 접수 기준, 마감시간 오후 4시)</li>
+						<li>문화 상품은 사용 전날 24시까지 취소 신청 시 취소수수료가 발생되지 않습니다.</li>
+					</ul>
+				</div>
+			</div>
+
+		</main>
+
+
+		<!-- =========================
+         [3열] 우측 광고 배너 영역 (누락분 복구)
+    ========================== -->
+		<aside class="right-banner">
+			<div class="banner banner-1">
+				<strong>쿠팡 only</strong>
+				<div class="banner-product">🧻</div>
+			</div>
+			<div class="banner banner-2">
+				<strong>추석연휴 숙소~64%</strong>
+				<div class="banner-character">🐰</div>
+			</div>
+			<div class="banner banner-3">
+				<strong>쿠팡이 직접 수입했어요!</strong>
+				<div class="banner-shop">🥤</div>
+			</div>
+			<div class="banner banner-4">
+				<strong>금주의 특가왕</strong>
+				<div class="banner-bell">🔔</div>
+				<div class="badge">1</div>
+			</div>
+		</aside>
+
+	</div> <!-- //.mypage-container (빠져있던 3단 레이아웃 닫는 태그) -->
+
+	<jsp:include page="/inc/footer.jsp" />	
+	<script src="${pageContext.request.contextPath}/js/header.js"></script>
+
+</body> <!-- 빠져있던 body 닫는 태그 -->
+</html> <!-- 빠져있던 html 닫는 태그 -->
