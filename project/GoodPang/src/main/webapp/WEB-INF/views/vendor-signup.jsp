@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -6,8 +8,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="./css/vendor-signup.css">
-  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/vendor-signup.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
   <title>굿팡 비즈니스 입점 신청</title>
 
 </head>
@@ -20,7 +22,7 @@
 
       <!-- 굿팡 로고 -->
       <div class="logo-area">
-      	<a href="index.html" class="brand-goodpang">GoodPang marketplace</a>
+      	<a href="${pageContext.request.contextPath}/index.jsp" class="brand-goodpang">GoodPang marketplace</a>
       </div>
 
 
@@ -34,7 +36,8 @@
       </p>
 
 
-      <form class="form" id="vendorForm" novalidate>
+      <form class="form" id="vendorForm" novalidate method="post"
+        action="${pageContext.request.contextPath}/vendor/signup">
 
         <!-- 사업자 유형 -->
 
@@ -388,7 +391,7 @@
 
       <p class="login-link">
         이미 굿팡 비즈니스 계정이 있으신가요?
-        <a href="./vendor-login.html">로그인</a>
+        <a href="${pageContext.request.contextPath}/vendor/login">로그인</a>
       </p>
 
 
@@ -852,13 +855,9 @@
         return;
       }
 
-      /* 완료 */
+      /* 완료 - 서버로 실제 제출 (doPost에서 파라미터 확인용) */
 
-      showModal("입점 신청 완료", "굿팡 비즈니스 입점 신청이 완료되었습니다.");
-
-      setTimeout(function () {
-        location.href = "./login.html";
-      }, 1500);
+      form.submit();
     });
 
 

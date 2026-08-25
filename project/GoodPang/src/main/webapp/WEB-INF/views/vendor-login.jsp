@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -6,8 +8,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="./css/vendor-login.css">
-  <link rel="stylesheet" href="css/common.css">	
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/vendor-login.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">	
   <title>굿팡 비즈니스 판매자 로그인</title>
 
 </head>
@@ -17,7 +19,7 @@
   <div class="wing-bg">
 
     <!-- 뒤로가기 -->
-    <a href="index.html" class="back-button" aria-label="이전으로">
+    <a href="${pageContext.request.contextPath}/index.jsp" class="back-button" aria-label="이전으로">
       <span class="back-arrow"></span>
     </a>
 
@@ -29,22 +31,27 @@
       <!-- 로고 -->
       
       <div class="logo-area">
-		<a href="index.html" class="brand-goodpang">GoodPang</a>
+		<a href="${pageContext.request.contextPath}/index.jsp" class="brand-goodpang">GoodPang</a>
       </div>
 
       <h1 class="title">
         판매자 로그인
       </h1>
 
-      <form class="form" id="loginForm" novalidate>
+      <form class="form" id="loginForm" novalidate method="post"
+        action="${pageContext.request.contextPath}/vendor/login">
+
+        <% if (request.getAttribute("error") != null) { %>
+          <p class="message error show"><%= request.getAttribute("error") %></p>
+        <% } %>
 
         <div class="field">
-          <input class="input" id="loginId" name="loginId" type="text" placeholder="아이디를 입력해주세요"
+          <input class="input" id="email" name="email" type="email" placeholder="아이디(이메일)를 입력해주세요"
             autocomplete="username">
         </div>
 
         <div class="field">
-          <input class="input" id="loginPw" name="loginPw" type="password" placeholder="비밀번호를 입력해주세요"
+          <input class="input" id="password" name="password" type="password" placeholder="비밀번호를 입력해주세요"
             autocomplete="current-password">
         </div>
 
@@ -66,7 +73,7 @@
         <span>판매자가 아니신가요?</span>
       </div>
 
-      <a href="./vendor-signup.html" class="signup-button">
+      <a href="${pageContext.request.contextPath}/vendor/signup" class="signup-button">
         판매자 회원가입
       </a>
 
@@ -76,7 +83,7 @@
           판매자 콜센터 <strong>1600-9879</strong>
         </p>
 
-        <a href="./sc-ui/account/privacy/agreePi.html" class="privacy-link" target="_blank" rel="noopener">
+        <a href="${pageContext.request.contextPath}/sc-ui/account/privacy/agreePi.html" class="privacy-link" target="_blank" rel="noopener">
           판매자 개인정보 처리방침
         </a>
 
@@ -96,8 +103,8 @@
   <script>
 
     const form = document.getElementById("loginForm");
-    const loginId = document.getElementById("loginId");
-    const loginPw = document.getElementById("loginPw");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
     const loginMessage = document.getElementById("loginMessage");
 
 
@@ -111,7 +118,7 @@
       loginMessage.classList.remove("show");
     }
 
-    [loginId, loginPw].forEach(function (input) {
+    [email, password].forEach(function (input) {
       input.addEventListener("input", function () {
         input.classList.remove("invalid");
         clearError();
@@ -120,23 +127,24 @@
 
 
     form.addEventListener("submit", function (event) {
-      event.preventDefault();
 
-      if (!loginId.value.trim()) {
-        loginId.classList.add("invalid");
+      if (!email.value.trim()) {
+        event.preventDefault();
+        email.classList.add("invalid");
         showError("아이디를 입력해주세요.");
-        loginId.focus();
+        email.focus();
         return;
       }
 
-      if (!loginPw.value) {
-        loginPw.classList.add("invalid");
+      if (!password.value) {
+        event.preventDefault();
+        password.classList.add("invalid");
         showError("비밀번호를 입력해주세요.");
-        loginPw.focus();
+        password.focus();
         return;
       }
 
-      location.href = "index.html";
+      // 유효성 검사 통과 시 폼이 그대로 서버(/vendor/login)로 제출됨
     });
 
   </script>
