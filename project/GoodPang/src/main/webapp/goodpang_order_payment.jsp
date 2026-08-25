@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+ <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
@@ -10,346 +9,446 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>쿠팡 주문/결제</title>
-
-<!-- CSS 분리 -->
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/goodpang_order_payment.css">
 </head>
+
 <body>
 
-	<div class="top-header"></div>
+<div class="top-header"></div>
 
-	<div class="container">
+<div class="container">
 
-		<h1 class="logo">
-			<a href="${pageContext.request.contextPath}/" title="GoodPang 홈으로"> <span
-				class="brand-goodpang">GoodPang</span>
-			</a>
-		</h1>
-		<h1 class="page-title">주문/결제</h1>
-		<div class="breadcrumb">
-			<span>주문결제</span> &gt; 주문완료
-		</div>
+	<h1 class="logo">
+		<a href="${pageContext.request.contextPath}/" title="GoodPang 홈으로">
+			<span class="brand-goodpang">GoodPang</span>
+		</a>
+	</h1>
 
+	<h1 class="page-title">주문/결제</h1>
 
-		<div class="content-wrap">
-			<!-- ========== 왼쪽 영역 ========== -->
-			<div class="left-section">
+	<div class="breadcrumb">
+		<span>주문결제</span> &gt; 주문완료
+	</div>
 
-				<!-- 배송지 -->
-				<div class="section-box">
-					<div class="section-header">
-						<div>
-							<strong>배송지</strong> | <span id="currentReceiverName">${address.receiverName}</span>
-						</div>
+	<div class="content-wrap">
 
-						<button class="btn-outline" type="button"
-							onclick="openAddressModal()">배송지 변경</button>
+		<!-- 왼쪽 영역 -->
+		<div class="left-section">
+
+			<!-- 배송지 -->
+			<div class="section-box">
+				<div class="section-header">
+					<div>
+						<strong>배송지</strong> |
+						<span id="currentReceiverName">${address.receiverName}</span>
 					</div>
 
-					<div class="section-body">
-
-						<div class="address-detail">
-							<span id="currentAddress">${address.address}</span><br> <span
-								id="currentDetailAddress">${address.detailAddress}</span><br>
-							휴대폰 : <span id="currentTel">${address.tel}</span>
-						</div>
-
-						<c:if test="${address.addressDefault}">
-							<span class="tag" id="currentDefaultTag"> 기본배송지 </span>
-						</c:if>
-
-					</div>
+					<button class="btn-outline"
+							type="button"
+							onclick="openAddressModal()">
+						배송지 변경
+					</button>
 				</div>
 
-				<%-- <input type="hidden" id="selectedAddressNo" name="addressNo"
-					value="${address.addressNo}"> --%>
-
-				<!-- 배송 요청사항 -->
-				<div class="section-box">
-					<div class="section-header">
-						<strong>배송 요청사항</strong>
-						<button class="btn-outline" type="button">변경</button>
+				<div class="section-body">
+					<div class="address-detail">
+						<span id="currentAddress">${address.address}</span><br>
+						<span id="currentDetailAddress">${address.detailAddress}</span><br>
+						휴대폰 :
+						<span id="currentTel">${address.tel}</span>
 					</div>
 
-					<div class="section-body">
-						<span id="currentRequestMessage"> <c:choose>
-								<c:when test="${not empty address.requestMsg}">
-                				${address.requestMsg}
-            					</c:when>
-								<c:otherwise>
-				                배송 요청사항이 없습니다.
-				            </c:otherwise>
-							</c:choose>
-						</span>
-					</div>
+					<c:if test="${address.addressDefault}">
+						<span class="tag" id="currentDefaultTag">기본배송지</span>
+					</c:if>
+				</div>
+			</div>
+
+			<!-- 배송 요청사항 -->
+			<div class="section-box">
+				<div class="section-header">
+					<strong>배송 요청사항</strong>
+					<button class="btn-outline" type="button">변경</button>
 				</div>
 
-				<!-- 결제수단 -->
-				<div class="section-box payment-section">
+				<div class="section-body">
+					<span id="currentRequestMessage">
+						<c:choose>
+							<c:when test="${not empty address.requestMsg}">
+								${address.requestMsg}
+							</c:when>
+							<c:otherwise>
+								배송 요청사항이 없습니다.
+							</c:otherwise>
+						</c:choose>
+					</span>
+				</div>
+			</div>
 
-					<div class="section-header">
-						<strong>결제수단</strong>
-					</div>
+			<!-- 결제수단 -->
+			<div class="section-box payment-section">
 
-					<div class="payment-method">
+				<div class="section-header">
+					<strong>결제수단</strong>
+				</div>
 
-						<!-- 쿠페이 머니 -->
-						<label class="pay-radio-row"> <input type="radio"
-							name="payMethod" value="coupayMoney"> <span
-							class="pay-title"> 쿠페이 머니 : <strong> <fmt:formatNumber
-										value="${summary.cashUsed}" pattern="#,###" />원
+				<div class="payment-method">
+
+					<!-- 쿠페이 머니 -->
+					<label class="pay-radio-row">
+						<input type="radio"
+							   name="paymentMethod"
+							   value="COUPAY_MONEY"
+							   form="paymentForm">
+
+						<span class="pay-title">
+							쿠페이 머니 :
+							<strong>
+								<fmt:formatNumber
+									value="${checkout.cashUsed}"
+									pattern="#,###"/>원
 							</strong>
-						</span> <span class="badge-red"> 최대 캐시적립 </span>
+						</span>
+
+						<span class="badge-red">최대 캐시적립</span>
+					</label>
+
+					<!-- 계좌이체 -->
+					<label class="pay-radio-row account-row">
+						<input type="radio"
+							   name="paymentMethod"
+							   value="BANK_TRANSFER"
+							   form="paymentForm"
+							   checked>
+						<span class="pay-title">계좌이체</span>
+					</label>
+
+					<!-- 계좌 선택 -->
+					<div class="bank-setting" id="bankSetting">
+
+						<select class="bank-select"
+								name="bankCode"
+								id="bankCode"
+								form="paymentForm">
+							<option value="SHINHAN">
+								신한은행 / **********4382
+							</option>
+							<option value="WOORI">
+								우리은행 / **********7204
+							</option>
+							<option value="NH">
+								농협은행 / **********9137
+							</option>
+						</select>
+
+						<label class="default-payment">
+							<input type="checkbox"
+								   name="defaultPayment"
+								   id="defaultPayment"
+								   value="Y"
+								   form="paymentForm"
+								   checked>
+							<span>기본 결제 수단으로 사용</span>
 						</label>
-
-
-						<!-- 계좌이체 -->
-						<label class="pay-radio-row account-row"> <input
-							type="radio" name="payMethod" value="bank" checked> <span
-							class="pay-title"> 계좌이체 </span>
-
-						</label>
-
-
-						<!-- 계좌 선택 -->
-						<div class="bank-setting">
-
-							<select class="bank-select" name="bankAccount">
-
-								<option value="SHINHAN">신한은행 / **********4382</option>
-
-								<option value="WOORI">우리은행 / **********7204</option>
-
-								<option value="NH">농협은행 / **********9137</option>
-
-							</select> <label class="default-payment"> <input type="checkbox"
-								name="defaultPayment" checked> <span> 기본 결제 수단으로
-									사용 </span>
-
-							</label>
-
-						</div>
-
-
-						<div class="payment-divider"></div>
-
-
-						<!-- 다른 결제수단 -->
-						<button class="other-payment-title" type="button"
-							onclick="toggleOtherPayment()">
-
-							<strong>다른 결제 수단</strong> <span id="paymentArrow"> ︿ </span>
-
-						</button>
-
-
-						<div class="other-payment-list" id="otherPaymentList">
-
-
-							<!-- 신용/체크카드 -->
-							<label class="pay-radio-row other-radio"> <input
-								type="radio" name="payMethod" value="card"> <span
-								class="pay-title"> 신용/체크카드 </span>
-
-							</label>
-
-
-							<!-- 법인카드 -->
-							<label class="pay-radio-row other-radio"> <input
-								type="radio" name="payMethod" value="companyCard"> <span
-								class="pay-title"> 법인카드 </span>
-
-							</label>
-
-
-							<!-- 휴대폰 -->
-							<label class="pay-radio-row other-radio"> <input
-								type="radio" name="payMethod" value="mobile"> <span
-								class="pay-title"> 휴대폰 </span>
-
-							</label>
-
-
-							<!-- 무통장입금 -->
-							<label class="pay-radio-row other-radio"> <input
-								type="radio" name="payMethod" value="virtualAccount"> <span
-								class="pay-title"> 무통장입금(가상계좌) </span>
-
-							</label>
-
-						</div>
-
 					</div>
 
+					<div class="payment-divider"></div>
+
+					<!-- 다른 결제수단 -->
+					<button class="other-payment-title"
+							type="button"
+							onclick="toggleOtherPayment()">
+						<strong>다른 결제 수단</strong>
+						<span id="paymentArrow">︿</span>
+					</button>
+
+					<div class="other-payment-list" id="otherPaymentList">
+
+						<!-- 신용/체크카드 -->
+						<label class="pay-radio-row other-radio">
+							<input type="radio"
+								   name="paymentMethod"
+								   value="CARD"
+								   form="paymentForm">
+							<span class="pay-title">신용/체크카드</span>
+						</label>
+
+						<!-- 카드사 선택 -->
+						<div class="card-setting hidden" id="cardSetting">
+							<select class="bank-select"
+									name="cardCompany"
+									id="cardCompany"
+									form="paymentForm"
+									disabled>
+								<option value="">카드사를 선택하세요</option>
+								<option value="SHINHAN">신한카드</option>
+								<option value="KB">KB국민카드</option>
+								<option value="SAMSUNG">삼성카드</option>
+								<option value="HYUNDAI">현대카드</option>
+							</select>
+						</div>
+
+						<!-- 휴대폰 -->
+						<label class="pay-radio-row other-radio">
+							<input type="radio"
+								   name="paymentMethod"
+								   value="MOBILE"
+								   form="paymentForm">
+							<span class="pay-title">휴대폰</span>
+						</label>
+
+						<!-- 무통장입금 -->
+						<label class="pay-radio-row other-radio">
+							<input type="radio"
+								   name="paymentMethod"
+								   value="VIRTUAL_ACCOUNT"
+								   form="paymentForm">
+							<span class="pay-title">무통장입금(가상계좌)</span>
+						</label>
+
+					</div>
 				</div>
+			</div>
 
-				<!-- 배송 / 상품 정보 -->
-				<div class="delivery-info">
-					<h4>배송 1건 중 1</h4>
+			<!-- 배송 / 상품 정보 -->
+			<div class="delivery-info">
 
-					<c:forEach var="item" items="${orderItems}" varStatus="status">
-						<div class="product-item">
-							<div class="product-img"></div>
-							<div class="product-info">
-								<div class="product-name">${item.productName}</div>
-								<div class="product-option">${item.optionName}</div>
-								<div class="product-price">
-									<fmt:formatNumber value="${item.salePrice}" pattern="#,###" />
-									원
-								</div>
-								<div class="product-qty">
-									수량 ${item.quantity}개
-									<c:if test="${item.freeDelivery}"> / 무료배송</c:if>
-								</div>
+				<h4>배송 1건 중 1</h4>
+
+				<c:forEach var="item"
+						   items="${checkoutItems}"
+						   varStatus="status">
+
+					<div class="product-item">
+						<div class="product-img"></div>
+
+						<div class="product-info">
+							<div class="product-name">
+								${item.productName}
+							</div>
+
+							<div class="product-option">
+								${item.optionName}
+							</div>
+
+							<div class="product-price">
+								<fmt:formatNumber
+									value="${item.price}"
+									pattern="#,###"/>원
+							</div>
+
+							<div class="product-qty">
+								수량 ${item.orderQty}개
 							</div>
 						</div>
-					</c:forEach>
-				</div>
+					</div>
 
+				</c:forEach>
 			</div>
 
-			<!-- ========== 오른쪽 결제 금액 영역 ========== -->
-			<div class="right-section">
-				<div class="payment-summary">
-					<h3>최종 결제 금액</h3>
+		</div>
 
-					<div class="price-row">
-						<span>총 상품 가격</span> <span><fmt:formatNumber
-								value="${summary.totalProductPrice}" pattern="#,###" />원</span>
-					</div>
+		<!-- 오른쪽 결제 금액 영역 -->
+		<div class="right-section">
 
-					<div class="price-row">
-						<span>즉시할인</span> <span class="discount">-<fmt:formatNumber
-								value="${summary.instantDiscount}" pattern="#,###" />원
-						</span>
-					</div>
+			<div class="payment-summary">
 
-					<div class="price-row">
-						<span> 쿠폰할인
-							<button class="coupon-btn" type="button">변경</button>
-						</span> <span class="discount">-<fmt:formatNumber
-								value="${summary.couponDiscount}" pattern="#,###" />원
-						</span>
-					</div>
+				<h3>최종 결제 금액</h3>
 
-					<div class="price-row">
-						<span>배송비</span> <span><fmt:formatNumber
-								value="${summary.deliveryFee}" pattern="#,###" />원</span>
-					</div>
+				<div class="price-row">
+					<span>총 상품 가격</span>
+					<span>
+						<fmt:formatNumber
+							value="${checkout.productAmount}"
+							pattern="#,###"/>원
+					</span>
+				</div>
 
-					<div class="price-row">
-						<span>쿠팡캐시</span>
-						<div class="cash-input">
-							<button type="button">전액사용</button>
-							<input type="text" value="${summary.cashUsed}"> 원
-						</div>
-					</div>
-					<div
-						style="text-align: right; font-size: 12px; color: #888; margin-top: -6px;">
-						잔여 :
-						<fmt:formatNumber value="${summary.remainCash}" pattern="#,###" />
+				<div class="price-row">
+					<span>즉시할인</span>
+					<span class="discount">
+						-<fmt:formatNumber
+							value="${checkout.instantDiscount}"
+							pattern="#,###"/>원
+					</span>
+				</div>
+
+				<div class="price-row">
+					<span>
+						쿠폰할인
+						<button class="coupon-btn" type="button">변경</button>
+					</span>
+
+					<span class="discount">
+						-<fmt:formatNumber
+							value="${checkout.couponDiscount}"
+							pattern="#,###"/>원
+					</span>
+				</div>
+
+				<div class="price-row">
+					<span>배송비</span>
+					<span>
+						<fmt:formatNumber
+							value="${checkout.deliveryFee}"
+							pattern="#,###"/>원
+					</span>
+				</div>
+
+				<div class="price-row">
+					<span>쿠팡캐시</span>
+
+					<div class="cash-input">
+						<button type="button">전액사용</button>
+
+						<input type="text"
+							   name="cashUsed"
+							   value="${checkout.cashUsed}"
+							   readonly>
 						원
 					</div>
-
-					<div class="divider"></div>
-
-					<div class="total-row">
-						<span class="label">총 결제 금액</span> <span class="amount"><fmt:formatNumber
-								value="${summary.finalPrice}" pattern="#,###" />원</span>
-					</div>
-
-					<div class="agree-links">
-						개인정보 제3자 제공 동의 <a href="#">보기</a>
-					</div>
-					<div class="agree-links">
-						개인정보 수집 및 이용 안내 <a href="#">보기</a>
-					</div>
-
-					<div class="notice">* 개별 판매자가 등록한 마켓플레이스(오픈마켓) 상품에 대한 광고,
-						상품주문, 배송 및 환불의 의무와 책임은 각 판매자가 부담하고, 이에 대하여 쿠팡은 통신판매중개자로서 통신판매의
-						당사자가 아니므로 일체 책임을 지지 않습니다.</div>
-
-					<div class="final-agree">위 주문 내용을 확인 하였으며, 회원 본인은 개인정보 이용 및
-						제공(해외직구의 경우 국외제공) 및 결제에 동의합니다.</div>
-
-
-
-					<!-- <button class="btn-pay" type="button" onclick="dummyPay()">결제하기</button> -->
-					
-					<form id="paymentForm"
-						action="${pageContext.request.contextPath}/order/checkout"
-						method="post">
-
-						<!-- 현재 주문번호 -->
-						<input type="hidden" name="orderNo" value="${orderNo}">
-
-						<!-- 선택한 배송지 -->
-						<input type="hidden" id="selectedAddressNo" name="addressNo"
-							value="${address.addressNo}">
-
-						<button class="btn-pay" type="submit">결제하기</button>
-
-					</form>
-
-
 				</div>
+
+				<div class="divider"></div>
+
+				<div class="total-row">
+					<span class="label">총 결제 금액</span>
+
+					<span class="amount">
+						<fmt:formatNumber
+							value="${checkout.totalPrice}"
+							pattern="#,###"/>원
+					</span>
+				</div>
+
+				<div class="agree-links">
+					개인정보 제3자 제공 동의
+					<a href="#">보기</a>
+				</div>
+
+				<div class="agree-links">
+					개인정보 수집 및 이용 안내
+					<a href="#">보기</a>
+				</div>
+
+				<div class="notice">
+					* 개별 판매자가 등록한 마켓플레이스(오픈마켓) 상품에 대한 광고,
+					상품주문, 배송 및 환불의 의무와 책임은 각 판매자가 부담하고,
+					이에 대하여 쿠팡은 통신판매중개자로서 통신판매의 당사자가
+					아니므로 일체 책임을 지지 않습니다.
+				</div>
+
+				<div class="final-agree">
+					위 주문 내용을 확인 하였으며, 회원 본인은 개인정보 이용 및
+					제공(해외직구의 경우 국외제공) 및 결제에 동의합니다.
+				</div>
+
+				<!-- 결제 FORM -->
+				<form id="paymentForm"
+					  action="${pageContext.request.contextPath}/order/checkout"
+					  method="post"
+					  onsubmit="return validatePayment();">
+
+					<input type="hidden"
+						   name="checkoutNo"
+						   value="${checkoutNo}">
+
+					<input type="hidden"
+						   id="selectedAddressNo"
+						   name="addressNo"
+						   value="${address.addressNo}">
+
+					<button class="btn-pay" type="submit">
+						결제하기
+					</button>
+				</form>
+
 			</div>
 		</div>
+
 	</div>
-	<!-- ===================================== -->
-	<!-- 배송지 선택 모달 -->
-	<!-- ===================================== -->
-	<div id="addressModalOverlay" class="address-modal-overlay">
-		<div class="address-modal" onclick="event.stopPropagation();">
-			<!-- 상단 -->
-			<div class="address-modal-header">
-				<h2>배송지 선택</h2>
-				<button type="button" class="address-modal-close"
-					onclick="closeAddressModal()">&times;</button>
-			</div>
-
-			<!-- 배송지 목록 -->
-			<div class="address-modal-body">
-				<c:forEach var="addr" items="${addressList}">
-					<div
-						class="address-card
-                    ${addr.addressNo == address.addressNo ? 'selected-address-card' : ''}">
-						<!-- 이름 -->
-						<div class="address-card-name">${addr.receiverName}</div>
+</div>
 
 
-						<!-- 태그 -->
-						<div class="address-tags">
-							<c:if test="${addr.addressDefault}">
-								<span class="address-tag default"> 기본배송지 </span>
-							</c:if>
-							<span class="address-tag fresh"> 로켓프레시 가능 </span> <span
-								class="address-tag rocket"> 로켓와우 가능 </span>
+<!-- 배송지 선택 모달 -->
+<div id="addressModalOverlay" class="address-modal-overlay">
+
+	<div class="address-modal" onclick="event.stopPropagation();">
+
+		<div class="address-modal-header">
+			<h2>배송지 선택</h2>
+
+			<button type="button"
+					class="address-modal-close"
+					onclick="closeAddressModal()">
+				&times;
+			</button>
+		</div>
+
+		<div class="address-modal-body">
+
+			<c:forEach var="addr" items="${addressList}">
+
+				<div class="address-card
+					${addr.addressNo == address.addressNo
+					? 'selected-address-card'
+					: ''}">
+
+					<div class="address-card-name">
+						${addr.receiverName}
+					</div>
+
+					<div class="address-tags">
+
+						<c:if test="${addr.addressDefault}">
+							<span class="address-tag default">
+								기본배송지
+							</span>
+						</c:if>
+
+						<span class="address-tag fresh">
+							로켓프레시 가능
+						</span>
+
+						<span class="address-tag rocket">
+							로켓와우 가능
+						</span>
+					</div>
+
+					<div class="address-card-detail">
+
+						<div class="address-text">
+							${addr.address}&nbsp;${addr.detailAddress}
 						</div>
 
+						<div>${addr.tel}</div>
 
-						<!-- 주소 -->
-						<div class="address-card-detail">
-							<div class="address-text">
-								${addr.address}&nbsp;${addr.detailAddress}</div>
+						<c:choose>
+							<c:when test="${not empty addr.requestMsg}">
+								<div class="address-request">
+									${addr.requestMsg}
+								</div>
+							</c:when>
 
-							<div>${addr.tel}</div>
-							<c:choose>
-								<c:when test="${not empty addr.requestMsg}">
-									<div class="address-request">${addr.requestMsg}</div>
-								</c:when>
-								<c:otherwise>
-									<div class="address-request">배송 요청사항 없음</div>
-								</c:otherwise>
-							</c:choose>
-						</div>
+							<c:otherwise>
+								<div class="address-request">
+									배송 요청사항 없음
+								</div>
+							</c:otherwise>
+						</c:choose>
 
+					</div>
 
-						<!-- 하단 버튼 -->
-						<div class="address-card-buttons">
-							<button type="button" class="address-edit-btn">수정</button>
-							<button type="button" class="address-select-btn"
+					<div class="address-card-buttons">
+
+						<button type="button"
+								class="address-edit-btn">
+							수정
+						</button>
+
+						<button type="button"
+								class="address-select-btn"
 								data-address-no="${addr.addressNo}"
 								data-receiver-name="${fn:escapeXml(addr.receiverName)}"
 								data-address="${fn:escapeXml(addr.address)}"
@@ -357,408 +456,485 @@
 								data-tel="${fn:escapeXml(addr.tel)}"
 								data-request-msg="${fn:escapeXml(addr.requestMsg)}"
 								data-default="${addr.addressDefault}"
-								onclick="selectAddress(this)">선택</button>
-						</div>
+								onclick="selectAddress(this)">
+							선택
+						</button>
+
 					</div>
-				</c:forEach>
+				</div>
 
+			</c:forEach>
 
-				<!-- 배송지 추가 -->
-				<button type="button" class="address-add-btn"
+			<button type="button"
+					class="address-add-btn"
 					onclick="openAddAddressModal()">
-					<span class="plus-icon">＋</span> 배송지 추가
+
+				<span class="plus-icon">＋</span>
+				배송지 추가
+
+			</button>
+
+		</div>
+	</div>
+</div>
+
+
+<!-- 배송지 추가 모달 -->
+<div id="addAddressModalOverlay" class="address-add-modal-overlay">
+
+	<div class="address-add-modal" onclick="event.stopPropagation();">
+
+		<div class="address-add-header">
+			<h2>배송지 추가</h2>
+
+			<button type="button"
+					class="address-add-close"
+					onclick="closeAddAddressModal()">
+				×
+			</button>
+		</div>
+
+		<form id="addAddressForm"
+			  action="${pageContext.request.contextPath}/address/add"
+			  method="post">
+
+			<div class="address-add-body">
+
+				<div class="add-address-row">
+					<div class="add-address-icon">♙</div>
+
+					<input type="text"
+						   name="receiverName"
+						   id="newReceiverName"
+						   placeholder="받는 사람"
+						   autocomplete="off">
+				</div>
+
+				<div class="add-address-row postcode-row">
+					<div class="add-address-icon">◉</div>
+
+					<button type="button"
+							class="postcode-search-btn"
+							onclick="findPostcode()">
+						우편번호 찾기
+					</button>
+
+					<input type="hidden"
+						   name="zipcode"
+						   id="newZipcode">
+				</div>
+
+				<div class="add-address-row address-input-row">
+					<div class="add-address-icon">⌂</div>
+
+					<input type="text"
+						   name="address"
+						   id="newAddress"
+						   placeholder="주소"
+						   readonly>
+				</div>
+
+				<div class="add-address-row">
+					<div class="add-address-icon">⌂</div>
+
+					<input type="text"
+						   name="detailAddress"
+						   id="newDetailAddress"
+						   placeholder="상세주소">
+				</div>
+
+				<div class="add-address-row phone-row">
+					<div class="add-address-icon">▣</div>
+
+					<input type="text"
+						   name="tel"
+						   id="newTel"
+						   placeholder="휴대폰 번호">
+
+					<span class="phone-plus">＋</span>
+				</div>
+
+				<button type="button" class="delivery-option-row">
+					<div class="delivery-option-icon">▦</div>
+					<span>일반배송 정보를 선택해 주세요.</span>
+					<strong>〉</strong>
+				</button>
+
+				<button type="button" class="delivery-option-row">
+					<div class="delivery-option-icon">▦</div>
+					<span>새벽배송 정보를 선택해 주세요.</span>
+					<strong>〉</strong>
+				</button>
+
+				<label class="default-address-check">
+					<input type="checkbox"
+						   name="addressDefault"
+						   value="Y">
+
+					<span class="custom-check"></span>
+					기본 배송지로 선택
+				</label>
+
+				<button type="submit" class="address-save-btn">
+					저장
 				</button>
 
 			</div>
-
-		</div>
+		</form>
 
 	</div>
-	<!-- ===================================== -->
-	<!-- 배송지 추가 모달 -->
-	<!-- ===================================== -->
-	<div id="addAddressModalOverlay" class="address-add-modal-overlay">
-
-		<div class="address-add-modal" onclick="event.stopPropagation();">
-
-			<!-- 상단 -->
-			<div class="address-add-header">
-				<h2>배송지 선택</h2>
-
-				<button type="button" class="address-add-close"
-					onclick="closeAddAddressModal()">×</button>
-			</div>
-
-			<!-- 실제 저장 FORM -->
-			<form id="addAddressForm"
-				action="${pageContext.request.contextPath}/address/add"
-				method="post">
-
-				<div class="address-add-body">
-
-					<!-- 받는 사람 -->
-					<div class="add-address-row">
-						<div class="add-address-icon">♙</div>
-
-						<input type="text" name="receiverName" id="newReceiverName"
-							placeholder="받는 사람" autocomplete="off">
-					</div>
+</div>
 
 
-					<!-- 우편번호 -->
-					<div class="add-address-row postcode-row">
-
-						<div class="add-address-icon">◉</div>
-
-						<button type="button" class="postcode-search-btn"
-							onclick="findPostcode()">우편번호 찾기</button>
-
-						<input type="hidden" name="zipcode" id="newZipcode">
-					</div>
-
-
-					<!-- 주소 -->
-					<div class="add-address-row address-input-row">
-
-						<div class="add-address-icon">⌂</div>
-
-						<input type="text" name="address" id="newAddress" placeholder="주소"
-							readonly>
-					</div>
-
-
-					<!-- 상세주소 -->
-					<div class="add-address-row">
-
-						<div class="add-address-icon">⌂</div>
-
-						<input type="text" name="detailAddress" id="newDetailAddress"
-							placeholder="상세주소">
-					</div>
-
-
-					<!-- 휴대폰 -->
-					<div class="add-address-row phone-row">
-
-						<div class="add-address-icon">▣</div>
-
-						<input type="text" name="tel" id="newTel" placeholder="휴대폰 번호">
-
-						<span class="phone-plus">＋</span>
-					</div>
-
-
-					<!-- 일반배송 -->
-					<button type="button" class="delivery-option-row">
-
-						<div class="delivery-option-icon">▦</div>
-
-						<span> 일반배송 정보를 선택해 주세요. </span> <strong>〉</strong>
-					</button>
-
-
-					<!-- 새벽배송 -->
-					<button type="button" class="delivery-option-row">
-
-						<div class="delivery-option-icon">▦</div>
-
-						<span> 새벽배송 정보를 선택해 주세요. </span> <strong>〉</strong>
-					</button>
-
-
-					<!-- 기본 배송지 -->
-					<label class="default-address-check"> <input
-						type="checkbox" name="addressDefault" value="Y"> <span
-						class="custom-check"></span> 기본 배송지로 선택
-					</label>
-
-
-					<!-- 저장 -->
-					<button type="submit" class="address-save-btn">저장</button>
-
-				</div>
-			</form>
-
-		</div>
-	</div>
-</body>
 <script>
+
 function toggleOtherPayment() {
 
-    const paymentList =
-        document.getElementById("otherPaymentList");
+	const paymentList =
+		document.getElementById("otherPaymentList");
 
-    const paymentArrow =
-        document.getElementById("paymentArrow");
+	const paymentArrow =
+		document.getElementById("paymentArrow");
 
-    paymentList.classList.toggle("hidden");
+	paymentList.classList.toggle("hidden");
 
-    // 닫혀있으면 아래 화살표
-    if (paymentList.classList.contains("hidden")) {
-        paymentArrow.innerHTML = "﹀";
-    } else {
-        paymentArrow.innerHTML = "︿";
-    }
+	if (paymentList.classList.contains("hidden")) {
+		paymentArrow.innerHTML = "﹀";
+	} else {
+		paymentArrow.innerHTML = "︿";
+	}
 }
 
-    /* function dummyPay() {
-        // 실제 결제 처리 없이 무조건 주문완료 페이지로 이동
-        location.href = "${pageContext.request.contextPath}/coupang_order_complete.jsp";
-    } */
-    
-    function openAddressModal() {
 
-        const modal =
-            document.getElementById("addressModalOverlay");
+/* 결제수단 변경 */
+document
+	.querySelectorAll('input[name="paymentMethod"]')
+	.forEach(function(radio) {
 
-        modal.classList.add("show");
+		radio.addEventListener("change", function() {
+			changePaymentMethod(this.value);
+		});
 
-        document.body.classList.add("modal-open");
-    }
+	});
 
 
-    function closeAddressModal() {
+function changePaymentMethod(paymentMethod) {
 
-        const modal =
-            document.getElementById("addressModalOverlay");
+	const bankSetting =
+		document.getElementById("bankSetting");
 
-        modal.classList.remove("show");
+	const bankCode =
+		document.getElementById("bankCode");
 
-        document.body.classList.remove("modal-open");
-    }
+	const defaultPayment =
+		document.getElementById("defaultPayment");
 
+	const cardSetting =
+		document.getElementById("cardSetting");
 
-    /*
-     * 배송지 선택
-     */
-    function selectAddress(button) {
+	const cardCompany =
+		document.getElementById("cardCompany");
 
-        const addressNo =
-            button.dataset.addressNo;
 
-        const receiverName =
-            button.dataset.receiverName;
+	if (paymentMethod === "BANK_TRANSFER") {
 
-        const address =
-            button.dataset.address;
+		bankSetting.classList.remove("hidden");
 
-        const detailAddress =
-            button.dataset.detailAddress;
+		bankCode.disabled = false;
+		defaultPayment.disabled = false;
 
-        const tel =
-            button.dataset.tel;
+	} else {
 
-        const requestMsg =
-            button.dataset.requestMsg;
+		bankSetting.classList.add("hidden");
 
-        const isDefault =
-            button.dataset.default === "true";
+		bankCode.disabled = true;
+		defaultPayment.disabled = true;
+	}
 
 
-        /*
-         * 주문페이지 배송지 변경
-         */
-        document.getElementById(
-            "currentReceiverName"
-        ).textContent = receiverName;
+	if (paymentMethod === "CARD") {
 
+		cardSetting.classList.remove("hidden");
+		cardCompany.disabled = false;
 
-        document.getElementById(
-            "currentAddress"
-        ).textContent = address;
+	} else {
 
+		cardSetting.classList.add("hidden");
+		cardCompany.disabled = true;
+	}
+}
 
-        document.getElementById(
-            "currentDetailAddress"
-        ).textContent = detailAddress;
 
+/* 결제 검증 */
+function validatePayment() {
 
-        document.getElementById(
-            "currentTel"
-        ).textContent = tel;
+	const addressNo =
+		document.getElementById("selectedAddressNo").value;
 
+	const paymentMethod =
+		document.querySelector(
+			'input[name="paymentMethod"]:checked'
+		);
 
-        /*
-         * 실제 주문 때 사용할 ADDRESS_NO
-         */
-        document.getElementById(
-            "selectedAddressNo"
-        ).value = addressNo;
+	if (!addressNo || addressNo.trim() === "") {
+		alert("배송지를 선택해주세요.");
+		return false;
+	}
 
+	if (!paymentMethod) {
+		alert("결제수단을 선택해주세요.");
+		return false;
+	}
 
-        /*
-         * 배송 요청사항도 변경
-         */
-        const requestArea =
-            document.getElementById(
-                "currentRequestMessage"
-            );
+	if (paymentMethod.value === "BANK_TRANSFER") {
 
-        if (requestArea) {
+		const bankCode =
+			document.getElementById("bankCode").value;
 
-            if (
-                requestMsg !== null &&
-                requestMsg.trim() !== ""
-            ) {
+		if (!bankCode || bankCode.trim() === "") {
+			alert("은행을 선택해주세요.");
+			return false;
+		}
+	}
 
-                requestArea.textContent =
-                    requestMsg;
+	if (paymentMethod.value === "CARD") {
 
-                requestArea.style.color =
-                    "#333";
+		const cardCompany =
+			document.getElementById("cardCompany").value;
 
-            } else {
+		if (!cardCompany || cardCompany.trim() === "") {
+			alert("카드사를 선택해주세요.");
+			return false;
+		}
+	}
 
-                requestArea.textContent =
-                    "배송 요청사항이 없습니다.";
+	const payButton =
+		document.querySelector(".btn-pay");
 
-                requestArea.style.color =
-                    "#aaa";
-            }
-        }
+	payButton.disabled = true;
+	payButton.textContent = "결제 처리중...";
 
+	return true;
+}
 
-        /*
-         * 선택된 카드 파란 테두리
-         */
-        document
-            .querySelectorAll(".address-card")
-            .forEach(card => {
 
-                card.classList.remove(
-                    "selected-address-card"
-                );
+/* 배송지 모달 */
+function openAddressModal() {
 
-            });
+	const modal =
+		document.getElementById("addressModalOverlay");
 
+	modal.classList.add("show");
+	document.body.classList.add("modal-open");
+}
 
-        button
-            .closest(".address-card")
-            .classList.add(
-                "selected-address-card"
-            );
 
+function closeAddressModal() {
 
-        /*
-         * 모달 닫기
-         */
-        closeAddressModal();
-    }
+	const modal =
+		document.getElementById("addressModalOverlay");
 
+	modal.classList.remove("show");
+	document.body.classList.remove("modal-open");
+}
 
-    /*
-     * 배송지 추가
-     */
-     /*
-      * 배송지 추가 모달 열기
-      */
-     function openAddAddressModal() {
 
-         // 기존 배송지 선택 모달 닫기
-         const selectModal =
-             document.getElementById("addressModalOverlay");
+/* 배송지 선택 */
+function selectAddress(button) {
 
-         selectModal.classList.remove("show");
+	const addressNo = button.dataset.addressNo;
+	const receiverName = button.dataset.receiverName;
+	const address = button.dataset.address;
+	const detailAddress = button.dataset.detailAddress;
+	const tel = button.dataset.tel;
+	const requestMsg = button.dataset.requestMsg;
+	const isDefault = button.dataset.default === "true";
 
+	document.getElementById(
+		"currentReceiverName"
+	).textContent = receiverName;
 
-         // 배송지 추가 모달 열기
-         const addModal =
-             document.getElementById("addAddressModalOverlay");
+	document.getElementById(
+		"currentAddress"
+	).textContent = address;
 
-         addModal.classList.add("show");
+	document.getElementById(
+		"currentDetailAddress"
+	).textContent = detailAddress;
 
-         document.body.classList.add("modal-open");
-     }
+	document.getElementById(
+		"currentTel"
+	).textContent = tel;
 
+	document.getElementById(
+		"selectedAddressNo"
+	).value = addressNo;
 
-     /*
-      * 배송지 추가 모달 닫기
-      */
-     function closeAddAddressModal() {
 
-         const addModal =
-             document.getElementById("addAddressModalOverlay");
+	const requestArea =
+		document.getElementById(
+			"currentRequestMessage"
+		);
 
-         addModal.classList.remove("show");
+	if (requestArea) {
 
+		if (
+			requestMsg !== null &&
+			requestMsg !== undefined &&
+			requestMsg.trim() !== ""
+		) {
 
-         // 다시 배송지 선택 모달 보여주기
-         const selectModal =
-             document.getElementById("addressModalOverlay");
+			requestArea.textContent = requestMsg;
+			requestArea.style.color = "#333";
 
-         selectModal.classList.add("show");
-     }
+		} else {
 
+			requestArea.textContent =
+				"배송 요청사항이 없습니다.";
 
-     /*
-      * 우편번호 찾기
-      * 나중에 다음 우편번호 API 연결
-      */
-     function findPostcode() {
+			requestArea.style.color = "#aaa";
+		}
+	}
 
-         alert("우편번호 검색 API를 연결하면 됩니다.");
 
-     }
+	const defaultTag =
+		document.getElementById(
+			"currentDefaultTag"
+		);
 
-    /*
-     * 모달의 어두운 배경 클릭 시 닫기
-     */
-    document
-        .getElementById("addressModalOverlay")
-        .addEventListener(
-            "click",
-            closeAddressModal
-        );
+	if (defaultTag) {
 
+		if (isDefault) {
+			defaultTag.style.display = "inline-block";
+		} else {
+			defaultTag.style.display = "none";
+		}
+	}
 
-    /*
-     * ESC로 닫기
-     */
-    document.addEventListener(
-        "keydown",
-        function(event) {
 
-            if (event.key === "Escape") {
+	document
+		.querySelectorAll(".address-card")
+		.forEach(function(card) {
+			card.classList.remove(
+				"selected-address-card"
+			);
+		});
 
-                closeAddressModal();
 
-            }
+	button
+		.closest(".address-card")
+		.classList
+		.add("selected-address-card");
 
-        }
-    );
-    
-    document
-    .getElementById("addAddressModalOverlay")
-    .addEventListener("click", function(event) {
+	closeAddressModal();
+}
 
-        if (event.target === this) {
-            closeAddAddressModal();
-        }
 
-    });
-    
-    document.addEventListener(
-    	    "keydown",
-    	    function(event) {
+/* 배송지 추가 */
+function openAddAddressModal() {
 
-    	        if (event.key === "Escape") {
+	const selectModal =
+		document.getElementById(
+			"addressModalOverlay"
+		);
 
-    	            const addModal =
-    	                document.getElementById(
-    	                    "addAddressModalOverlay"
-    	                );
+	selectModal.classList.remove("show");
 
-    	            if (addModal.classList.contains("show")) {
 
-    	                closeAddAddressModal();
+	const addModal =
+		document.getElementById(
+			"addAddressModalOverlay"
+		);
 
-    	            } else {
+	addModal.classList.add("show");
 
-    	                closeAddressModal();
+	document.body.classList.add("modal-open");
+}
 
-    	            }
-    	        }
-    	    }
-    	);
+
+function closeAddAddressModal() {
+
+	const addModal =
+		document.getElementById(
+			"addAddressModalOverlay"
+		);
+
+	addModal.classList.remove("show");
+
+
+	const selectModal =
+		document.getElementById(
+			"addressModalOverlay"
+		);
+
+	selectModal.classList.add("show");
+}
+
+
+function findPostcode() {
+	alert("우편번호 검색 API를 연결하면 됩니다.");
+}
+
+
+/* 모달 배경 클릭 */
+document
+	.getElementById("addressModalOverlay")
+	.addEventListener("click", function(event) {
+
+		if (event.target === this) {
+			closeAddressModal();
+		}
+
+	});
+
+
+document
+	.getElementById("addAddressModalOverlay")
+	.addEventListener("click", function(event) {
+
+		if (event.target === this) {
+			closeAddAddressModal();
+		}
+
+	});
+
+
+/* ESC 닫기 */
+document.addEventListener(
+	"keydown",
+	function(event) {
+
+		if (event.key === "Escape") {
+
+			const addModal =
+				document.getElementById(
+					"addAddressModalOverlay"
+				);
+
+			if (addModal.classList.contains("show")) {
+				closeAddAddressModal();
+			} else {
+				closeAddressModal();
+			}
+		}
+
+	}
+);
+
+
+/* 최초 결제수단 상태 */
+const initialPaymentMethod =
+	document.querySelector(
+		'input[name="paymentMethod"]:checked'
+	);
+
+if (initialPaymentMethod) {
+	changePaymentMethod(
+		initialPaymentMethod.value
+	);
+}
+
 </script>
+
+</body>
 </html>

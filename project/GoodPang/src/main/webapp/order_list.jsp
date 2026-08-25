@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -300,5 +300,8 @@
 	<jsp:include page="/inc/footer.jsp" />	
 	<script src="${pageContext.request.contextPath}/js/header.js"></script>
 
-</body> <!-- 빠져있던 body 닫는 태그 -->
-</html> <!-- 빠져있던 html 닫는 태그 -->
+    <script src="${pageContext.request.contextPath}/js/order_list.js"></script>
+    
+    <jsp:include page="/inc/footer.jsp" />
+</body>
+</html>

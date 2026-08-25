@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
+    import="com.goodpang.dto.SellerDTO" %>
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -25,6 +26,57 @@
 
     <!-- 메인 -->
     <main class="main">
+
+<%
+    SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+    String approvalStatus = (loginSeller != null) ? loginSeller.getApprovalStatus() : null;
+
+    if (approvalStatus != null && !"승인".equals(approvalStatus)) {
+
+        String bannerColor;
+        String bannerTitle;
+        String bannerDesc;
+        String actionUrl = null;
+        String actionLabel = null;
+
+        switch (approvalStatus) {
+            case "입점 대기":
+                bannerColor = "#fff4e5";
+                bannerTitle = "입점 절차가 완료되지 않았습니다.";
+                bannerDesc = "사업장 정보, 정산계좌, 서류를 제출하셔야 상품 등록 및 판매가 가능합니다.";
+                actionUrl = request.getContextPath() + "/vendor/business-info";
+                actionLabel = "추가정보 입력하기";
+                break;
+            case "심사 중":
+                bannerColor = "#e8f0fe";
+                bannerTitle = "입점 심사가 진행 중입니다.";
+                bannerDesc = "심사가 완료되면 등록하신 이메일로 안내드립니다.";
+                break;
+            case "반려":
+                bannerColor = "#fdecea";
+                bannerTitle = "입점 신청이 반려되었습니다.";
+                bannerDesc = (loginSeller.getRejectReason() != null)
+                        ? "사유: " + loginSeller.getRejectReason()
+                        : "자세한 사유는 판매자 고객센터로 문의해주세요.";
+                actionUrl = request.getContextPath() + "/vendor/business-info";
+                actionLabel = "정보 다시 제출하기";
+                break;
+            default:
+                bannerColor = "#f5f5f5";
+                bannerTitle = "";
+                bannerDesc = "";
+        }
+%>
+      <div style="background:<%= bannerColor %>;border-radius:8px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <strong style="display:block;margin-bottom:4px;"><%= bannerTitle %></strong>
+          <span><%= bannerDesc %></span>
+        </div>
+<% if (actionUrl != null) { %>
+        <a href="<%= actionUrl %>" style="background:#111;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;white-space:nowrap;"><%= actionLabel %></a>
+<% } %>
+      </div>
+<% } %>
 
       <div class="page-head">
 

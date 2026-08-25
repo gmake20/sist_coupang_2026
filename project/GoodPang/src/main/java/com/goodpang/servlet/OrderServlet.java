@@ -3,25 +3,31 @@ package com.goodpang.servlet;
 import java.io.IOException;
 import java.util.List;
 
+import com.goodpang.dao.CheckoutDAO;
 import com.goodpang.dao.OrderDAO;
+import com.goodpang.dao.CheckoutDAO;
 import com.goodpang.dto.AddressDTO;
+import com.goodpang.dto.CheckoutDTO;
+import com.goodpang.dto.CheckoutItemDTO;
 import com.goodpang.dto.MemberDTO;
-import com.goodpang.dto.OrderItemDTO;
-import com.goodpang.dto.OrderSummaryDTO;
+import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/order/payment")
-// http://localhost:8080/GoodPang/order/payment
+// 예:
+// http://localhost:8080/GoodPang/order/payment?checkoutNo=1
+
 public class OrderServlet extends HttpServlet {
 
-    private final OrderDAO orderDAO = new OrderDAO();
+    private static final long serialVersionUID = 1L;
 
+    private final OrderDAO orderDAO = new OrderDAO();
+    private final CheckoutDAO checkoutDAO = new CheckoutDAO();
 
     @Override
     protected void doGet(
@@ -29,70 +35,109 @@ public class OrderServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-		/* int memberNo = 1; */
-        int orderNo = 100;
-        
-        HttpSession session =
-                request.getSession(false);
-
-            if (session == null) {
-
-                response.sendRedirect(
-                    request.getContextPath()
-                    + "/login"
+        MemberDTO member =
+                LoginUtil.requireLogin(
+                        request,
+                        response
                 );
 
-                return;
-            }
+        if (member == null) {
+            return;
+        }
 
-            MemberDTO member =
-                (MemberDTO)
-                session.getAttribute(
-                    "loginMember"
-                );
-
-            if (member == null) {
-
-                response.sendRedirect(
-                    request.getContextPath()
-                    + "/login"
-                );
-
-                return;
-            }
-
-            int memberNo =
+        int memberNo =
                 member.getMemberNo();
-        
-        OrderDAO dao = new OrderDAO();
+
+		String checkoutNoParam = request.getParameter("checkoutNo");
+		 
+        if (checkoutNoParam == null
+                || checkoutNoParam.isBlank()) {
+
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "결제 정보가 없습니다." 
+            );
+
+            return;
+        }
+        int checkoutNo;
+        try {
+
+            checkoutNo =
+                    Integer.parseInt(checkoutNoParam);
+
+        } catch (NumberFormatException e) {
+
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "잘못된 결제번호입니다."
+            );
+
+            return;
+        }
+
+        CheckoutDTO checkout =
+                checkoutDAO.getCheckout(
+                        checkoutNo,
+                        memberNo
+                );
+
+        if (checkout == null) {
+
+            response.sendError(
+                    HttpServletResponse.SC_NOT_FOUND,
+                    "결제 정보를 찾을 수 없습니다."
+            );
+
+            return;
+        }
+
+
+        List<CheckoutItemDTO> checkoutItems =
+                checkoutDAO.getCheckoutItems(
+                        checkoutNo
+                );
 
         AddressDTO address =
-                dao.getAddress(memberNo);
-        
-        List<AddressDTO> addressList =
-        	    orderDAO.getAddressList(memberNo);
-        
-        OrderSummaryDTO summary =
-                orderDAO.getOrderSummary(orderNo);
-        
-//        List<OrderItemDTO> orderItems =
-//                dao.getOrderItems(orderNo);
+                orderDAO.getAddress(
+                        memberNo
+                );
 
-        request.setAttribute("address", address);
-        
+        List<AddressDTO> addressList =
+                orderDAO.getAddressList(
+                        memberNo
+                );
+
         request.setAttribute(
-        	    "addressList",
-        	    addressList
-        	);
-		/*
-		 * request.setAttribute("orderItems", orderItems);
-		 */
-        request.setAttribute("summary", summary);
-        
-        request.setAttribute("orderNo", orderNo);
+                "checkout",
+                checkout
+        );
+
+        request.setAttribute(
+                "checkoutItems",
+                checkoutItems
+        );
+
+        request.setAttribute(
+                "address",
+                address
+        );
+
+        request.setAttribute(
+                "addressList",
+                addressList
+        );
+
+        request.setAttribute(
+                "checkoutNo",
+                checkoutNo
+        );
 
         request.getRequestDispatcher(
                 "/goodpang_order_payment.jsp"
-        ).forward(request, response);
+        ).forward(
+                request,
+                response
+        );
     }
 }

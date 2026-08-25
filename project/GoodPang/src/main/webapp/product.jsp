@@ -34,7 +34,7 @@
 
        ★ 이 페이지는 "틀 하나 + 상품 데이터 N개" 구조를 염두에 두고 만듦.
          지금은 값을 직접 써넣었지만, 나중에 JSP 로 바꿀 때
-         값이 들어갈 자리만 ${p.name} 같은 걸로 갈아끼우면 됨.
+         값이 들어갈 자리만 {p.name} 같은 걸로 갈아끼우면 됨.
          그래서 값이 들어가는 자리마다 ▶JSP 주석을 달아둠.
 
        ★ 클래스 이름은 전부 .product-page 안에서만 쓰도록 CSS 를 잡았음.
@@ -88,10 +88,6 @@
 					<!-- ① 머리부분 — 재고경고 / 브랜드 / 상품명 / 별점 -->
 					<div class="product-buy-header">
 
-						<!-- ※ 재고 경고("단 N개 남음 빨리 주문하세요!")는 원본에 있지만
-                 2026-08-21 사용자 요청으로 뺐음. 되살리려면 아래 한 줄:
-                 <p class="stock-warning">단 <strong>3</strong>개 남음 빨리 주문하세요!</p> -->
-
 						<!-- 브랜드명 — 파란 글씨(#346aff). ▶JSP: ${p.brand} -->
 						<a href="#" class="brand-info">베이직스</a>
 
@@ -127,7 +123,7 @@
 						</div>
 
 						<!-- 별점 + 리뷰수. 리뷰 영역으로 이동하는 링크(#reviews)
-                 ▶JSP: 별은 평점으로 계산, 숫자는 ${p.reviewCount} -->
+                 ▶JSP: 별은 평점으로 계산, 숫자는 {p.reviewCount} -->
 						<div class="review-atf">
 							<span class="stars">★★★★☆</span> <a href="#reviews" class="count">(2,033)</a>
 						</div>
@@ -187,7 +183,7 @@
 					</div>
 
 					<!-- ④ 옵션 — 원본은 section 을 옵션 종류만큼 반복함
-               ▶JSP: &lt;c:forEach items="${p.options}"&gt; 로 감쌀 자리.
+               ▶JSP: &lt;c:forEach items="{p.options}"&gt; 로 감쌀 자리.
                  그래서 두 덩어리를 일부러 똑같은 모양으로 만들어둠 -->
 					<div class="fashion-option">
 
@@ -210,11 +206,6 @@
 								색상: <span class="option-value">화이트</span>
 							</div>
 							<ul class="option-chips">
-								<!-- ⚠ 2026-08-24 — 여기 이름표가 서로 바뀌어 있었음.
-								     칩 사진의 평균색을 재보니 option-1 은 rgb(27,26,25)=검정,
-								     option-2 는 rgb(29,40,63)=남색(파랑 채널만 높음) 인데
-								     이름표는 반대(1=네이비, 2=블랙)로 달려 있었음.
-								     사진 파일을 바꾸지 않고 이름표만 맞바꿔서 고침 -->
 								<li data-color="블랙"><a href="#"><img src="${pageContext.request.contextPath}/images/product-detail/option-1.jpg" alt="블랙"></a></li>
 								<li data-color="네이비"><a href="#"><img src="${pageContext.request.contextPath}/images/product-detail/option-2.jpg" alt="네이비"></a></li>
 								<li class="is-on" data-color="화이트"><a href="#"><img
@@ -237,11 +228,15 @@
 					</div>
 
 					<!-- ⑥ 수량 + 구매 버튼 (원본 실측: 전부 높이 42px) -->
-					<div class="prod-buy-quantity-and-footer">
+					<form class="prod-buy-quantity-and-footer" method="post"
+						action="${pageContext.request.contextPath}/cart.jsp">
+						<input type="hidden" name="productNo" value="10">
+						<input type="hidden" name="color" id="selectedColor" value="화이트">
+
 						<!-- 수량 — 원본은 왼쪽에 숫자, 오른쪽에 위/아래 화살표가 세로로 2단.
                  (좌우 - + 배치가 아님. 2026-08-21 원본 확대해서 확인) -->
 						<div class="product-quantity">
-							<input type="text" class="qty-input" value="1" readonly>
+							<input type="text" class="qty-input" name="quantity" value="1" readonly>
 							<div class="qty-spin">
 								<button type="button" class="qty-plus">
 									<span class="blind">수량 더하기</span>
@@ -251,24 +246,27 @@
 								</button>
 							</div>
 						</div>
-						<button type="button" class="prod-cart-btn">장바구니 담기</button>
-						<button type="button" class="prod-buy-btn">
+						<button type="submit" class="prod-cart-btn">장바구니 담기</button>
+						<button type="submit" class="prod-buy-btn"
+							formaction="${pageContext.request.contextPath}/order/buy"
+							formmethod="post">
 							바로구매<i class="arrow-right"></i>
 						</button>
 						<!-- 위 배송방법에서 "무료배송+무료반품(로켓와우)"을 고르면 위 두 칸 대신 이거 하나만 보임
 						     (원본을 직접 클릭해서 확인함 — js/product.js setupDeliveryOption) -->
-						<button type="button" class="prod-wow-btn">
+						<button type="submit" class="prod-wow-btn"
+							formaction="${pageContext.request.contextPath}/goodpang_order_payment.jsp">
 							로켓와우로 무료배송<i class="arrow-right"></i>
 						</button>
 						<!-- 품절일 때 위 두 버튼 대신 이것만 보임 (원본도 회색 한 칸으로 바뀜) -->
 						<button type="button" class="prod-soldout-btn" disabled>품절</button>
-					</div>
+					</form>
 
-					<!-- ⑦ 맨 아래 작은 글씨 -->
+					<!-- ⑦ 맨 아래 작은 글씨 색상계열, 굿팡상품번호 텍스트만 삭제, 통째로 삭제하면 배치 달라짐-->
 					<div class="product-description">
 						<ul>
-							<li>색상계열: 화이트계열</li>
-							<li>굿팡상품번호: 25 - 100025</li>
+							<li></li>
+							<li></li>
 						</ul>
 					</div>
 
@@ -405,7 +403,7 @@
 							<strong class="gw-card__price">8,550원</strong>
 							<span class="gw-card__ship">내일(목) 도착 보장</span>
 							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(60)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
+							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:{d.left}%%" -->
 							<span class="gw-card__stock"><span class="bar"><i style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
 					<li class="gw-card"><a href="#">
@@ -539,7 +537,7 @@
            ★ 임시 ★ 이미지가 없어서 회색 상자로 대신함.
              원본 이미지는 780 x 3661 / 780 x 3661 / 780 x 2818 이었음.
              우리 상자는 780 x 1200 으로 잡아둠 (그대로 흉내내면 화면이 너무 길어져서 확인이 힘듦)
-             ▶JSP: &lt;c:forEach items="${p.detailImages}"&gt; 로 감쌀 자리 —
+             ▶JSP: &lt;c:forEach items="{p.detailImages}"&gt; 로 감쌀 자리 —
                    상세설명 이미지는 상품마다 장수가 다름 -->
 			<div class="product-detail-content">
 				<div class="detail-image">
@@ -580,7 +578,7 @@
 						<!-- 별점 분포 막대
                  ★ 막대 길이를 style="width:78%" 처럼 인라인으로 준 이유:
                    이 값만 데이터에 따라 매번 달라지기 때문. CSS 파일에는 못 적음.
-                   ▶JSP 로 가면 style="width:${r.percent}%" 가 될 자리 -->
+                   ▶JSP 로 가면 style="width:{r.percent}%" 가 될 자리 -->
 						<ul class="score-graph">
 							<li><span class="label">최고</span> <span class="bar"><i
 									style="width: 78%"></i></span> <span class="pct">78%</span></li>
@@ -607,7 +605,47 @@
 								<span class="pct">40%</span>
 							</div>
 						</dl>
-						<button type="button" class="survey-more">자세히 보기</button>
+
+						<!-- ★ "자세히 보기" 를 누르면 열리는 항목별 전체 분포 (2026-08-24 추가)
+						     원본을 Playwright 로 직접 열어서 확인함 — 모달이 아니라 **그 자리에서 아래로 펼쳐짐**.
+						     원본 실측: 항목명 110px 고정 / 막대 8px·radius 4px / 퍼센트 38px 우측정렬 /
+						               사이 gap 12px, 그룹 안 gap 8px, 그룹 사이 gap 24px, 글자 14px/17px
+						     ★ 1등 항목만 막대가 시안색(#34CAE2), 나머지는 회색 — 원본이 그렇게 구분함
+						       (그래서 클래스 .is-top 을 1등에만 붙임)
+						     평소엔 CSS 가 감춰두고, .is-open 이 붙으면 나타남 (js/product.js setupSurveyMore)
+						     ▶JSP: &lt;c:forEach items="{survey}"&gt; 로 감쌀 자리 — 설문 항목 수가 카테고리마다 다름
+						       (의류는 사이즈·색상, 식품은 맛·양 …). 퍼센트는 style="width:{o.percent}%" -->
+						<div class="survey-detail">
+							<div class="survey-group">
+								<p class="survey-group__title">사이즈</p>
+								<div class="survey-opt is-top">
+									<span class="name">정사이즈예요</span> <span class="bar"><i
+										style="width: 80%"></i></span> <span class="pct">80%</span>
+								</div>
+								<div class="survey-opt">
+									<span class="name">생각보다 커요</span> <span class="bar"><i
+										style="width: 20%"></i></span> <span class="pct">20%</span>
+								</div>
+							</div>
+							<div class="survey-group">
+								<p class="survey-group__title">색상</p>
+								<div class="survey-opt is-top">
+									<span class="name">화면과 비슷해요</span> <span class="bar"><i
+										style="width: 40%"></i></span> <span class="pct">40%</span>
+								</div>
+								<div class="survey-opt">
+									<span class="name">화면과 같아요</span> <span class="bar"><i
+										style="width: 40%"></i></span> <span class="pct">40%</span>
+								</div>
+								<div class="survey-opt">
+									<span class="name">화면과 달라요</span> <span class="bar"><i
+										style="width: 20%"></i></span> <span class="pct">20%</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- 글자가 "자세히 보기" ↔ "접기" 로 바뀜 (원본과 동일). 화살표는 CSS ::after 로 그림 -->
+						<button type="button" class="survey-more" aria-expanded="false">자세히 보기</button>
 
 						<!-- 안내 문구 — 리뷰가 상품(productId)에 붙지 판매자에 붙는 게 아니라는 뜻.
                  나중에 DB 설계할 때 리뷰 테이블이 어디에 연결되는지와 같은 얘기 -->
@@ -618,14 +656,18 @@
 					<!-- ── 오른쪽: 목록 ───────────────────────── -->
 					<div class="review-list">
 
-						<!-- 리뷰 사진 모아보기 (원본 실측 100 x 100)
-                 ★ 임시 ★ 사진이 없어서 회색 네모 -->
-						<ul class="review-gallery">
-							<li><img src="${pageContext.request.contextPath}/images/product-detail/review-1.jpg" alt=""></li>
-							<li><img src="${pageContext.request.contextPath}/images/product-detail/review-2.jpg" alt=""></li>
-							<li><img src="${pageContext.request.contextPath}/images/product-detail/review-3.jpg" alt=""></li>
-							<li><img src="${pageContext.request.contextPath}/images/product-detail/review-4.jpg" alt=""></li>
-						</ul>
+						<!-- 리뷰 사진 모아보기 — 누르면 갤러리 모달이 열림 (js/product.js setupReviewGallery)
+
+						     ★ 안이 비어 있는 게 맞음. JS 가 **아래 리뷰 카드들의 .review-photos 를 훑어서**
+						       사진을 모아 여기에 채움.
+						     ★ 왜 이렇게 바꿨나 (2026-08-24):
+						       전에는 여기에 사진 목록을 손으로 적고 data-review 로 주인을 표시했음.
+						       그런데 "어느 사진이 누구 리뷰인지" 가 갤러리와 리뷰 카드 **두 군데**에 적히는 구조라
+						       실제로 어긋났음 — 갤러리는 review-4 를 최*영 것이라 했는데
+						       최*영 카드에는 사진이 없어서, 전체보기로 가면 사진이 없었음.
+						       이제 사진의 출처가 **리뷰 카드 하나뿐**이라 어긋날 수가 없음.
+						     ▶JSP: 카드 안 사진만 &lt;c:forEach&gt; 로 찍어내면 이 줄은 그대로 두면 됨 -->
+						<ul class="review-gallery"></ul>
 
 						<!-- 정렬 / 검색 / 별점 필터 (2026-08-21 실제로 동작하게 만듦 — js/product.js setupReviewTools)
 						     ★ 원본에 "별점순"은 없음. 베스트순·최신순 두 개뿐이고, 별점은 정렬이 아니라
@@ -650,14 +692,14 @@
 						</div>
 
 						<!-- 리뷰 카드
-                 ▶JSP: &lt;c:forEach items="${reviews}" var="r"&gt; 로 감쌀 자리.
+                 ▶JSP: &lt;c:forEach items="{reviews}" var="r"&gt; 로 감쌀 자리.
                    그래서 3개를 **완전히 같은 구조**로 만들어둠 (안에 든 글자만 다름)
                    
                  ★ 원본은 리뷰 카드가 10개라 이 영역이 3,320px 인데 우리는 3개라 1,447px (44%).
                    **모자란 게 아니라 개수만 다른 것.** 카드 하나의 구조·크기는 원본과 같음.
                    DB 를 붙이면 &lt;c:forEach&gt; 가 리뷰 수만큼 찍어내므로 저절로 채워짐 —
                    지금 개수를 늘리려고 카드를 복붙할 필요 없음 (2026-08-21 확인) -->
-						<article class="review-item" data-helpful="8">
+						<article class="review-item" data-review-id="r1" data-helpful="8">
 							<div class="review-head">
 								<span class="review-avatar"></span>
 								<div class="review-writer">
@@ -701,7 +743,7 @@
 							</div>
 						</article>
 
-						<article class="review-item" data-helpful="15">
+						<article class="review-item" data-review-id="r2" data-helpful="15">
 							<div class="review-head">
 								<span class="review-avatar"></span>
 								<div class="review-writer">
@@ -740,7 +782,7 @@
 							</div>
 						</article>
 
-						<article class="review-item" data-helpful="3">
+						<article class="review-item" data-review-id="r3" data-helpful="3">
 							<div class="review-head">
 								<span class="review-avatar"></span>
 								<div class="review-writer">
@@ -780,7 +822,7 @@
 
 						<!-- ★ 아래 2개는 2026-08-24 에 페이지네이션(다음 참고)을 실제로 보여주려고 추가한 더미.
 						     리뷰가 3개뿐이면 항상 1페이지 안에 다 들어가서 "다음 페이지" 버튼이 아예 동작을 안 함 -->
-						<article class="review-item" data-helpful="5">
+						<article class="review-item" data-review-id="r4" data-helpful="5">
 							<div class="review-head">
 								<span class="review-avatar"></span>
 								<div class="review-writer">
@@ -792,8 +834,15 @@
 								</div>
 							</div>
 							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 블랙, 100</p>
-							<strong class="review-headline">색이 진짜 예뻐요</strong>
-							<p class="review-text">블랙이 화면보다 더 고급스럽게 나왔어요. 목선도 안 늘어나고 세탁 두 번 해도 그대로입니다.</p>
+							<ul class="review-photos">
+								<li><img src="${pageContext.request.contextPath}/images/product-detail/review-4.jpg" alt=""></li>
+							</ul>
+							<!-- ★ 이 리뷰의 글은 사진(review-4.jpg = 쿠팡 봉투에 담긴 포장 상태)에 맞춰 씀.
+							     전에는 "블랙이 화면보다 더 고급스럽게 나왔어요" 였는데 사진은 민트색 포장이라 안 맞았음
+							     (2026-08-24 사용자가 지적). 더미 데이터라도 사진과 글은 맞춰두는 게 맞음 -->
+							<strong class="review-headline">포장이 깔끔해요</strong>
+							<p class="review-text">봉투 그대로 왔고 비닐도 안 찢어져 있었어요. 주문 다음 날 바로 도착했습니다. 마감도
+								깔끔하네요.</p>
 							<dl class="review-attr">
 								<div>
 									<dt>평소 사이즈</dt>
@@ -818,7 +867,7 @@
 							</div>
 						</article>
 
-						<article class="review-item" data-helpful="1">
+						<article class="review-item" data-review-id="r5" data-helpful="1">
 							<div class="review-head">
 								<span class="review-avatar"></span>
 								<div class="review-writer">
@@ -921,7 +970,7 @@
            ★ 여기 글은 거의 전부 **모든 상품이 똑같이 쓰는 고정 문구**임.
              상품마다 달라지는 건 맨 아래 "판매자 정보" 표뿐.
              ▶JSP 로 가면 이 절 전체를 &lt;jsp:include page="/WEB-INF/views/etc-policy.jsp"/&gt;
-               로 빼고, 판매자 정보만 ${seller.xxx} 로 채우면 됨 -->
+               로 빼고, 판매자 정보만 {seller.xxx} 로 채우면 됨 -->
 			<section class="prod-etc" id="delivery">
 
 				<!-- ── 배송정보 ───────────────────────── -->
@@ -1022,7 +1071,7 @@
 
 				<!-- ── 판매자 정보 ────────────────────
              ★ 이 표만 상품(정확히는 판매자)마다 달라짐. 나머지는 전부 고정 문구.
-               ▶JSP: ${seller.name} ${seller.tel} … 로 바뀔 자리 -->
+               ▶JSP: {seller.name} {seller.tel} … 로 바뀔 자리 -->
 				<h3 class="etc-title">판매자 정보</h3>
 				<table class="policy-table">
 					<tbody>
@@ -1093,6 +1142,80 @@
 	<!-- ★ 이 푸터는 inc/footer.jsp 에서 그대로 옮겨온 것. 위 헤더와 같은 규칙 -->
 	<jsp:include page="inc/footer.jsp" />
 
+
+	<!-- ==================================================
+	     리뷰 사진 갤러리 — 2단 구조 (2026-08-24)
+	     원본을 Playwright 로 직접 열어서 확인한 흐름:
+	       ① 리뷰 사진 썸네일 클릭 → "갤러리" 모달 (사진 전체를 격자로)
+	       ② 그 안의 썸네일을 또 클릭 → "사진 뷰어" (큰 사진 + 좌우 화살표 + 리뷰 글)
+	     둘 다 여기 미리 만들어두고 평소엔 CSS 가 감춰둠. 안의 내용은 JS 가 채움
+	     (js/product.js setupReviewGallery).
+
+	     ★ 왜 body 끝에 두는가: 모달은 화면 전체를 덮어야 하는데, 리뷰 섹션 안에 두면
+	       부모의 overflow·position·z-index 에 갇혀서 잘리거나 뒤에 깔릴 수 있음.
+	       화면 전체를 덮는 것은 문서 맨 끝에 두는 게 정석
+	     ================================================== -->
+
+	<!-- ── ① 갤러리 모달 ── 원본 실측: 흰 패널 982px / 덮개 rgba(17,17,17,0.87) / z-index 9999 -->
+	<div class="review-gallery-modal" hidden>
+		<div class="gallery-panel" role="dialog" aria-modal="true" aria-label="리뷰 사진 갤러리">
+			<div class="gallery-head">
+				<strong class="gallery-title">갤러리</strong>
+				<span class="gallery-sub">섬네일을 클릭하면 더 많은 상품평 정보를 볼 수 있어요</span>
+				<button type="button" class="gallery-close">
+					<span class="blind">갤러리 닫기</span>
+				</button>
+			</div>
+			<div class="gallery-body">
+				<!-- 사진 개수 — JS 가 숫자를 채움 -->
+				<p class="gallery-count">이미지 <strong>0</strong></p>
+				<!-- 격자 — JS 가 li 를 만들어 넣음 (원본 실측 140x140, radius 4px) -->
+				<ul class="gallery-grid"></ul>
+			</div>
+		</div>
+	</div>
+
+	<!-- ── ② 사진 뷰어 ── 원본 실측: 어두운 패널 rgb(34,34,34) / 982px -->
+	<div class="photo-viewer" hidden>
+		<div class="viewer-panel" role="dialog" aria-modal="true" aria-label="리뷰 사진 크게 보기">
+			<!-- 위: 누가 쓴 리뷰인지 -->
+			<div class="viewer-head">
+				<span class="viewer-avatar"></span>
+				<div class="viewer-writer">
+					<strong class="name"></strong>
+					<div class="meta">
+						<span class="stars"></span> <span class="date"></span>
+					</div>
+				</div>
+				<button type="button" class="viewer-close">
+					<span class="blind">닫기</span>
+				</button>
+			</div>
+
+			<!-- 가운데: 큰 사진 + 좌우 화살표 -->
+			<div class="viewer-stage">
+				<button type="button" class="viewer-prev">
+					<span class="blind">이전 사진</span>
+				</button>
+				<img class="viewer-img" src="" alt="">
+				<button type="button" class="viewer-next">
+					<span class="blind">다음 사진</span>
+				</button>
+			</div>
+
+			<!-- 사진 아래: 작은 썸네일 줄 (지금 보는 것에 파란 테두리). JS 가 채움 -->
+			<ul class="viewer-thumbs"></ul>
+
+			<!-- 맨 아래: 옵션 + 리뷰 글 + 전체보기 -->
+			<div class="viewer-foot">
+				<div class="viewer-text-wrap">
+					<p class="viewer-option"></p>
+					<p class="viewer-text"></p>
+				</div>
+				<button type="button" class="viewer-all">전체보기</button>
+			</div>
+		</div>
+	</div>
 
 	<!-- JS는 </body> 바로 앞에! HTML을 다 읽은 뒤에 실행되게 하려고 -->
 	<script src="${pageContext.request.contextPath}/js/header.js"></script>

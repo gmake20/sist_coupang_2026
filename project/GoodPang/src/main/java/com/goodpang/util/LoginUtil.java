@@ -10,69 +10,90 @@ import jakarta.servlet.http.HttpSession;
 
 public class LoginUtil {
 
-    private LoginUtil() {
-        // 객체 생성 방지
-    }
+	public static MemberDTO requireLogin(
+			HttpServletRequest request,
+			HttpServletResponse response)
+			throws IOException {
 
-    /**
-     * 로그인 여부 확인
-     *
-     * 로그인 O → 로그인 회원 MemberDTO 반환
-     * 로그인 X → 현재 주소 저장 후 /login 이동, null 반환
-     */
-    public static MemberDTO requireLogin(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws IOException {
+		HttpSession session =
+				request.getSession();
 
-        HttpSession session =
-                request.getSession(false);
+		MemberDTO loginMember =
+				(MemberDTO) session.getAttribute(
+						"loginMember"
+				);
 
-        // 로그인되어 있는 경우
-        if (session != null) {
+		if (loginMember != null) {
+			return loginMember;
+		}
 
-            MemberDTO loginMember =
-                    (MemberDTO) session.getAttribute(
-                            "loginMember"
-                    );
+		String method =
+				request.getMethod();
 
-            if (loginMember != null) {
-                return loginMember;
-            }
-        }
+		String contextPath =
+				request.getContextPath();
 
-        // =========================
-        // 로그인하지 않은 경우
-        // =========================
+		if ("GET".equalsIgnoreCase(method)) {
 
-        // 세션이 없다면 생성
-        session = request.getSession();
+			String requestURI =
+					request.getRequestURI();
 
-        // 현재 요청 URL
-        String redirectUrl =
-                request.getRequestURI();
+			String queryString =
+					request.getQueryString();
 
-        // GET 파라미터까지 저장
-        String queryString =
-                request.getQueryString();
+			String redirectUrl =
+					requestURI;
 
-        if (queryString != null &&
-            !queryString.isBlank()) {
+			if (queryString != null
+					&& !queryString.isBlank()) {
 
-            redirectUrl += "?" + queryString;
-        }
+				redirectUrl +=
+						"?" + queryString;
+			}
 
-        // 로그인 후 이동할 주소 저장
-        session.setAttribute(
-                "redirectAfterLogin",
-                redirectUrl
-        );
+			session.setAttribute(
+					"redirectAfterLogin",
+					redirectUrl
+			);
 
-        // 로그인 페이지로 이동
-        response.sendRedirect(
-                request.getContextPath() + "/login"
-        );
+		} else {
 
-        return null;
-    }
+			String referer =
+					request.getHeader(
+							"Referer"
+					);
+
+			if (referer != null
+					&& !referer.isBlank()) {
+
+				int contextIndex =
+						referer.indexOf(
+								contextPath
+						);
+
+				if (contextIndex >= 0) {
+
+					String redirectUrl =
+							referer.substring(
+									contextIndex
+							);
+
+					session.setAttribute(
+							"redirectAfterLogin",
+							redirectUrl
+					);
+				}
+			}
+		}
+
+		response.sendRedirect(
+				contextPath
+				+ "/login"
+		);
+
+		return null;
+	}
+
+	private LoginUtil() {
+	}
 }

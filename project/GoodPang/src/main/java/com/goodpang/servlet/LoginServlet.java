@@ -17,102 +17,170 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    protected void doGet(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doGet(
+			HttpServletRequest request,
+			HttpServletResponse response)
+			throws ServletException, IOException {
 
-        request.getRequestDispatcher("/login.jsp")
-               .forward(request, response);
-    }
-
-    @Override
-    protected void doPost(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
-
-    	
-        request.setCharacterEncoding("UTF-8");
-
-        String email =
-            request.getParameter("email");
-
-        String password =
-            request.getParameter("password");
-        
-        MemberDAO dao =
-            new MemberDAO();
-
-        MemberDTO member =
-            dao.findByEmail(email);
-
-        // 이메일 없음
-        if (member == null) {
-
-            request.setAttribute(
-                "error",
-                "아이디 또는 비밀번호가 올바르지 않습니다."
-            );
-
-            request.getRequestDispatcher("/login.jsp")
-                   .forward(request, response);
-
-            return;
-        }
-
-        // 비밀번호 확인
-        if (!BCrypt.checkpw(
-                password,
-                member.getMemberPw())) {
-
-            request.setAttribute(
-                "error",
-                "아이디 또는 비밀번호가 올바르지 않습니다."
-            );
-
-            request.getRequestDispatcher("/login.jsp")
-                   .forward(request, response);
-
-            return;
-        }
+		HttpSession session =
+				request.getSession();
 
 
-        HttpSession session =
-            request.getSession();
+		String redirectAfterLogin =
+				(String) session.getAttribute(
+					"redirectAfterLogin"
+				);
 
-        session.setAttribute(
-            "loginMember",
-            member
-        );
+		if (redirectAfterLogin == null
+				|| redirectAfterLogin.isBlank()) {
 
-        session.setAttribute(
-            "memberNo",
-            member.getMemberNo()
-        );
+			String referer =
+					request.getHeader("Referer");
 
-        session.setAttribute(
-            "memberName",
-            member.getMemberName()
-        );
+			if (referer != null
+					&& !referer.isBlank()
+					&& !referer.contains("/login")) {
 
-        // 30분
-        session.setMaxInactiveInterval(
-            30 * 60
-        );
+				String contextPath =
+						request.getContextPath();
 
-        String redirectUrl =
-                (String) session.getAttribute("redirectAfterLogin");
+				int index =
+						referer.indexOf(
+							contextPath
+						);
 
-        session.removeAttribute("redirectAfterLogin");
+				if (index >= 0) {
 
-        if (redirectUrl != null && !redirectUrl.isBlank()) {
-            response.sendRedirect(redirectUrl);
-        } else {
-            response.sendRedirect(request.getContextPath() + "/");
-        }
-    }
+					String redirectUrl =
+							referer.substring(index);
+
+					session.setAttribute(
+						"redirectAfterLogin",
+						redirectUrl
+					);
+				}
+			}
+		}
+
+		request
+			.getRequestDispatcher("/login.jsp")
+			.forward(request, response);
+	}
+
+	@Override
+	protected void doPost(
+			HttpServletRequest request,
+			HttpServletResponse response)
+			throws ServletException, IOException {
+
+		request.setCharacterEncoding("UTF-8");
+
+		String email =
+				request.getParameter("email");
+
+		String password =
+				request.getParameter("password");
+		
+		if (email == null
+				|| email.isBlank()
+				|| password == null
+				|| password.isBlank()) {
+
+			request.setAttribute(
+				"error",
+				"아이디 또는 비밀번호를 입력해주세요."
+			);
+
+			request
+				.getRequestDispatcher("/login.jsp")
+				.forward(request, response);
+
+			return;
+		}
+
+		MemberDAO dao =
+				new MemberDAO();
+
+		MemberDTO member =
+				dao.findByEmail(email);
+
+		if (member == null) {
+
+			request.setAttribute(
+				"error",
+				"아이디 또는 비밀번호가 올바르지 않습니다."
+			);
+
+			request
+				.getRequestDispatcher("/login.jsp")
+				.forward(request, response);
+
+			return;
+		}
+
+		if (!BCrypt.checkpw(
+				password,
+				member.getMemberPw())) {
+
+			request.setAttribute(
+				"error",
+				"아이디 또는 비밀번호가 올바르지 않습니다."
+			);
+
+			request
+				.getRequestDispatcher("/login.jsp")
+				.forward(request, response);
+
+			return;
+		}
+		
+		HttpSession session =
+				request.getSession();
+
+		session.setAttribute(
+			"loginMember",
+			member
+		);
+
+		session.setAttribute(
+			"memberNo",
+			member.getMemberNo()
+		);
+
+		session.setAttribute(
+			"memberName",
+			member.getMemberName()
+		);
+
+		session.setMaxInactiveInterval(
+			30 * 60
+		);
+
+		String redirectUrl =
+				(String) session.getAttribute(
+					"redirectAfterLogin"
+				);
+
+		session.removeAttribute(
+			"redirectAfterLogin"
+		);
+
+		if (redirectUrl != null
+				&& !redirectUrl.isBlank()
+				&& !redirectUrl.contains("/login")) {
+
+			response.sendRedirect(
+				redirectUrl
+			);
+
+			return;
+		}
+
+		response.sendRedirect(
+			request.getContextPath() + "/"
+		);
+	}
 }

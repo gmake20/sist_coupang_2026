@@ -266,198 +266,261 @@ public class OrderDAO {
 	 */
 	public OrderSummaryDTO getOrderSummary(int orderNo) {
 
-		OrderSummaryDTO summary = null;
+	    OrderSummaryDTO summary = null;
 
-		String sql = """
-				SELECT
-				    o.order_no,
-				    NVL(o.product_amount, 0) AS total_product_price,
-				    NVL(o.delivery_fee, 0) AS delivery_fee,
-				    NVL(o.instant_discount, 0) AS instant_discount,
-				    NVL(o.coupon_discount, 0) AS coupon_discount,
-				    NVL(o.cash_used, 0) AS cash_used,
-				    NVL(o.total_price, 0) AS final_price
-				FROM orders o
-				WHERE o.order_no = ?
-				""";
+	    String sql = """
+	            SELECT
+	                o.order_no,
 
-		try (
-				Connection conn =
-				ConnectionProvider.getConnection();
+	                NVL(o.product_amount, 0)
+	                    AS total_product_price,
 
-				PreparedStatement pstmt =
-						conn.prepareStatement(sql)
-				) {
+	                NVL(o.delivery_fee, 0)
+	                    AS delivery_fee,
 
-			pstmt.setInt(1, orderNo);
+	                NVL(o.instant_discount, 0)
+	                    AS instant_discount,
 
-			try (ResultSet rs = pstmt.executeQuery()) {
+	                NVL(o.coupon_discount, 0)
+	                    AS coupon_discount,
 
-				if (rs.next()) {
+	                NVL(o.cash_used, 0)
+	                    AS cash_used,
 
-					summary =
-							new OrderSummaryDTO();
+	                GREATEST(
+	                    0,
+	                    NVL(o.product_amount, 0)
+	                    - NVL(o.instant_discount, 0)
+	                    - NVL(o.coupon_discount, 0)
+	                    - NVL(o.cash_used, 0)
+	                    + NVL(o.delivery_fee, 0)
+	                ) AS final_price
 
-					summary.setTotalProductPrice(
-							rs.getInt(
-									"total_product_price"
-									)
-							);
+	            FROM orders o
+	            WHERE o.order_no = ?
+	            """;
 
-					summary.setDeliveryFee(
-							rs.getInt(
-									"delivery_fee"
-									)
-							);
+	    try (
+	        Connection conn =
+	                ConnectionProvider.getConnection();
 
-					summary.setFinalPrice(
-							rs.getInt(
-									"final_price"
-									)
-							);
-					summary.setInstantDiscount(rs.getInt("instant_discount"));
-					summary.setCouponDiscount(rs.getInt("coupon_discount"));
-					summary.setCashUsed(rs.getInt("cash_used"));
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
 
-				}
-			}
+	        pstmt.setInt(1, orderNo);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	        try (ResultSet rs = pstmt.executeQuery()) {
 
-		return summary;
+	            if (rs.next()) {
+
+	                summary = new OrderSummaryDTO();
+
+	                summary.setTotalProductPrice(
+	                        rs.getInt("total_product_price")
+	                );
+
+	                summary.setDeliveryFee(
+	                        rs.getInt("delivery_fee")
+	                );
+
+	                summary.setInstantDiscount(
+	                        rs.getInt("instant_discount")
+	                );
+
+	                summary.setCouponDiscount(
+	                        rs.getInt("coupon_discount")
+	                );
+
+	                summary.setCashUsed(
+	                        rs.getInt("cash_used")
+	                );
+
+	                summary.setFinalPrice(
+	                        rs.getInt("final_price")
+	                );
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return summary;
 	}
 
 	public OrderCompleteDTO getOrderComplete(int orderNo) {
 
-		OrderCompleteDTO dto = null;
+	    OrderCompleteDTO dto = null;
 
-		String sql = """
-				SELECT
-				    o.ORDER_NO,
-				    o.MEMBER_NO,
-				    o.ORDER_DATE,
-				    o.DELIVERY_FEE,
-				    o.TOTAL_PRICE,
-				    o.ORDER_STATUS,
-				    o.PRODUCT_AMOUNT,
-				    o.INSTANT_DISCOUNT,
-				    o.COUPON_DISCOUNT,
-				    o.CASH_USED,
+	    String sql = """
+	            SELECT
+	                o.ORDER_NO,
+	                o.MEMBER_NO,
+	                o.ORDER_DATE,
+	                o.PAYMENT_METHOD,
+	                o.DELIVERY_FEE,
+	                o.TOTAL_PRICE,
+	                o.ORDER_STATUS,
+	                o.PRODUCT_AMOUNT,
+	                o.INSTANT_DISCOUNT,
+	                o.COUPON_DISCOUNT,
+	                o.CASH_USED,
 
-				    d.RECEIVER_NAME,
-				    d.TEL,
-				    d.ZIPCODE,
-				    d.ADDRESS,
-				    d.DETAIL_ADDRESS,
-				    d.REQUEST_MSG
+	                d.RECEIVER_NAME,
+	                d.TEL,
+	                d.ZIPCODE,
+	                d.ADDRESS,
+	                d.DETAIL_ADDRESS,
+	                d.REQUEST_MSG
 
-				FROM ORDERS o
+	            FROM ORDERS o
 
-				JOIN ORDER_DELIVERY d
-				  ON o.ORDER_NO = d.ORDER_NO
+	            JOIN ORDER_ADDRESS d
+	              ON o.ORDER_ADDRESS_NO
+	               = d.ORDER_ADDRESS_NO
 
-				WHERE o.ORDER_NO = ?
-				""";
+	            WHERE o.ORDER_NO = ?
+	            """;
 
-		try (
-				Connection conn = ConnectionProvider.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(sql)
-				) {
+	    try (
+	        Connection conn =
+	                ConnectionProvider.getConnection();
 
-			/*
-			 * ORDER_NO
-			 */
-			pstmt.setInt(1, orderNo);
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
 
-			try (ResultSet rs = pstmt.executeQuery()) {
+	        pstmt.setInt(
+	                1,
+	                orderNo
+	        );
+	        try (
+	            ResultSet rs =
+	                    pstmt.executeQuery()
+	        ) {
 
-				if (rs.next()) {
+	            if (rs.next()) {
+	                dto = new OrderCompleteDTO();
 
-					dto = new OrderCompleteDTO();
-
-					dto.setReceiverName(
-							rs.getString("RECEIVER_NAME")
-							);
-
-					dto.setReceiverPhone(
-							rs.getString("TEL")
-							);
-
-					dto.setZipcode(
-							rs.getString("ZIPCODE")
-							);
-
-					String address =
-							rs.getString("ADDRESS");
-
-					String detailAddress =
-							rs.getString("DETAIL_ADDRESS");
+	                dto.setReceiverName(
+	                        rs.getString(
+	                                "RECEIVER_NAME"
+	                        )
+	                );
 
 
-					if (address == null) {
-						address = "";
-					}
+	                dto.setReceiverPhone(
+	                        rs.getString(
+	                                "TEL"
+	                        )
+	                );
 
-					if (detailAddress != null
-							&& !detailAddress.isBlank()) {
+	                dto.setZipcode(
+	                        rs.getString(
+	                                "ZIPCODE"
+	                        )
+	                );
 
-						address += " " + detailAddress;
-					}
+	                String address =
+	                        rs.getString(
+	                                "ADDRESS"
+	                        );
 
-					dto.setAddress(address);
-					dto.setRequestMsg(
-							rs.getString("REQUEST_MSG")
-							);
-
-					if (rs.getDate("ORDER_DATE") != null) {
-
-						dto.setArrivalDate(
-								rs.getDate("ORDER_DATE")
-								.toLocalDate()
-								.plusDays(1)
-								.toString()
-								);
-					}
+	                String detailAddress =
+	                        rs.getString(
+	                                "DETAIL_ADDRESS"
+	                        );
 
 
-					/*
+	                if (address == null) {
+	                    address = "";
+	                }
 
-					 * 현재 ORDERS / ORDER_DELIVERY에는
-					 * 판매자 정보가 없으므로 임시값
-					 */
-					dto.setSellerName(
-							"주식회사 회사이름"
-							);
-					dto.setOrderAmount(
-							rs.getInt("PRODUCT_AMOUNT")
-							);
 
-					int discountAmount =
-							rs.getInt("INSTANT_DISCOUNT")
-							+
-							rs.getInt("COUPON_DISCOUNT");
+	                if (detailAddress != null
+	                        && !detailAddress.isBlank()) {
 
-					dto.setDiscountAmount(
-							discountAmount
-							);
+	                    address +=
+	                            " "
+	                            + detailAddress;
+	                }
 
-					dto.setShippingFee(
-							rs.getInt("DELIVERY_FEE")
-							);
 
-					dto.setPaymentAmount(
-							rs.getInt("TOTAL_PRICE")
-							);
-				}
-			}
+	                dto.setAddress(
+	                        address
+	                );
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	                dto.setRequestMsg(
+	                        rs.getString(
+	                                "REQUEST_MSG"
+	                        )
+	                );
 
-		return dto;
+	                if (rs.getDate(
+	                        "ORDER_DATE"
+	                ) != null) {
+
+	                    dto.setArrivalDate(
+	                            rs.getDate(
+	                                    "ORDER_DATE"
+	                            )
+	                            .toLocalDate()
+	                            .plusDays(1)
+	                            .toString()
+	                    );
+	                }
+
+
+	                dto.setSellerName(
+	                        "주식회사 회사이름"
+	                );
+
+	                dto.setOrderAmount(
+	                        rs.getInt(
+	                                "PRODUCT_AMOUNT"
+	                        )
+	                );
+
+	                int discountAmount =
+
+	                        rs.getInt(
+	                                "INSTANT_DISCOUNT"
+	                        )
+
+	                        +
+
+	                        rs.getInt(
+	                                "COUPON_DISCOUNT"
+	                        );
+
+
+	                dto.setDiscountAmount(
+	                        discountAmount
+	                );
+
+	                dto.setShippingFee(
+	                        rs.getInt(
+	                                "DELIVERY_FEE"
+	                        )
+	                );
+
+	                dto.setPaymentAmount(
+	                        rs.getInt(
+	                                "TOTAL_PRICE"
+	                        )
+	                );
+	            }
+
+	        }
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+	    }
+
+
+	    return dto;
 	}
 	
 	public int insertOrderDelivery(
