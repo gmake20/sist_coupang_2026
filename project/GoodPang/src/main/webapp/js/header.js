@@ -25,7 +25,7 @@
 const categoryMenu = document.querySelector('#wa-pc-category .menu');
 
 if (categoryMenu) {
-  fetch('category/getinfo?ctype=main')
+  fetch('/category/getinfo?ctype=main')
     .then(function (res) { return res.json(); })
     .then(renderCategoryMenu)
     .catch(function (e) {
