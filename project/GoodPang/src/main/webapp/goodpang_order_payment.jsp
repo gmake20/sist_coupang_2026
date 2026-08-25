@@ -22,8 +22,8 @@
 	<div class="container">
 
 		<h1 class="logo">
-			<a href="${pageContext.request.contextPath}/" title="GoodPang 홈으로"> <span
-				class="brand-goodpang">GoodPang</span>
+			<a href="${pageContext.request.contextPath}/" title="GoodPang 홈으로">
+				<span class="brand-goodpang">GoodPang</span>
 			</a>
 		</h1>
 		<h1 class="page-title">주문/결제</h1>
@@ -188,20 +188,20 @@
 				<div class="delivery-info">
 					<h4>배송 1건 중 1</h4>
 
-					<c:forEach var="item" items="${orderItems}" varStatus="status">
+					<c:forEach var="item" items="${checkoutItems}" varStatus="status">
 						<div class="product-item">
 							<div class="product-img"></div>
+
 							<div class="product-info">
 								<div class="product-name">${item.productName}</div>
 								<div class="product-option">${item.optionName}</div>
+
 								<div class="product-price">
-									<fmt:formatNumber value="${item.salePrice}" pattern="#,###" />
+									<fmt:formatNumber value="${item.price}" pattern="#,###" />
 									원
 								</div>
-								<div class="product-qty">
-									수량 ${item.quantity}개
-									<c:if test="${item.freeDelivery}"> / 무료배송</c:if>
-								</div>
+
+								<div class="product-qty">수량 ${item.orderQty}개</div>
 							</div>
 						</div>
 					</c:forEach>
@@ -210,53 +210,53 @@
 			</div>
 
 			<!-- ========== 오른쪽 결제 금액 영역 ========== -->
+
 			<div class="right-section">
 				<div class="payment-summary">
 					<h3>최종 결제 금액</h3>
 
 					<div class="price-row">
-						<span>총 상품 가격</span> <span><fmt:formatNumber
-								value="${summary.totalProductPrice}" pattern="#,###" />원</span>
+						<span>총 상품 가격</span> <span> <fmt:formatNumber
+								value="${checkout.productAmount}" pattern="#,###" />원
+						</span>
 					</div>
 
 					<div class="price-row">
-						<span>즉시할인</span> <span class="discount">-<fmt:formatNumber
-								value="${summary.instantDiscount}" pattern="#,###" />원
+						<span>즉시할인</span> <span class="discount"> -<fmt:formatNumber
+								value="${checkout.instantDiscount}" pattern="#,###" />원
 						</span>
 					</div>
 
 					<div class="price-row">
 						<span> 쿠폰할인
 							<button class="coupon-btn" type="button">변경</button>
-						</span> <span class="discount">-<fmt:formatNumber
-								value="${summary.couponDiscount}" pattern="#,###" />원
+						</span> <span class="discount"> -<fmt:formatNumber
+								value="${checkout.couponDiscount}" pattern="#,###" />원
 						</span>
 					</div>
 
 					<div class="price-row">
-						<span>배송비</span> <span><fmt:formatNumber
-								value="${summary.deliveryFee}" pattern="#,###" />원</span>
+						<span>배송비</span> <span> <fmt:formatNumber
+								value="${checkout.deliveryFee}" pattern="#,###" />원
+						</span>
 					</div>
 
 					<div class="price-row">
 						<span>쿠팡캐시</span>
+
 						<div class="cash-input">
 							<button type="button">전액사용</button>
-							<input type="text" value="${summary.cashUsed}"> 원
+							<input type="text" name="cashUsed" value="${checkout.cashUsed}">
+							원
 						</div>
-					</div>
-					<div
-						style="text-align: right; font-size: 12px; color: #888; margin-top: -6px;">
-						잔여 :
-						<fmt:formatNumber value="${summary.remainCash}" pattern="#,###" />
-						원
 					</div>
 
 					<div class="divider"></div>
 
 					<div class="total-row">
-						<span class="label">총 결제 금액</span> <span class="amount"><fmt:formatNumber
-								value="${summary.finalPrice}" pattern="#,###" />원</span>
+						<span class="label">총 결제 금액</span> <span class="amount"> <fmt:formatNumber
+								value="${checkout.totalPrice}" pattern="#,###" />원
+						</span>
 					</div>
 
 					<div class="agree-links">
@@ -273,23 +273,16 @@
 					<div class="final-agree">위 주문 내용을 확인 하였으며, 회원 본인은 개인정보 이용 및
 						제공(해외직구의 경우 국외제공) 및 결제에 동의합니다.</div>
 
-
-
-					<!-- <button class="btn-pay" type="button" onclick="dummyPay()">결제하기</button> -->
-					
 					<form id="paymentForm"
 						action="${pageContext.request.contextPath}/order/checkout"
 						method="post">
 
-						<!-- 현재 주문번호 -->
-						<input type="hidden" name="orderNo" value="${orderNo}">
+						<input type="hidden" name="checkoutNo" value="${checkoutNo}">
 
-						<!-- 선택한 배송지 -->
 						<input type="hidden" id="selectedAddressNo" name="addressNo"
 							value="${address.addressNo}">
 
 						<button class="btn-pay" type="submit">결제하기</button>
-
 					</form>
 
 
