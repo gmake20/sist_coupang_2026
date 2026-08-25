@@ -32,6 +32,9 @@
 
 <body>
 	<jsp:include page="/inc/header.jsp" />
+	 <div class="category-layer" id="wa-pc-category">
+ </div>   
+	<script src="js/header.js"></script>
 	
   
 	<!-- =========================
