@@ -391,7 +391,7 @@
 
       <p class="login-link">
         이미 굿팡 비즈니스 계정이 있으신가요?
-        <a href="./vendor-login.html">로그인</a>
+        <a href="${pageContext.request.contextPath}/vendor/login">로그인</a>
       </p>
 
 

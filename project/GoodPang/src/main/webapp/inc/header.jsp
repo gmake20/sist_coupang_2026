@@ -4,7 +4,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <link rel="stylesheet"
-
+  
 	href="${pageContext.request.contextPath}/css/common.css">
 	
 	
@@ -55,9 +55,9 @@
 
 				<li><a
 
-					href="${pageContext.request.contextPath}/vendor-signup.html">
+					href="${pageContext.request.contextPath}/vendor/login">
 
-						판매자 가입 </a></li>
+						판매자 로그인 </a></li>
 
 				<li class="cs-center"><a href="#"> 고객센터 </a>
 
