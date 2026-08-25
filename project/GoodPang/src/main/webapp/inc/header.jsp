@@ -770,7 +770,7 @@
 
 						<li class="my-coupang"><a
 
-							href="${pageContext.request.contextPath}/order/order_list "> <img
+							href="${pageContext.request.contextPath}/order/order_list"> <img
 
 								src="${pageContext.request.contextPath}/images/icons/person.png"
 

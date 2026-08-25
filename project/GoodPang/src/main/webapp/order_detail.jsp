@@ -368,6 +368,7 @@
 
 	</div>
 	<jsp:include page="/inc/footer.jsp" />
+	<script src="${pageContext.request.contextPath}/js/header.js"></script>
 
 </body>
 </html>
