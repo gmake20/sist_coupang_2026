@@ -126,7 +126,7 @@
 					<div class="header-main">
 
 						<h1 class="logo">
-							<a href="index.html" class="brand-goodpang">GoodPang</a>
+							<a href="index.jsp" class="brand-goodpang">GoodPang</a>
 						</h1>
 
 						<!-- 검색폼 (높이 41px, 파란 테두리 2px) -->
