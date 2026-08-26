@@ -56,4 +56,5 @@ public class ProductWriteDTO {
     private String saleStatus;
 
     private List<ProductOptionWriteDTO> options = new ArrayList<>();
+    private List<String> detailImageUrls = new ArrayList<>();
 }

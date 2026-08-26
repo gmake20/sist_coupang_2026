@@ -136,6 +136,14 @@ public class VendorProductWriteServlet extends HttpServlet {
 			dto.getOptions().add(buildOptionDTO(request, i));
 		}
 
+		int descImageCount = parseIntOrZero(request.getParameter("descImageCount"));
+		for (int i = 0; i < descImageCount; i++) {
+			String url = saveUploadedImage(request, "descImage_" + i);
+			if (url != null) {
+				dto.getDetailImageUrls().add(url);
+			}
+		}
+
 		return dto;
 	}
 

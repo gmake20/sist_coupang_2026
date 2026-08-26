@@ -189,8 +189,8 @@
               <p class="hint">이미지 권장 크기 : 1,000px x 1,000px (최소 500px 이상) / 10MB 이하의 JPG, PNG 파일</p>
 
               <div class="table-toolbar">
-                <button class="btn btn-outline btn-sm" type="button">대표이미지 일괄등록</button>
-                <button class="btn btn-outline btn-sm" type="button">추가이미지 일괄등록</button>
+                <button class="btn btn-outline btn-sm" type="button" id="bulkMainImageButton">대표이미지 일괄등록</button>
+                <button class="btn btn-outline btn-sm" type="button" id="bulkExtraImageButton">추가이미지 일괄등록</button>
                 <button class="btn btn-outline btn-sm" type="button">이미지 URL주소로 일괄등록</button>
                 <button class="btn btn-outline btn-sm" type="button">추가이미지 일괄삭제</button>
               </div>
@@ -199,7 +199,7 @@
                 <table class="data-table" id="imageTable">
                   <thead>
                     <tr>
-                      <th class="col-check"><input type="checkbox"></th>
+                      <th class="col-check"><input type="checkbox" id="imageCheckAll"></th>
                       <th>옵션명</th>
                       <th>대표이미지 <span class="required-dot">•</span></th>
                       <th>추가이미지 (최대 9장)</th>
@@ -209,6 +209,9 @@
                   <tbody id="imageTableBody"></tbody>
                 </table>
               </div>
+
+              <input type="file" id="bulkMainImageFileInput" accept="image/jpeg,image/png" hidden>
+              <input type="file" id="bulkExtraImageFileInput" accept="image/jpeg,image/png" multiple hidden>
 
               <input type="file" id="imageMainFileInput" accept="image/jpeg,image/png" hidden>
               <input type="file" id="imageExtraFileInput" accept="image/jpeg,image/png" multiple hidden>
@@ -248,7 +251,14 @@
                 <button class="btn btn-primary" type="button" id="descRegisterButton">이미지 등록</button>
               </div>
 
+              <div class="desc-preview" id="descPreview" hidden>
+                <div class="desc-preview-list" id="descPreviewList"></div>
+                <button class="btn btn-outline btn-sm" type="button" id="descManageButton">이미지 관리 (<span id="descImageCount">0</span>장)</button>
+              </div>
+
               <p class="hint">이미지 권장 크기 : 780px x 5,000px / 10MB 이하의 JPG, PNG 파일</p>
+
+              <input type="file" id="descImageFileInput" accept="image/jpeg,image/png" multiple hidden>
 
             </div>
           </section>
@@ -347,6 +357,8 @@
             </div>
             <div class="block-body" id="tagBlockBody">
 
+              <p class="warning-text">⚠ 이 항목은 아직 서버에 저장되지 않습니다. 입력하셔도 상품 등록 시 반영되지 않으니 참고해주세요.</p>
+
               <div class="field-row">
                 <label class="field-label">태그</label>
                 <div class="field-control">
@@ -375,6 +387,8 @@
               </button>
             </div>
             <div class="block-body" id="noticeBlockBody">
+
+              <p class="warning-text">⚠ 이 항목은 아직 서버에 저장되지 않습니다. 입력하셔도 상품 등록 시 반영되지 않으니 참고해주세요.</p>
 
               <div class="notice-select-row">
                 <select class="input select" id="noticeTypeSelect">
@@ -1060,8 +1074,8 @@
         tbody.innerHTML = combinations
           .map(
             (combo, index) =>
-              "<tr>" +
-              '<td class="col-check"><input type="checkbox"></td>' +
+              '<tr data-row="' + index + '">' +
+              '<td class="col-check"><input type="checkbox" class="image-row-check" data-row="' + index + '"></td>' +
               "<td>" + combo.label + "</td>" +
               '<td><span class="image-slot main-slot" data-row="' + index + '"><svg class="icon"><use href="#ic-plus"/></svg></span></td>' +
               '<td><div class="image-slot-group" data-row="' + index + '">' +
@@ -1141,6 +1155,84 @@
         }
 
         renderImageSlot(activeImageRow);
+      });
+
+
+      /* =========================================================
+         상품이미지 — 체크한 옵션 행에 대표/추가이미지 일괄 적용
+      ========================================================= */
+
+      function getCheckedImageRows() {
+        return Array.from(document.querySelectorAll(".image-row-check:checked")).map(
+          (checkbox) => Number(checkbox.dataset.row)
+        );
+      }
+
+      document.getElementById("imageCheckAll").addEventListener("change", function () {
+        document.querySelectorAll(".image-row-check").forEach(
+          (checkbox) => (checkbox.checked = this.checked)
+        );
+      });
+
+      const bulkMainImageFileInput = document.getElementById("bulkMainImageFileInput");
+      const bulkExtraImageFileInput = document.getElementById("bulkExtraImageFileInput");
+
+      document.getElementById("bulkMainImageButton").addEventListener("click", function () {
+        if (getCheckedImageRows().length === 0) {
+          alert("대표이미지를 적용할 옵션을 먼저 체크해주세요.");
+          return;
+        }
+        bulkMainImageFileInput.click();
+      });
+
+      document.getElementById("bulkExtraImageButton").addEventListener("click", function () {
+        if (getCheckedImageRows().length === 0) {
+          alert("추가이미지를 적용할 옵션을 먼저 체크해주세요.");
+          return;
+        }
+        bulkExtraImageFileInput.click();
+      });
+
+      bulkMainImageFileInput.addEventListener("change", function () {
+        const file = bulkMainImageFileInput.files[0];
+        bulkMainImageFileInput.value = "";
+
+        if (!file || !isValidImageFile(file)) return;
+
+        getCheckedImageRows().forEach(function (row) {
+          const state = optionImages[row];
+          if (!state) return;
+
+          if (state.main) URL.revokeObjectURL(state.main.url);
+          state.main = { file: file, url: URL.createObjectURL(file) };
+          renderImageSlot(row);
+        });
+      });
+
+      bulkExtraImageFileInput.addEventListener("change", function () {
+        const files = Array.from(bulkExtraImageFileInput.files).filter(isValidImageFile);
+        bulkExtraImageFileInput.value = "";
+
+        if (files.length === 0) return;
+
+        let anyRowFull = false;
+
+        getCheckedImageRows().forEach(function (row) {
+          const state = optionImages[row];
+          if (!state) return;
+
+          const remaining = MAX_EXTRA_IMAGES - state.extra.length;
+          if (files.length > remaining) anyRowFull = true;
+
+          files.slice(0, remaining).forEach(function (file) {
+            state.extra.push({ file: file, url: URL.createObjectURL(file) });
+          });
+          renderImageSlot(row);
+        });
+
+        if (anyRowFull) {
+          alert("추가이미지는 옵션당 최대 " + MAX_EXTRA_IMAGES + "장까지 등록할 수 있습니다. 일부 옵션은 다 채워지지 않았을 수 있습니다.");
+        }
       });
 
       function addOptionValue(groupIndex) {
@@ -1297,6 +1389,9 @@
 
       const descImages = [];
       const descModalBackdrop = document.getElementById("descModalBackdrop");
+      const descImageFileInput = document.getElementById("descImageFileInput");
+
+      let descEditIndex = null;
 
       function renderDescImageList() {
         const list = document.getElementById("descImageList");
@@ -1308,10 +1403,10 @@
 
         list.innerHTML = descImages
           .map(
-            (_, index) =>
+            (item, index) =>
               '<div class="desc-image-row" data-index="' + index + '">' +
               '<span class="drag-handle">⁝⁝</span>' +
-              '<div class="desc-image-thumb"><svg class="icon"><use href="#ic-image"/></svg></div>' +
+              '<div class="desc-image-thumb"><img src="' + item.url + '" alt=""></div>' +
               '<div class="desc-image-actions">' +
               '<button type="button" class="btn btn-outline btn-xs desc-edit">수정</button>' +
               '<button type="button" class="btn btn-outline btn-xs desc-remove">삭제</button>' +
@@ -1319,25 +1414,70 @@
           )
           .join("");
 
+        list.querySelectorAll(".desc-edit").forEach(function (button) {
+          button.addEventListener("click", function () {
+            descEditIndex = Number(button.closest(".desc-image-row").dataset.index);
+            descImageFileInput.multiple = false;
+            descImageFileInput.click();
+          });
+        });
+
         list.querySelectorAll(".desc-remove").forEach(function (button) {
           button.addEventListener("click", function () {
             const index = Number(button.closest(".desc-image-row").dataset.index);
+            URL.revokeObjectURL(descImages[index].url);
             descImages.splice(index, 1);
             renderDescImageList();
           });
         });
       }
 
+      function renderDescPreview() {
+        const hasImages = descImages.length > 0;
+
+        document.getElementById("descEmpty").hidden = hasImages;
+        document.getElementById("descPreview").hidden = !hasImages;
+        document.getElementById("descImageCount").textContent = descImages.length;
+
+        document.getElementById("descPreviewList").innerHTML = descImages
+          .map((item) => '<div class="desc-image-thumb"><img src="' + item.url + '" alt=""></div>')
+          .join("");
+      }
+
       document.getElementById("descRegisterButton").addEventListener("click", function () {
         descModalBackdrop.classList.add("show");
       });
 
+      document.getElementById("descManageButton").addEventListener("click", function () {
+        descModalBackdrop.classList.add("show");
+      });
+
       document.getElementById("descAddImageButton").addEventListener("click", function () {
-        descImages.push({});
+        descEditIndex = null;
+        descImageFileInput.multiple = true;
+        descImageFileInput.click();
+      });
+
+      descImageFileInput.addEventListener("change", function () {
+        const files = Array.from(descImageFileInput.files).filter(isValidImageFile);
+        descImageFileInput.value = "";
+
+        if (files.length === 0) return;
+
+        if (descEditIndex !== null) {
+          URL.revokeObjectURL(descImages[descEditIndex].url);
+          descImages[descEditIndex] = { file: files[0], url: URL.createObjectURL(files[0]) };
+        } else {
+          files.forEach(function (file) {
+            descImages.push({ file: file, url: URL.createObjectURL(file) });
+          });
+        }
+
         renderDescImageList();
       });
 
       document.getElementById("descClearAllButton").addEventListener("click", function () {
+        descImages.forEach((item) => URL.revokeObjectURL(item.url));
         descImages.length = 0;
         renderDescImageList();
       });
@@ -1350,7 +1490,7 @@
       document.getElementById("descModalCancel").addEventListener("click", closeDescModal);
 
       document.getElementById("descModalSave").addEventListener("click", function () {
-        document.getElementById("descEmpty").hidden = descImages.length > 0;
+        renderDescPreview();
         closeDescModal();
       });
 
@@ -1450,6 +1590,13 @@
         const detailTypeMap = { image: "이미지 업로드", editor: "에디터 작성", html: "HTML 작성" };
         const activeDescType = document.querySelector("#descTypeTabs .tab-btn.active").dataset.type;
         formData.append("detailType", detailTypeMap[activeDescType] || "이미지 업로드");
+
+        if (activeDescType === "image") {
+          formData.append("descImageCount", descImages.length);
+          descImages.forEach(function (item, index) {
+            formData.append("descImage_" + index, item.file);
+          });
+        }
 
         formData.append("jejuShippingYn", document.querySelector('input[name="jejuShipping"]:checked').value);
         formData.append("courier", document.getElementById("courierSelect").value);

@@ -38,6 +38,11 @@ public class ProductWriteDAO {
                     }
                 }
 
+                int detailOrder = 1;
+                for (String detailImageUrl : dto.getDetailImageUrls()) {
+                    insertImageRow(conn, productNo, null, "상세설명", detailOrder++, detailImageUrl);
+                }
+
                 conn.commit();
                 return productNo;
 
@@ -198,7 +203,7 @@ public class ProductWriteDAO {
         }
     }
 
-    private void insertImageRow(Connection conn, int productNo, int optionId, String purpose, int order, String imageUrl) throws Exception {
+    private void insertImageRow(Connection conn, int productNo, Integer optionId, String purpose, int order, String imageUrl) throws Exception {
 
         int imageNo = nextVal(conn, "SEQ_PRODUCT_IMAGE");
 
@@ -213,7 +218,11 @@ public class ProductWriteDAO {
 
             pstmt.setInt(i++, imageNo);
             pstmt.setInt(i++, productNo);
-            pstmt.setInt(i++, optionId);
+            if (optionId != null) {
+                pstmt.setInt(i++, optionId);
+            } else {
+                pstmt.setNull(i++, java.sql.Types.NUMERIC);
+            }
             pstmt.setString(i++, purpose);
             pstmt.setInt(i++, order);
             pstmt.setString(i++, imageUrl);
