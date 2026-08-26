@@ -246,12 +246,7 @@
 					<!-- ⑥ 수량 + 구매 버튼 (원본 실측: 전부 높이 42px) -->
 					<form class="prod-buy-quantity-and-footer" method="post"
 						action="${pageContext.request.contextPath}/cart.jsp">
-
-					
-						<input type="hidden" name="productId" value="${p.productNo}">
-
-
-
+						<input type="hidden" name="productNo" value="${p.productNo}">
 						<input type="hidden" name="color" id="selectedColor" value="화이트">
 
 						<!-- 수량 — 원본은 왼쪽에 숫자, 오른쪽에 위/아래 화살표가 세로로 2단.
