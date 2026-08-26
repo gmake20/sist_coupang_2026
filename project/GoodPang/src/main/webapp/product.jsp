@@ -10,12 +10,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet"
 	href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/reset.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/reset.css">
 <!-- 1. 브라우저 기본 스타일 지우기 -->
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/common.css">
 <!-- 2. 헤더/푸터 (모든 페이지 공통) -->
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/product.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/main.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/product.css">
 <!-- 4. 상세페이지 전용 -->
 </head>
 
@@ -70,15 +74,23 @@
                  ※ 상세페이지 사진은 images/products/ 가 아니라 images/product-detail/ 를 씀.
                    images/products/ 는 메인페이지 상품카드 전용 (2026-08-20 분리) -->
 					<ul class="product-image__thumbs">
-						<li class="is-on"><a href="#"><img src="${pageContext.request.contextPath}/images/product-detail/photo-1.jpg" alt=""></a></li>
-						<li><a href="#"><img src="${pageContext.request.contextPath}/images/product-detail/photo-2.jpg" alt=""></a></li>
-						<li><a href="#"><img src="${pageContext.request.contextPath}/images/product-detail/photo-3.jpg" alt=""></a></li>
+						<li class="is-on"><a href="#"><img
+								src="${pageContext.request.contextPath}/images/product-detail/photo-1.jpg"
+								alt=""></a></li>
+						<li><a href="#"><img
+								src="${pageContext.request.contextPath}/images/product-detail/photo-2.jpg"
+								alt=""></a></li>
+						<li><a href="#"><img
+								src="${pageContext.request.contextPath}/images/product-detail/photo-3.jpg"
+								alt=""></a></li>
 					</ul>
 
 					<!-- 큰 이미지 (정사각형)
                ★ 임시 ★ 위와 같음 -->
 					<div class="product-image__main">
-						<img src="${pageContext.request.contextPath}/images/product-detail/photo-1.jpg" alt="무형광 남성 반팔 라운드 티셔츠 3종 세트">
+						<img
+							src="${pageContext.request.contextPath}/images/product-detail/photo-1.jpg"
+							alt="무형광 남성 반팔 라운드 티셔츠 3종 세트">
 					</div>
 				</div>
 
@@ -104,7 +116,8 @@
 							<div class="wish-and-share">
 								<button type="button" class="btn-wish">
 									<svg viewBox="0 0 24 24" aria-hidden="true">
-										<path d="M12 20.3 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z" />
+										<path
+											d="M12 20.3 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z" />
 									</svg>
 									<span class="blind">찜하기</span>
 								</button>
@@ -132,9 +145,9 @@
 					<!-- ② 가격 -->
 					<div class="price-container">
 						<div class="price-now">
-							<span class="discount">15%</span> <strong class="total-price" data-unit-price="19900">19,900원</strong>
-							<span class="badge-rocket">로켓배송</span> <span
-								class="badge-tomorrow">내일도착</span>
+							<span class="discount">15%</span> <strong class="total-price"
+								data-unit-price="19900">19,900원</strong> <span
+								class="badge-rocket">로켓배송</span> <span class="badge-tomorrow">내일도착</span>
 						</div>
 						<!-- 원가 취소선 (#768695 + line-through) -->
 						<div class="price-origin">
@@ -158,8 +171,9 @@
 							<em class="txt-bold">무료배송</em> (로켓배송 상품 19,800원 이상 구매 시)
 						</p>
 						<p class="delivery-date">
-							<em class="txt-green">내일(목) 8/20</em> <em class="txt-green-normal">도착
-								보장</em> <span class="txt-sub">(11시간 20분 내 주문 시 / 서울·경기 기준)</span>
+							<em class="txt-green">내일(목) 8/20</em> <em
+								class="txt-green-normal">도착 보장</em> <span class="txt-sub">(11시간
+								20분 내 주문 시 / 서울·경기 기준)</span>
 						</p>
 
 						<!-- 배송 방법 선택 (2026-08-21 추가)
@@ -170,15 +184,15 @@
 						     ▶JSP: 지금은 앞쪽(로켓배송)이 기본 선택. 로그인/와우 여부에 따라 서버가
 						       기본값을 정하게 될 자리 -->
 						<ul class="radio-group">
-							<li class="radio-item is-on">
-								<span class="radio"></span>
-								<span class="radio-text">로켓배송 상품 19,800원 이상 무료배송</span>
-							</li>
-							<li class="radio-item">
-								<span class="radio"></span>
-								<span class="radio-text">무료배송 + 무료반품 <span class="separator">|</span> 로켓와우 신청시</span>
-								<button type="button" class="radio-info"><span class="blind">안내</span></button>
-							</li>
+							<li class="radio-item is-on"><span class="radio"></span> <span
+								class="radio-text">로켓배송 상품 19,800원 이상 무료배송</span></li>
+							<li class="radio-item"><span class="radio"></span> <span
+								class="radio-text">무료배송 + 무료반품 <span class="separator">|</span>
+									로켓와우 신청시
+							</span>
+								<button type="button" class="radio-info">
+									<span class="blind">안내</span>
+								</button></li>
 						</ul>
 					</div>
 
@@ -206,10 +220,15 @@
 								색상: <span class="option-value">화이트</span>
 							</div>
 							<ul class="option-chips">
-								<li data-color="블랙"><a href="#"><img src="${pageContext.request.contextPath}/images/product-detail/option-1.jpg" alt="블랙"></a></li>
-								<li data-color="네이비"><a href="#"><img src="${pageContext.request.contextPath}/images/product-detail/option-2.jpg" alt="네이비"></a></li>
+								<li data-color="블랙"><a href="#"><img
+										src="${pageContext.request.contextPath}/images/product-detail/option-1.jpg"
+										alt="블랙"></a></li>
+								<li data-color="네이비"><a href="#"><img
+										src="${pageContext.request.contextPath}/images/product-detail/option-2.jpg"
+										alt="네이비"></a></li>
 								<li class="is-on" data-color="화이트"><a href="#"><img
-									src="${pageContext.request.contextPath}/images/product-detail/option-3.jpg" alt="화이트"></a></li>
+										src="${pageContext.request.contextPath}/images/product-detail/option-3.jpg"
+										alt="화이트"></a></li>
 							</ul>
 						</section>
 					</div>
@@ -229,37 +248,58 @@
 
 					<!-- ⑥ 수량 + 구매 버튼 (원본 실측: 전부 높이 42px) -->
 					<form class="prod-buy-quantity-and-footer" method="post"
-						action="${pageContext.request.contextPath}/cart.jsp">
+						action="${pageContext.request.contextPath}/cart/add">
+
+						<!-- 상품번호 -->
 						<input type="hidden" name="productNo" value="10">
+
+						<!-- 실제 CART에 저장할 OPTION_ID -->
+						<input type="hidden" name="optionId" id="selectedOptionId"
+							value="25">
+
+						<!-- 화면 표시용 선택 옵션 -->
 						<input type="hidden" name="color" id="selectedColor" value="화이트">
 
-						<!-- 수량 — 원본은 왼쪽에 숫자, 오른쪽에 위/아래 화살표가 세로로 2단.
-                 (좌우 - + 배치가 아님. 2026-08-21 원본 확대해서 확인) -->
+						<!-- 수량 -->
 						<div class="product-quantity">
-							<input type="text" class="qty-input" name="quantity" value="1" readonly>
+
+							<input type="text" class="qty-input" name="quantity" value="1"
+								readonly>
 							<div class="qty-spin">
 								<button type="button" class="qty-plus">
-									<span class="blind">수량 더하기</span>
+									<span class="blind"> 수량 더하기 </span>
 								</button>
 								<button type="button" class="qty-minus">
-									<span class="blind">수량 빼기</span>
+									<span class="blind"> 수량 빼기 </span>
 								</button>
 							</div>
 						</div>
+
+						<!-- 장바구니 -->
 						<button type="submit" class="prod-cart-btn">장바구니 담기</button>
+
+						<!-- 바로구매 -->
 						<button type="submit" class="prod-buy-btn"
 							formaction="${pageContext.request.contextPath}/order/buy"
 							formmethod="post">
-							바로구매<i class="arrow-right"></i>
+
+							바로구매 <i class="arrow-right"></i>
+
 						</button>
-						<!-- 위 배송방법에서 "무료배송+무료반품(로켓와우)"을 고르면 위 두 칸 대신 이거 하나만 보임
-						     (원본을 직접 클릭해서 확인함 — js/product.js setupDeliveryOption) -->
+
+						<!-- 로켓와우 -->
 						<button type="submit" class="prod-wow-btn"
-							formaction="${pageContext.request.contextPath}/goodpang_order_payment.jsp">
-							로켓와우로 무료배송<i class="arrow-right"></i>
+							formaction="${pageContext.request.contextPath}/order/buy"
+							formmethod="post">
+
+							로켓와우로 무료배송 <i class="arrow-right"></i>
+
 						</button>
-						<!-- 품절일 때 위 두 버튼 대신 이것만 보임 (원본도 회색 한 칸으로 바뀜) -->
-						<button type="button" class="prod-soldout-btn" disabled>품절</button>
+
+						<!-- 품절 -->
+						<button type="button" class="prod-soldout-btn" disabled>
+							품절</button>
+
 					</form>
 
 					<!-- ⑦ 맨 아래 작은 글씨 색상계열, 굿팡상품번호 텍스트만 삭제, 통째로 삭제하면 배치 달라짐-->
@@ -292,95 +332,97 @@
 				<!-- .is-cut = 넘치는 부분을 잘라내는 상자. 안쪽 ul 이 옆으로 밀리며 움직임 -->
 				<div class="sdp-ads__body">
 					<ul class="sdp-ads__list">
-						<li class="ad-item"><a href="#">
-								<span class="ad-item__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/ad-1.jpg" alt=""></span>
-								<span class="ad-item__name">베스티하루 로카티 ROKA 반팔 티셔츠</span>
-								<span class="ad-item__price">
-									<span class="was">할인 <del>23,900</del></span>
-									<span class="now"><em class="rate">58%</em> <strong>9,900</strong></span>
-								</span>
-								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
-								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(63)</span>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-1.jpg"
+									alt=""></span> <span class="ad-item__name">베스티하루 로카티 ROKA
+									반팔 티셔츠</span> <span class="ad-item__price"> <span class="was">할인
+										<del>23,900</del>
+								</span> <span class="now"><em class="rate">58%</em> <strong>9,900</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">내일(목) 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(63)</span>
 						</a></li>
-						<li class="ad-item"><a href="#">
-								<span class="ad-item__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/ad-2.jpg" alt=""></span>
-								<span class="ad-item__name">3장 세트 ROKA 기능성 냉감 쿨링 남자 여자 반팔티 로카티</span>
-								<span class="ad-item__price">
-									<span class="now"><strong>18,900</strong></span>
-								</span>
-								<span class="ad-item__tag">무료배송</span>
-								<span class="ad-item__ship">모레(금) 도착 예정</span>
-								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(30)</span>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-2.jpg"
+									alt=""></span> <span class="ad-item__name">3장 세트 ROKA 기능성
+									냉감 쿨링 남자 여자 반팔티 로카티</span> <span class="ad-item__price"> <span
+									class="now"><strong>18,900</strong></span>
+							</span> <span class="ad-item__tag">무료배송</span> <span
+								class="ad-item__ship">모레(금) 도착 예정</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(30)</span>
 						</a></li>
-						<li class="ad-item"><a href="#">
-								<span class="ad-item__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/ad-3.jpg" alt=""></span>
-								<span class="ad-item__name">워크존 로카티 코리아아미 쿨링 반팔 티셔츠 남녀공용</span>
-								<span class="ad-item__price">
-									<span class="was">할인 <del>18,300</del></span>
-									<span class="now"><em class="rate">60%</em> <strong>7,290</strong></span>
-								</span>
-								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
-								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(398)</span>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-3.jpg"
+									alt=""></span> <span class="ad-item__name">워크존 로카티 코리아아미
+									쿨링 반팔 티셔츠 남녀공용</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>18,300</del></span> <span class="now"><em
+										class="rate">60%</em> <strong>7,290</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">내일(목) 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(398)</span>
 						</a></li>
-						<li class="ad-item"><a href="#">
-								<span class="ad-item__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/ad-4.jpg" alt=""></span>
-								<span class="ad-item__name">밀리랩 로카티 ROKA 반팔 티셔츠 2P</span>
-								<span class="ad-item__price">
-									<span class="was">할인 <del>25,800</del></span>
-									<span class="now"><em class="rate">36%</em> <strong>16,500</strong></span>
-								</span>
-								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
-								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(6,543)</span>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-4.jpg"
+									alt=""></span> <span class="ad-item__name">밀리랩 로카티 ROKA
+									반팔 티셔츠 2P</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>25,800</del></span> <span class="now"><em
+										class="rate">36%</em> <strong>16,500</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">내일(목) 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(6,543)</span>
 						</a></li>
-						<li class="ad-item"><a href="#">
-								<span class="ad-item__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/ad-5.jpg" alt=""></span>
-								<span class="ad-item__name">5장 모던프로 스포츠 기능성 드라이 라운드 반팔 티셔츠</span>
-								<span class="ad-item__price">
-									<span class="was">할인 <del>120,000</del></span>
-									<span class="now"><em class="rate">87%</em> <strong>14,800</strong></span>
-								</span>
-								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
-								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(357)</span>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-5.jpg"
+									alt=""></span> <span class="ad-item__name">5장 모던프로 스포츠
+									기능성 드라이 라운드 반팔 티셔츠</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>120,000</del></span> <span class="now"><em
+										class="rate">87%</em> <strong>14,800</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">내일(목) 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(357)</span>
 						</a></li>
-						<li class="ad-item"><a href="#">
-								<span class="ad-item__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/ad-6.jpg" alt=""></span>
-								<span class="ad-item__name">NEOX 네옥스 쿨론 자카드 검정 라운드넥 반팔 티셔츠</span>
-								<span class="ad-item__price">
-									<span class="was">할인 <del>34,900</del></span>
-									<span class="now"><em class="rate">77%</em> <strong>7,910</strong></span>
-								</span>
-								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
-								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(76)</span>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-6.jpg"
+									alt=""></span> <span class="ad-item__name">NEOX 네옥스 쿨론
+									자카드 검정 라운드넥 반팔 티셔츠</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>34,900</del></span> <span class="now"><em
+										class="rate">77%</em> <strong>7,910</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">내일(목) 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(76)</span>
 						</a></li>
-						<li class="ad-item"><a href="#">
-								<span class="ad-item__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/ad-7.jpg" alt=""></span>
-								<span class="ad-item__name">쿨링 ROKA 로카티 반팔 단체 티셔츠 반티 체육대회 유니폼</span>
-								<span class="ad-item__price">
-									<span class="was">할인 <del>20,000</del></span>
-									<span class="now"><em class="rate">56%</em> <strong>8,800</strong></span>
-								</span>
-								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
-								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(6,384)</span>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-7.jpg"
+									alt=""></span> <span class="ad-item__name">쿨링 ROKA 로카티 반팔
+									단체 티셔츠 반티 체육대회 유니폼</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>20,000</del></span> <span class="now"><em
+										class="rate">56%</em> <strong>8,800</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">내일(목) 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(6,384)</span>
 						</a></li>
-						<li class="ad-item"><a href="#">
-								<span class="ad-item__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/ad-8.jpg" alt=""></span>
-								<span class="ad-item__name">아소트 냉감 통기성 메쉬 로카티 코리아 아미 반팔 티셔츠</span>
-								<span class="ad-item__price">
-									<span class="was">할인 <del>21,900</del></span>
-									<span class="now"><em class="rate">54%</em> <strong>9,920</strong></span>
-								</span>
-								<span class="ad-item__tag">무료배송</span>
-								<span class="ad-item__ship">모레(금) 도착 예정</span>
-								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(682)</span>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-8.jpg"
+									alt=""></span> <span class="ad-item__name">아소트 냉감 통기성 메쉬
+									로카티 코리아 아미 반팔 티셔츠</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>21,900</del></span> <span class="now"><em
+										class="rate">54%</em> <strong>9,920</strong></span>
+							</span> <span class="ad-item__tag">무료배송</span> <span
+								class="ad-item__ship">모레(금) 도착 예정</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(682)</span>
 						</a></li>
 					</ul>
-					<button type="button" class="sdp-ads__next"><span class="blind">다음 상품</span></button>
+					<button type="button" class="sdp-ads__next">
+						<span class="blind">다음 상품</span>
+					</button>
 				</div>
 			</section>
 
@@ -390,65 +432,73 @@
 			     ★ 메인과 다른 점: 카드마다 "N % 남음" 재고 게이지가 붙음 -->
 			<section class="gw-deal">
 				<div class="gw-deal__head">
-					<h2>오늘의 <em>판매자 특가</em></h2>
+					<h2>
+						오늘의 <em>판매자 특가</em>
+					</h2>
 					<span class="gw-deal__page">1/5</span>
 				</div>
 
 				<ul class="gw-deal__list">
-					<li class="gw-card"><a href="#">
-							<span class="gw-card__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/gw-1.jpg" alt=""></span>
-							<span class="gw-card__tag">특가진행중</span>
-							<span class="gw-card__name">REPUBLIC OF KOREA 쿨링 반팔 티셔츠 RT002 - 헬스 운동 기능성</span>
-							<span class="gw-card__was">할인 <em>43%</em> <del>15,000</del></span>
-							<strong class="gw-card__price">8,550원</strong>
-							<span class="gw-card__ship">내일(목) 도착 보장</span>
-							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(60)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:{d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i style="width: 99%"></i></span>99 % 남음</span>
+					<li class="gw-card"><a href="#"> <span
+							class="gw-card__thumb"><img
+								src="${pageContext.request.contextPath}/images/product-detail/gw-1.jpg"
+								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
+							class="gw-card__name">REPUBLIC OF KOREA 쿨링 반팔 티셔츠 RT002 -
+								헬스 운동 기능성</span> <span class="gw-card__was">할인 <em>43%</em> <del>15,000</del></span>
+							<strong class="gw-card__price">8,550원</strong> <span
+							class="gw-card__ship">내일(목) 도착 보장</span> <span
+							class="gw-card__rating"><em class="stars">★★★★☆</em>(60)</span> <!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:{d.left}%%" -->
+							<span class="gw-card__stock"><span class="bar"><i
+									style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
-					<li class="gw-card"><a href="#">
-							<span class="gw-card__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/gw-2.jpg" alt=""></span>
-							<span class="gw-card__tag">특가진행중</span>
-							<span class="gw-card__name">NEOX 네옥스 밀리터리 디지털 기능성 V넥 쿨론 반팔 티셔츠</span>
-							<span class="gw-card__was">할인 <em>68%</em> <del>24,500</del></span>
-							<strong class="gw-card__price">7,670원</strong>
-							<span class="gw-card__ship">내일(목) 도착 보장</span>
-							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(44)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i style="width: 94%"></i></span>94 % 남음</span>
+					<li class="gw-card"><a href="#"> <span
+							class="gw-card__thumb"><img
+								src="${pageContext.request.contextPath}/images/product-detail/gw-2.jpg"
+								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
+							class="gw-card__name">NEOX 네옥스 밀리터리 디지털 기능성 V넥 쿨론 반팔 티셔츠</span> <span
+							class="gw-card__was">할인 <em>68%</em> <del>24,500</del></span> <strong
+							class="gw-card__price">7,670원</strong> <span
+							class="gw-card__ship">내일(목) 도착 보장</span> <span
+							class="gw-card__rating"><em class="stars">★★★★☆</em>(44)</span> <!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
+							<span class="gw-card__stock"><span class="bar"><i
+									style="width: 94%"></i></span>94 % 남음</span>
 					</a></li>
-					<li class="gw-card"><a href="#">
-							<span class="gw-card__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/gw-3.jpg" alt=""></span>
-							<span class="gw-card__tag">특가진행중</span>
-							<span class="gw-card__name">인디오 남성용 빅사이즈 밀리터리 카모플라쥬 쿨링 반팔티셔츠</span>
-							<span class="gw-card__was">할인 <em>10%</em> <del>10,800</del></span>
-							<strong class="gw-card__price">9,720원</strong>
-							<span class="gw-card__ship">내일(목) 도착 보장</span>
-							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(26)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i style="width: 99%"></i></span>99 % 남음</span>
+					<li class="gw-card"><a href="#"> <span
+							class="gw-card__thumb"><img
+								src="${pageContext.request.contextPath}/images/product-detail/gw-3.jpg"
+								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
+							class="gw-card__name">인디오 남성용 빅사이즈 밀리터리 카모플라쥬 쿨링 반팔티셔츠</span> <span
+							class="gw-card__was">할인 <em>10%</em> <del>10,800</del></span> <strong
+							class="gw-card__price">9,720원</strong> <span
+							class="gw-card__ship">내일(목) 도착 보장</span> <span
+							class="gw-card__rating"><em class="stars">★★★★☆</em>(26)</span> <!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
+							<span class="gw-card__stock"><span class="bar"><i
+									style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
-					<li class="gw-card"><a href="#">
-							<span class="gw-card__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/gw-4.jpg" alt=""></span>
-							<span class="gw-card__tag">특가진행중</span>
-							<span class="gw-card__name">NEOX 네옥스 쿨론 밀리터리 디지털 라운드넥 로카 런닝</span>
-							<span class="gw-card__was">할인 <em>80%</em> <del>34,900</del></span>
-							<strong class="gw-card__price">6,950원</strong>
-							<span class="gw-card__ship">내일(목) 도착 보장</span>
-							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(14)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i style="width: 99%"></i></span>99 % 남음</span>
+					<li class="gw-card"><a href="#"> <span
+							class="gw-card__thumb"><img
+								src="${pageContext.request.contextPath}/images/product-detail/gw-4.jpg"
+								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
+							class="gw-card__name">NEOX 네옥스 쿨론 밀리터리 디지털 라운드넥 로카 런닝</span> <span
+							class="gw-card__was">할인 <em>80%</em> <del>34,900</del></span> <strong
+							class="gw-card__price">6,950원</strong> <span
+							class="gw-card__ship">내일(목) 도착 보장</span> <span
+							class="gw-card__rating"><em class="stars">★★★★☆</em>(14)</span> <!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
+							<span class="gw-card__stock"><span class="bar"><i
+									style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
-					<li class="gw-card"><a href="#">
-							<span class="gw-card__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/gw-5.jpg" alt=""></span>
-							<span class="gw-card__tag">특가진행중</span>
-							<span class="gw-card__name">FLY 남녀공용 기능성 드라이 스포츠 반팔 티셔츠 헬스 러닝</span>
-							<span class="gw-card__was">할인 <em>11%</em> <del>6,490</del></span>
-							<strong class="gw-card__price">5,770원</strong>
-							<span class="gw-card__ship">내일(목) 도착 보장</span>
-							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(216)</span>
+					<li class="gw-card"><a href="#"> <span
+							class="gw-card__thumb"><img
+								src="${pageContext.request.contextPath}/images/product-detail/gw-5.jpg"
+								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
+							class="gw-card__name">FLY 남녀공용 기능성 드라이 스포츠 반팔 티셔츠 헬스 러닝</span> <span
+							class="gw-card__was">할인 <em>11%</em> <del>6,490</del></span> <strong
+							class="gw-card__price">5,770원</strong> <span
+							class="gw-card__ship">내일(목) 도착 보장</span> <span
+							class="gw-card__rating"><em class="stars">★★★★☆</em>(216)</span>
 							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i style="width: 96%"></i></span>96 % 남음</span>
+							<span class="gw-card__stock"><span class="bar"><i
+									style="width: 96%"></i></span>96 % 남음</span>
 					</a></li>
 				</ul>
 			</section>
@@ -465,10 +515,8 @@
 			<!-- ★ 스크롤을 내려도 화면 위에 붙어 있음(sticky) + 지금 보고 있는 구간에 따라
 			     활성 탭이 저절로 바뀜(scroll-spy). 원본이 그렇게 동작함 (2026-08-21 반영) -->
 			<nav class="detail-tabs">
-				<a href="#detail" class="is-on">상품상세</a>
-				<a href="#reviews">상품평 (2,033)</a>
-				<a href="#qna">상품문의</a>
-				<a href="#delivery">배송/교환/반품 안내</a>
+				<a href="#detail" class="is-on">상품상세</a> <a href="#reviews">상품평
+					(2,033)</a> <a href="#qna">상품문의</a> <a href="#delivery">배송/교환/반품 안내</a>
 			</nav>
 
 			<!-- ===== 필수 표기 정보 =====
@@ -520,7 +568,8 @@
 
 				<!-- 눌러도 아직 아무 일 없음. 나중에 접힌 줄을 펴는 자리 -->
 				<!-- 눌러서 접힌 줄을 펴고 접음. 글자도 같이 바뀜 (js/product.js) -->
-				<button type="button" class="item-brief__more" aria-expanded="false">필수 표기 정보 더보기</button>
+				<button type="button" class="item-brief__more" aria-expanded="false">필수
+					표기 정보 더보기</button>
 			</div>
 
 			<!-- ===== 사기 거래 경고 =====
@@ -541,13 +590,19 @@
                    상세설명 이미지는 상품마다 장수가 다름 -->
 			<div class="product-detail-content">
 				<div class="detail-image">
-					<img src="${pageContext.request.contextPath}/images/product-detail/detail-1.jpg" alt="">
+					<img
+						src="${pageContext.request.contextPath}/images/product-detail/detail-1.jpg"
+						alt="">
 				</div>
 				<div class="detail-image">
-					<img src="${pageContext.request.contextPath}/images/product-detail/detail-2.jpg" alt="">
+					<img
+						src="${pageContext.request.contextPath}/images/product-detail/detail-2.jpg"
+						alt="">
 				</div>
 				<div class="detail-image">
-					<img src="${pageContext.request.contextPath}/images/product-detail/detail-3.jpg" alt="">
+					<img
+						src="${pageContext.request.contextPath}/images/product-detail/detail-3.jpg"
+						alt="">
 				</div>
 			</div>
 
@@ -645,11 +700,13 @@
 						</div>
 
 						<!-- 글자가 "자세히 보기" ↔ "접기" 로 바뀜 (원본과 동일). 화살표는 CSS ::after 로 그림 -->
-						<button type="button" class="survey-more" aria-expanded="false">자세히 보기</button>
+						<button type="button" class="survey-more" aria-expanded="false">자세히
+							보기</button>
 
 						<!-- 안내 문구 — 리뷰가 상품(productId)에 붙지 판매자에 붙는 게 아니라는 뜻.
                  나중에 DB 설계할 때 리뷰 테이블이 어디에 연결되는지와 같은 얘기 -->
-						<p class="review-notice">동일한 상품에 대해 작성된 상품 리뷰로, 판매자는 다를 수 있습니다.</p>
+						<p class="review-notice">동일한 상품에 대해 작성된 상품 리뷰로, 판매자는 다를 수
+							있습니다.</p>
 						<a href="#" class="review-policy">상품리뷰 운영원칙</a>
 					</div>
 
@@ -678,7 +735,8 @@
 						       지금 JS 는 그 전까지 화면에서만 흉내내는 것 -->
 						<div class="review-tools">
 							<div class="review-sort">
-								<a href="#" class="is-on" data-sort="best">베스트순</a> <a href="#" data-sort="latest">최신순</a>
+								<a href="#" class="is-on" data-sort="best">베스트순</a> <a href="#"
+									data-sort="latest">최신순</a>
 							</div>
 							<input type="text" class="review-search" placeholder="검색어를 입력하세요">
 							<select class="review-filter">
@@ -712,13 +770,20 @@
 							</div>
 							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 화이트, 95</p>
 							<ul class="review-photos">
-								<li><img src="${pageContext.request.contextPath}/images/product-detail/review-1.jpg" alt=""></li>
-								<li><img src="${pageContext.request.contextPath}/images/product-detail/review-2.jpg" alt=""></li>
-								<li><img src="${pageContext.request.contextPath}/images/product-detail/review-3.jpg" alt=""></li>
+								<li><img
+									src="${pageContext.request.contextPath}/images/product-detail/review-1.jpg"
+									alt=""></li>
+								<li><img
+									src="${pageContext.request.contextPath}/images/product-detail/review-2.jpg"
+									alt=""></li>
+								<li><img
+									src="${pageContext.request.contextPath}/images/product-detail/review-3.jpg"
+									alt=""></li>
 							</ul>
 							<strong class="review-headline">국내원단 대만족</strong>
-							<p class="review-text">쿠팡에서 의류제품 3중포장으로 이렇게까지 깔끔하게 받아본건 처음입니다~~~
-								여름용이라 시원하게 입어야해서 원단비교를 꼼꼼하게 했어요. 확실히 국내원단 사용해서인지 가볍고 시원해요~</p>
+							<p class="review-text">쿠팡에서 의류제품 3중포장으로 이렇게까지 깔끔하게 받아본건
+								처음입니다~~~ 여름용이라 시원하게 입어야해서 원단비교를 꼼꼼하게 했어요. 확실히 국내원단 사용해서인지 가볍고
+								시원해요~</p>
 							<dl class="review-attr">
 								<div>
 									<dt>평소 사이즈</dt>
@@ -756,8 +821,8 @@
 							</div>
 							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 그레이, 100</p>
 							<strong class="review-headline">가격 대비 만족합니다</strong>
-							<p class="review-text">3장에 이 가격이면 괜찮은 것 같아요. 목 늘어남 없이 잘 입고 있습니다. 다만 흰색은 살짝 비치는 편이라
-								안에 하나 더 입어야 할 듯요.</p>
+							<p class="review-text">3장에 이 가격이면 괜찮은 것 같아요. 목 늘어남 없이 잘 입고
+								있습니다. 다만 흰색은 살짝 비치는 편이라 안에 하나 더 입어야 할 듯요.</p>
 							<dl class="review-attr">
 								<div>
 									<dt>평소 사이즈</dt>
@@ -795,7 +860,8 @@
 							</div>
 							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 블랙, 105</p>
 							<strong class="review-headline">사이즈가 조금 작아요</strong>
-							<p class="review-text">평소 105 입는데 어깨가 살짝 낍니다. 한 치수 크게 사시는 걸 추천드려요. 원단이랑 배송은 만족합니다.</p>
+							<p class="review-text">평소 105 입는데 어깨가 살짝 낍니다. 한 치수 크게 사시는 걸
+								추천드려요. 원단이랑 배송은 만족합니다.</p>
 							<dl class="review-attr">
 								<div>
 									<dt>평소 사이즈</dt>
@@ -835,14 +901,16 @@
 							</div>
 							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 블랙, 100</p>
 							<ul class="review-photos">
-								<li><img src="${pageContext.request.contextPath}/images/product-detail/review-4.jpg" alt=""></li>
+								<li><img
+									src="${pageContext.request.contextPath}/images/product-detail/review-4.jpg"
+									alt=""></li>
 							</ul>
 							<!-- ★ 이 리뷰의 글은 사진(review-4.jpg = 쿠팡 봉투에 담긴 포장 상태)에 맞춰 씀.
 							     전에는 "블랙이 화면보다 더 고급스럽게 나왔어요" 였는데 사진은 민트색 포장이라 안 맞았음
 							     (2026-08-24 사용자가 지적). 더미 데이터라도 사진과 글은 맞춰두는 게 맞음 -->
 							<strong class="review-headline">포장이 깔끔해요</strong>
-							<p class="review-text">봉투 그대로 왔고 비닐도 안 찢어져 있었어요. 주문 다음 날 바로 도착했습니다. 마감도
-								깔끔하네요.</p>
+							<p class="review-text">봉투 그대로 왔고 비닐도 안 찢어져 있었어요. 주문 다음 날 바로
+								도착했습니다. 마감도 깔끔하네요.</p>
 							<dl class="review-attr">
 								<div>
 									<dt>평소 사이즈</dt>
@@ -880,7 +948,8 @@
 							</div>
 							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 네이비, 110</p>
 							<strong class="review-headline">그냥 무난해요</strong>
-							<p class="review-text">가격 생각하면 나쁘지 않은데 배송이 하루 늦게 왔어요. 옷 자체는 평범합니다.</p>
+							<p class="review-text">가격 생각하면 나쁘지 않은데 배송이 하루 늦게 왔어요. 옷 자체는
+								평범합니다.</p>
 							<dl class="review-attr">
 								<div>
 									<dt>평소 사이즈</dt>
@@ -915,7 +984,8 @@
 						     ▶JSP: 총 페이지 수 = 서버가 리뷰 개수(2,033) ÷ 페이지당 개수로 계산해서 내려줄 자리.
 						       지금은 더미 리뷰 5개를 3개씩 나눠 2페이지로 흉내냄 (js/product.js PAGE_SIZE). -->
 						<nav class="review-pagination">
-							<button type="button" class="page-prev" aria-label="이전 페이지" disabled>‹</button>
+							<button type="button" class="page-prev" aria-label="이전 페이지"
+								disabled>‹</button>
 							<span class="page-numbers"></span>
 							<button type="button" class="page-next" aria-label="다음 페이지">›</button>
 						</nav>
@@ -937,13 +1007,13 @@
 
 				<!-- 안내 5줄 — 실측 13px / #555. 일부만 굵게 (원본 그대로) -->
 				<ul class="qna-guide">
-					<li>구매한 상품의 <strong>취소/반품은 마이굿팡 구매내역에서 신청</strong> 가능합니다.</li>
-					<li>상품문의 및 후기게시판을 통해 취소나 환불, 반품 등은 처리되지 않습니다.</li>
-					<li><strong>가격, 판매자, 교환/환불 및 배송 등 해당 상품 자체와 관련 없는 문의는 고객센터 내 1:1
-							문의하기</strong>를 이용해주세요.
+					<li>구매한 상품의 <strong>취소/반품은 마이굿팡 구매내역에서 신청</strong> 가능합니다.
 					</li>
-					<li><strong>"해당 상품 자체"와 관계없는 글, 양도, 광고성, 욕설, 비방, 도배 등의 글은 예고 없이 이동,
-							노출제한, 삭제 등의 조치가 취해질 수 있습니다.</strong></li>
+					<li>상품문의 및 후기게시판을 통해 취소나 환불, 반품 등은 처리되지 않습니다.</li>
+					<li><strong>가격, 판매자, 교환/환불 및 배송 등 해당 상품 자체와 관련 없는 문의는
+							고객센터 내 1:1 문의하기</strong>를 이용해주세요.</li>
+					<li><strong>"해당 상품 자체"와 관계없는 글, 양도, 광고성, 욕설, 비방, 도배
+							등의 글은 예고 없이 이동, 노출제한, 삭제 등의 조치가 취해질 수 있습니다.</strong></li>
 					<li>공개 게시판이므로 전화번호, 메일 주소 등 고객님의 소중한 개인정보는 절대 남기지 말아주세요.</li>
 				</ul>
 
@@ -959,7 +1029,8 @@
 				<p class="qna-empty">아직 문의가 없습니다.</p>
 
 				<div class="qna-report">
-					<span>판매 부적격 상품 또는 허위과장광고 및 지식재산권을 침해하는 상품의 경우 신고하여 주시기 바랍니다.</span>
+					<span>판매 부적격 상품 또는 허위과장광고 및 지식재산권을 침해하는 상품의 경우 신고하여 주시기
+						바랍니다.</span>
 					<button type="button" class="btn-report-qna">신고하기</button>
 				</div>
 			</section>
@@ -983,8 +1054,8 @@
 							<!-- rowspan=2 : 세로로 두 칸을 하나로 합침.
                    왼쪽 두 줄(배송방법/묶음배송)에 배송비 한 칸이 걸쳐 있는 모양 -->
 							<th rowspan="2">배송비</th>
-							<td rowspan="2">무료배송<br> - 로켓배송 상품 중 19,800원 이상 구매 시 무료배송<br>
-								- 도서산간 지역 추가비용 없음
+							<td rowspan="2">무료배송<br> - 로켓배송 상품 중 19,800원 이상 구매 시
+								무료배송<br> - 도서산간 지역 추가비용 없음
 							</td>
 						</tr>
 						<tr>
@@ -995,9 +1066,9 @@
 							<th>배송기간</th>
 							<!-- colspan=3 : 가로로 세 칸을 하나로 합침 -->
 							<td colspan="3">• 굿팡친구 배송 지역 : 주문 및 결제 완료 후, 1-2일 이내 도착<br>
-								• 굿팡친구 미배송 지역 : 주문 및 결제 완료 후, 2-3일 이내 도착<br>
-								- 도서 산간 지역 등은 하루가 더 소요될 수 있습니다.<br>
-								• 천재지변, 물량 수급 변동 등 예외적인 사유 발생 시, 다소 지연될 수 있는 점 양해 부탁드립니다.
+								• 굿팡친구 미배송 지역 : 주문 및 결제 완료 후, 2-3일 이내 도착<br> - 도서 산간 지역 등은
+								하루가 더 소요될 수 있습니다.<br> • 천재지변, 물량 수급 변동 등 예외적인 사유 발생 시, 다소
+								지연될 수 있는 점 양해 부탁드립니다.
 							</td>
 						</tr>
 					</tbody>
@@ -1005,23 +1076,25 @@
 
 				<!-- ── 교환/반품 안내 ──────────────────── -->
 				<h3 class="etc-title">교환/반품 안내</h3>
-				<p class="etc-note">• 교환/반품에 관한 일반적인 사항은 판매자가 제시사항보다 관계법령이 우선합니다.<br>
-					다만, 판매자의 제시사항이 관계법령보다 소비자에게 유리한 경우에는 판매자 제시사항이 적용됩니다.
+				<p class="etc-note">
+					• 교환/반품에 관한 일반적인 사항은 판매자가 제시사항보다 관계법령이 우선합니다.<br> 다만, 판매자의
+					제시사항이 관계법령보다 소비자에게 유리한 경우에는 판매자 제시사항이 적용됩니다.
 				</p>
 				<table class="policy-table">
 					<tbody>
 						<tr>
 							<th>교환/반품 비용</th>
 							<td>• 와우멤버십 회원: 무료로 반품/교환 가능<br> • 와우멤버십 회원 아닌 경우:<br>
-								1) [총 주문금액] - [반품 상품금액] = 19,800원 미만인 경우 반품비 5,000원<br> 2) [총 주문금액] -
-								[반품 상품금액] = 19,800원 이상인 경우 반품비 2,500원
+								1) [총 주문금액] - [반품 상품금액] = 19,800원 미만인 경우 반품비 5,000원<br> 2)
+								[총 주문금액] - [반품 상품금액] = 19,800원 이상인 경우 반품비 2,500원
 							</td>
 						</tr>
 						<tr>
 							<th>교환/반품 신청 기준일</th>
-							<td>• 단순변심에 의한 로켓배송 상품의 교환/반품은 제품 수령 후 30일 이내까지, 교환/반품 제한사항에 해당하지 않는
-								경우에만 가능 (교환/반품 비용 고객부담)<br> • 상품의 내용이 표시·광고의 내용과 다른 경우에는 상품을 수령한
-								날부터 3개월 이내, 그 사실을 안 날 또는 알 수 있었던 날부터 30일 이내에 청약철회 가능
+							<td>• 단순변심에 의한 로켓배송 상품의 교환/반품은 제품 수령 후 30일 이내까지, 교환/반품 제한사항에
+								해당하지 않는 경우에만 가능 (교환/반품 비용 고객부담)<br> • 상품의 내용이 표시·광고의 내용과 다른
+								경우에는 상품을 수령한 날부터 3개월 이내, 그 사실을 안 날 또는 알 수 있었던 날부터 30일 이내에 청약철회
+								가능
 							</td>
 						</tr>
 					</tbody>
@@ -1031,10 +1104,12 @@
 				<h3 class="etc-title">교환/반품 제한사항</h3>
 				<ul class="etc-list">
 					<li>주문/제작 상품의 경우, 상품의 제작이 이미 진행된 경우</li>
-					<li>상품 포장을 개봉하여 사용 또는 설치 완료되어 상품의 가치가 훼손된 경우 (단, 내용 확인을 위한 포장 개봉의 경우는 예외)</li>
+					<li>상품 포장을 개봉하여 사용 또는 설치 완료되어 상품의 가치가 훼손된 경우 (단, 내용 확인을 위한 포장
+						개봉의 경우는 예외)</li>
 					<li>고객의 사용, 시간경과, 일부 소비에 의하여 상품의 가치가 현저히 감소한 경우</li>
 					<li>세트상품 일부 사용, 구성품을 분실하였거나 취급 부주의로 인한 파손/고장/오염으로 재판매 불가한 경우</li>
-					<li>모니터 해상도의 차이로 인해 색상이나 이미지가 실제와 달라, 고객이 단순 변심으로 교환/반품을 무료로 요청하는 경우</li>
+					<li>모니터 해상도의 차이로 인해 색상이나 이미지가 실제와 달라, 고객이 단순 변심으로 교환/반품을 무료로
+						요청하는 경우</li>
 					<li>제조사의 사정 (신모델 출시 등) 및 부품 가격 변동 등에 의해 무료 교환/반품으로 요청하는 경우</li>
 				</ul>
 				<p class="etc-note">※ 각 상품별로 아래와 같은 사유로 취소/반품이 제한될 수 있습니다.</p>
@@ -1042,20 +1117,21 @@
 					<tbody>
 						<tr>
 							<th>의류/잡화/수입명품</th>
-							<td>• 상품의 택(TAG) 및 라벨의 멸실 또는 훼손, 상품의 사용 또는 훼손, 구성품 누락으로 상품의 가치가 현저히
-								감소된 경우</td>
+							<td>• 상품의 택(TAG) 및 라벨의 멸실 또는 훼손, 상품의 사용 또는 훼손, 구성품 누락으로 상품의
+								가치가 현저히 감소된 경우</td>
 						</tr>
 						<tr>
 							<th>계절상품/식품/화장품</th>
-							<td>• 신선/냉장/냉동 상품의 단순변심의 경우<br> • 뷰티 상품 이용 시 트러블(알러지, 붉은 반점, 가려움,
-								따가움)이 발생하는 경우, 진료 확인서 및 소견서 등을 증빙하면 환불이 가능 (제반비용 고객부담)
+							<td>• 신선/냉장/냉동 상품의 단순변심의 경우<br> • 뷰티 상품 이용 시 트러블(알러지,
+								붉은 반점, 가려움, 따가움)이 발생하는 경우, 진료 확인서 및 소견서 등을 증빙하면 환불이 가능 (제반비용
+								고객부담)
 							</td>
 						</tr>
 						<tr>
 							<th>전자/가전/설치상품</th>
-							<td>• 전자제품 특성상 정품 스티커가 제거되었거나, 설치 또는 사용 이후에 단순변심인 경우<br> • 설치 또는
-								사용하여 재판매가 어려운 경우, 액정이 있는 상품의 전원을 켠 경우<br> • 홀로그램 등을 분리, 분실,
-								훼손하여 상품의 가치가 현저히 감소하여 재판매가 불가할 경우 (노트북, 데스크탑 PC 등)
+							<td>• 전자제품 특성상 정품 스티커가 제거되었거나, 설치 또는 사용 이후에 단순변심인 경우<br>
+								• 설치 또는 사용하여 재판매가 어려운 경우, 액정이 있는 상품의 전원을 켠 경우<br> • 홀로그램 등을
+								분리, 분실, 훼손하여 상품의 가치가 현저히 감소하여 재판매가 불가할 경우 (노트북, 데스크탑 PC 등)
 							</td>
 						</tr>
 						<tr>
@@ -1077,8 +1153,8 @@
 					<tbody>
 						<tr>
 							<th>소비자상담 및 교환반품 문의</th>
-							<td colspan="3">굿팡고객센터 1577-0000<br> <span class="sub">배송 및 환불/교환에 대한
-									문의는 마이굿팡-고객센터 내 상담하기를 이용해주세요.</span>
+							<td colspan="3">굿팡고객센터 1577-0000<br> <span class="sub">배송
+									및 환불/교환에 대한 문의는 마이굿팡-고객센터 내 상담하기를 이용해주세요.</span>
 							</td>
 						</tr>
 						<tr>
@@ -1101,17 +1177,17 @@
 						</tr>
 						<tr>
 							<th>구매안전 서비스</th>
-							<td colspan="3">02-006-00042 <a href="#" class="link">서비스 가입사실 확인 &gt;</a><br>
-								<span class="sub">본 판매자는 고객님의 안전거래를 위해 관련 법률에 의거하여 굿팡페이의
-									구매안전서비스를 적용하고 있습니다.</span>
+							<td colspan="3">02-006-00042 <a href="#" class="link">서비스
+									가입사실 확인 &gt;</a><br> <span class="sub">본 판매자는 고객님의
+									안전거래를 위해 관련 법률에 의거하여 굿팡페이의 구매안전서비스를 적용하고 있습니다.</span>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 
-				<p class="etc-footnote">미성년자가 체결한 계약은 법정대리인이 동의하지 않는 경우 본인 또는 법정대리인이 취소할 수
-					있습니다. 굿팡은 통신판매중개자로서 통신판매의 당사자가 아니며, 광고, 고시정보, 상품 주문, 배송 및 환불의 의무와 책임은 각
-					판매자에게 있습니다.</p>
+				<p class="etc-footnote">미성년자가 체결한 계약은 법정대리인이 동의하지 않는 경우 본인 또는
+					법정대리인이 취소할 수 있습니다. 굿팡은 통신판매중개자로서 통신판매의 당사자가 아니며, 광고, 고시정보, 상품 주문,
+					배송 및 환불의 의무와 책임은 각 판매자에게 있습니다.</p>
 			</section>
 
 		</div>
@@ -1158,17 +1234,20 @@
 
 	<!-- ── ① 갤러리 모달 ── 원본 실측: 흰 패널 982px / 덮개 rgba(17,17,17,0.87) / z-index 9999 -->
 	<div class="review-gallery-modal" hidden>
-		<div class="gallery-panel" role="dialog" aria-modal="true" aria-label="리뷰 사진 갤러리">
+		<div class="gallery-panel" role="dialog" aria-modal="true"
+			aria-label="리뷰 사진 갤러리">
 			<div class="gallery-head">
-				<strong class="gallery-title">갤러리</strong>
-				<span class="gallery-sub">섬네일을 클릭하면 더 많은 상품평 정보를 볼 수 있어요</span>
+				<strong class="gallery-title">갤러리</strong> <span class="gallery-sub">섬네일을
+					클릭하면 더 많은 상품평 정보를 볼 수 있어요</span>
 				<button type="button" class="gallery-close">
 					<span class="blind">갤러리 닫기</span>
 				</button>
 			</div>
 			<div class="gallery-body">
 				<!-- 사진 개수 — JS 가 숫자를 채움 -->
-				<p class="gallery-count">이미지 <strong>0</strong></p>
+				<p class="gallery-count">
+					이미지 <strong>0</strong>
+				</p>
 				<!-- 격자 — JS 가 li 를 만들어 넣음 (원본 실측 140x140, radius 4px) -->
 				<ul class="gallery-grid"></ul>
 			</div>
@@ -1177,7 +1256,8 @@
 
 	<!-- ── ② 사진 뷰어 ── 원본 실측: 어두운 패널 rgb(34,34,34) / 982px -->
 	<div class="photo-viewer" hidden>
-		<div class="viewer-panel" role="dialog" aria-modal="true" aria-label="리뷰 사진 크게 보기">
+		<div class="viewer-panel" role="dialog" aria-modal="true"
+			aria-label="리뷰 사진 크게 보기">
 			<!-- 위: 누가 쓴 리뷰인지 -->
 			<div class="viewer-head">
 				<span class="viewer-avatar"></span>

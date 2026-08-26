@@ -1,360 +1,207 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>회원가입</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원가입</title>
 
-  <link rel="stylesheet"
-        href="${pageContext.request.contextPath}/css/signup.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/signup.css">
 </head>
 
 <body>
-<div class="page">
-  <main class="signup">
+	<div class="page">
+		<main class="signup">
 
-    <!-- GoodPang 로고 -->
-    <h1 class="logo">
-      <a href="${pageContext.request.contextPath}/" title="GoodPang 홈으로">
-        <span class="brand-goodpang">GoodPang</span>
-      </a>
-    </h1>
+			<!-- GoodPang 로고 -->
+			<h1 class="logo">
+				<a href="${pageContext.request.contextPath}/" title="GoodPang 홈으로">
+					<span class="brand-goodpang">GoodPang</span>
+				</a>
+			</h1>
 
-    <br>
+			<br>
 
-    <h1 class="title">
-      회원정보를 입력해주세요
-    </h1>
+			<h1 class="title">회원정보를 입력해주세요</h1>
 
-    <!-- 서버에서 전달된 오류 메시지 -->
-    <c:if test="${not empty error}">
-      <p class="message error show">
-        <c:out value="${error}" />
-      </p>
-    </c:if>
+			<!-- 서버에서 전달된 오류 메시지 -->
+			<c:if test="${not empty error}">
+				<p class="message error show">
+					<c:out value="${error}" />
+				</p>
+			</c:if>
 
-    <!--
+			<!--
       SignupServlet:
       @WebServlet("/signup")
       doPost()로 전송
     -->
-    <form
-      class="form"
-      id="signupForm"
-      action="${pageContext.request.contextPath}/signup"
-      method="post"
-      novalidate
-    >
+			<form class="form" id="signupForm"
+				action="${pageContext.request.contextPath}/signup" method="post"
+				novalidate>
 
-      <!-- 아이디 -->
-      <div class="field">
-        <input
-          class="input"
-          id="memberId"
-          name="memberId"
-          type="text"
-          placeholder="아이디"
-          autocomplete="username"
-          maxlength="50"
-        >
-      </div>
+				<!-- 아이디 -->
+				<div class="field">
+					<input class="input" id="memberId" name="memberId" type="text"
+						placeholder="아이디" autocomplete="username" maxlength="50">
+				</div>
 
-      <!-- 이메일 -->
-      <div class="field">
-        <input
-          class="input"
-          id="email"
-          name="email"
-          type="email"
-          placeholder="이메일"
-          autocomplete="email"
-          maxlength="100"
-        >
+				<!-- 이메일 -->
+				<div class="field">
+					<input class="input" id="email" name="email" type="email"
+						placeholder="이메일" autocomplete="email" maxlength="100">
 
-        <p
-          id="emailMessage"
-          class="message error"
-        >
-          이메일 주소를 정확하게 입력해주세요.
-        </p>
-      </div>
+					<p id="emailMessage" class="message error">이메일 주소를
+						정확하게 입력해주세요.</p>
+				</div>
 
-      <!-- 비밀번호 -->
-      <div class="field password-field">
-        <input
-          class="input"
-          id="password"
-          name="memberPw"
-          type="password"
-          placeholder="비밀번호"
-          autocomplete="new-password"
-          maxlength="100"
-        >
+				<!-- 비밀번호 -->
+				<div class="field password-field">
+					<input class="input" id="password" name="memberPw" type="password"
+						placeholder="비밀번호" autocomplete="new-password" maxlength="100">
 
-        <button
-          class="password-button"
-          id="passwordToggle"
-          type="button"
-        >
-          보기
-        </button>
-      </div>
+					<button class="password-button" id="passwordToggle" type="button">
+						보기</button>
+				</div>
 
-      <!-- 비밀번호 확인 -->
-      <div class="field password-field">
-        <input
-          class="input"
-          id="passwordConfirm"
-          name="memberPwConfirm"
-          type="password"
-          placeholder="비밀번호 확인"
-          autocomplete="new-password"
-          maxlength="100"
-        >
+				<!-- 비밀번호 확인 -->
+				<div class="field password-field">
+					<input class="input" id="passwordConfirm" name="memberPwConfirm"
+						type="password" placeholder="비밀번호 확인" autocomplete="new-password"
+						maxlength="100">
 
-        <button
-          class="password-button"
-          id="passwordConfirmToggle"
-          type="button"
-        >
-          보기
-        </button>
+					<button class="password-button" id="passwordConfirmToggle"
+						type="button">보기</button>
 
-        <p
-          id="passwordMessage"
-          class="message error"
-        >
-          비밀번호가 일치하지 않습니다.
-        </p>
-      </div>
+					<p id="passwordMessage" class="message error">비밀번호가
+						일치하지 않습니다.</p>
+				</div>
 
-      <!-- 이름 -->
-      <div class="field name-field">
-        <input
-          class="input"
-          id="name"
-          name="memberName"
-          type="text"
-          placeholder="이름"
-          autocomplete="name"
-          maxlength="30"
-        >
-      </div>
+				<!-- 이름 -->
+				<div class="field name-field">
+					<input class="input" id="name" name="memberName" type="text"
+						placeholder="이름" autocomplete="name" maxlength="30">
+				</div>
 
-      <!-- 휴대폰 -->
-      <div class="phone-row">
-        <select
-          class="country"
-          id="country"
-          aria-label="국가번호"
-        >
-          <option value="+82">🇰🇷 +82</option>
-        </select>
+				<!-- 휴대폰 -->
+				<div class="phone-row">
+					<select class="country" id="country" aria-label="국가번호">
+						<option value="+82">🇰🇷 +82</option>
+					</select> <input class="input phone-input" id="phone" name="phone"
+						type="tel" placeholder="휴대폰 번호" autocomplete="tel" maxlength="13">
+				</div>
 
-        <input
-          class="input phone-input"
-          id="phone"
-          name="phone"
-          type="tel"
-          placeholder="휴대폰 번호"
-          autocomplete="tel"
-          maxlength="13"
-        >
-      </div>
+				<!-- 인증번호 -->
+				<div class="verification-row">
+					<input class="input verification-input" id="verification"
+						name="verification" type="text" placeholder="인증번호" maxlength="6"
+						inputmode="numeric">
 
-      <!-- 인증번호 -->
-      <div class="verification-row">
-        <input
-          class="input verification-input"
-          id="verification"
-          name="verification"
-          type="text"
-          placeholder="인증번호"
-          maxlength="6"
-          inputmode="numeric"
-        >
+					<button class="verify-button" id="verifyButton" type="button">
+						인증번호 받기</button>
+				</div>
 
-        <button
-          class="verify-button"
-          id="verifyButton"
-          type="button"
-        >
-          인증번호 받기
-        </button>
-      </div>
+				<p id="verificationMessage" class="message"></p>
 
-      <p
-        id="verificationMessage"
-        class="message"
-      ></p>
+				<!-- 약관 -->
+				<section class="agreement">
 
-      <!-- 약관 -->
-      <section class="agreement">
+					<!-- 전체 동의 -->
+					<div class="agreement-all">
+						<label> <input class="check" id="agreeAll" type="checkbox">
+							만 14세 이상이며 모두 동의합니다.
+						</label>
+					</div>
 
-        <!-- 전체 동의 -->
-        <div class="agreement-all">
-          <label>
-            <input
-              class="check"
-              id="agreeAll"
-              type="checkbox"
-            >
-            만 14세 이상이며 모두 동의합니다.
-          </label>
-        </div>
+					<div class="agreement-list">
 
-        <div class="agreement-list">
+						<!-- 이용약관 -->
+						<div class="agreement-item">
+							<input class="check required-check" id="agreeTerms"
+								type="checkbox"> <label for="agreeTerms">
+								<span class="required">[필수]</span> GoodPang 이용약관 동의 <a href="#"
+								class="terms-link" onclick="return false;">
+									보기 </a>
+							</label>
+						</div>
 
-          <!-- 이용약관 -->
-          <div class="agreement-item">
-            <input
-              class="check required-check"
-              id="agreeTerms"
-              type="checkbox"
-            >
+						<!-- 전자금융거래 -->
+						<div class="agreement-item">
+							<input class="check required-check" id="agreeFinance"
+								type="checkbox"> <label for="agreeFinance">
+								<span class="required">[필수]</span> 전자금융거래 이용약관 동의 <a href="#"
+								class="terms-link" onclick="return false;">
+									보기 </a>
+							</label>
+						</div>
 
-            <label for="agreeTerms">
-              <span class="required">[필수]</span>
-              GoodPang 이용약관 동의
-              <a
-                href="#"
-                class="terms-link"
-                onclick="return false;"
-              >
-                보기
-              </a>
-            </label>
-          </div>
+						<!-- 개인정보 -->
+						<div class="agreement-item">
+							<input class="check required-check" id="agreePrivacy"
+								type="checkbox"> <label for="agreePrivacy">
+								<span class="required">[필수]</span> 개인정보 수집 및 이용 동의 <a href="#"
+								class="terms-link" onclick="return false;">
+									보기 </a>
+							</label>
+						</div>
 
-          <!-- 전자금융거래 -->
-          <div class="agreement-item">
-            <input
-              class="check required-check"
-              id="agreeFinance"
-              type="checkbox"
-            >
+						<!-- 마케팅 -->
+						<div class="agreement-item">
+							<input class="check" id="agreeMarketing" type="checkbox">
 
-            <label for="agreeFinance">
-              <span class="required">[필수]</span>
-              전자금융거래 이용약관 동의
-              <a
-                href="#"
-                class="terms-link"
-                onclick="return false;"
-              >
-                보기
-              </a>
-            </label>
-          </div>
+							<label for="agreeMarketing"> <span class="optional">[선택]</span>
+								개인정보 수집 및 이용 동의 (마케팅)
+							</label>
+						</div>
 
-          <!-- 개인정보 -->
-          <div class="agreement-item">
-            <input
-              class="check required-check"
-              id="agreePrivacy"
-              type="checkbox"
-            >
+						<!-- 광고성 정보 -->
+						<div class="agreement-item">
+							<input class="check" id="agreeAdvertisement" type="checkbox">
 
-            <label for="agreePrivacy">
-              <span class="required">[필수]</span>
-              개인정보 수집 및 이용 동의
-              <a
-                href="#"
-                class="terms-link"
-                onclick="return false;"
-              >
-                보기
-              </a>
-            </label>
-          </div>
+							<label for="agreeAdvertisement"> <span class="optional">[선택]</span>
+								광고성 정보 수신 동의
+							</label>
+						</div>
 
-          <!-- 마케팅 -->
-          <div class="agreement-item">
-            <input
-              class="check"
-              id="agreeMarketing"
-              type="checkbox"
-            >
+					</div>
+				</section>
 
-            <label for="agreeMarketing">
-              <span class="optional">[선택]</span>
-              개인정보 수집 및 이용 동의 (마케팅)
-            </label>
-          </div>
+				<!-- 가입 버튼 -->
+				<button class="submit" id="submitButton" type="submit">
+					동의하고 가입완료</button>
 
-          <!-- 광고성 정보 -->
-          <div class="agreement-item">
-            <input
-              class="check"
-              id="agreeAdvertisement"
-              type="checkbox"
-            >
+			</form>
 
-            <label for="agreeAdvertisement">
-              <span class="optional">[선택]</span>
-              광고성 정보 수신 동의
-            </label>
-          </div>
+			<footer class="footer">
+				<div>GoodPang</div>
+				<div>© 2026 GoodPang. All rights reserved.</div>
+			</footer>
 
-        </div>
-      </section>
-
-      <!-- 가입 버튼 -->
-      <button
-        class="submit"
-        id="submitButton"
-        type="submit"
-      >
-        동의하고 가입완료
-      </button>
-
-    </form>
-
-    <footer class="footer">
-      <div>GoodPang</div>
-      <div>© 2026 GoodPang. All rights reserved.</div>
-    </footer>
-
-  </main>
-</div>
+		</main>
+	</div>
 
 
-<!-- 모달 -->
-<div
-  class="modal-backdrop"
-  id="modalBackdrop"
->
-  <div class="modal">
+	<!-- 모달 -->
+	<div class="modal-backdrop" id="modalBackdrop">
+		<div class="modal">
 
-    <h2
-      class="modal-title"
-      id="modalTitle"
-    >
-      안내
-    </h2>
+			<h2 class="modal-title" id="modalTitle">안내</h2>
 
-    <div
-      class="modal-body"
-      id="modalBody"
-    ></div>
+			<div class="modal-body" id="modalBody"></div>
 
-    <div class="modal-footer">
-      <button
-        class="modal-button"
-        id="modalConfirm"
-        type="button"
-      >
-        확인
-      </button>
-    </div>
+			<div class="modal-footer">
+				<button class="modal-button" id="modalConfirm" type="button">
+					확인</button>
+			</div>
 
-  </div>
-</div>
+		</div>
+	</div>
 
 
-<script>
+	<script>
   /* =========================================================
      요소
   ========================================================= */
@@ -953,4 +800,5 @@
 </script>
 
 </body>
+
 </html>

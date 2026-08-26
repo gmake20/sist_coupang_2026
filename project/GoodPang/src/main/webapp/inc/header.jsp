@@ -800,13 +800,15 @@
 
 						<li class="cart"><a
 
-							href="${pageContext.request.contextPath}/cart.jsp"> <img
+							href="${pageContext.request.contextPath}/cart"> <img
 
 								src="${pageContext.request.contextPath}/images/icons/cart.png"
 
-								width="44" height="44" alt="장바구니"> <em class="cart-count">
-
-									0 </em> <span class="icon-label"> 장바구니 </span>
+								width="44" height="44" alt="장바구니">
+								
+								 <em class="cart-count">
+									${empty sessionScope.cartCount ? 0 : sessionScope.cartCount}
+									</em> <span class="icon-label"> 장바구니 </span>
 
 						</a>
 
@@ -820,7 +822,7 @@
 
 										<li class="empty-cart">장바구니에 담은 상품이 없습니다.</li>
 
-									</ul> <a href="${pageContext.request.contextPath}/cart.jsp"
+									</ul> <a href="${pageContext.request.contextPath}/cart"
 
 									class="cart-btn"> <span> 장바구니 전체보기 <i
 

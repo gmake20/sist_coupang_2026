@@ -1,9 +1,11 @@
 package com.goodpang.servlet;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.goodpang.dao.CartDAO;
 import com.goodpang.dao.MemberDAO;
 import com.goodpang.dto.MemberDTO;
 
@@ -23,7 +25,7 @@ public class LoginServlet extends HttpServlet {
 	protected void doGet(
 			HttpServletRequest request,
 			HttpServletResponse response)
-			throws ServletException, IOException {
+					throws ServletException, IOException {
 
 		HttpSession session =
 				request.getSession();
@@ -31,8 +33,8 @@ public class LoginServlet extends HttpServlet {
 
 		String redirectAfterLogin =
 				(String) session.getAttribute(
-					"redirectAfterLogin"
-				);
+						"redirectAfterLogin"
+						);
 
 		if (redirectAfterLogin == null
 				|| redirectAfterLogin.isBlank()) {
@@ -49,8 +51,8 @@ public class LoginServlet extends HttpServlet {
 
 				int index =
 						referer.indexOf(
-							contextPath
-						);
+								contextPath
+								);
 
 				if (index >= 0) {
 
@@ -58,23 +60,23 @@ public class LoginServlet extends HttpServlet {
 							referer.substring(index);
 
 					session.setAttribute(
-						"redirectAfterLogin",
-						redirectUrl
-					);
+							"redirectAfterLogin",
+							redirectUrl
+							);
 				}
 			}
 		}
 
 		request
-			.getRequestDispatcher("/login.jsp")
-			.forward(request, response);
+		.getRequestDispatcher("/login.jsp")
+		.forward(request, response);
 	}
 
 	@Override
 	protected void doPost(
 			HttpServletRequest request,
 			HttpServletResponse response)
-			throws ServletException, IOException {
+					throws ServletException, IOException {
 
 		request.setCharacterEncoding("UTF-8");
 
@@ -83,20 +85,20 @@ public class LoginServlet extends HttpServlet {
 
 		String password =
 				request.getParameter("password");
-		
+
 		if (email == null
 				|| email.isBlank()
 				|| password == null
 				|| password.isBlank()) {
 
 			request.setAttribute(
-				"error",
-				"아이디 또는 비밀번호를 입력해주세요."
-			);
+					"error",
+					"아이디 또는 비밀번호를 입력해주세요."
+					);
 
 			request
-				.getRequestDispatcher("/login.jsp")
-				.forward(request, response);
+			.getRequestDispatcher("/login.jsp")
+			.forward(request, response);
 
 			return;
 		}
@@ -110,13 +112,13 @@ public class LoginServlet extends HttpServlet {
 		if (member == null) {
 
 			request.setAttribute(
-				"error",
-				"아이디 또는 비밀번호가 올바르지 않습니다."
-			);
+					"error",
+					"아이디 또는 비밀번호가 올바르지 않습니다."
+					);
 
 			request
-				.getRequestDispatcher("/login.jsp")
-				.forward(request, response);
+			.getRequestDispatcher("/login.jsp")
+			.forward(request, response);
 
 			return;
 		}
@@ -126,61 +128,105 @@ public class LoginServlet extends HttpServlet {
 				member.getMemberPw())) {
 
 			request.setAttribute(
-				"error",
-				"아이디 또는 비밀번호가 올바르지 않습니다."
-			);
+					"error",
+					"아이디 또는 비밀번호가 올바르지 않습니다."
+					);
 
 			request
-				.getRequestDispatcher("/login.jsp")
-				.forward(request, response);
+			.getRequestDispatcher("/login.jsp")
+			.forward(request, response);
 
 			return;
 		}
-		
+
 		HttpSession session =
 				request.getSession();
 
 		session.setAttribute(
-			"loginMember",
-			member
-		);
+				"loginMember",
+				member
+				);
+		
+		CartDAO cartDAO =
+				new CartDAO();
+
+		@SuppressWarnings("unchecked")
+		Map<Integer, Integer> guestCart =
+			(Map<Integer, Integer>)
+			
+		session.getAttribute("guestCart");
+
+		if (guestCart != null
+				&& !guestCart.isEmpty()) {
+
+			for (Map.Entry<Integer, Integer> entry
+					: guestCart.entrySet()) {
+
+				int optionId =
+						entry.getKey();
+
+				int quantity =
+						entry.getValue();
+
+				cartDAO.addCart(
+						member.getMemberNo(),
+						optionId,
+						quantity
+						);
+
+			}
+
+			// DB CART로 옮긴 다음 삭제
+			session.removeAttribute("guestCart");
+		}
+		
+		int cartCount =
+				cartDAO.getCartCount(
+				member.getMemberNo()
+				);
+
+				session.setAttribute(
+				"cartCount",
+				cartCount
+				);
+		
 
 		session.setAttribute(
-			"memberNo",
-			member.getMemberNo()
-		);
+				"memberNo",
+				member.getMemberNo()
+				);
 
 		session.setAttribute(
-			"memberName",
-			member.getMemberName()
-		);
+				"memberName",
+				member.getMemberName()
+				);
 
 		session.setMaxInactiveInterval(
-			30 * 60
-		);
+				30 * 60
+				);
 
 		String redirectUrl =
 				(String) session.getAttribute(
-					"redirectAfterLogin"
-				);
+						"redirectAfterLogin"
+						);
 
 		session.removeAttribute(
-			"redirectAfterLogin"
-		);
+				"redirectAfterLogin"
+				);
 
 		if (redirectUrl != null
 				&& !redirectUrl.isBlank()
 				&& !redirectUrl.contains("/login")) {
 
 			response.sendRedirect(
-				redirectUrl
-			);
+					redirectUrl
+					);
 
 			return;
 		}
 
 		response.sendRedirect(
-			request.getContextPath() + "/"
-		);
+				request.getContextPath() + "/"
+				);
 	}
 }
