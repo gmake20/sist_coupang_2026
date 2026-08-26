@@ -1,5 +1,8 @@
 package com.goodpang.dto;
 
+
+import java.sql.Timestamp;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,10 +14,21 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderItemDTO {
     
-	private int orderNo; // <-- 추가
-    private String productName;
-    private String optionName;
-    private int salePrice;
-    private int quantity;
-    private boolean freeDelivery;
+	private int orderNo; 
+	private int memberNo;
+	private String orderStatus; 
+	/* private LocalDate orderDate; */
+	private Timestamp orderDate;
+	private int totalPrice; 
+	private String productName; 
+	private int quantity;
+	private String option1Type;
+	private String option1Value;
+	private String option2Type;
+	private String option2Value;
+	private Long orderDetailNo;
+    private Long productNo;
+
+
 }
+ 

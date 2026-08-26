@@ -196,6 +196,7 @@ public class OrderDAO {
 	/*
 	 * 주문 상품 조회
 	 */
+	/*
 	public List<OrderItemDTO> getOrderItems(int orderNo) {
 
 		List<OrderItemDTO> orderItems =
@@ -259,7 +260,7 @@ public class OrderDAO {
 
 		return orderItems;
 	}
-
+*/
 
 	/*
 	 * 주문 금액 조회
@@ -560,7 +561,7 @@ public class OrderDAO {
             return pstmt.executeUpdate();
         }
     }
-	
+	/*
 	public List<OrderItemDTO> getOrderListByMemberNo(int memberNo) {
 
 		List<OrderItemDTO> list = new ArrayList<>();
@@ -571,13 +572,15 @@ public class OrderDAO {
 					o.ORDER_DATE,
 					o.TOTAL_PRICE,
 					o.ORDER_STATUS,
-					p.PAYMENT_METHOD
+					
 				FROM ORDERS o
-				JOIN PAYMENT p
+				JOIN PRODUCT p
 				  ON o.ORDER_NO = p.ORDER_NO
 				WHERE o.MEMBER_NO = ?
 				ORDER BY o.ORDER_NO DESC
 				""";
+		
+		
 
 		try (
 			Connection conn = ConnectionProvider.getConnection();
@@ -628,6 +631,7 @@ public class OrderDAO {
 
 		return list;
 	}
+	*/
 	
 	public int updateTotalPrice(
 	        Connection conn,
