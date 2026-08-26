@@ -1,3 +1,4 @@
+/*
 package com.goodpang.servlet;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class OrderPaymentServlet extends HttpServlet {
                         request,
                         response
                 );
+                
 
         if (member == null) {
             return;
@@ -241,3 +243,4 @@ public class OrderPaymentServlet extends HttpServlet {
         }
     }
 }
+ */

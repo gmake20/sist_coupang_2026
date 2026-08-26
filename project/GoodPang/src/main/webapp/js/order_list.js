@@ -1,8 +1,9 @@
 // 년도/기간별 의류 상품 샘플 데이터
+/*
 const orderData = {
     recent: [
         {
-            orderNo: "20260812-0001",
+            orderNo: 20,
             date: "2026. 8. 12",
             delivery: "8/13(목) 도착",
             badge: "🚀 로켓 내일",
@@ -11,7 +12,7 @@ const orderData = {
             img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=150"
         },
         {
-            orderNo: "20260803-0001",
+            orderNo: 30,
             date: "2026. 8. 3",
             delivery: "8/4(화) 도착",
             badge: "🚀 판매자로켓 내일",
@@ -20,7 +21,7 @@ const orderData = {
             img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=150"
         },
         {
-            orderNo: "20260725-0001",
+            orderNo: 50,
             date: "2026. 7. 25",
             delivery: "7/26(일) 도착",
             badge: "🚀 로켓 내일",
@@ -31,7 +32,7 @@ const orderData = {
     ],
     "2026": [
         {
-            orderNo: "20260410-0001",
+            orderNo: 60,
             date: "2026. 4. 10",
             delivery: "4/11(토) 도착",
             badge: "🚀 로켓 내일",
@@ -81,7 +82,7 @@ const orderData = {
         }
     ]
 };
-
+*/
 document.addEventListener("DOMContentLoaded", function () {
     const listContainer = document.getElementById("order-card-list");
     const periodBtns = document.querySelectorAll(".btn-period");
@@ -96,8 +97,8 @@ document.addEventListener("DOMContentLoaded", function () {
     function renderOrders(yearKey, page) {
         currentYearKey = yearKey;
 
-        const items = orderData[yearKey] || orderData["recent"];
-
+      //  const items = orderData[yearKey] || orderData["recent"];
+/*
         if (items.length === 0) {
             listContainer.innerHTML = `<div style="text-align:center; padding:50px; color:#888;">해당 기간의 주문 내역이 없습니다.</div>`;
             updatePagerState(0, 0);
@@ -143,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
             </div>`;
         });
-
+		*/
         listContainer.innerHTML = html;
         updatePagerState(safePage, totalPages);
     }

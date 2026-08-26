@@ -580,9 +580,13 @@ public class OrderDAO {
 	            """;
 
 	    try (
-	        Connection conn = ConnectionProvider.getConnection();
-	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    		Connection conn =
+                ConnectionProvider.getConnection();
+
+        PreparedStatement pstmt =
+                conn.prepareStatement(sql)
 	    ) {
+	    	System.out.println(sql);
 
 	        pstmt.setInt(1, memberNo);
 
