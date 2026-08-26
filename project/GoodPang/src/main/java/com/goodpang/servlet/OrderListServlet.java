@@ -3,7 +3,9 @@ package com.goodpang.servlet;
 import java.io.IOException;
 import java.util.List;
 
-import com.goodpang.dao.OrderDAO;
+import javax.naming.NamingException;
+
+import com.goodpang.dao.OrderListDAO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.OrderItemDTO;
 import com.goodpang.util.LoginUtil;
@@ -22,45 +24,43 @@ public class OrderListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
     	
-		 //int memberNo = 1; 
+		 //int memberNo = 81; 
          
-        HttpSession session = request.getSession();
-        System.out.println("[DEBUG OrderListServlet] === 주문 리스트 정보 조회 시작 ===");
-        
-        // 세션에서 로그인한 회원번호 추출
-        Integer memberNo = (Integer) session.getAttribute("memberNo");
-
-        // 미로그인 시 처리
-        if (memberNo == null) {
-          response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-        
-        System.out.println("[DEBUG OrderListServlet] === 주문 리스트 정보 조회 시작 ==="+ memberNo);
-        
+    	 // 로그인 확인
         MemberDTO loginMember =
                 LoginUtil.requireLogin(
                         request,
                         response
                 );
-        
+
         if (loginMember == null) {
             return;
         }
-    	
-      //  int memberNo = loginMember.getMemberNo();
 
-        
-        // DAO 호출 시 세션에서 꺼낸 memberNo 전달
-        OrderDAO dao = new OrderDAO();
-        List<OrderItemDTO> orderList = dao.getOrderListByMemberNo(memberNo);
-        
-        int resultCount = (orderList != null) ? orderList.size() : 0;
-        System.out.println("[DEBUG OrderListServlet] DB 조회 완료건: " + resultCount);
+        int memberNo =
+                loginMember.getMemberNo();
 
+        System.out.println("[DEBUG OrderListServlet] === 주문 리스트 정보 조회 시작 ===" + memberNo );
+     
+        
+       
+        
+     // 3. OrderListDAO를 사용하여 로그인한 회원의 마이페이지 주문 목록 조회[cite: 1]
+        OrderListDAO orderListDAO = new OrderListDAO();
+        List<OrderItemDTO> orderList = null;
+		try {
+			orderList = orderListDAO.selectMyPageOrders(memberNo);
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        // 4. 조회한 결과를 request 영역에 저장
         request.setAttribute("orderList", orderList);
+
+        // 5. 주문 내역 JSP 화면으로 포워딩
         request.getRequestDispatcher("/order_list.jsp")
                .forward(request, response);
-        
+            
     }
 }

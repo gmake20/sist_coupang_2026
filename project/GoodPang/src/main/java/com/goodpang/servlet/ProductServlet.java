@@ -1,6 +1,10 @@
 package com.goodpang.servlet;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.List;
+import java.util.Locale;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,7 +13,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.goodpang.dao.ProductDAO;
+import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.ProductDTO;
+import com.goodpang.dto.ReviewDTO;
 
 /*
  * /product?productNo=1 로 들어오면 DB 에서 상품 하나를 읽어서 product.jsp 로 넘겨줌.
@@ -46,8 +52,26 @@ public class ProductServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "상품을 찾을 수 없습니다.");
                     return;
                 }
+                
+                // 배송예정일 — "내일(요일) M/d" 형태로 매번 계산
+                LocalDate tomorrow = LocalDate.now().plusDays(1);
+                String dayOfWeek = tomorrow.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);
+                String deliveryDate = "내일(" + dayOfWeek + ") " + tomorrow.getMonthValue() + "/" + tomorrow.getDayOfMonth();
+                request.setAttribute("deliveryDate", deliveryDate);
+
+                // 적립 혜택 — 가격의 5%
+                int rewardCash = product.getProductPrice() * 5 / 100;
+                request.setAttribute("rewardCash", rewardCash);
 
                 request.setAttribute("p", product);
+                
+                request.setAttribute("p", product);
+                
+                // 리뷰
+                ReviewDAO reviewDAO = new ReviewDAO();
+                List<ReviewDTO> reviews = reviewDAO.selectReviewsByProductNo(productNo);
+                request.setAttribute("reviews", reviews);
+                request.setAttribute("reviewCount", reviews.size());
             }
 
         } catch (NumberFormatException e) {
