@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="./css/vendor_product_write.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/vendor_product_write.css">
     <title>굿팡 판매자 상품 등록</title>
 
   </head>
@@ -36,29 +36,6 @@
               <button class="btn btn-primary" type="button" id="topSubmitButton">상품등록</button>
             </div>
           </div>
-
-
-          <!-- 카탈로그 매칭하기 -->
-          <section class="panel form-block">
-            <div class="block-head">
-              <h2>카탈로그 매칭하기 <a href="#" class="help-link">도움말</a></h2>
-            </div>
-            <div class="block-body">
-              <div class="info-box">
-                쿠팡에서 판매중인 상품 정보를 불러와 손쉽게 상품을 등록할 수 있습니다.<br>
-                카탈로그 매칭은 내 상품의 검색 노출수와, 랭킹을 높이는데 보다 더 유리합니다. 상품을 매칭하고 아이템 위너로 만들어 보세요.
-              </div>
-              <div class="inline-search">
-                <input class="input" type="text" placeholder="상품명, 상품 ID, URL, 브랜드명, 쿠팡 상품 번호">
-                <button class="btn btn-primary" type="button">
-                  <svg class="icon">
-                    <use href="#ic-search" />
-                  </svg>
-                  검색
-                </button>
-              </div>
-            </div>
-          </section>
 
 
           <!-- 노출상품명 -->
@@ -98,7 +75,7 @@
               <div class="field-row collapsible" id="managedNameBody" hidden>
                 <label class="field-label"></label>
                 <div class="field-control">
-                  <input class="input" type="text" placeholder="판매자 내부 관리용 상품명 (고객에게 노출되지 않음)">
+                  <input class="input" id="internalNameInput" type="text" placeholder="판매자 내부 관리용 상품명 (고객에게 노출되지 않음)">
                 </div>
               </div>
 
@@ -113,35 +90,19 @@
             </div>
             <div class="block-body">
 
-              <div class="tab-group" id="categoryTabs">
-                <button class="tab-btn active" type="button" data-tab="search">카테고리 검색</button>
-                <button class="tab-btn" type="button" data-tab="select">카테고리 선택</button>
+              <div class="info-box">
+                쿠팡에서 판매중인 상품 정보를 불러와 손쉽게 상품을 등록할 수 있습니다.<br>
+                카탈로그 매칭은 내 상품의 검색 노출수와, 랭킹을 높이는데 보다 더 유리합니다. 상품을 매칭하고 아이템 위너로 만들어 보세요.
               </div>
 
-              <div class="tab-panel" id="categoryTabSearch">
-                <div class="autocomplete">
-                  <div class="input-icon-wrap">
-                    <svg class="icon">
-                      <use href="#ic-search" />
-                    </svg>
-                    <input class="input" id="categorySearchInput" type="text" placeholder="예) 귤, 백팩, 공기청정기">
-                  </div>
-                  <ul class="autocomplete-list" id="categorySearchList" hidden></ul>
+              <div class="autocomplete">
+                <div class="input-icon-wrap">
+                  <svg class="icon">
+                    <use href="#ic-search" />
+                  </svg>
+                  <input class="input" id="categorySearchInput" type="text" placeholder="예) 귤, 백팩, 공기청정기">
                 </div>
-              </div>
-
-              <div class="tab-panel" id="categoryTabSelect" hidden>
-                <div class="cascade-select">
-                  <select class="input select" id="mainCategorySelect">
-                    <option value="">대분류 선택</option>
-                  </select>
-                  <select class="input select" id="midCategorySelect" disabled>
-                    <option value="">중분류 선택</option>
-                  </select>
-                  <select class="input select" id="subCategorySelect" disabled>
-                    <option value="">소분류 선택</option>
-                  </select>
-                </div>
+                <ul class="autocomplete-list" id="categorySearchList" hidden></ul>
               </div>
 
               <p class="selected-category" id="selectedCategory"></p>
@@ -164,31 +125,9 @@
 
               <div id="optionModeOn">
 
-                <div class="field-row">
-                  <label class="field-label">사이즈 <span class="help-q">?</span> <span
-                      class="required-dot">•</span></label>
-                  <div class="field-control">
-                    <div class="option-add-row">
-                      <input class="input" id="sizeValueInput" type="text" placeholder="옵션값 입력">
-                      <button class="btn btn-primary" type="button" id="sizeAddButton">추가</button>
-                      <div class="chip-list" id="sizeChipList"></div>
-                    </div>
-                    <p class="hint">S, Medium, Free, 대, one size 등</p>
-                  </div>
-                </div>
+                <div id="optionGroupList"></div>
 
-                <div class="field-row">
-                  <label class="field-label">색상 <span class="help-q">?</span> <span
-                      class="required-dot">•</span></label>
-                  <div class="field-control">
-                    <div class="option-add-row">
-                      <input class="input" id="colorValueInput" type="text" placeholder="옵션값 입력">
-                      <button class="btn btn-primary" type="button" id="colorAddButton">추가</button>
-                      <div class="chip-list" id="colorChipList"></div>
-                    </div>
-                    <p class="hint">화이트, 도트블루, Red, BR01, 그레이, 블랙, 블루, 민트, 레드, 퍼플, 옐로우 등</p>
-                  </div>
-                </div>
+                <button class="btn btn-outline btn-sm" type="button" id="addOptionGroupButton">+ 옵션 그룹 추가 (최대 3개)</button>
 
                 <a href="#" class="text-link">옵션 구성을 제안하고 싶어요</a>
 
@@ -209,7 +148,7 @@
                         <th>옵션명</th>
                         <th>정상가(원)</th>
                         <th>판매가(원) <span class="required-dot">•</span></th>
-                        <th>판매자 자동가격조정</th>
+                        <th>판매자 자동가격조정 <span class="help-q" title="경쟁 판매자들과 비교해서 내 상품 가격을 자동으로 낮춰(또는 조정해) '아이템위너'(대표 판매자로 노출되는 자리)를 계속 유지하게 해주는 기능">?</span></th>
                         <th>재고수량 <span class="required-dot">•</span></th>
                         <th>판매자상품코드</th>
                         <th>모델번호</th>
@@ -250,8 +189,8 @@
               <p class="hint">이미지 권장 크기 : 1,000px x 1,000px (최소 500px 이상) / 10MB 이하의 JPG, PNG 파일</p>
 
               <div class="table-toolbar">
-                <button class="btn btn-outline btn-sm" type="button">대표이미지 일괄등록</button>
-                <button class="btn btn-outline btn-sm" type="button">추가이미지 일괄등록</button>
+                <button class="btn btn-outline btn-sm" type="button" id="bulkMainImageButton">대표이미지 일괄등록</button>
+                <button class="btn btn-outline btn-sm" type="button" id="bulkExtraImageButton">추가이미지 일괄등록</button>
                 <button class="btn btn-outline btn-sm" type="button">이미지 URL주소로 일괄등록</button>
                 <button class="btn btn-outline btn-sm" type="button">추가이미지 일괄삭제</button>
               </div>
@@ -260,7 +199,7 @@
                 <table class="data-table" id="imageTable">
                   <thead>
                     <tr>
-                      <th class="col-check"><input type="checkbox"></th>
+                      <th class="col-check"><input type="checkbox" id="imageCheckAll"></th>
                       <th>옵션명</th>
                       <th>대표이미지 <span class="required-dot">•</span></th>
                       <th>추가이미지 (최대 9장)</th>
@@ -270,6 +209,12 @@
                   <tbody id="imageTableBody"></tbody>
                 </table>
               </div>
+
+              <input type="file" id="bulkMainImageFileInput" accept="image/jpeg,image/png" hidden>
+              <input type="file" id="bulkExtraImageFileInput" accept="image/jpeg,image/png" multiple hidden>
+
+              <input type="file" id="imageMainFileInput" accept="image/jpeg,image/png" hidden>
+              <input type="file" id="imageExtraFileInput" accept="image/jpeg,image/png" multiple hidden>
 
             </div>
           </section>
@@ -306,7 +251,14 @@
                 <button class="btn btn-primary" type="button" id="descRegisterButton">이미지 등록</button>
               </div>
 
+              <div class="desc-preview" id="descPreview" hidden>
+                <div class="desc-preview-list" id="descPreviewList"></div>
+                <button class="btn btn-outline btn-sm" type="button" id="descManageButton">이미지 관리 (<span id="descImageCount">0</span>장)</button>
+              </div>
+
               <p class="hint">이미지 권장 크기 : 780px x 5,000px / 10MB 이하의 JPG, PNG 파일</p>
+
+              <input type="file" id="descImageFileInput" accept="image/jpeg,image/png" multiple hidden>
 
             </div>
           </section>
@@ -322,16 +274,16 @@
               <div class="field-row">
                 <label class="field-label">제조사</label>
                 <div class="field-control">
-                  <input class="input" type="text" placeholder="제조사를 알 수 없는 경우 브랜드명을 입력해주세요.">
+                  <input class="input" id="manufacturerInput" type="text" placeholder="제조사를 알 수 없는 경우 브랜드명을 입력해주세요.">
                 </div>
               </div>
 
               <div class="field-row">
                 <label class="field-label">상품 구성 <span class="required-dot">•</span></label>
                 <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="productComposition" checked>동일한 상품으로 구성됨 <span
+                  <label class="radio-item"><input type="radio" name="productComposition" value="동일한 상품으로 구성됨" checked>동일한 상품으로 구성됨 <span
                       class="help-q">?</span></label>
-                  <label class="radio-item"><input type="radio" name="productComposition">다양한 상품이 혼합되어 구성됨 <span
+                  <label class="radio-item"><input type="radio" name="productComposition" value="다양한 상품이 혼합되어 구성됨">다양한 상품이 혼합되어 구성됨 <span
                       class="help-q">?</span></label>
                 </div>
               </div>
@@ -339,17 +291,17 @@
               <div class="field-row">
                 <label class="field-label">인증정보 <span class="help-q">?</span></label>
                 <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="certification">인증·신고 대상</label>
-                  <label class="radio-item"><input type="radio" name="certification">상세페이지 별도표기</label>
-                  <label class="radio-item"><input type="radio" name="certification" checked>인증·신고 대상 아님</label>
+                  <label class="radio-item"><input type="radio" name="certification" value="인증·신고 대상">인증·신고 대상</label>
+                  <label class="radio-item"><input type="radio" name="certification" value="상세페이지 별도표기">상세페이지 별도표기</label>
+                  <label class="radio-item"><input type="radio" name="certification" value="인증·신고 대상 아님" checked>인증·신고 대상 아님</label>
                 </div>
               </div>
 
               <div class="field-row">
                 <label class="field-label">병행수입 <span class="help-q">?</span></label>
                 <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="parallelImport">병행수입</label>
-                  <label class="radio-item"><input type="radio" name="parallelImport" checked>병행수입 아님</label>
+                  <label class="radio-item"><input type="radio" name="parallelImport" value="Y">병행수입</label>
+                  <label class="radio-item"><input type="radio" name="parallelImport" value="N" checked>병행수입 아님</label>
                 </div>
               </div>
 
@@ -357,8 +309,8 @@
                 <label class="field-label">미성년자 구매 <span class="required-dot">•</span> <span
                     class="help-q">?</span></label>
                 <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="minorPurchase" checked>가능</label>
-                  <label class="radio-item"><input type="radio" name="minorPurchase">불가능</label>
+                  <label class="radio-item"><input type="radio" name="minorPurchase" value="Y" checked>가능</label>
+                  <label class="radio-item"><input type="radio" name="minorPurchase" value="N">불가능</label>
                   <p class="warning-text">
                     ⚠ 상품 등록 후에는 미성년자 구매 '가능'으로 변경할 수 없습니다. 실수로 '불가능'을 선택하신 경우, 상품을 새로 등록해 주세요.
                   </p>
@@ -368,24 +320,24 @@
               <div class="field-row">
                 <label class="field-label">인당 최대구매수량 <span class="help-q">?</span></label>
                 <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="maxPurchase">설정함</label>
-                  <label class="radio-item"><input type="radio" name="maxPurchase" checked>설정안함</label>
+                  <label class="radio-item"><input type="radio" name="maxPurchase" value="Y">설정함</label>
+                  <label class="radio-item"><input type="radio" name="maxPurchase" value="N" checked>설정안함</label>
                 </div>
               </div>
 
               <div class="field-row">
                 <label class="field-label">판매기간 <span class="help-q">?</span></label>
                 <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="salePeriod">설정함</label>
-                  <label class="radio-item"><input type="radio" name="salePeriod" checked>설정안함</label>
+                  <label class="radio-item"><input type="radio" name="salePeriod" value="Y">설정함</label>
+                  <label class="radio-item"><input type="radio" name="salePeriod" value="N" checked>설정안함</label>
                 </div>
               </div>
 
               <div class="field-row">
                 <label class="field-label">부가세 <span class="required-dot">•</span> <span class="help-q">?</span></label>
                 <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="vat" checked>과세</label>
-                  <label class="radio-item"><input type="radio" name="vat">면세</label>
+                  <label class="radio-item"><input type="radio" name="vat" value="과세" checked>과세</label>
+                  <label class="radio-item"><input type="radio" name="vat" value="면세">면세</label>
                 </div>
               </div>
 
@@ -404,6 +356,8 @@
               </button>
             </div>
             <div class="block-body" id="tagBlockBody">
+
+              <p class="warning-text">⚠ 이 항목은 아직 서버에 저장되지 않습니다. 입력하셔도 상품 등록 시 반영되지 않으니 참고해주세요.</p>
 
               <div class="field-row">
                 <label class="field-label">태그</label>
@@ -433,6 +387,8 @@
               </button>
             </div>
             <div class="block-body" id="noticeBlockBody">
+
+              <p class="warning-text">⚠ 이 항목은 아직 서버에 저장되지 않습니다. 입력하셔도 상품 등록 시 반영되지 않으니 참고해주세요.</p>
 
               <div class="notice-select-row">
                 <select class="input select" id="noticeTypeSelect">
@@ -558,8 +514,8 @@
               <div class="field-row">
                 <label class="field-label">제주/도서산간 배송여부 <span class="required-dot">•</span></label>
                 <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="jejuShipping" checked>가능</label>
-                  <label class="radio-item"><input type="radio" name="jejuShipping">불가능</label>
+                  <label class="radio-item"><input type="radio" name="jejuShipping" value="Y" checked>가능</label>
+                  <label class="radio-item"><input type="radio" name="jejuShipping" value="N">불가능</label>
                   <p class="side-note">주소록/배송관리 메뉴에서 택배사와 도서산간 추가배송비를 설정할 수 있습니다.</p>
                 </div>
               </div>
@@ -586,7 +542,7 @@
               <div class="field-row">
                 <label class="field-label">배송방법 <span class="required-dot">•</span></label>
                 <div class="field-control">
-                  <select class="input select">
+                  <select class="input select" id="deliveryMethodSelect">
                     <option value="">선택하세요</option>
                     <option selected>일반배송</option>
                     <option>신선냉동</option>
@@ -600,8 +556,8 @@
               <div class="field-row">
                 <label class="field-label">묶음배송 <span class="required-dot">•</span></label>
                 <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="bundleShipping" checked>가능</label>
-                  <label class="radio-item"><input type="radio" name="bundleShipping">불가능</label>
+                  <label class="radio-item"><input type="radio" name="bundleShipping" value="Y" checked>가능</label>
+                  <label class="radio-item"><input type="radio" name="bundleShipping" value="N">불가능</label>
                   <p class="side-note">출고 정보가 같은 상품만 묶음배송할 수 있습니다. (착불배송 선택 불가)</p>
                 </div>
               </div>
@@ -609,7 +565,7 @@
               <div class="field-row">
                 <label class="field-label">배송비 종류 <span class="required-dot">•</span></label>
                 <div class="field-control">
-                  <select class="input select">
+                  <select class="input select" id="shippingFeeTypeSelect">
                     <option selected>무료배송</option>
                     <option>유료배송</option>
                     <option>조건부무료배송</option>
@@ -624,15 +580,15 @@
               <div class="field-row">
                 <label class="field-label">출고 소요일 <span class="help-q">?</span></label>
                 <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="leadTime" checked>기본 입력</label>
-                  <label class="radio-item"><input type="radio" name="leadTime">구매 옵션별로 입력</label>
+                  <label class="radio-item"><input type="radio" name="leadTime" value="기본 입력" checked>기본 입력</label>
+                  <label class="radio-item"><input type="radio" name="leadTime" value="구매 옵션별로 입력">구매 옵션별로 입력</label>
                 </div>
               </div>
 
               <div class="field-row" id="dayLeadTimeRow">
                 <label class="field-label"></label>
                 <div class="field-control lead-time-control">
-                  <input class="input lead-time-input" type="number" value="1" min="0">
+                  <input class="input lead-time-input" id="leadTimeDaysInput" type="number" value="1" min="0">
                   <span>일</span>
                   <label class="checkbox-item">
                     <input type="checkbox" id="sameDayShipCheck" checked>
@@ -644,7 +600,7 @@
               <div class="field-row" id="sameDayCutoffRow">
                 <label class="field-label">당일출고 마감</label>
                 <div class="field-control">
-                  <select class="input select cutoff-select">
+                  <select class="input select cutoff-select" id="cutoffTimeSelect">
                     <option>10:00</option>
                     <option>11:00</option>
                     <option selected>12:00</option>
@@ -770,7 +726,7 @@
     </div>
 
 
-    <script src="js/vendor-common.js"></script>
+    <script src="${pageContext.request.contextPath}/js/vendor-common.js"></script>
     <script>
 
       /* =========================================================
@@ -817,12 +773,6 @@
         });
       }
 
-      setupTabGroup("categoryTabs", function (button) {
-        const isSearch = button.dataset.tab === "search";
-        document.getElementById("categoryTabSearch").hidden = !isSearch;
-        document.getElementById("categoryTabSelect").hidden = isSearch;
-      });
-
       setupTabGroup("optionModeTabs", function (button) {
         document.getElementById("optionModeOn").hidden = button.dataset.mode !== "on";
       });
@@ -859,48 +809,17 @@
 
 
       /* =========================================================
-         카테고리 — 검색 / 선택 (이전에 만든 CATEGORY 재귀 테이블 데모 데이터)
+         카테고리 — 검색어로 최종(리프) 카테고리 후보 조회 → 선택
       ========================================================= */
-
-      const categoryTree = {
-        "식품": {
-          "신선식품": {
-            "과일류": ["과일"]
-          }
-        },
-        "가전디지털": {
-          "계절가전": ["공기청정기"]
-        },
-        "패션의류/잡화": {
-          "남성패션": {
-            "가방/잡화": ["가방"]
-          }
-        }
-      };
-
-      const categoryPaths = [
-        "식품>신선식품>과일류>과일>귤",
-        "식품>신선식품>과일류>과일>사과",
-        "식품>생수/음료>음료>과일/야채음료>감귤/한라봉주스",
-        "가전디지털>계절가전>공기청정기",
-        "패션의류/잡화>남성패션>가방/잡화>가방>백팩",
-        "패션의류/잡화>여성패션>가방/잡화>가방>토트백",
-        "뷰티>향수>액체향수>여성향수>오 드 뚜왈렛",
-        "뷰티>향수>액체향수>남성향수>오 드 뚜왈렛",
-        "주방용품>취사도구>부자재/패킹>냄비뚜껑/멀티커버"
-      ];
 
       const categorySearchInput = document.getElementById("categorySearchInput");
       const categorySearchList = document.getElementById("categorySearchList");
       const selectedCategory = document.getElementById("selectedCategory");
 
-      function selectCategory(path) {
-        selectedCategory.textContent = "선택된 카테고리 : " + path;
-        categorySearchList.hidden = true;
-        categorySearchInput.value = path.split(">").pop();
-      }
+      let selectedCategoryNo = null;
+      let categorySearchTimer = null;
 
-      categorySearchInput.addEventListener("input", function () {
+      function searchCategory() {
         const keyword = categorySearchInput.value.trim();
 
         if (!keyword) {
@@ -909,89 +828,56 @@
           return;
         }
 
-        const matches = categoryPaths.filter((path) => path.includes(keyword));
+        fetch("${pageContext.request.contextPath}/category/getinfo?keyword=" + encodeURIComponent(keyword))
+          .then(function (res) { return res.json(); })
+          .then(function (categories) {
 
-        if (matches.length === 0) {
-          categorySearchList.hidden = true;
-          categorySearchList.innerHTML = "";
-          return;
-        }
+            if (!Array.isArray(categories) || categories.length === 0) {
+              categorySearchList.innerHTML = "<li class='empty'>검색 결과가 없습니다.</li>";
+              categorySearchList.hidden = false;
+              return;
+            }
 
-        categorySearchList.innerHTML = matches
-          .map((path) => "<li>" + path.replace(/>/g, "&gt;") + "</li>")
-          .join("");
-        categorySearchList.hidden = false;
+            categorySearchList.innerHTML = categories
+              .map(function (category) {
+                return "<li data-category-no='" + category.categoryNo + "'>" + category.categoryName + "</li>";
+              })
+              .join("");
+            categorySearchList.hidden = false;
+          })
+          .catch(function (err) {
+            console.error("카테고리 검색에 실패했습니다.", err);
+            categorySearchList.innerHTML = "<li class='empty'>검색 중 오류가 발생했습니다.</li>";
+            categorySearchList.hidden = false;
+          });
+      }
+
+      categorySearchInput.addEventListener("input", function () {
+        clearTimeout(categorySearchTimer);
+        categorySearchTimer = setTimeout(searchCategory, 300);
       });
 
       categorySearchList.addEventListener("click", function (event) {
-        const item = event.target.closest("li");
+        const item = event.target.closest("li[data-category-no]");
         if (!item) return;
-        selectCategory(item.textContent.replace(/&gt;/g, ">"));
-      });
 
-
-      const mainCategorySelect = document.getElementById("mainCategorySelect");
-      const midCategorySelect = document.getElementById("midCategorySelect");
-      const subCategorySelect = document.getElementById("subCategorySelect");
-
-      Object.keys(categoryTree).forEach(function (mainName) {
-        const option = document.createElement("option");
-        option.value = mainName;
-        option.textContent = mainName;
-        mainCategorySelect.appendChild(option);
-      });
-
-      function resetSelect(select, placeholder) {
-        select.innerHTML = "<option value=''>" + placeholder + "</option>";
-        select.disabled = true;
-      }
-
-      mainCategorySelect.addEventListener("change", function () {
-        resetSelect(midCategorySelect, "중분류 선택");
-        resetSelect(subCategorySelect, "소분류 선택");
-
-        const midTree = categoryTree[mainCategorySelect.value];
-        if (!midTree) return;
-
-        Object.keys(midTree).forEach(function (midName) {
-          const option = document.createElement("option");
-          option.value = midName;
-          option.textContent = midName;
-          midCategorySelect.appendChild(option);
-        });
-        midCategorySelect.disabled = false;
-      });
-
-      midCategorySelect.addEventListener("change", function () {
-        resetSelect(subCategorySelect, "소분류 선택");
-
-        const midTree = categoryTree[mainCategorySelect.value];
-        const subList = midTree && midTree[midCategorySelect.value];
-        if (!subList) return;
-
-        subList.forEach(function (subName) {
-          const option = document.createElement("option");
-          option.value = subName;
-          option.textContent = subName;
-          subCategorySelect.appendChild(option);
-        });
-        subCategorySelect.disabled = false;
-      });
-
-      subCategorySelect.addEventListener("change", function () {
-        if (!subCategorySelect.value) return;
-        selectCategory(
-          [mainCategorySelect.value, midCategorySelect.value, subCategorySelect.value].join(">")
-        );
+        selectedCategoryNo = item.dataset.categoryNo;
+        selectedCategory.textContent = "선택된 카테고리 : " + item.textContent;
+        categorySearchList.hidden = true;
+        categorySearchInput.value = item.textContent;
       });
 
 
       /* =========================================================
-         옵션 — 사이즈/색상 값 추가 → 조합으로 옵션 목록 테이블 생성
+         옵션 — 판매자가 옵션명을 직접 정하는 옵션 그룹 (최대 3개) → 조합으로 옵션 목록 테이블 생성
       ========================================================= */
 
-      const sizeValues = [];
-      const colorValues = [];
+      const MAX_OPTION_GROUPS = 3;
+
+      const optionGroups = [
+        { name: "사이즈", values: [] },
+        { name: "색상", values: [] }
+      ];
 
       function renderChips(listElement, values, onRemove) {
         listElement.innerHTML = values
@@ -1010,40 +896,102 @@
         });
       }
 
+      function renderOptionGroups() {
+        const container = document.getElementById("optionGroupList");
+
+        container.innerHTML = optionGroups
+          .map(function (group, index) {
+            const removeButton = optionGroups.length > 1
+              ? '<button class="btn btn-outline btn-sm option-group-remove" type="button" data-group="' + index + '">그룹 삭제</button>'
+              : "";
+
+            return (
+              '<div class="field-row option-group">' +
+              '<label class="field-label option-group-label">' +
+              '<input class="input input-sm option-group-name" type="text" placeholder="옵션명 (예: 사이즈)" ' +
+              'value="' + group.name.replace(/"/g, "&quot;") + '" data-group="' + index + '">' +
+              ' <span class="required-dot">•</span>' +
+              "</label>" +
+              '<div class="field-control">' +
+              '<div class="option-add-row">' +
+              '<input class="input option-value-input" type="text" placeholder="옵션값 입력" data-group="' + index + '">' +
+              '<button class="btn btn-primary option-value-add" type="button" data-group="' + index + '">추가</button>' +
+              removeButton +
+              '<div class="chip-list option-value-chips" data-group="' + index + '"></div>' +
+              "</div>" +
+              '<p class="hint">예: S, Medium, Free, 대 / 화이트, 블랙, 레드 등</p>' +
+              "</div>" +
+              "</div>"
+            );
+          })
+          .join("");
+
+        optionGroups.forEach(function (group, index) {
+          renderChips(
+            container.querySelector('.option-value-chips[data-group="' + index + '"]'),
+            group.values,
+            function (valueIndex) {
+              group.values.splice(valueIndex, 1);
+              renderOptionGroups();
+              renderOptionTable();
+            }
+          );
+        });
+
+        document.getElementById("addOptionGroupButton").disabled = optionGroups.length >= MAX_OPTION_GROUPS;
+      }
+
+      function cartesianCombine(groups) {
+        return groups.reduce(
+          function (acc, group) {
+            const next = [];
+            acc.forEach(function (partial) {
+              group.values.forEach(function (value) {
+                next.push(partial.concat([{ type: group.name, value: value }]));
+              });
+            });
+            return next;
+          },
+          [[]]
+        );
+      }
+
+      let currentCombinations = [];
+
       function renderOptionTable() {
         const tbody = document.getElementById("optionTableBody");
         const emptyRow = document.getElementById("optionEmptyRow");
 
-        const combinations = [];
-        if (sizeValues.length && colorValues.length) {
-          colorValues.forEach((color) => {
-            sizeValues.forEach((size) => {
-              combinations.push(color + ", " + size);
+        const activeGroups = optionGroups.filter((group) => group.values.length > 0);
+
+        const combinations = activeGroups.length === 0
+          ? []
+          : cartesianCombine(activeGroups).map(function (parts) {
+              return {
+                label: parts.map((part) => part.value).join(", "),
+                option1: parts[0] || null,
+                option2: parts[1] || null,
+                option3: parts[2] || null
+              };
             });
-          });
-        } else if (sizeValues.length) {
-          sizeValues.forEach((size) => combinations.push(size));
-        } else if (colorValues.length) {
-          colorValues.forEach((color) => combinations.push(color));
-        }
+
+        currentCombinations = combinations;
 
         document.getElementById("optionCount").textContent = combinations.length;
-        document.getElementById("filterOptionCount").textContent = combinations.length;
 
         if (combinations.length === 0) {
           tbody.innerHTML = "";
           tbody.appendChild(emptyRow);
-          renderFilterTable(combinations);
           renderImageTable(combinations);
           return;
         }
 
         tbody.innerHTML = combinations
           .map(
-            (label) =>
-              "<tr>" +
+            (combo, index) =>
+              '<tr data-row="' + index + '">' +
               '<td class="col-check"><input type="checkbox"></td>' +
-              "<td>" + label + "</td>" +
+              "<td>" + combo.label + "</td>" +
               '<td><input class="input input-sm" type="number" value="0"></td>' +
               '<td><input class="input input-sm" type="number" value="0"></td>' +
               '<td class="center"><label class="switch"><input type="checkbox"><span class="slider"></span></label></td>' +
@@ -1055,76 +1003,288 @@
           )
           .join("");
 
-        renderFilterTable(combinations);
         renderImageTable(combinations);
       }
 
-      function renderFilterTable(combinations) {
-        const tbody = document.getElementById("filterTableBody");
-        tbody.innerHTML = combinations
-          .map(
-            (label) =>
-              "<tr><td>" + label + "</td>" +
-              '<td><input class="input input-sm" type="text"></td>' +
-              '<td><input class="input input-sm" type="text"></td>' +
-              '<td><input class="input input-sm" type="text"></td></tr>'
-          )
-          .join("");
+      /* =========================================================
+         상품이미지 — 옵션별 대표이미지 1장 / 추가이미지 최대 9장 업로드·미리보기
+      ========================================================= */
+
+      const optionImages = [];
+      let activeImageRow = null;
+
+      const imageMainFileInput = document.getElementById("imageMainFileInput");
+      const imageExtraFileInput = document.getElementById("imageExtraFileInput");
+
+      const MAX_EXTRA_IMAGES = 9;
+      const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
+      function isValidImageFile(file) {
+        if (file.type !== "image/jpeg" && file.type !== "image/png") {
+          alert(file.name + " : JPG, PNG 파일만 등록할 수 있습니다.");
+          return false;
+        }
+        if (file.size > MAX_IMAGE_SIZE) {
+          alert(file.name + " : 10MB 이하 파일만 등록할 수 있습니다.");
+          return false;
+        }
+        return true;
+      }
+
+      function renderImageSlot(row) {
+        const state = optionImages[row];
+        if (!state) return;
+
+        const mainSlot = document.querySelector('.main-slot[data-row="' + row + '"]');
+        if (mainSlot) {
+          mainSlot.classList.toggle("filled", !!state.main);
+          mainSlot.innerHTML = state.main
+            ? '<img src="' + state.main.url + '" alt="">' +
+              '<button type="button" class="slot-remove" data-row="' + row + '" data-slot="main">&times;</button>'
+            : '<svg class="icon"><use href="#ic-plus"/></svg>';
+        }
+
+        const group = document.querySelector('.image-slot-group[data-row="' + row + '"]');
+        if (group) {
+          const thumbs = state.extra
+            .map(function (item, index) {
+              return '<span class="image-slot filled extra-slot">' +
+                '<img src="' + item.url + '" alt="">' +
+                '<button type="button" class="slot-remove" data-row="' + row + '" data-slot="extra" data-index="' + index + '">&times;</button>' +
+                '</span>';
+            })
+            .join("");
+
+          const addButton = state.extra.length < MAX_EXTRA_IMAGES
+            ? '<button type="button" class="image-slot add-extra-slot" data-row="' + row + '"><svg class="icon"><use href="#ic-plus"/></svg></button>'
+            : "";
+
+          group.innerHTML = thumbs + addButton;
+        }
       }
 
       function renderImageTable(combinations) {
         const tbody = document.getElementById("imageTableBody");
+
+        optionImages.length = 0;
+        combinations.forEach(function () {
+          optionImages.push({ main: null, extra: [] });
+        });
+
         tbody.innerHTML = combinations
           .map(
-            (label) =>
-              "<tr>" +
-              '<td class="col-check"><input type="checkbox"></td>' +
-              "<td>" + label + "</td>" +
-              '<td><button type="button" class="image-slot main-slot"><svg class="icon"><use href="#ic-plus"/></svg></button></td>' +
-              '<td><button type="button" class="image-slot"><svg class="icon"><use href="#ic-plus"/></svg></button></td>' +
+            (combo, index) =>
+              '<tr data-row="' + index + '">' +
+              '<td class="col-check"><input type="checkbox" class="image-row-check" data-row="' + index + '"></td>' +
+              "<td>" + combo.label + "</td>" +
+              '<td><span class="image-slot main-slot" data-row="' + index + '"><svg class="icon"><use href="#ic-plus"/></svg></span></td>' +
+              '<td><div class="image-slot-group" data-row="' + index + '">' +
+              '<button type="button" class="image-slot add-extra-slot" data-row="' + index + '"><svg class="icon"><use href="#ic-plus"/></svg></button>' +
+              "</div></td>" +
               '<td><button type="button" class="btn btn-outline btn-xs">이미지 URL 입력</button></td>' +
               "</tr>"
           )
           .join("");
+      }
 
-        tbody.querySelectorAll(".image-slot").forEach(function (slot) {
-          slot.addEventListener("click", function () {
-            slot.classList.toggle("filled");
-          });
+      document.getElementById("imageTableBody").addEventListener("click", function (event) {
+
+        const removeButton = event.target.closest(".slot-remove");
+        if (removeButton) {
+          event.stopPropagation();
+
+          const row = Number(removeButton.dataset.row);
+          const slot = removeButton.dataset.slot;
+
+          if (slot === "main") {
+            URL.revokeObjectURL(optionImages[row].main.url);
+            optionImages[row].main = null;
+          } else {
+            const index = Number(removeButton.dataset.index);
+            URL.revokeObjectURL(optionImages[row].extra[index].url);
+            optionImages[row].extra.splice(index, 1);
+          }
+
+          renderImageSlot(row);
+          return;
+        }
+
+        const mainSlot = event.target.closest(".main-slot");
+        if (mainSlot) {
+          activeImageRow = Number(mainSlot.dataset.row);
+          imageMainFileInput.click();
+          return;
+        }
+
+        const addExtraSlot = event.target.closest(".add-extra-slot");
+        if (addExtraSlot) {
+          activeImageRow = Number(addExtraSlot.dataset.row);
+          imageExtraFileInput.click();
+        }
+      });
+
+      imageMainFileInput.addEventListener("change", function () {
+        const file = imageMainFileInput.files[0];
+        imageMainFileInput.value = "";
+
+        if (!file || activeImageRow === null || !isValidImageFile(file)) return;
+
+        const state = optionImages[activeImageRow];
+        if (state.main) URL.revokeObjectURL(state.main.url);
+        state.main = { file: file, url: URL.createObjectURL(file) };
+
+        renderImageSlot(activeImageRow);
+      });
+
+      imageExtraFileInput.addEventListener("change", function () {
+        const files = Array.from(imageExtraFileInput.files);
+        imageExtraFileInput.value = "";
+
+        if (activeImageRow === null) return;
+
+        const state = optionImages[activeImageRow];
+        const remaining = MAX_EXTRA_IMAGES - state.extra.length;
+
+        files.slice(0, remaining).forEach(function (file) {
+          if (!isValidImageFile(file)) return;
+          state.extra.push({ file: file, url: URL.createObjectURL(file) });
         });
+
+        if (files.length > remaining) {
+          alert("추가이미지는 최대 " + MAX_EXTRA_IMAGES + "장까지 등록할 수 있습니다.");
+        }
+
+        renderImageSlot(activeImageRow);
+      });
+
+
+      /* =========================================================
+         상품이미지 — 체크한 옵션 행에 대표/추가이미지 일괄 적용
+      ========================================================= */
+
+      function getCheckedImageRows() {
+        return Array.from(document.querySelectorAll(".image-row-check:checked")).map(
+          (checkbox) => Number(checkbox.dataset.row)
+        );
       }
 
-      function handleSizeRemove(index) {
-        sizeValues.splice(index, 1);
-        renderChips(document.getElementById("sizeChipList"), sizeValues, handleSizeRemove);
-        renderOptionTable();
-      }
+      document.getElementById("imageCheckAll").addEventListener("change", function () {
+        document.querySelectorAll(".image-row-check").forEach(
+          (checkbox) => (checkbox.checked = this.checked)
+        );
+      });
 
-      function handleColorRemove(index) {
-        colorValues.splice(index, 1);
-        renderChips(document.getElementById("colorChipList"), colorValues, handleColorRemove);
-        renderOptionTable();
-      }
+      const bulkMainImageFileInput = document.getElementById("bulkMainImageFileInput");
+      const bulkExtraImageFileInput = document.getElementById("bulkExtraImageFileInput");
 
-      document.getElementById("sizeAddButton").addEventListener("click", function () {
-        const input = document.getElementById("sizeValueInput");
+      document.getElementById("bulkMainImageButton").addEventListener("click", function () {
+        if (getCheckedImageRows().length === 0) {
+          alert("대표이미지를 적용할 옵션을 먼저 체크해주세요.");
+          return;
+        }
+        bulkMainImageFileInput.click();
+      });
+
+      document.getElementById("bulkExtraImageButton").addEventListener("click", function () {
+        if (getCheckedImageRows().length === 0) {
+          alert("추가이미지를 적용할 옵션을 먼저 체크해주세요.");
+          return;
+        }
+        bulkExtraImageFileInput.click();
+      });
+
+      bulkMainImageFileInput.addEventListener("change", function () {
+        const file = bulkMainImageFileInput.files[0];
+        bulkMainImageFileInput.value = "";
+
+        if (!file || !isValidImageFile(file)) return;
+
+        getCheckedImageRows().forEach(function (row) {
+          const state = optionImages[row];
+          if (!state) return;
+
+          if (state.main) URL.revokeObjectURL(state.main.url);
+          state.main = { file: file, url: URL.createObjectURL(file) };
+          renderImageSlot(row);
+        });
+      });
+
+      bulkExtraImageFileInput.addEventListener("change", function () {
+        const files = Array.from(bulkExtraImageFileInput.files).filter(isValidImageFile);
+        bulkExtraImageFileInput.value = "";
+
+        if (files.length === 0) return;
+
+        let anyRowFull = false;
+
+        getCheckedImageRows().forEach(function (row) {
+          const state = optionImages[row];
+          if (!state) return;
+
+          const remaining = MAX_EXTRA_IMAGES - state.extra.length;
+          if (files.length > remaining) anyRowFull = true;
+
+          files.slice(0, remaining).forEach(function (file) {
+            state.extra.push({ file: file, url: URL.createObjectURL(file) });
+          });
+          renderImageSlot(row);
+        });
+
+        if (anyRowFull) {
+          alert("추가이미지는 옵션당 최대 " + MAX_EXTRA_IMAGES + "장까지 등록할 수 있습니다. 일부 옵션은 다 채워지지 않았을 수 있습니다.");
+        }
+      });
+
+      function addOptionValue(groupIndex) {
+        const input = document.querySelector('.option-value-input[data-group="' + groupIndex + '"]');
         const value = input.value.trim();
-        if (!value || sizeValues.includes(value)) return;
-        sizeValues.push(value);
-        input.value = "";
-        renderChips(document.getElementById("sizeChipList"), sizeValues, handleSizeRemove);
+        const group = optionGroups[groupIndex];
+
+        if (!value || group.values.includes(value)) return;
+
+        group.values.push(value);
+        renderOptionGroups();
+        renderOptionTable();
+      }
+
+      document.getElementById("optionGroupList").addEventListener("input", function (event) {
+        if (!event.target.classList.contains("option-group-name")) return;
+
+        const index = Number(event.target.dataset.group);
+        optionGroups[index].name = event.target.value;
         renderOptionTable();
       });
 
-      document.getElementById("colorAddButton").addEventListener("click", function () {
-        const input = document.getElementById("colorValueInput");
-        const value = input.value.trim();
-        if (!value || colorValues.includes(value)) return;
-        colorValues.push(value);
-        input.value = "";
-        renderChips(document.getElementById("colorChipList"), colorValues, handleColorRemove);
-        renderOptionTable();
+      document.getElementById("optionGroupList").addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" || !event.target.classList.contains("option-value-input")) return;
+        event.preventDefault();
+        addOptionValue(Number(event.target.dataset.group));
       });
+
+      document.getElementById("optionGroupList").addEventListener("click", function (event) {
+
+        const addButton = event.target.closest(".option-value-add");
+        if (addButton) {
+          addOptionValue(Number(addButton.dataset.group));
+          return;
+        }
+
+        const removeButton = event.target.closest(".option-group-remove");
+        if (removeButton) {
+          optionGroups.splice(Number(removeButton.dataset.group), 1);
+          renderOptionGroups();
+          renderOptionTable();
+        }
+      });
+
+      document.getElementById("addOptionGroupButton").addEventListener("click", function () {
+        if (optionGroups.length >= MAX_OPTION_GROUPS) return;
+        optionGroups.push({ name: "", values: [] });
+        renderOptionGroups();
+      });
+
+      renderOptionGroups();
+      renderOptionTable();
 
       document.getElementById("optionDeleteButton").addEventListener("click", function () {
         document.querySelectorAll("#optionTableBody tr").forEach(function (row) {
@@ -1229,6 +1389,9 @@
 
       const descImages = [];
       const descModalBackdrop = document.getElementById("descModalBackdrop");
+      const descImageFileInput = document.getElementById("descImageFileInput");
+
+      let descEditIndex = null;
 
       function renderDescImageList() {
         const list = document.getElementById("descImageList");
@@ -1240,10 +1403,10 @@
 
         list.innerHTML = descImages
           .map(
-            (_, index) =>
+            (item, index) =>
               '<div class="desc-image-row" data-index="' + index + '">' +
               '<span class="drag-handle">⁝⁝</span>' +
-              '<div class="desc-image-thumb"><svg class="icon"><use href="#ic-image"/></svg></div>' +
+              '<div class="desc-image-thumb"><img src="' + item.url + '" alt=""></div>' +
               '<div class="desc-image-actions">' +
               '<button type="button" class="btn btn-outline btn-xs desc-edit">수정</button>' +
               '<button type="button" class="btn btn-outline btn-xs desc-remove">삭제</button>' +
@@ -1251,25 +1414,70 @@
           )
           .join("");
 
+        list.querySelectorAll(".desc-edit").forEach(function (button) {
+          button.addEventListener("click", function () {
+            descEditIndex = Number(button.closest(".desc-image-row").dataset.index);
+            descImageFileInput.multiple = false;
+            descImageFileInput.click();
+          });
+        });
+
         list.querySelectorAll(".desc-remove").forEach(function (button) {
           button.addEventListener("click", function () {
             const index = Number(button.closest(".desc-image-row").dataset.index);
+            URL.revokeObjectURL(descImages[index].url);
             descImages.splice(index, 1);
             renderDescImageList();
           });
         });
       }
 
+      function renderDescPreview() {
+        const hasImages = descImages.length > 0;
+
+        document.getElementById("descEmpty").hidden = hasImages;
+        document.getElementById("descPreview").hidden = !hasImages;
+        document.getElementById("descImageCount").textContent = descImages.length;
+
+        document.getElementById("descPreviewList").innerHTML = descImages
+          .map((item) => '<div class="desc-image-thumb"><img src="' + item.url + '" alt=""></div>')
+          .join("");
+      }
+
       document.getElementById("descRegisterButton").addEventListener("click", function () {
         descModalBackdrop.classList.add("show");
       });
 
+      document.getElementById("descManageButton").addEventListener("click", function () {
+        descModalBackdrop.classList.add("show");
+      });
+
       document.getElementById("descAddImageButton").addEventListener("click", function () {
-        descImages.push({});
+        descEditIndex = null;
+        descImageFileInput.multiple = true;
+        descImageFileInput.click();
+      });
+
+      descImageFileInput.addEventListener("change", function () {
+        const files = Array.from(descImageFileInput.files).filter(isValidImageFile);
+        descImageFileInput.value = "";
+
+        if (files.length === 0) return;
+
+        if (descEditIndex !== null) {
+          URL.revokeObjectURL(descImages[descEditIndex].url);
+          descImages[descEditIndex] = { file: files[0], url: URL.createObjectURL(files[0]) };
+        } else {
+          files.forEach(function (file) {
+            descImages.push({ file: file, url: URL.createObjectURL(file) });
+          });
+        }
+
         renderDescImageList();
       });
 
       document.getElementById("descClearAllButton").addEventListener("click", function () {
+        descImages.forEach((item) => URL.revokeObjectURL(item.url));
         descImages.length = 0;
         renderDescImageList();
       });
@@ -1282,7 +1490,7 @@
       document.getElementById("descModalCancel").addEventListener("click", closeDescModal);
 
       document.getElementById("descModalSave").addEventListener("click", function () {
-        document.getElementById("descEmpty").hidden = descImages.length > 0;
+        renderDescPreview();
         closeDescModal();
       });
 
@@ -1292,12 +1500,177 @@
 
 
       /* =========================================================
-         폼 제출 — 데모용. 실제 서버 전송은 하지 않음
+         폼 제출 — 옵션별 대표/추가이미지까지 포함해서 서버에 실제로 저장
       ========================================================= */
+
+      function collectOptionRows() {
+        return Array.from(document.querySelectorAll("#optionTableBody tr[data-row]")).map(function (row) {
+          const rowIndex = Number(row.dataset.row);
+          const combo = currentCombinations[rowIndex] || { option1: null, option2: null, option3: null };
+          const cells = row.querySelectorAll("td");
+
+          return {
+            option1: combo.option1,
+            option2: combo.option2,
+            option3: combo.option3,
+            normalPrice: cells[2].querySelector("input").value,
+            salePrice: cells[3].querySelector("input").value,
+            autoPriceAdjustYn: cells[4].querySelector("input").checked ? "Y" : "N",
+            quantity: cells[5].querySelector("input").value,
+            sellerProductCode: cells[6].querySelector("input").value,
+            modelNo: cells[7].querySelector("input").value,
+            barcode: cells[8].querySelector("input").value,
+            images: optionImages[rowIndex] || { main: null, extra: [] }
+          };
+        });
+      }
+
+      function validateProductForm(rows) {
+        if (!displayNameInput.value.trim()) {
+          alert("노출상품명을 입력해주세요.");
+          return false;
+        }
+
+        if (!noBrandCheck.checked && !brandInput.value.trim()) {
+          alert("브랜드를 입력하거나 '브랜드 없음'을 선택해주세요.");
+          return false;
+        }
+
+        if (!selectedCategoryNo) {
+          alert("카테고리를 검색해서 선택해주세요.");
+          return false;
+        }
+
+        if (optionGroups.some((group) => group.values.length > 0 && !group.name.trim())) {
+          alert("옵션명을 입력해주세요.");
+          return false;
+        }
+
+        if (rows.length === 0) {
+          alert("옵션을 최소 1개 이상 추가해주세요.");
+          return false;
+        }
+
+        for (const row of rows) {
+          if (!row.salePrice || Number(row.salePrice) <= 0) {
+            alert("모든 옵션의 판매가를 입력해주세요.");
+            return false;
+          }
+          if (row.quantity === "" || Number(row.quantity) < 0) {
+            alert("모든 옵션의 재고수량을 입력해주세요.");
+            return false;
+          }
+          if (!row.images.main) {
+            alert("모든 옵션에 대표이미지를 등록해주세요.");
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      function buildProductFormData(rows) {
+        const formData = new FormData();
+
+        formData.append("brandName", noBrandCheck.checked ? "" : brandInput.value.trim());
+        formData.append("noBrandYn", noBrandCheck.checked ? "Y" : "N");
+        formData.append("displayName", displayNameInput.value.trim());
+        formData.append("internalName", document.getElementById("internalNameInput").value.trim());
+        formData.append("categoryNo", selectedCategoryNo);
+
+        formData.append("manufacturer", document.getElementById("manufacturerInput").value.trim());
+        formData.append("compositionType", document.querySelector('input[name="productComposition"]:checked').value);
+        formData.append("certificationType", document.querySelector('input[name="certification"]:checked').value);
+        formData.append("parallelImportYn", document.querySelector('input[name="parallelImport"]:checked').value);
+        formData.append("minorPurchaseYn", document.querySelector('input[name="minorPurchase"]:checked').value);
+        formData.append("maxPurchaseYn", document.querySelector('input[name="maxPurchase"]:checked').value);
+        formData.append("salePeriodYn", document.querySelector('input[name="salePeriod"]:checked').value);
+        formData.append("vatType", document.querySelector('input[name="vat"]:checked').value);
+
+        const detailTypeMap = { image: "이미지 업로드", editor: "에디터 작성", html: "HTML 작성" };
+        const activeDescType = document.querySelector("#descTypeTabs .tab-btn.active").dataset.type;
+        formData.append("detailType", detailTypeMap[activeDescType] || "이미지 업로드");
+
+        if (activeDescType === "image") {
+          formData.append("descImageCount", descImages.length);
+          descImages.forEach(function (item, index) {
+            formData.append("descImage_" + index, item.file);
+          });
+        }
+
+        formData.append("jejuShippingYn", document.querySelector('input[name="jejuShipping"]:checked').value);
+        formData.append("courier", document.getElementById("courierSelect").value);
+        formData.append("deliveryMethod", document.getElementById("deliveryMethodSelect").value);
+        formData.append("bundleShippingYn", document.querySelector('input[name="bundleShipping"]:checked').value);
+        formData.append("shippingFeeType", document.getElementById("shippingFeeTypeSelect").value);
+        formData.append("leadTimeInputType", document.querySelector('input[name="leadTime"]:checked').value);
+        formData.append("leadTimeDays", document.getElementById("leadTimeDaysInput").value);
+
+        const sameDayShipYn = document.getElementById("sameDayShipCheck").checked ? "Y" : "N";
+        formData.append("sameDayShipYn", sameDayShipYn);
+        formData.append("cutoffTime", sameDayShipYn === "Y" ? document.getElementById("cutoffTimeSelect").value : "");
+
+        formData.append("initialShippingFee", document.getElementById("initialShippingFee").value);
+        formData.append("returnShippingFee", document.getElementById("returnShippingFee").value);
+
+        formData.append("optionCount", rows.length);
+
+        rows.forEach(function (row, i) {
+          formData.append("option_" + i + "_option1Type", row.option1 ? row.option1.type : "");
+          formData.append("option_" + i + "_option1Value", row.option1 ? row.option1.value : "");
+          formData.append("option_" + i + "_option2Type", row.option2 ? row.option2.type : "");
+          formData.append("option_" + i + "_option2Value", row.option2 ? row.option2.value : "");
+          formData.append("option_" + i + "_option3Type", row.option3 ? row.option3.type : "");
+          formData.append("option_" + i + "_option3Value", row.option3 ? row.option3.value : "");
+          formData.append("option_" + i + "_normalPrice", row.normalPrice || "0");
+          formData.append("option_" + i + "_salePrice", row.salePrice);
+          formData.append("option_" + i + "_autoPriceAdjustYn", row.autoPriceAdjustYn);
+          formData.append("option_" + i + "_quantity", row.quantity);
+          formData.append("option_" + i + "_sellerProductCode", row.sellerProductCode || "");
+          formData.append("option_" + i + "_modelNo", row.modelNo || "");
+          formData.append("option_" + i + "_barcode", row.barcode || "");
+          formData.append("option_" + i + "_mainImage", row.images.main.file);
+
+          const extraImages = row.images.extra || [];
+          formData.append("option_" + i + "_extraImageCount", extraImages.length);
+          extraImages.forEach(function (item, j) {
+            formData.append("option_" + i + "_extraImage_" + j, item.file);
+          });
+        });
+
+        return formData;
+      }
 
       function submitProductForm(event) {
         if (event) event.preventDefault();
-        alert("데모 화면입니다. 실제 상품 등록 요청은 전송되지 않습니다.");
+
+        const rows = collectOptionRows();
+        if (!validateProductForm(rows)) return;
+
+        const formData = buildProductFormData(rows);
+        const submitButtons = document.querySelectorAll('#topSubmitButton, .write-foot button[type="submit"]');
+        submitButtons.forEach(function (btn) { btn.disabled = true; });
+
+        fetch("${pageContext.request.contextPath}/vendor/product/write", {
+          method: "POST",
+          body: formData
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (result) {
+            if (result.success) {
+              alert("상품이 등록되었습니다. (상품번호 " + result.productNo + ")");
+              window.location.href = "${pageContext.request.contextPath}/vendor_products.jsp";
+            } else {
+              alert(result.message || "상품 등록에 실패했습니다.");
+            }
+          })
+          .catch(function (err) {
+            console.error("상품 등록 요청 실패", err);
+            alert("상품 등록 중 오류가 발생했습니다.");
+          })
+          .finally(function () {
+            submitButtons.forEach(function (btn) { btn.disabled = false; });
+          });
       }
 
       document.getElementById("productForm").addEventListener("submit", submitProductForm);
