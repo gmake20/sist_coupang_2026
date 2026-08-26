@@ -58,6 +58,12 @@ public class VendorProductWriteServlet extends HttpServlet {
 			return;
 		}
 
+		if (loginSeller.getZipcode() == null || loginSeller.getZipcode().isBlank()
+				|| loginSeller.getBusinessAddress() == null || loginSeller.getBusinessAddress().isBlank()) {
+			writeJson(response, 400, new Result(false, "사업자 정보에 출고지/반품지 주소가 등록되어 있지 않습니다. 판매자센터에서 사업자 정보를 먼저 등록해주세요.", 0));
+			return;
+		}
+
 		try {
 			ProductWriteDTO dto = buildProductWriteDTO(request, loginSeller);
 
@@ -73,6 +79,9 @@ public class VendorProductWriteServlet extends HttpServlet {
 			int productNo = productWriteDAO.insertProduct(dto);
 			writeJson(response, 200, new Result(true, null, productNo));
 
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+			writeJson(response, 400, new Result(false, "첨부 이미지의 개수 또는 용량이 너무 큽니다. 이미지 수를 줄이거나 용량을 낮춰 다시 시도해주세요.", 0));
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			writeJson(response, 400, new Result(false, "입력값을 다시 확인해주세요.", 0));
