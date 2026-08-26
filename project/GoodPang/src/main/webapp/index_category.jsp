@@ -1,4 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+
+int x = 10;
+for(int i=0;i<x;i++) {
+	System.out.println(i);
+}
+%>
+
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
