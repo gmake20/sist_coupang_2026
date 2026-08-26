@@ -2242,38 +2242,6 @@
   color: #888;
 }
 
-/* 재고 게이지 — 회색 트랙(.bar) 위에 남은 만큼 진한 막대(i).
-   ★ 트랙을 별도 요소로 둔 이유: i 의 width:99% 는 "부모 폭의 99%" 인데
-     부모가 글자까지 포함한 넓은 상자면 엉뚱한 길이가 됨.
-     56px 짜리 트랙을 부모로 두어야 99% 가 의도한 길이가 됨.
-     (리뷰의 별점 분포 막대와 같은 구조) */
-.product-page .gw-card__stock {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  font-size: 11px;
-  line-height: 12px;
-  color: #888;
-}
-
-.product-page .gw-card__stock .bar {
-  flex: none;
-  width: 56px;
-  height: 8px;
-  border-radius: 4px;
-  background: #eaedf0;
-  overflow: hidden;
-}
-
-.product-page .gw-card__stock .bar i {
-  display: block;
-  height: 100%;
-  background: #8a94a0;
-}
-
-
-
 
 /* ============================================================
    8. 반응형 — index.html 과 같은 데스크톱 퍼스트(max-width) 방식,
