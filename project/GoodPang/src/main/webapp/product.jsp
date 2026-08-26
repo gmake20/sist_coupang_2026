@@ -1,11 +1,11 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
+<%@ taglib uri="jakarta.tags.core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>무형광 남성 반팔 라운드 티셔츠 3종 세트, 화이트/그레이/블랙 - 티셔츠 | 굿팡</title>
+<title>${p.productName} - ${p.subCategoryName} | 굿팡</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet"
@@ -45,13 +45,28 @@
 
 			<!-- ── 빵부스러기(breadcrumb) — 지금 내가 어느 카테고리에 있는지 ──
            원본은 "쿠팡 홈 > 쿠팡수입 > 패션의류/잡화 > ..." 형태.
-           <nav> 으로 감싸는 이유: 이건 글이 아니라 "길 안내"라서 -->
+            <nav> 으로 감싸는 이유: 이건 글이 아니라 "길 안내"라서
+
+           ▶JSP: ProductServlet 이 request 에 담아준 "p"(ProductDTO) 의
+             mainCategoryName / midCategoryName / subCategoryName 을 그대로 씀
+             (ProductDAO 가 PRODUCT→SUB_CATEGORY→MID_CATEGORY→MAIN_CATEGORY 조인해서 채워둔 값).
+             JS 는 필요 없음 — 요청마다 서버(JSP)가 이미 값을 들고 있어서 EL 로 바로 찍으면 됨.
+             (카테고리 "메뉴판" 을 그리는 category/getinfo + header.js 와는 다른 데이터임 — 그건
+             사이트 전체 카테고리 트리고, 여긴 "이 상품 하나"가 속한 카테고리 경로임)
+           href="#" 는 그대로 둠 — 카테고리별 상품목록 페이지가 아직 없어서. 나중에 생기면
+             href="category?categoryNo=..." 식으로 채울 것 -->
 			<nav class="breadcrumb">
 				<ol>
-					<li><a href="index.html">굿팡 홈</a></li>
+					<li><a href="index.jsp">굿팡 홈</a></li>
+					<!--   
 					<li><a href="#">남성패션</a></li>
 					<li><a href="#">의류</a></li>
 					<li><a href="#">티셔츠</a></li>
+					 --> 
+					<li><a href="#">${p.mainCategoryName}</a></li>
+          			<li><a href="#">${p.midCategoryName}</a></li>
+          			<li><a href="#">${p.subCategoryName}</a></li>
+          			
 				</ol>
 			</nav>
 
@@ -88,15 +103,16 @@
 					<!-- ① 머리부분 — 재고경고 / 브랜드 / 상품명 / 별점 -->
 					<div class="product-buy-header">
 
-						<!-- 브랜드명 — 파란 글씨(#346aff). ▶JSP: ${p.brand} -->
-						<a href="#" class="brand-info">베이직스</a>
+						<!-- 브랜드명 — 파란 글씨(#346aff). ▶JSP:  -->
+						<!-- <a href="#" class="brand-info">베이직스</a> -->
+						<a href="#" class="brand-info">${p.storeName}</a>
 
 						<div class="product-title-row">
 							<!-- 상품명. 페이지에서 제일 중요한 제목이라 h1.
                    ※ index.html 은 h1 이 로고였는데, 이 페이지의 주인공은 상품이라
                      여기서는 상품명이 h1 이 되는 게 맞음 -->
-							<h1 class="product-title">무형광 남성 반팔 라운드 티셔츠 3종 세트,
-								화이트/그레이/블랙</h1>
+							<!-- <h1 class="product-title">무형광 남성 반팔 라운드 티셔츠 3종 세트, 화이트/그레이/블랙</h1> -->
+							<h1 class="product-title">${p.productName}</h1>
 
 							<!-- 찜 / 공유 버튼 — 원본은 SVG 아이콘이라 우리도 SVG 로 그림.
                    글자(♡ ↗)로 대신하면 모양이 원본과 다르고 폰트에 따라 달라짐.
@@ -125,16 +141,16 @@
 						<!-- 별점 + 리뷰수. 리뷰 영역으로 이동하는 링크(#reviews)
                  ▶JSP: 별은 평점으로 계산, 숫자는 {p.reviewCount} -->
 						<div class="review-atf">
-							<span class="stars">★★★★☆</span> <a href="#reviews" class="count">(2,033)</a>
+							<span class="stars">★★★★☆</span> <a href="#reviews" class="count">(${reviewCount})</a>
 						</div>
 					</div>
 
 					<!-- ② 가격 -->
 					<div class="price-container">
 						<div class="price-now">
-							<span class="discount">15%</span> <strong class="total-price" data-unit-price="19900">19,900원</strong>
-							<span class="badge-rocket">로켓배송</span> <span
-								class="badge-tomorrow">내일도착</span>
+							<!-- <span class="discount">15%</span> <strong class="total-price" data-unit-price="19900">19,900원</strong> -->
+							<span class="discount">15%</span> <strong class="total-price" data-unit-price="${p.productPrice}">${p.productPrice}원</strong>
+							<span class="badge-rocket">로켓배송</span> <span class="badge-tomorrow">내일도착</span>
 						</div>
 						<!-- 원가 취소선 (#768695 + line-through) -->
 						<div class="price-origin">
@@ -158,7 +174,7 @@
 							<em class="txt-bold">무료배송</em> (로켓배송 상품 19,800원 이상 구매 시)
 						</p>
 						<p class="delivery-date">
-							<em class="txt-green">내일(목) 8/20</em> <em class="txt-green-normal">도착
+							<em class="txt-green">${deliveryDate}</em> <em class="txt-green-normal">도착
 								보장</em> <span class="txt-sub">(11시간 20분 내 주문 시 / 서울·경기 기준)</span>
 						</p>
 
@@ -218,7 +234,7 @@
 					<div class="conditional-benefits">
 						<div class="benefit-row">
 							<span class="benefit-label">적립</span> <span class="benefit-text">
-								<em>최대 995원</em> <u>굿팡캐시 적립</u> · 굿페이 머니 결제시
+								<em>최대 ${rewardCash}원 </em> <u>굿팡캐시 적립</u> · 굿페이 머니 결제시
 							</span> <a href="#" class="benefit-more">혜택보기</a>
 						</div>
 						<div class="benefit-row pay-methods">
@@ -230,7 +246,7 @@
 					<!-- ⑥ 수량 + 구매 버튼 (원본 실측: 전부 높이 42px) -->
 					<form class="prod-buy-quantity-and-footer" method="post"
 						action="${pageContext.request.contextPath}/cart.jsp">
-						<input type="hidden" name="productNo" value="10">
+						<input type="hidden" name="productNo" value="${p.productNo}">
 						<input type="hidden" name="color" id="selectedColor" value="화이트">
 
 						<!-- 수량 — 원본은 왼쪽에 숫자, 오른쪽에 위/아래 화살표가 세로로 2단.
@@ -300,7 +316,7 @@
 									<span class="now"><em class="rate">58%</em> <strong>9,900</strong></span>
 								</span>
 								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
+								<span class="ad-item__ship">${deliveryDate} 도착 보장</span>
 								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(63)</span>
 						</a></li>
 						<li class="ad-item"><a href="#">
@@ -310,7 +326,7 @@
 									<span class="now"><strong>18,900</strong></span>
 								</span>
 								<span class="ad-item__tag">무료배송</span>
-								<span class="ad-item__ship">모레(금) 도착 예정</span>
+								<span class="ad-item__ship">${deliveryDate} 도착 예정</span>
 								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(30)</span>
 						</a></li>
 						<li class="ad-item"><a href="#">
@@ -321,7 +337,7 @@
 									<span class="now"><em class="rate">60%</em> <strong>7,290</strong></span>
 								</span>
 								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
+								<span class="ad-item__ship">${deliveryDate} 도착 보장</span>
 								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(398)</span>
 						</a></li>
 						<li class="ad-item"><a href="#">
@@ -332,7 +348,7 @@
 									<span class="now"><em class="rate">36%</em> <strong>16,500</strong></span>
 								</span>
 								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
+								<span class="ad-item__ship">${deliveryDate} 도착 보장</span>
 								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(6,543)</span>
 						</a></li>
 						<li class="ad-item"><a href="#">
@@ -343,7 +359,7 @@
 									<span class="now"><em class="rate">87%</em> <strong>14,800</strong></span>
 								</span>
 								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
+								<span class="ad-item__ship">${deliveryDate} 도착 보장</span>
 								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(357)</span>
 						</a></li>
 						<li class="ad-item"><a href="#">
@@ -354,7 +370,7 @@
 									<span class="now"><em class="rate">77%</em> <strong>7,910</strong></span>
 								</span>
 								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
+								<span class="ad-item__ship">${deliveryDate} 도착 보장</span>
 								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(76)</span>
 						</a></li>
 						<li class="ad-item"><a href="#">
@@ -365,7 +381,7 @@
 									<span class="now"><em class="rate">56%</em> <strong>8,800</strong></span>
 								</span>
 								<span class="ad-item__tag">무료반품</span>
-								<span class="ad-item__ship">내일(목) 도착 보장</span>
+								<span class="ad-item__ship">${deliveryDate} 도착 보장</span>
 								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(6,384)</span>
 						</a></li>
 						<li class="ad-item"><a href="#">
@@ -376,7 +392,7 @@
 									<span class="now"><em class="rate">54%</em> <strong>9,920</strong></span>
 								</span>
 								<span class="ad-item__tag">무료배송</span>
-								<span class="ad-item__ship">모레(금) 도착 예정</span>
+								<span class="ad-item__ship">${deliveryDate} 도착 예정</span>
 								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(682)</span>
 						</a></li>
 					</ul>
@@ -401,10 +417,8 @@
 							<span class="gw-card__name">REPUBLIC OF KOREA 쿨링 반팔 티셔츠 RT002 - 헬스 운동 기능성</span>
 							<span class="gw-card__was">할인 <em>43%</em> <del>15,000</del></span>
 							<strong class="gw-card__price">8,550원</strong>
-							<span class="gw-card__ship">내일(목) 도착 보장</span>
+							<span class="gw-card__ship">${deliveryDate} 도착 보장</span>
 							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(60)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:{d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
 					<li class="gw-card"><a href="#">
 							<span class="gw-card__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/gw-2.jpg" alt=""></span>
@@ -412,10 +426,8 @@
 							<span class="gw-card__name">NEOX 네옥스 밀리터리 디지털 기능성 V넥 쿨론 반팔 티셔츠</span>
 							<span class="gw-card__was">할인 <em>68%</em> <del>24,500</del></span>
 							<strong class="gw-card__price">7,670원</strong>
-							<span class="gw-card__ship">내일(목) 도착 보장</span>
+							<span class="gw-card__ship">${deliveryDate} 도착 보장</span>
 							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(44)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i style="width: 94%"></i></span>94 % 남음</span>
 					</a></li>
 					<li class="gw-card"><a href="#">
 							<span class="gw-card__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/gw-3.jpg" alt=""></span>
@@ -423,10 +435,8 @@
 							<span class="gw-card__name">인디오 남성용 빅사이즈 밀리터리 카모플라쥬 쿨링 반팔티셔츠</span>
 							<span class="gw-card__was">할인 <em>10%</em> <del>10,800</del></span>
 							<strong class="gw-card__price">9,720원</strong>
-							<span class="gw-card__ship">내일(목) 도착 보장</span>
+							<span class="gw-card__ship">${deliveryDate} 도착 보장</span>
 							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(26)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
 					<li class="gw-card"><a href="#">
 							<span class="gw-card__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/gw-4.jpg" alt=""></span>
@@ -434,10 +444,8 @@
 							<span class="gw-card__name">NEOX 네옥스 쿨론 밀리터리 디지털 라운드넥 로카 런닝</span>
 							<span class="gw-card__was">할인 <em>80%</em> <del>34,900</del></span>
 							<strong class="gw-card__price">6,950원</strong>
-							<span class="gw-card__ship">내일(목) 도착 보장</span>
+							<span class="gw-card__ship">${deliveryDate} 도착 보장</span>
 							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(14)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
 					<li class="gw-card"><a href="#">
 							<span class="gw-card__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/gw-5.jpg" alt=""></span>
@@ -445,10 +453,8 @@
 							<span class="gw-card__name">FLY 남녀공용 기능성 드라이 스포츠 반팔 티셔츠 헬스 러닝</span>
 							<span class="gw-card__was">할인 <em>11%</em> <del>6,490</del></span>
 							<strong class="gw-card__price">5,770원</strong>
-							<span class="gw-card__ship">내일(목) 도착 보장</span>
+							<span class="gw-card__ship">${deliveryDate} 도착 보장</span>
 							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(216)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i style="width: 96%"></i></span>96 % 남음</span>
 					</a></li>
 				</ul>
 			</section>
@@ -466,7 +472,8 @@
 			     활성 탭이 저절로 바뀜(scroll-spy). 원본이 그렇게 동작함 (2026-08-21 반영) -->
 			<nav class="detail-tabs">
 				<a href="#detail" class="is-on">상품상세</a>
-				<a href="#reviews">상품평 (2,033)</a>
+				<!-- <a href="#reviews">상품평 (2,033)</a> -->
+				<a href="#reviews">상품평 (${reviewCount})</a>
 				<a href="#qna">상품문의</a>
 				<a href="#delivery">배송/교환/반품 안내</a>
 			</nav>
@@ -572,7 +579,7 @@
                    (JSON-LD 의 ratingValue 4.2 / ratingCount 17 로 확인).
                    별 그림이 평점을, 숫자가 개수를 나타내는 구조 -->
 						<div class="review-score">
-							<span class="stars">★★★★☆</span> <strong>2,033</strong>
+							<span class="stars">★★★★☆</span> <strong>${reviewCount}</strong>
 						</div>
 
 						<!-- 별점 분포 막대
@@ -699,214 +706,34 @@
                    **모자란 게 아니라 개수만 다른 것.** 카드 하나의 구조·크기는 원본과 같음.
                    DB 를 붙이면 &lt;c:forEach&gt; 가 리뷰 수만큼 찍어내므로 저절로 채워짐 —
                    지금 개수를 늘리려고 카드를 복붙할 필요 없음 (2026-08-21 확인) -->
-						<article class="review-item" data-review-id="r1" data-helpful="8">
-							<div class="review-head">
-								<span class="review-avatar"></span>
-								<div class="review-writer">
-									<strong class="name">고*미</strong>
-									<div class="meta">
-										<span class="stars">★★★★★</span> <span class="date">2026.06.16</span>
-									</div>
-									<span class="seller">판매자: 빅토리샵</span>
-								</div>
-							</div>
-							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 화이트, 95</p>
-							<ul class="review-photos">
-								<li><img src="${pageContext.request.contextPath}/images/product-detail/review-1.jpg" alt=""></li>
-								<li><img src="${pageContext.request.contextPath}/images/product-detail/review-2.jpg" alt=""></li>
-								<li><img src="${pageContext.request.contextPath}/images/product-detail/review-3.jpg" alt=""></li>
-							</ul>
-							<strong class="review-headline">국내원단 대만족</strong>
-							<p class="review-text">쿠팡에서 의류제품 3중포장으로 이렇게까지 깔끔하게 받아본건 처음입니다~~~
-								여름용이라 시원하게 입어야해서 원단비교를 꼼꼼하게 했어요. 확실히 국내원단 사용해서인지 가볍고 시원해요~</p>
-							<dl class="review-attr">
-								<div>
-									<dt>평소 사이즈</dt>
-									<dd>105</dd>
-								</div>
-								<div>
-									<dt>키</dt>
-									<dd>178</dd>
-								</div>
-								<div>
-									<dt>색상</dt>
-									<dd>화면과 같아요</dd>
-								</div>
-								<div>
-									<dt>사이즈</dt>
-									<dd>정사이즈예요</dd>
-								</div>
-							</dl>
-							<div class="review-foot">
-								<button type="button" class="btn-helpful">도움이 돼요</button>
-								<a href="#" class="btn-report">신고하기</a>
-							</div>
-						</article>
-
-						<article class="review-item" data-review-id="r2" data-helpful="15">
-							<div class="review-head">
-								<span class="review-avatar"></span>
-								<div class="review-writer">
-									<strong class="name">박*훈</strong>
-									<div class="meta">
-										<span class="stars">★★★★☆</span> <span class="date">2026.06.02</span>
-									</div>
-									<span class="seller">판매자: 빅토리샵</span>
-								</div>
-							</div>
-							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 그레이, 100</p>
-							<strong class="review-headline">가격 대비 만족합니다</strong>
-							<p class="review-text">3장에 이 가격이면 괜찮은 것 같아요. 목 늘어남 없이 잘 입고 있습니다. 다만 흰색은 살짝 비치는 편이라
-								안에 하나 더 입어야 할 듯요.</p>
-							<dl class="review-attr">
-								<div>
-									<dt>평소 사이즈</dt>
-									<dd>100</dd>
-								</div>
-								<div>
-									<dt>키</dt>
-									<dd>175</dd>
-								</div>
-								<div>
-									<dt>색상</dt>
-									<dd>화면과 비슷해요</dd>
-								</div>
-								<div>
-									<dt>사이즈</dt>
-									<dd>정사이즈예요</dd>
-								</div>
-							</dl>
-							<div class="review-foot">
-								<button type="button" class="btn-helpful">도움이 돼요</button>
-								<a href="#" class="btn-report">신고하기</a>
-							</div>
-						</article>
-
-						<article class="review-item" data-review-id="r3" data-helpful="3">
-							<div class="review-head">
-								<span class="review-avatar"></span>
-								<div class="review-writer">
-									<strong class="name">이*연</strong>
-									<div class="meta">
-										<span class="stars">★★★☆☆</span> <span class="date">2026.05.28</span>
-									</div>
-									<span class="seller">판매자: 빅토리샵</span>
-								</div>
-							</div>
-							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 블랙, 105</p>
-							<strong class="review-headline">사이즈가 조금 작아요</strong>
-							<p class="review-text">평소 105 입는데 어깨가 살짝 낍니다. 한 치수 크게 사시는 걸 추천드려요. 원단이랑 배송은 만족합니다.</p>
-							<dl class="review-attr">
-								<div>
-									<dt>평소 사이즈</dt>
-									<dd>105</dd>
-								</div>
-								<div>
-									<dt>키</dt>
-									<dd>182</dd>
-								</div>
-								<div>
-									<dt>색상</dt>
-									<dd>화면과 같아요</dd>
-								</div>
-								<div>
-									<dt>사이즈</dt>
-									<dd>작아요</dd>
-								</div>
-							</dl>
-							<div class="review-foot">
-								<button type="button" class="btn-helpful">도움이 돼요</button>
-								<a href="#" class="btn-report">신고하기</a>
-							</div>
-						</article>
-
-						<!-- ★ 아래 2개는 2026-08-24 에 페이지네이션(다음 참고)을 실제로 보여주려고 추가한 더미.
-						     리뷰가 3개뿐이면 항상 1페이지 안에 다 들어가서 "다음 페이지" 버튼이 아예 동작을 안 함 -->
-						<article class="review-item" data-review-id="r4" data-helpful="5">
-							<div class="review-head">
-								<span class="review-avatar"></span>
-								<div class="review-writer">
-									<strong class="name">최*영</strong>
-									<div class="meta">
-										<span class="stars">★★★★★</span> <span class="date">2026.07.20</span>
-									</div>
-									<span class="seller">판매자: 빅토리샵</span>
-								</div>
-							</div>
-							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 블랙, 100</p>
-							<ul class="review-photos">
-								<li><img src="${pageContext.request.contextPath}/images/product-detail/review-4.jpg" alt=""></li>
-							</ul>
-							<!-- ★ 이 리뷰의 글은 사진(review-4.jpg = 쿠팡 봉투에 담긴 포장 상태)에 맞춰 씀.
-							     전에는 "블랙이 화면보다 더 고급스럽게 나왔어요" 였는데 사진은 민트색 포장이라 안 맞았음
-							     (2026-08-24 사용자가 지적). 더미 데이터라도 사진과 글은 맞춰두는 게 맞음 -->
-							<strong class="review-headline">포장이 깔끔해요</strong>
-							<p class="review-text">봉투 그대로 왔고 비닐도 안 찢어져 있었어요. 주문 다음 날 바로 도착했습니다. 마감도
-								깔끔하네요.</p>
-							<dl class="review-attr">
-								<div>
-									<dt>평소 사이즈</dt>
-									<dd>100</dd>
-								</div>
-								<div>
-									<dt>키</dt>
-									<dd>173</dd>
-								</div>
-								<div>
-									<dt>색상</dt>
-									<dd>화면과 같아요</dd>
-								</div>
-								<div>
-									<dt>사이즈</dt>
-									<dd>정사이즈예요</dd>
-								</div>
-							</dl>
-							<div class="review-foot">
-								<button type="button" class="btn-helpful">도움이 돼요</button>
-								<a href="#" class="btn-report">신고하기</a>
-							</div>
-						</article>
-
-						<article class="review-item" data-review-id="r5" data-helpful="1">
-							<div class="review-head">
-								<span class="review-avatar"></span>
-								<div class="review-writer">
-									<strong class="name">정*수</strong>
-									<div class="meta">
-										<span class="stars">★★★☆☆</span> <span class="date">2026.05.15</span>
-									</div>
-									<span class="seller">판매자: 빅토리샵</span>
-								</div>
-							</div>
-							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 네이비, 110</p>
-							<strong class="review-headline">그냥 무난해요</strong>
-							<p class="review-text">가격 생각하면 나쁘지 않은데 배송이 하루 늦게 왔어요. 옷 자체는 평범합니다.</p>
-							<dl class="review-attr">
-								<div>
-									<dt>평소 사이즈</dt>
-									<dd>110</dd>
-								</div>
-								<div>
-									<dt>키</dt>
-									<dd>185</dd>
-								</div>
-								<div>
-									<dt>색상</dt>
-									<dd>화면과 비슷해요</dd>
-								</div>
-								<div>
-									<dt>사이즈</dt>
-									<dd>정사이즈예요</dd>
-								</div>
-							</dl>
-							<div class="review-foot">
-								<button type="button" class="btn-helpful">도움이 돼요</button>
-								<a href="#" class="btn-report">신고하기</a>
-							</div>
-						</article>
-
-						<!-- 검색·필터 결과가 0개일 때만 JS 가 보여줌 (평소엔 CSS 로 감춰둠) -->
-						<p class="review-empty">조건에 맞는 후기가 없어요</p>
+	<c:choose>
+	    <c:when test="${not empty reviews}">
+	        <c:forEach items="${reviews}" var="r">
+	        <article class="review-item">
+	            <div class="review-head">
+	                <span class="review-avatar"></span>
+	                <div class="review-writer">
+	                    <strong class="name">${r.maskedName}</strong>
+	                    <div class="meta">
+	                        <span class="stars">${r.ratingStars}</span> <span class="date">${r.reviewDate}</span>
+	                    </div>
+	                </div>
+	            </div>
+	            <c:if test="${not empty r.optionText}">
+	            <p class="review-option">${r.optionText}</p>
+	            </c:if>
+	            <p class="review-text">${r.reviewContent}</p>
+	            <div class="review-foot">
+	                <button type="button" class="btn-helpful">도움이 돼요</button>
+	                <a href="#" class="btn-report">신고하기</a>
+	            </div>
+	        </article>
+	        </c:forEach>
+	    </c:when>
+	    <c:otherwise>
+	        <p class="review-empty">조건에 맞는 후기가 없어요</p>
+	    </c:otherwise>
+	</c:choose>
 
 						<!-- 페이지네이션 — 원본 실측(ref/product/vp_05_review2.jpeg): "‹ (1) 2 ›" 모양,
 						     지금 고른 페이지만 파란 원 테두리.
@@ -1081,7 +908,7 @@
 									문의는 마이굿팡-고객센터 내 상담하기를 이용해주세요.</span>
 							</td>
 						</tr>
-						<tr>
+						<!-- <tr>
 							<th>상호/대표자</th>
 							<td>베이직스 / 김미영</td>
 							<th>사업장 소재지</th>
@@ -1098,7 +925,25 @@
 							<td>2026-부천원미-1026</td>
 							<th>사업자번호</th>
 							<td>886-34-01859</td>
-						</tr>
+						</tr> -->
+						 <tr>
+					    <th>상호/대표자</th>
+					    <td>${p.storeName} / ${p.ceoName}</td>
+					    <th>사업장 소재지</th>
+					    <td>${p.businessAddress} ${p.businessDetailAddress}</td>
+					</tr>
+					<tr>
+					    <th>e-mail</th>
+					    <td>${p.email}</td>
+					    <th>연락처</th>
+					    <td>${p.phone}</td>
+					</tr>
+					<tr>
+					    <th>통신판매업 신고번호</th>
+					    <td>${p.mailOrderNo}</td>
+					    <th>사업자번호</th>
+					    <td>${p.businessNo}</td>
+					</tr>
 						<tr>
 							<th>구매안전 서비스</th>
 							<td colspan="3">02-006-00042 <a href="#" class="link">서비스 가입사실 확인 &gt;</a><br>
@@ -1106,6 +951,7 @@
 									구매안전서비스를 적용하고 있습니다.</span>
 							</td>
 						</tr>
+						 
 					</tbody>
 				</table>
 

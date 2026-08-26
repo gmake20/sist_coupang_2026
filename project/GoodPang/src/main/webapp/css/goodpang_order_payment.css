@@ -584,76 +584,62 @@ body {
 ======================================== */
 
 .bank-setting {
-    display: flex;
-    align-items: center;
-
-    margin-left: 30px;
-    margin-top: 3px;
-    margin-bottom: 28px;
-
-    gap: 12px;
+	margin-top: 8px;
+	margin-left: 0px;
 }
+
 
 
 /* 은행 선택 */
 .bank-select {
-    width: 320px;
-    height: 40px;
+	box-sizing: border-box;
+	width: 100%;
+	height: 42px;
+	padding: 0 14px;
 
-    padding: 0 40px 0 12px;
+	border: 1px solid #bbb;
+	border-radius: 4px;
 
-    border: 1px solid #c8c8c8;
-    border-radius: 4px;
+	background-color: #fff;
+	color: #333;
 
-    background: #fff;
-
-    color: #333;
-
-    font-size: 14px;
-
-    outline: none;
-
-    cursor: pointer;
+	font-size: 14px;
+	outline: none;
 }
-
 
 .bank-select:focus {
-    border-color: #4285f4;
+	border-color: #346aff;
 }
-
 
 /* 기본 결제수단 */
 .default-payment {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
+	gap: 7px;
 
-    gap: 7px;
+	margin: 0;
+	padding: 0 0 0 2px;
 
-    font-size: 14px;
+	font-size: 13px;
+	color: #333;
 
-    cursor: pointer;
+	white-space: nowrap;
+	cursor: pointer;
 }
 
 
-/* checkbox */
+/* 체크박스 */
 .default-payment input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
+	width: 20px;
+	height: 20px;
+	margin: 0;
 
-    width: 20px;
-    height: 20px;
+	flex-shrink: 0;
 
-    margin: 0;
-
-    border: 1px solid #bcbcbc;
-    border-radius: 4px;
-
-    background: #fff;
-
-    cursor: pointer;
-
-    position: relative;
+	accent-color: #4285f4;
+	cursor: pointer;
 }
+
 
 
 /* 체크됐을 때 */
@@ -682,6 +668,10 @@ body {
     transform: rotate(45deg);
 }
 
+.default-payment span {
+	display: inline-block;
+	white-space: nowrap;
+}
 
 /* 구분선 */
 .payment-divider {
@@ -1437,4 +1427,229 @@ body.modal-open {
         height: 90vh;
     }
 
+}
+
+
+
+/* 결제수단 등록 버튼 */
+.payment-add-btn {
+	box-sizing: border-box;
+
+	width: 118px;
+	height: 42px;
+	padding: 0;
+
+	border: 1px solid #aaa;
+	border-radius: 4px;
+
+	background: #fff;
+	color: #333;
+
+	font-size: 13px;
+	font-weight: 600;
+
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.payment-add-btn:hover {
+	border-color: #346aff;
+	color: #346aff;
+}
+
+.payment-add-modal-overlay {
+	display: none;
+	position: fixed;
+	z-index: 3000;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.45);
+	justify-content: center;
+	align-items: center;
+}
+
+.payment-add-modal-overlay.show {
+	display: flex;
+}
+
+.payment-add-modal {
+	width: 430px;
+	max-width: calc(100% - 40px);
+	background: #fff;
+	border-radius: 6px;
+	overflow: hidden;
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+}
+
+.payment-add-modal-header {
+	height: 65px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 24px;
+	border-bottom: 1px solid #ddd;
+}
+
+.payment-add-modal-header h2 {
+	margin: 0;
+	font-size: 20px;
+	font-weight: 700;
+	color: #111;
+}
+
+.payment-add-modal-close {
+	border: 0;
+	background: none;
+	font-size: 30px;
+	color: #777;
+	cursor: pointer;
+}
+
+.payment-add-modal-body {
+	padding: 24px;
+}
+
+.payment-add-type {
+	display: flex;
+	margin-bottom: 24px;
+	border-bottom: 1px solid #ddd;
+}
+
+.payment-type-btn {
+	flex: 1;
+	height: 48px;
+	border: 0;
+	border-bottom: 3px solid transparent;
+	background: #fff;
+	color: #777;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.payment-type-btn.active {
+	border-bottom-color: #346aff;
+	color: #346aff;
+}
+
+.payment-add-label {
+	margin-top: 16px;
+	margin-bottom: 7px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #333;
+}
+
+.payment-add-input,
+.payment-add-select {
+	box-sizing: border-box;
+	width: 100%;
+	height: 44px;
+	padding: 0 12px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: #fff;
+	font-size: 14px;
+	outline: none;
+}
+
+.payment-add-input:focus,
+.payment-add-select:focus {
+	border-color: #346aff;
+}
+
+.card-number-area {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.card-number-input {
+	box-sizing: border-box;
+	width: 78px;
+	height: 44px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	text-align: center;
+	font-size: 14px;
+	outline: none;
+}
+
+.card-number-input:focus {
+	border-color: #346aff;
+}
+
+.payment-add-default {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	margin-top: 23px;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.payment-add-save-btn {
+	width: 100%;
+	height: 50px;
+	margin-top: 25px;
+	border: 0;
+	border-radius: 4px;
+	background: #346aff;
+	color: #fff;
+	font-size: 16px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.payment-add-save-btn:hover {
+	background: #2556d8;
+}
+
+.payment-add-content.hidden {
+	display: none;
+}
+
+.payment-select-row {
+	display: grid;
+	grid-template-columns: minmax(260px, 320px) 118px auto;
+	align-items: center;
+	column-gap: 10px;
+	width: 100%;
+}
+
+.payment-add-btn {
+	height: 40px;
+	padding: 0 14px;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	background: #fff;
+	color: #333;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.payment-add-btn:hover {
+	border-color: #346aff;
+	color: #346aff;
+}
+
+.payment-add-modal-overlay {
+	display: none;
+	position: fixed;
+	z-index: 3000;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.45);
+	justify-content: center;
+	align-items: center;
+}
+
+.payment-add-modal-overlay.show {
+	display: flex;
 }
