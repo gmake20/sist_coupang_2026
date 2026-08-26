@@ -196,9 +196,9 @@
                 </div>
             </c:if>
         </div> <!-- // .product-info 닫기 -->
-										</div>
-									</div>
-
+        </div>
+        
+									
 									<!-- 3종 하단 액션 버튼 그룹 -->
 									<div class="delivery-buttons"
 										style="display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
@@ -221,7 +221,7 @@
 
 						</c:forEach>
 					</c:when>
-
+					
 					<c:otherwise>
 						<div class="empty-order-container"
 							style="text-align: center; padding: 60px 0;">
