@@ -25,9 +25,19 @@ public class ProductDTO {
 
     private int sellerNo;
     private String storeName;          // SELLER.STORE_NAME — product.jsp 의 .brand-info 자리
+    private String ceoName;               // SELLER.CEO_NAME
+    private String businessAddress;       // SELLER.BUSINESS_ADDRESS
+    private String businessDetailAddress; // SELLER.BUSINESS_DETAIL_ADDRESS
+    private String email;                 // SELLER.EMAIL
+    private String phone;                 // SELLER.PHONE
+    private String mailOrderNo;           // SELLER.MAIL_ORDER_NO
+    private String businessNo;            // SELLER.BUSINESS_NO
 
     private int subCategoryNo;
     private String subCategoryName;    // 빵부스러기 맨 끝 칸
     private String midCategoryName;
     private String mainCategoryName;   // 빵부스러기 맨 앞 칸
+
+    
+    
 }
