@@ -935,7 +935,7 @@ public class OrderDAO {
 						SYSDATE,
 						DELIVERY_FEE,
 						TOTAL_PRICE,
-						'주문완료',
+						'결제완료',
 						?,
 						PRODUCT_AMOUNT,
 						INSTANT_DISCOUNT,
