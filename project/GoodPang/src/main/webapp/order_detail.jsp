@@ -2,7 +2,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%
-    String orderNo = "1001";
+	String orderNo = request.getParameter("orderNo");
 %>
 <!--위의 문장을 바꿉니다...OSB String orderNo = request.getParameter("orderNo");-->
 <!DOCTYPE html>
@@ -368,6 +368,7 @@
 
 	</div>
 	<jsp:include page="/inc/footer.jsp" />
+	<script src="${pageContext.request.contextPath}/js/header.js"></script>
 
 </body>
 </html>

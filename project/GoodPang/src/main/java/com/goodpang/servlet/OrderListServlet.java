@@ -22,18 +22,21 @@ public class OrderListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
     	
-		/* int memberNo = 1; */
+		 //int memberNo = 1; 
          
         HttpSession session = request.getSession();
+        System.out.println("[DEBUG OrderListServlet] === 주문 리스트 정보 조회 시작 ===");
         
         // 세션에서 로그인한 회원번호 추출
-       // Integer memberNo = (Integer) session.getAttribute("memberNo");
+        Integer memberNo = (Integer) session.getAttribute("memberNo");
 
         // 미로그인 시 처리
-//        if (memberNo == null) {
-//          response.sendRedirect(request.getContextPath() + "/member/login.do");
-//            return;
-//        }
+        if (memberNo == null) {
+          response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        System.out.println("[DEBUG OrderListServlet] === 주문 리스트 정보 조회 시작 ==="+ memberNo);
         
         MemberDTO loginMember =
                 LoginUtil.requireLogin(
@@ -45,12 +48,15 @@ public class OrderListServlet extends HttpServlet {
             return;
         }
     	
-        int memberNo = loginMember.getMemberNo();
+      //  int memberNo = loginMember.getMemberNo();
 
         
         // DAO 호출 시 세션에서 꺼낸 memberNo 전달
         OrderDAO dao = new OrderDAO();
         List<OrderItemDTO> orderList = dao.getOrderListByMemberNo(memberNo);
+        
+        int resultCount = (orderList != null) ? orderList.size() : 0;
+        System.out.println("[DEBUG OrderListServlet] DB 조회 완료건: " + resultCount);
 
         request.setAttribute("orderList", orderList);
         request.getRequestDispatcher("/order_list.jsp")

@@ -246,14 +246,18 @@
 					<!-- ⑥ 수량 + 구매 버튼 (원본 실측: 전부 높이 42px) -->
 					<form class="prod-buy-quantity-and-footer" method="post"
 						action="${pageContext.request.contextPath}/cart.jsp">
-						<!-- <input type="hidden" name="productId" value="25"> -->
+
+					
 						<input type="hidden" name="productId" value="${p.productNo}">
+
+
+
 						<input type="hidden" name="color" id="selectedColor" value="화이트">
 
 						<!-- 수량 — 원본은 왼쪽에 숫자, 오른쪽에 위/아래 화살표가 세로로 2단.
                  (좌우 - + 배치가 아님. 2026-08-21 원본 확대해서 확인) -->
 						<div class="product-quantity">
-							<input type="text" class="qty-input" name="qty" value="1" readonly>
+							<input type="text" class="qty-input" name="quantity" value="1" readonly>
 							<div class="qty-spin">
 								<button type="button" class="qty-plus">
 									<span class="blind">수량 더하기</span>
@@ -265,7 +269,8 @@
 						</div>
 						<button type="submit" class="prod-cart-btn">장바구니 담기</button>
 						<button type="submit" class="prod-buy-btn"
-							formaction="${pageContext.request.contextPath}/goodpang_order_payment.jsp">
+							formaction="${pageContext.request.contextPath}/order/buy"
+							formmethod="post">
 							바로구매<i class="arrow-right"></i>
 						</button>
 						<!-- 위 배송방법에서 "무료배송+무료반품(로켓와우)"을 고르면 위 두 칸 대신 이거 하나만 보임

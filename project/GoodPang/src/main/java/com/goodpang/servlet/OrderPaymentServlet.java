@@ -2,10 +2,11 @@ package com.goodpang.servlet;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLIntegrityConstraintViolationException;
 
 import com.goodpang.dao.OrderDAO;
+import com.goodpang.dto.MemberDTO;
 import com.goodpang.util.ConnectionProvider;
+import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,183 +17,193 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/order/checkout")
 public class OrderPaymentServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    
-    @Override
-    protected void doPost(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	protected void doPost(
+			HttpServletRequest request,
+			HttpServletResponse response)
+					throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
 
-        String orderNoParam =
-                request.getParameter("orderNo");
+		MemberDTO member =
+				LoginUtil.requireLogin(
+						request,
+						response
+						);
 
-        String addressNoParam =
-                request.getParameter("addressNo");
+		if (member == null) {
+			return;
+		}
 
-        if (orderNoParam == null
-                || orderNoParam.isBlank()
-                || addressNoParam == null
-                || addressNoParam.isBlank()) {
+		int memberNo =
+				member.getMemberNo();
 
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/order/payment"
-            );
+		String checkoutNoParam =
+				request.getParameter("checkoutNo");
 
-            return;
-        }
+		String addressNoParam =
+				request.getParameter("addressNo");
 
+		String paymentMethod =
+				request.getParameter("paymentMethod");
 
-        Connection conn = null;
+		String bankCode =
+				request.getParameter("bankCode");
 
-        try {
-
-            int orderNo =
-                    Integer.parseInt(orderNoParam);
-
-            int addressNo =
-                    Integer.parseInt(addressNoParam);
+		String cardCompany =
+				request.getParameter("cardCompany");
 
 
-            conn =
-                    ConnectionProvider.getConnection();
+		if (checkoutNoParam == null
+				|| checkoutNoParam.isBlank()
+				|| addressNoParam == null
+				|| addressNoParam.isBlank()
+				|| paymentMethod == null || paymentMethod.isBlank()
+				) {
 
-            conn.setAutoCommit(false);
+			response.sendError(
+					HttpServletResponse.SC_BAD_REQUEST,
+					"결제 정보가 올바르지 않습니다."
+					);
 
+			return;
+		}
 
-            OrderDAO dao =
-                    new OrderDAO();
+		Connection conn = null;
+		try {
+			int checkoutNo =
+					Integer.parseInt(
+							checkoutNoParam
+							);
+			int addressNo =
+					Integer.parseInt(
+							addressNoParam
+							);
+			conn =
+					ConnectionProvider
+					.getConnection();
+			conn.setAutoCommit(false);
 
-            int priceResult =
-                    dao.updateTotalPrice(
-                            conn,
-                            orderNo
-                    );
+			OrderDAO dao =
+					new OrderDAO();
 
-            if (priceResult != 1) {
+			boolean checkoutExists =
+					dao.existsCheckout(
+							conn,
+							checkoutNo,
+							memberNo
+							);
+			if (!checkoutExists) {
 
-                throw new Exception(
-                        "주문 금액 수정 실패"
-                );
-            }
+				throw new Exception(
+						"존재하지 않거나 접근할 수 없는 checkout입니다."
+						);
+			}
+			boolean addressExists =
+					dao.existsAddress(
+							conn,
+							addressNo,
+							memberNo
+							);
+			if (!addressExists) {
 
-            int addressResult =
-                    dao.updateOrderAddress(
-                            conn,
-                            orderNo,
-                            addressNo
-                    );
-
-            if (addressResult != 1) {
-
-                throw new Exception(
-                        "배송지 번호 저장 실패"
-                );
-            }
-
-            int deliveryResult =
-                    dao.insertOrderDelivery(
-                            conn,
-                            orderNo,
-                            addressNo
-                    );
-
-            if (deliveryResult != 1) {
-
-                throw new Exception(
-                        "주문 배송지 저장 실패"
-                );
-            }
-
-            int statusResult =
-                    dao.updateOrderStatus(
-                            conn,
-                            orderNo,
-                            "PAID"
-                    );
-
-            if (statusResult != 1) {
-
-                throw new Exception(
-                        "주문 상태 변경 실패"
-                );
-            }
-
-            conn.commit();
-
-
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/order/complete?orderNo="
-                    + orderNo
-            );
-
-
-        } catch (NumberFormatException e) {
-
-            rollback(conn);
-
-            response.sendError(
-                    HttpServletResponse.SC_BAD_REQUEST,
-                    "잘못된 주문번호 또는 배송지번호입니다."
-            );
+				throw new Exception(
+						"잘못된 배송지입니다."
+						);
+			}
+			int orderAddressNo =
+					dao.insertOrderAddress(
+							conn,
+							addressNo,
+							memberNo
+							);
+			int orderNo =
+					dao.insertOrderFromCheckout(
+							conn,
+							checkoutNo,
+							memberNo,
+							orderAddressNo,
+							paymentMethod
+							);
 
 
-        } catch (SQLIntegrityConstraintViolationException e) {
+			if (orderNo <= 0) {
 
-            rollback(conn);
+				throw new Exception(
+						"주문 생성 실패"
+						);
+			}
 
-            e.printStackTrace();
+			int detailCount =
+					dao.insertOrderDetailsFromCheckout(
+							conn,
+							checkoutNo,
+							orderNo
+							);
+			if (detailCount <= 0) {
 
-            response.sendRedirect(
-                    request.getContextPath()
-                    + "/order/already-completed"
-            );
+				throw new Exception(
+						"주문 상품 저장 실패"
+						);
+			}
+			dao.deleteCheckoutItems(
+					conn,
+					checkoutNo
+					);
+			dao.deleteCheckout(
+					conn,
+					checkoutNo,
+					memberNo
+					);
+			conn.commit();
+			response.sendRedirect(
+					request.getContextPath()
+					+ "/order/complete?orderNo="
+					+ orderNo
+					);
+
+		} catch (NumberFormatException e) {
+
+			rollback(conn);
+
+			response.sendError(
+					HttpServletResponse.SC_BAD_REQUEST,
+					"잘못된 checkout 번호 또는 배송지 번호입니다."
+					);
 
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 
-            rollback(conn);
+			rollback(conn);
 
-            e.printStackTrace();
+			e.printStackTrace();
 
-            throw new ServletException(
-                    "결제 처리 중 오류가 발생했습니다.",
-                    e
-            );
+			throw new ServletException(
+					"결제 처리 중 오류가 발생했습니다.",
+					e
+					);
+		} finally {
+			if (conn != null) {
+				try {
+					conn.setAutoCommit(true);
+					conn.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
-
-        } finally {
-
-            if (conn != null) {
-
-                try {
-
-                    conn.setAutoCommit(true);
-
-                    conn.close();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private void rollback(Connection conn) {
-
-        if (conn != null) {
-
-            try {
-                conn.rollback();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+	private void rollback(
+			Connection conn) {
+		if (conn != null) {
+			try {
+				conn.rollback();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
