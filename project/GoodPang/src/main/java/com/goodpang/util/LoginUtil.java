@@ -10,47 +10,90 @@ import jakarta.servlet.http.HttpSession;
 
 public class LoginUtil {
 
-    public static MemberDTO requireLogin(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws IOException {
+	public static MemberDTO requireLogin(
+			HttpServletRequest request,
+			HttpServletResponse response)
+			throws IOException {
 
-        HttpSession session =
-                request.getSession();
+		HttpSession session =
+				request.getSession();
 
-        MemberDTO loginMember =
-                (MemberDTO) session.getAttribute(
-                    "loginMember"
-                );
+		MemberDTO loginMember =
+				(MemberDTO) session.getAttribute(
+						"loginMember"
+				);
 
-        if (loginMember == null) {
+		if (loginMember != null) {
+			return loginMember;
+		}
 
-            String requestUri =
-                    request.getRequestURI();
+		String method =
+				request.getMethod();
 
-            String queryString =
-                    request.getQueryString();
+		String contextPath =
+				request.getContextPath();
 
-            if (queryString != null
-                    && !queryString.isBlank()) {
+		if ("GET".equalsIgnoreCase(method)) {
 
-                requestUri += "?" + queryString;
-            }
+			String requestURI =
+					request.getRequestURI();
 
-            // 로그인 성공 후 돌아올 페이지 저장
-            session.setAttribute(
-                "redirectAfterLogin",
-                requestUri
-            );
+			String queryString =
+					request.getQueryString();
 
-            response.sendRedirect(
-                request.getContextPath()
-                + "/login"
-            );
+			String redirectUrl =
+					requestURI;
 
-            return null;
-        }
+			if (queryString != null
+					&& !queryString.isBlank()) {
 
-        return loginMember;
-    }
+				redirectUrl +=
+						"?" + queryString;
+			}
+
+			session.setAttribute(
+					"redirectAfterLogin",
+					redirectUrl
+			);
+
+		} else {
+
+			String referer =
+					request.getHeader(
+							"Referer"
+					);
+
+			if (referer != null
+					&& !referer.isBlank()) {
+
+				int contextIndex =
+						referer.indexOf(
+								contextPath
+						);
+
+				if (contextIndex >= 0) {
+
+					String redirectUrl =
+							referer.substring(
+									contextIndex
+							);
+
+					session.setAttribute(
+							"redirectAfterLogin",
+							redirectUrl
+					);
+				}
+			}
+		}
+
+		response.sendRedirect(
+				contextPath
+				+ "/login"
+		);
+
+		return null;
+	}
+
+	private LoginUtil() {
+	}
 }

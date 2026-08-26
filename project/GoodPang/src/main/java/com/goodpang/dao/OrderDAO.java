@@ -358,7 +358,6 @@ public class OrderDAO {
 	                o.ORDER_NO,
 	                o.MEMBER_NO,
 	                o.ORDER_DATE,
-	                o.PAYMENT_METHOD,
 	                o.DELIVERY_FEE,
 	                o.TOTAL_PRICE,
 	                o.ORDER_STATUS,
@@ -564,57 +563,70 @@ public class OrderDAO {
 	
 	public List<OrderItemDTO> getOrderListByMemberNo(int memberNo) {
 
-	    List<OrderItemDTO> list = new ArrayList<>();
+		List<OrderItemDTO> list = new ArrayList<>();
 
-	    // ORDERS 테이블 단독 조회
-	    String sql = """
-	            SELECT 
-	                ORDER_NO,
-	                ORDER_DATE,
-	                TOTAL_PRICE,
-	                ORDER_STATUS,
-	                PAYMENT_METHOD
-	            FROM ORDERS
-	            WHERE MEMBER_NO = ?
-	            ORDER BY ORDER_NO DESC
-	            """;
+		String sql = """
+				SELECT
+					o.ORDER_NO,
+					o.ORDER_DATE,
+					o.TOTAL_PRICE,
+					o.ORDER_STATUS,
+					p.PAYMENT_METHOD
+				FROM ORDERS o
+				JOIN PAYMENT p
+				  ON o.ORDER_NO = p.ORDER_NO
+				WHERE o.MEMBER_NO = ?
+				ORDER BY o.ORDER_NO DESC
+				""";
 
-	    try (
-	        Connection conn = ConnectionProvider.getConnection();
-	        PreparedStatement pstmt = conn.prepareStatement(sql)
-	    ) {
+		try (
+			Connection conn = ConnectionProvider.getConnection();
+			PreparedStatement pstmt = conn.prepareStatement(sql)
+		) {
+	    	System.out.println(sql);
 
-	        pstmt.setInt(1, memberNo);
+			pstmt.setInt(1, memberNo);
 
-	        try (ResultSet rs = pstmt.executeQuery()) {
+			try (ResultSet rs = pstmt.executeQuery()) {
 
-	            while (rs.next()) {
+				while (rs.next()) {
 
-	                OrderItemDTO item = new OrderItemDTO();
-	                
-	                // orderNo 세팅
-	                item.setOrderNo(rs.getInt("ORDER_NO"));
-	                
-	                // 상품명이 별도 테이블에 없으므로 주문 대표 타이틀로 대체
-	                item.setProductName("주문번호 " + rs.getInt("ORDER_NO") + "번 (" + rs.getString("ORDER_STATUS") + ")");
-	                
-	                // 옵션명 대신 결제 수단 표기 (선택사항)
-	                item.setOptionName("결제수단: " + rs.getString("PAYMENT_METHOD"));
-	                
-	                // 총 결제 금액 및 수량
-	                item.setSalePrice(rs.getInt("TOTAL_PRICE"));
-	                item.setQuantity(1);
-	                item.setFreeDelivery(true);
+					OrderItemDTO item = new OrderItemDTO();
 
-	                list.add(item);
-	            }
-	        }
+					item.setOrderNo(
+							rs.getInt("ORDER_NO")
+					);
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+					item.setProductName(
+							"주문번호 "
+							+ rs.getInt("ORDER_NO")
+							+ "번 ("
+							+ rs.getString("ORDER_STATUS")
+							+ ")"
+					);
 
-	    return list;
+					item.setOptionName(
+							"결제수단: "
+							+ rs.getString("PAYMENT_METHOD")
+					);
+
+					item.setSalePrice(
+							rs.getInt("TOTAL_PRICE")
+					);
+
+					item.setQuantity(1);
+
+					item.setFreeDelivery(true);
+
+					list.add(item);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return list;
 	}
 	
 	public int updateTotalPrice(
@@ -868,121 +880,123 @@ public class OrderDAO {
 	    }
 
 	 public int insertOrderFromCheckout(
-	            Connection conn,
-	            int checkoutNo,
-	            int memberNo,
-	            int orderAddressNo,
-	            String paymentMethod)
-	            throws Exception {
+				Connection conn,
+				int checkoutNo,
+				int memberNo,
+				int orderAddressNo,
+				String paymentMethod)
+				throws Exception {
 
-	        /*
-	         * ORDER_NO 생성
-	         */
-	        int orderNo = 0;
+			/*
+			 * ORDER_NO 생성
+			 */
+			int orderNo = 0;
 
-	        String seqSql = """
-	                SELECT SEQ_ORDER_NO.NEXTVAL
-	                FROM DUAL
-	                """;
+			String seqSql = """
+					SELECT SEQ_ORDER_NO.NEXTVAL
+					FROM DUAL
+					""";
 
-	        try (PreparedStatement pstmt =
-	                     conn.prepareStatement(seqSql);
+			try (PreparedStatement pstmt = conn.prepareStatement(seqSql);
+				 ResultSet rs = pstmt.executeQuery()) {
 
-	             ResultSet rs =
-	                     pstmt.executeQuery()) {
+				if (rs.next()) {
+					orderNo = rs.getInt(1);
+				}
+			}
 
-	            if (rs.next()) {
-	                orderNo =
-	                        rs.getInt(1);
-	            }
-	        }
-
-
-	        if (orderNo == 0) {
-
-	            throw new Exception(
-	                    "ORDER_NO 생성 실패"
-	            );
-	        }
+			if (orderNo == 0) {
+				throw new Exception("ORDER_NO 생성 실패");
+			}
 
 
-	        /*
-	         * CHECKOUT 데이터를 ORDERS에 복사
-	         */
-	        String sql = """
-	                INSERT INTO ORDERS (
-	                    ORDER_NO,
-	                    MEMBER_NO,
-	                    ORDER_DATE,
-	                    PAYMENT_METHOD,
-	                    DELIVERY_FEE,
-	                    TOTAL_PRICE,
-	                    ORDER_STATUS,
-	                    ORDER_ADDRESS_NO,
-	                    PRODUCT_AMOUNT,
-	                    INSTANT_DISCOUNT,
-	                    COUPON_DISCOUNT,
-	                    CASH_USED
-	                )
-	                SELECT
-	                    ?,
-	                    MEMBER_NO,
-	                    SYSDATE,
-	                    ?,
-	                    DELIVERY_FEE,
-	                    TOTAL_PRICE,
-	                    'PAID',
-	                    ?,
-	                    PRODUCT_AMOUNT,
-	                    INSTANT_DISCOUNT,
-	                    COUPON_DISCOUNT,
-	                    CASH_USED
-	                FROM CHECKOUT
-	                WHERE CHECKOUT_NO = ?
-	                  AND MEMBER_NO = ?
-	                """;
+			/*
+			 * CHECKOUT → ORDERS
+			 *
+			 * PAYMENT_METHOD는 PAYMENT 테이블로 이동했으므로 제거
+			 */
+			String orderSql = """
+					INSERT INTO ORDERS (
+						ORDER_NO,
+						MEMBER_NO,
+						ORDER_DATE,
+						DELIVERY_FEE,
+						TOTAL_PRICE,
+						ORDER_STATUS,
+						ORDER_ADDRESS_NO,
+						PRODUCT_AMOUNT,
+						INSTANT_DISCOUNT,
+						COUPON_DISCOUNT,
+						CASH_USED
+					)
+					SELECT
+						?,
+						MEMBER_NO,
+						SYSDATE,
+						DELIVERY_FEE,
+						TOTAL_PRICE,
+						'주문완료',
+						?,
+						PRODUCT_AMOUNT,
+						INSTANT_DISCOUNT,
+						COUPON_DISCOUNT,
+						CASH_USED
+					FROM CHECKOUT
+					WHERE CHECKOUT_NO = ?
+					  AND MEMBER_NO = ?
+					""";
 
-	        try (PreparedStatement pstmt =
-	                     conn.prepareStatement(sql)) {
+			try (PreparedStatement pstmt = conn.prepareStatement(orderSql)) {
 
-	            pstmt.setInt(
-	                    1,
-	                    orderNo
-	            );
+				pstmt.setInt(1, orderNo);
+				pstmt.setInt(2, orderAddressNo);
+				pstmt.setInt(3, checkoutNo);
+				pstmt.setInt(4, memberNo);
 
-	            pstmt.setString(
-	                    2,
-	                    paymentMethod
-	            );
+				int result = pstmt.executeUpdate();
 
-	            pstmt.setInt(
-	                    3,
-	                    orderAddressNo
-	            );
+				if (result != 1) {
+					throw new Exception("ORDERS 생성 실패");
+				}
+			}
 
-	            pstmt.setInt(
-	                    4,
-	                    checkoutNo
-	            );
+			String paymentSql = """
+					INSERT INTO PAYMENT (
+						PAYMENT_NO,
+						ORDER_NO,
+						PAYMENT_METHOD,
+						PAYMENT_AMOUNT,
+						PAYMENT_STATUS,
+						PAYMENT_DATE
+					)
+					SELECT
+						SEQ_PAYMENT_NO.NEXTVAL,
+						?,
+						?,
+						TOTAL_PRICE,
+						'PAID',
+						SYSDATE
+					FROM CHECKOUT
+					WHERE CHECKOUT_NO = ?
+					  AND MEMBER_NO = ?
+					""";
 
-	            pstmt.setInt(
-	                    5,
-	                    memberNo
-	            );
+			try (PreparedStatement pstmt = conn.prepareStatement(paymentSql)) {
 
-	            int result =
-	                    pstmt.executeUpdate();
+				pstmt.setInt(1, orderNo);
+				pstmt.setString(2, paymentMethod);
+				pstmt.setInt(3, checkoutNo);
+				pstmt.setInt(4, memberNo);
 
-	            if (result != 1) {
+				int result = pstmt.executeUpdate();
 
-	                throw new Exception(
-	                        "ORDERS 생성 실패"
-	                );
-	            }
-	        }
+				if (result != 1) {
+					throw new Exception("PAYMENT 생성 실패");
+				}
+			}
 
-	        return orderNo;
-	    }
+			return orderNo;
+		}
 	 
 	   public int insertOrderDetailsFromCheckout(
 	            Connection conn,
@@ -1077,5 +1091,4 @@ public class OrderDAO {
 	            return pstmt.executeUpdate();
 	        }
 	   }
-
 }
