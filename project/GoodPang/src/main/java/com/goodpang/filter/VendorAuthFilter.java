@@ -17,10 +17,10 @@ import jakarta.servlet.http.HttpSession;
  * LoginUtil.requireLogin() 같은 페이지별 호출 대신 필터로 한 번에 로그인 여부를 검사한다.
  */
 @WebFilter(urlPatterns = {
-    "/vendor_dashboard.jsp",
-    "/vendor_products.jsp",
-    "/vendor_orders.jsp",
-    "/vendor_product_write.jsp"
+        "/vendor_dashboard.jsp",
+        "/vendor_products.jsp",
+        "/vendor_orders.jsp",
+        "/vendor/product/write"
 })
 public class VendorAuthFilter implements Filter {
 

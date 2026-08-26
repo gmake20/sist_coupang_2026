@@ -36,7 +36,7 @@
         <div class="page-actions">
           <button class="btn btn-outline" type="button">엑셀 다운로드</button>
           <button class="btn btn-outline" type="button">엑셀 업로드</button>
-          <a class="btn btn-primary" href="./vendor_product_write.jsp">상품 등록</a>
+          <a class="btn btn-primary" href="/vendor/product/write">상품 등록</a>
         </div>
 
       </div>

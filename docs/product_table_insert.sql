@@ -14,7 +14,7 @@
 --      합니다 (docs/category_table_insert.sql 실행 후라면 문제 없음).
 --
 -- ⚠ 상품3(생수)은 option_yn='N'이라 PRODUCT_OPTION 행을 아예 만들지 않습니다. 그래서
--- 옛날처럼 PRODUCT_IN + 트리거로 입고 처리를 할 수 없어서, base_quantity를 직접 UPDATE
+-- 옛날처럼 PRODUCT_IN + 트리거로 입고 처리를 할 수 없어서, quantity를 직접 UPDATE
 -- 했습니다. OPTION_ID 번호도 상품3의 더미 옵션 행이 빠지면서 상품4·상품5부터 한 칸씩
 -- 앞당겨졌습니다 (상품4: 12~19 → 11~18, 상품5: 20~22 → 19~21).
 --
@@ -30,9 +30,9 @@
 -- 상품1: 남성 반팔 티셔츠 — 사이즈 단일 옵션 / 29,000원 (option_yn='Y')
 -- 카테고리: 패션의류/잡화 > 남녀공용의류 > 티셔츠 (10301)
 INSERT INTO PRODUCT (
-    product_no, seller_no, category_no,
-    sale_method, brand_name, no_brand_yn, display_name, internal_name,
-    option_yn, base_price, base_quantity,
+    product_no, seller_no, sub_category_no,
+    sale_method, brand_name, no_brand_yn, product_name, internal_name,
+    option_yn, product_price, quantity,
     manufacturer, composition_type, certification_type, parallel_import_yn,
     minor_purchase_yn, max_purchase_yn, max_purchase_qty,
     sale_period_yn, sale_start_date, sale_end_date, vat_type,
@@ -61,9 +61,9 @@ INSERT INTO PRODUCT (
 -- 상품2: 여성 롱패딩 — 색상 × 사이즈 2개 옵션 / 189,000원 (option_yn='Y')
 -- 카테고리: 패션의류/잡화 > 남녀공용의류 > 아우터 (10308, ⚠ 여성 전용 리프가 없어 임시매핑)
 INSERT INTO PRODUCT (
-    product_no, seller_no, category_no,
-    sale_method, brand_name, no_brand_yn, display_name, internal_name,
-    option_yn, base_price, base_quantity,
+    product_no, seller_no, sub_category_no,
+    sale_method, brand_name, no_brand_yn, product_name, internal_name,
+    option_yn, product_price, quantity,
     manufacturer, composition_type, certification_type, parallel_import_yn,
     minor_purchase_yn, max_purchase_yn, max_purchase_qty,
     sale_period_yn, sale_start_date, sale_end_date, vat_type,
@@ -89,12 +89,12 @@ INSERT INTO PRODUCT (
     '판매 중', SYSDATE, SYSDATE
 );
 
--- 상품3: 생수 2L(6입) — 옵션 없는 상품 (option_yn='N') → base_price=4,500원, base_quantity는 아래 UPDATE로 채움
+-- 상품3: 생수 2L(6입) — 옵션 없는 상품 (option_yn='N') → product_price=4,500원, quantity는 아래 UPDATE로 채움
 -- 카테고리: 식품 > 생수/음료 > 생수 (40601)
 INSERT INTO PRODUCT (
-    product_no, seller_no, category_no,
-    sale_method, brand_name, no_brand_yn, display_name, internal_name,
-    option_yn, base_price, base_quantity,
+    product_no, seller_no, sub_category_no,
+    sale_method, brand_name, no_brand_yn, product_name, internal_name,
+    option_yn, product_price, quantity,
     manufacturer, composition_type, certification_type, parallel_import_yn,
     minor_purchase_yn, max_purchase_yn, max_purchase_qty,
     sale_period_yn, sale_start_date, sale_end_date, vat_type,
@@ -123,9 +123,9 @@ INSERT INTO PRODUCT (
 -- 상품4: 남성 운동화 — 색상 × 사이즈 × 소재 3개 옵션 / 일반 89,000원 / 방수 94,000원 (option_yn='Y')
 -- 카테고리: 패션의류/잡화 > 남성패션 > 신발 (10202)
 INSERT INTO PRODUCT (
-    product_no, seller_no, category_no,
-    sale_method, brand_name, no_brand_yn, display_name, internal_name,
-    option_yn, base_price, base_quantity,
+    product_no, seller_no, sub_category_no,
+    sale_method, brand_name, no_brand_yn, product_name, internal_name,
+    option_yn, product_price, quantity,
     manufacturer, composition_type, certification_type, parallel_import_yn,
     minor_purchase_yn, max_purchase_yn, max_purchase_qty,
     sale_period_yn, sale_start_date, sale_end_date, vat_type,
@@ -154,9 +154,9 @@ INSERT INTO PRODUCT (
 -- 상품5: 벌꿀 — 수량 옵션 (option_yn='Y')
 -- 카테고리: 식품 > 가루/조미료/오일 > 천연조미료 (41205, ⚠ 꿀 전용 리프가 없어 임시매핑)
 INSERT INTO PRODUCT (
-    product_no, seller_no, category_no,
-    sale_method, brand_name, no_brand_yn, display_name, internal_name,
-    option_yn, base_price, base_quantity,
+    product_no, seller_no, sub_category_no,
+    sale_method, brand_name, no_brand_yn, product_name, internal_name,
+    option_yn, product_price, quantity,
     manufacturer, composition_type, certification_type, parallel_import_yn,
     minor_purchase_yn, max_purchase_yn, max_purchase_qty,
     sale_period_yn, sale_start_date, sale_end_date, vat_type,
@@ -185,7 +185,7 @@ INSERT INTO PRODUCT (
 
 -- PRODUCT_OPTION 컬럼순서:
 -- OPTION_ID, product_no, OPTION1_TYPE, OPTION1_VALUE, OPTION2_TYPE, OPTION2_VALUE, OPTION3_TYPE, OPTION3_VALUE,
--- normal_price, sale_price, auto_price_adjust_yn, quantity, seller_product_code, model_no, barcode, STATUS
+-- normal_price, PRICE, auto_price_adjust_yn, quantity, seller_product_code, model_no, barcode, STATUS
 
 -- 상품1: 사이즈 단일 옵션 / 29,000원
 INSERT INTO PRODUCT_OPTION VALUES (SEQ_OPTION.NEXTVAL, 1, '사이즈','S',  NULL,NULL, NULL,NULL, NULL, 29000, 'N', 0, NULL, NULL, NULL, 'N');
@@ -201,7 +201,7 @@ INSERT INTO PRODUCT_OPTION VALUES (SEQ_OPTION.NEXTVAL, 2, '색상','베이지', 
 INSERT INTO PRODUCT_OPTION VALUES (SEQ_OPTION.NEXTVAL, 2, '색상','베이지', '사이즈','M', NULL,NULL, NULL, 189000, 'N', 0, NULL, NULL, NULL, 'N');
 INSERT INTO PRODUCT_OPTION VALUES (SEQ_OPTION.NEXTVAL, 2, '색상','베이지', '사이즈','L', NULL,NULL, NULL, 189000, 'N', 0, NULL, NULL, NULL, 'N');
 
--- 상품3(생수): option_yn='N'이라 PRODUCT_OPTION 행 없음 (base_price=4,500원을 그대로 사용)
+-- 상품3(생수): option_yn='N'이라 PRODUCT_OPTION 행 없음 (product_price=4,500원을 그대로 사용)
 
 -- 상품4: 색상 × 사이즈 × 소재 3개 옵션 / 일반 89,000원 / 방수 94,000원
 INSERT INTO PRODUCT_OPTION VALUES (SEQ_OPTION.NEXTVAL, 4, '색상','화이트', '사이즈','260', '소재','일반', NULL, 89000, 'N', 0, NULL, NULL, NULL, 'N');
@@ -239,8 +239,8 @@ INSERT INTO PRODUCT_IN VALUES (SEQ_PRODUCT_IN.NEXTVAL, 5,  SYSDATE, 9);  -- 베�
 INSERT INTO PRODUCT_IN VALUES (SEQ_PRODUCT_IN.NEXTVAL, 10, SYSDATE, 10); -- 베이지L: 10
 -- → TRIGGER: OPTION 5~10 QUANTITY = 20/15/10/8/5/10, STATUS = 'Y'
 
--- 상품3(생수)은 옵션이 없어서 PRODUCT_IN/트리거 대신 PRODUCT.base_quantity를 직접 채움
-UPDATE PRODUCT SET base_quantity = 200 WHERE product_no = 3; -- 생수: 200
+-- 상품3(생수)은 옵션이 없어서 PRODUCT_IN/트리거 대신 PRODUCT.quantity를 직접 채움
+UPDATE PRODUCT SET quantity = 200 WHERE product_no = 3; -- 생수: 200
 
 -- 상품4 초기 입고 (OPTION_ID 11~18, 상품3 더미옵션이 빠지면서 12~19 → 11~18로 한 칸 당겨짐)
 INSERT INTO PRODUCT_IN VALUES (SEQ_PRODUCT_IN.NEXTVAL, 15, SYSDATE, 11); -- 화이트260일반: 15
@@ -267,5 +267,5 @@ COMMIT;
 -- =========================================================
 -- SELECT * FROM PRODUCT ORDER BY product_no;
 -- SELECT * FROM PRODUCT_OPTION ORDER BY product_no, OPTION_ID;
--- SELECT * FROM PRODUCT WHERE product_no = 3; -- base_quantity=200 확인
+-- SELECT * FROM PRODUCT WHERE product_no = 3; -- quantity=200 확인
 -- EXEC UP_PRODUCT_IN(1, 10); -- 상품1 S사이즈 추가 입고 예시

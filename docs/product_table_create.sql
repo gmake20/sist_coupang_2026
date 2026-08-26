@@ -138,23 +138,23 @@ CREATE TABLE PRODUCT (
     /* 기본 정보 */
     product_no                 NUMBER(10) NOT NULL, /* 상품번호 (PK) */
     seller_no                  NUMBER(10) NOT NULL, /* 판매자번호 */
-    category_no                NUMBER(10) NOT NULL, /* 카테고리번호 (CATEGORY, 소분류 리프) */
+    sub_category_no             NUMBER(10) NOT NULL, /* 카테고리번호 (CATEGORY, 소분류 리프) */
 
     sale_method                 VARCHAR2(20) NOT NULL, /* 판매방식: 판매자배송 / 로켓그로스 */
     brand_name                  VARCHAR2(100), /* 브랜드 (브랜드 없음이면 NULL) */
     no_brand_yn                 CHAR(1) NOT NULL, /* 브랜드 없음(자체제작) 여부 Y/N */
-    display_name                VARCHAR2(100) NOT NULL, /* 노출상품명 */
+    product_name                 VARCHAR2(100) NOT NULL, /* 노출상품명 */
     internal_name               VARCHAR2(100), /* 등록상품명(판매자관리용) */
 
     /* 옵션 */
     option_yn                   CHAR(1) NOT NULL, /* 옵션 설정함(Y)/설정안함(N) */
-    base_price                  NUMBER(10), /* 옵션 미설정시 판매가 */
-    base_quantity                NUMBER(10), /* 옵션 미설정시 재고수량 */
+    product_price                NUMBER(10), /* 옵션 미설정시 판매가 */
+    quantity                     NUMBER(10), /* 옵션 미설정시 재고수량 */
 
     /* 상품 주요 정보 */
     manufacturer                 VARCHAR2(100), /* 제조사 */
-    composition_type             VARCHAR2(30) NOT NULL, /* 상품구성 */
-    certification_type           VARCHAR2(30) NOT NULL, /* 인증정보 */
+    composition_type             VARCHAR2(50) NOT NULL, /* 상품구성 */
+    certification_type           VARCHAR2(50) NOT NULL, /* 인증정보 */
     parallel_import_yn           CHAR(1) NOT NULL, /* 병행수입 여부 */
     minor_purchase_yn            CHAR(1) NOT NULL, /* 미성년자 구매 가능여부 */
     max_purchase_yn               CHAR(1) NOT NULL, /* 인당 최대구매수량 설정여부 */
@@ -165,7 +165,7 @@ CREATE TABLE PRODUCT (
     vat_type                       VARCHAR2(10) NOT NULL, /* 부가세: 과세/면세 */
 
     /* 상세설명 */
-    detail_type                 VARCHAR2(20) NOT NULL, /* 이미지 업로드/에디터 작성/HTML 작성 */
+    detail_type                 VARCHAR2(30) NOT NULL, /* 이미지 업로드/에디터 작성/HTML 작성 */
     product_desc                CLOB, /* 에디터·HTML 작성 내용 */
 
     /* 배송 */
@@ -173,12 +173,12 @@ CREATE TABLE PRODUCT (
     shipping_address               VARCHAR2(200) NOT NULL, /* 출고지 기본주소 */
     shipping_detail_address        VARCHAR2(200), /* 출고지 상세주소 */
     jeju_shipping_yn               CHAR(1) NOT NULL, /* 제주/도서산간 배송여부 */
-    delivery_service_code          VARCHAR2(20) NOT NULL, /* 택배사 */
-    delivery_method                VARCHAR2(30) NOT NULL, /* 배송방법 */
+    delivery_service_code          VARCHAR2(30) NOT NULL, /* 택배사 */
+    delivery_method                VARCHAR2(40) NOT NULL, /* 배송방법 */
     bundle_shipping_yn             CHAR(1) NOT NULL, /* 묶음배송 가능여부 */
-    shipping_fee_type              VARCHAR2(30) NOT NULL, /* 배송비 종류 */
+    shipping_fee_type              VARCHAR2(40) NOT NULL, /* 배송비 종류 */
     shipping_fee                   NUMBER(10) DEFAULT 0, /* 배송비 금액 */
-    lead_time_input_type           VARCHAR2(20) NOT NULL, /* 출고소요일 입력방식 */
+    lead_time_input_type           VARCHAR2(40) NOT NULL, /* 출고소요일 입력방식 */
     lead_time_days                 NUMBER(3), /* 출고 소요일(일) */
     same_day_ship_yn                CHAR(1) NOT NULL, /* 당일출고 여부 */
     same_day_cutoff_time            VARCHAR2(5), /* 당일출고 마감시각 (예: 12:00) */
@@ -191,7 +191,7 @@ CREATE TABLE PRODUCT (
     return_shipping_fee          NUMBER(10) NOT NULL, /* 반품배송비(편도) */
 
     /* 상태/메타 */
-    sale_status                 VARCHAR2(20) NOT NULL, /* 판매중/품절/판매중지/승인대기 */
+    sale_status                 VARCHAR2(30) NOT NULL, /* 판매중/품절/판매중지/승인대기 */
     created_date                 DATE NOT NULL, /* 등록일 */
     updated_date                 DATE NOT NULL  /* 수정일 */
 );
@@ -208,7 +208,7 @@ ALTER TABLE PRODUCT
 
 ALTER TABLE PRODUCT
     ADD CONSTRAINT FK_CATEGORY_TO_PRODUCT
-        FOREIGN KEY (category_no) REFERENCES CATEGORY (category_no);
+        FOREIGN KEY (sub_category_no) REFERENCES CATEGORY (category_no);
 
 ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_SALE_METHOD
     CHECK (sale_method IN ('판매자배송', '로켓그로스'));
@@ -286,7 +286,7 @@ CREATE TABLE PRODUCT_OPTION (
     OPTION3_TYPE           VARCHAR2(50),             /* 옵션타입3 */
     OPTION3_VALUE          VARCHAR2(100),            /* 옵션값3 */
     normal_price           NUMBER(10),               /* 정상가(원) */
-    sale_price             NUMBER(10)     NOT NULL, /* 판매가(원) */
+    PRICE                  NUMBER(10)     NOT NULL, /* 판매가(원) */
     auto_price_adjust_yn   CHAR(1)        NOT NULL, /* 판매자 자동가격조정 여부 */
     quantity               NUMBER(10)     NOT NULL, /* 재고수량 */
     seller_product_code    VARCHAR2(50),             /* 판매자상품코드 */
@@ -407,7 +407,7 @@ CREATE OR REPLACE PROCEDURE UP_PRODUCT_IN (
 -- 입고 프로시저. 옵션번호와 수량을 입력하면 해당 상품이 입고된다.
 -- 사용법 : EXEC UP_PRODUCT_IN(옵션번호, 수량);
 -- ⚠ OPTION_ID 기준이라 PRODUCT_OPTION 행이 없는 상품(option_yn='N')에는 못 씀.
---   그런 상품은 UPDATE PRODUCT SET base_quantity = base_quantity + 수량 WHERE product_no = ... 로 직접 처리
+--   그런 상품은 UPDATE PRODUCT SET quantity = quantity + 수량 WHERE product_no = ... 로 직접 처리
     P_OPTION_NO IN PRODUCT_IN.OPTION_ID%TYPE,
     P_QUANTITY  IN PRODUCT_IN.QUANTITY%TYPE
 ) IS

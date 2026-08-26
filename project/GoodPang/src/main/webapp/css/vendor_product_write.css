@@ -449,7 +449,6 @@ ul {
 .form-block {
   margin-bottom: 16px;
   padding: 0;
-  overflow: hidden;
 
   background: #fff;
   border: 1px solid #edeef1;
@@ -490,6 +489,7 @@ ul {
   font-size: 10px;
   font-weight: 700;
   vertical-align: middle;
+  cursor: help;
 }
 
 .collapse-toggle {
@@ -628,6 +628,9 @@ ul {
   flex: 1;
   min-width: 0;
 }
+
+.field-label.option-group-label { display: flex; align-items: center; gap: 6px; }
+.field-label .option-group-name { width: auto; flex: 1; }
 
 .field-control .input { max-width: 480px; }
 
@@ -953,6 +956,9 @@ ul {
 /* --- 상품이미지 --- */
 
 .image-slot {
+  position: relative;
+  overflow: hidden;
+
   width: 48px;
   height: 48px;
 
@@ -965,6 +971,7 @@ ul {
 
   color: #aaa;
   background: #fafafa;
+  cursor: pointer;
 }
 
 .image-slot:hover { border-color: #346aff; color: #346aff; }
@@ -976,7 +983,42 @@ ul {
   color: #346aff;
 }
 
+.image-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .main-slot { border-color: #f4514a44; }
+
+.image-slot-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 320px;
+}
+
+.slot-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+
+  width: 16px;
+  height: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .55);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.slot-remove:hover { background: rgba(0, 0, 0, .75); }
 
 /* --- 상세설명 --- */
 
