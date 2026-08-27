@@ -1,13 +1,17 @@
 package com.goodpang.servlet;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.NamingException;
 
 import com.goodpang.dao.OrderListDAO;
+import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.OrderItemDTO;
+import com.goodpang.dto.ReviewAvailableDTO;
 import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
@@ -15,7 +19,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
 //http://localhost:8080/GoodPang/order/order_list
 @WebServlet("/order/order_list")
 public class OrderListServlet extends HttpServlet {
@@ -40,9 +44,23 @@ public class OrderListServlet extends HttpServlet {
         int memberNo =
                 loginMember.getMemberNo();
 
-        System.out.println("[DEBUG OrderListServlet] === 주문 리스트 정보 조회 시작 ===" + memberNo );
      
+        ReviewDAO reviewDAO = new ReviewDAO();
+
+        List<ReviewAvailableDTO> reviewList =
+                reviewDAO.getReviewStatus(memberNo);
         
+        for (ReviewAvailableDTO review : reviewList) {
+
+            System.out.println(
+                "[REVIEW] orderDetailNo = "
+                + review.getOrderDetailNo()
+                + ", reviewWritten = "
+                + review.isReviewWritten()
+            );
+        }
+
+        request.setAttribute("reviewList", reviewList);
        
         
      // 3. OrderListDAO를 사용하여 로그인한 회원의 마이페이지 주문 목록 조회[cite: 1]
@@ -53,6 +71,14 @@ public class OrderListServlet extends HttpServlet {
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		for (OrderItemDTO item : orderList) {
+
+		    System.out.println(
+		            "[ORDER] orderDetailNo = "
+		            + item.getOrderDetailNo()
+		    );
 		}
 
         // 4. 조회한 결과를 request 영역에 저장

@@ -18,9 +18,7 @@
 
 		<div class="mypang-layout">
 
-			<!-- =========================
-         왼쪽 MY쿠팡 메뉴
-    ========================== -->
+		
 			<aside class="mypang-sidebar">
 
 				<div class="mypang-logo">MY쿠팡</div>
@@ -61,9 +59,7 @@
 			</aside>
 
 
-			<!-- =========================
-         중앙 리뷰 작성
-    ========================== -->
+		
 			<main class="review-page">
 
 				<h1 class="review-title">리뷰관리</h1>

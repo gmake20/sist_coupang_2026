@@ -50,7 +50,7 @@ public class OrderDetailServlet extends HttpServlet {
                 int orderNo = Integer.parseInt(orderNoParam.trim());
 
                 OrderDetailDAO dao = new OrderDetailDAO();
-                detailList = dao.getOrderDetailList(orderNo);
+                detailList = dao.getOrderDetailListv2(orderNo);
 
                 // 주문 공통 정보(수령인, 배송지, 결제수단 등)를 JSP 상단에서 편하게 쓰기 위해 첫 번째 항목 바인딩
                 if (detailList != null && !detailList.isEmpty()) {
