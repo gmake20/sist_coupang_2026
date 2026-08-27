@@ -405,7 +405,7 @@ footer {
 
             <h3>MY 쇼핑</h3>
 
-            <a href="${pageContext.request.contextPath}/order_list.jsp">
+            <a href="${pageContext.request.contextPath}/order/order_list">
                 주문목록/배송조회
             </a>
 

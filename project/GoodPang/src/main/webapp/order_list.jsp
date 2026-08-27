@@ -207,9 +207,10 @@
 											style="flex: 1; padding: 8px; border: 1px solid #0073e9; color: #0073e9; background: #fff; border-radius: 4px; cursor: pointer;">
 											배송 조회</button>
 										<button type="button" class="delivery-btn btn-action"
-											onclick="location.href='${pageContext.request.contextPath}/order/claim?orderNo=${item.orderNo}'"
+											onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${item.orderNo}'"
 											style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
 											교환, 반품 신청</button>
+											
 										<button type="button" class="delivery-btn btn-action"
 											onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${item.orderDetailNo}&productNo=${item.productNo}'"
 											style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
