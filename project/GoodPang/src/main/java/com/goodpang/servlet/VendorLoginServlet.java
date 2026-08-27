@@ -52,7 +52,7 @@ public class VendorLoginServlet extends HttpServlet {
 		}
 
 		// 입점심사 상태(입점 대기/심사 중/승인/반려)와 무관하게 로그인은 허용하고,
-		// 상태별 안내는 대시보드(vendor_dashboard.jsp)에서 분기 처리한다.
+		// 상태별 안내는 대시보드(vendor-dashboard.jsp)에서 분기 처리한다.
 		HttpSession session = request.getSession();
 
 		session.setAttribute("loginSeller", seller);
@@ -68,7 +68,7 @@ public class VendorLoginServlet extends HttpServlet {
 		if (redirectUrl != null && !redirectUrl.isBlank()) {
 			response.sendRedirect(redirectUrl);
 		} else {
-			response.sendRedirect(request.getContextPath() + "/vendor_dashboard.jsp");
+			response.sendRedirect(request.getContextPath() + "/vendor/dashboard");
 		}
 	}
 

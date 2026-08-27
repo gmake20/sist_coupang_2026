@@ -1,10 +1,8 @@
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
-<%
-	String orderNo = request.getParameter("orderNo");
-%>
-<!--위의 문장을 바꿉니다...OSB String orderNo = request.getParameter("orderNo");-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -109,14 +107,12 @@
 				<h1>주문상세</h1>
 
 				<div class="order-info">
-					<strong>2026. 8. 12</strong> 주문 <span class="dot">·</span> 주문번호 <span
-						class="order-number"><%= orderNo %></span>
+					<strong><fmt:formatDate value="${orderInfo.orderDate}" pattern="yyyy. M. d" /></strong></strong> 주문 <span class="dot">·</span> 주문번호 <span
+						class="order-number">${orderInfo.orderNo}</span>
 				</div>
 
 			</section>
 
-			<%@ taglib prefix="c" uri="jakarta.tags.core"%>
-			<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
 <!-- =========================
      배송 상품 리스트 (JSTL 반복문)
@@ -127,21 +123,13 @@
 					<div class="delivery-main">
 
 						<div class="delivery-title">
-							배송완료 <span>·</span> <strong>8/13(목) 도착</strong>
+							배송완료 <span>·</span> <strong>${item.orderStatus}</strong>
 						</div>
 
 						<div class="product-row">
 
 							<!-- 상품 이미지 -->
 							<div class="product-image">
-								<%--<c:choose>
-                        <c:when test="${not empty item.productImg}">
-                           img src="${item.productImg}" alt="${item.productName}"
-                        </c:when>
-                        <c:otherwise>
-                            <div class="clothes-icon">👕</div>
-                        </c:otherwise>
-                    </c:choose>--%>
 								<div class="clothes-icon">👕</div>
 							</div>
 
@@ -149,20 +137,28 @@
 							<div class="product-info">
 
 								<div class="product-name">
-									<%--c:if test="${item.isRocket}">
-                            <span class="rocket">🚀 로켓배송</span>
-                        </c:if--%>
+								
 									<span class="rocket">🚀 로켓배송</span> ${item.productName}
 								</div>
 
 								<div class="product-price">
-									<fmt:formatNumber value="${item.price}" pattern="#,###" />
-									원 <span>·</span> ${item.orderQty}개
+									<fmt:formatNumber value="${item.totalPrice}" pattern="#,###" />
+									원 <span>·</span> ${item.quantity}개
 								</div>
 
-								<div class="product-option">
-									<span>사이즈 / 색상: </span> ${item.optionName}
-								</div>
+								<!-- 옵션 정보 동적 출력 -->
+										<c:if test="${not empty item.option1Value or not empty item.option2Value}">
+											<div class="product-option">
+												<span>옵션: </span>
+												<c:if test="${not empty item.option1Value}">
+													<c:if test="${not empty item.option1Type}">${item.option1Type}: </c:if>${item.option1Value}
+												</c:if>
+												<c:if test="${not empty item.option1Value and not empty item.option2Value}"> / </c:if>
+												<c:if test="${not empty item.option2Value}">
+													<c:if test="${not empty item.option2Type}">${item.option2Type}: </c:if>${item.option2Value}
+												</c:if>
+											</div>
+										</c:if>
 
 							</div>
 
@@ -204,23 +200,23 @@
 
 					<div class="info-row">
 						<div class="info-title">받는사람</div>
-						<div class="info-value">김지훈</div>
+						<div class="info-value">${orderInfo.memberName}</div>
 					</div>
 
 					<div class="info-row">
 						<div class="info-title">연락처</div>
-						<div class="info-value">010-2486-5319</div>
+						<div class="info-value">${orderInfo.phone}</div>
 					</div>
 
 					<div class="info-row">
 						<div class="info-title">받는주소</div>
-						<div class="info-value">(06236) 서울특별시 강남구 테헤란로 123, 4층 401호
+						<div class="info-value">${orderInfo.address} ${orderInfo.detailAddress}
 						</div>
 					</div>
 
 					<div class="info-row">
 						<div class="info-title">배송요청사항</div>
-						<div class="info-value">문 앞에 놓아주세요.</div>
+						<div class="info-value">${not empty orderInfo.requestMsg ? orderInfo.requestMsg : '요청사항 없음'}</div>
 					</div>
 
 				</div>
@@ -240,16 +236,17 @@
 
 				<div class="payment-box">
 
-					<div class="payment-method">비씨카드&nbsp; / &nbsp;일시불</div>
+					<div class="payment-method">${orderInfo.paymentMethod}</div>
 
 					<div class="payment-price">
 
 						<div class="price-row">
-							<span>총 상품가격</span> <strong>19,800 원</strong>
+							<span>총 상품가격</span><strong><fmt:formatNumber value="${orderInfo.totalPrice}" pattern="#,###" /></strong>
+							
 						</div>
 
 						<div class="price-row">
-							<span>배송비</span> <strong>0 원</strong>
+							<span>배송비</span> <strong>${orderInfo.deliveryFee}</strong>
 						</div>
 
 					</div>
@@ -259,10 +256,10 @@
 
 				<div class="payment-total">
 
-					<div>비씨카드&nbsp; / &nbsp;일시불</div>
+					<div>${orderInfo.paymentMethod}</div>
 
 					<div>
-						<span>총 결제금액</span> <strong>19,800 원</strong>
+						<span>총 결제금액</span> <strong><fmt:formatNumber value="${orderInfo.totalPrice + orderInfo.deliveryFee}" pattern="#,###" /> 원</strong>
 					</div>
 
 				</div>

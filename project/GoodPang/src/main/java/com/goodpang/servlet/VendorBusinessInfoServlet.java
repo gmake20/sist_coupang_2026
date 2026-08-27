@@ -77,8 +77,8 @@ public class VendorBusinessInfoServlet extends HttpServlet {
 			return;
 		}
 
-		String businessCertUrl = saveUploadedFile(request, "businessCert", loginSeller.getBusinessCertUrl());
-		String mailOrderCertUrl = saveUploadedFile(request, "mailOrderCert", loginSeller.getMailOrderCertUrl());
+		String businessCertUrl = saveUploadedFile(request, "businessCert", loginSeller.getBusinessCertUrl(), loginSeller.getSellerNo());
+		String mailOrderCertUrl = saveUploadedFile(request, "mailOrderCert", loginSeller.getMailOrderCertUrl(), loginSeller.getSellerNo());
 
 		// 최초 제출 시에는 서류 첨부 둘 다 필수
 		if (businessCertUrl == null || mailOrderCertUrl == null) {
@@ -112,7 +112,7 @@ public class VendorBusinessInfoServlet extends HttpServlet {
 			SellerDTO refreshed = dao.findByEmail(loginSeller.getEmail());
 			session.setAttribute("loginSeller", refreshed);
 
-			response.sendRedirect(request.getContextPath() + "/vendor_dashboard.jsp");
+			response.sendRedirect(request.getContextPath() + "/vendor/dashboard");
 
 		} else {
 
@@ -126,7 +126,7 @@ public class VendorBusinessInfoServlet extends HttpServlet {
 	 * 첨부파일이 새로 들어왔으면 webapp/upload/에 저장 후 경로를 반환하고,
 	 * 첨부가 없으면(재제출 등) 기존 경로(existingUrl)를 그대로 반환한다.
 	 */
-	private String saveUploadedFile(HttpServletRequest request, String partName, String existingUrl) throws IOException, ServletException {
+	private String saveUploadedFile(HttpServletRequest request, String partName, String existingUrl, int sellerNo) throws IOException, ServletException {
 
 		Part part = request.getPart(partName);
 
@@ -150,7 +150,7 @@ public class VendorBusinessInfoServlet extends HttpServlet {
 
 		String savedName = UUID.randomUUID() + ext;
 
-		String uploadDir = getServletContext().getRealPath("/upload");
+		String uploadDir = getServletContext().getRealPath("/upload/" + sellerNo);
 		File uploadDirFile = new File(uploadDir);
 
 		if (!uploadDirFile.exists()) {
@@ -159,7 +159,7 @@ public class VendorBusinessInfoServlet extends HttpServlet {
 
 		part.write(uploadDir + File.separator + savedName);
 
-		return "upload/" + savedName;
+		return "upload/" + sellerNo + "/" + savedName;
 	}
 
 }

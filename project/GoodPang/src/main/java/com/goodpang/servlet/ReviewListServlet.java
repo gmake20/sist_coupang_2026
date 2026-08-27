@@ -6,6 +6,7 @@ import java.util.List;
 import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.ReviewDTO;
+import com.goodpang.dto.ReviewDTO2;
 import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
@@ -37,7 +38,7 @@ public class ReviewListServlet extends HttpServlet {
         int memberNo =
             loginMember.getMemberNo();
 
-        List<ReviewDTO> reviewList =
+        List<ReviewDTO2> reviewList =
             reviewDAO.selectReviewsByMemberNo(memberNo);
 
         request.setAttribute(
