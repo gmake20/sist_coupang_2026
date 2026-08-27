@@ -20,7 +20,10 @@ import jakarta.servlet.http.HttpSession;
         "/vendor_dashboard.jsp",
         "/vendor_products.jsp",
         "/vendor_orders.jsp",
-        "/vendor/product/write"
+        "/vendor/dashboard",
+        "/vendor/product",
+        "/vendor/product/write",
+        "/vendor/order"
 })
 public class VendorAuthFilter implements Filter {
 

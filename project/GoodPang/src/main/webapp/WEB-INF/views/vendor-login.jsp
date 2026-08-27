@@ -47,12 +47,12 @@
 
         <div class="field">
           <input class="input" id="email" name="email" type="email" placeholder="아이디(이메일)를 입력해주세요"
-            autocomplete="username">
+            autocomplete="username" value="aaa@gmail.com">
         </div>
 
         <div class="field">
           <input class="input" id="password" name="password" type="password" placeholder="비밀번호를 입력해주세요"
-            autocomplete="current-password">
+            autocomplete="current-password" value="abcd1234">
         </div>
 
         <p id="loginMessage" class="message error"></p>

@@ -127,7 +127,7 @@
 
                 <div id="optionGroupList"></div>
 
-                <button class="btn btn-outline btn-sm" type="button" id="addOptionGroupButton">+ 옵션 그룹 추가 (최대 3개)</button>
+                <button class="btn btn-outline btn-sm" type="button" id="addOptionGroupButton">+ 옵션 그룹 추가 (최대 2개)</button>
 
                 <a href="#" class="text-link">옵션 구성을 제안하고 싶어요</a>
 
@@ -869,10 +869,10 @@
 
 
       /* =========================================================
-         옵션 — 판매자가 옵션명을 직접 정하는 옵션 그룹 (최대 3개) → 조합으로 옵션 목록 테이블 생성
+         옵션 — 판매자가 옵션명을 직접 정하는 옵션 그룹 (최대 2개) → 조합으로 옵션 목록 테이블 생성
       ========================================================= */
 
-      const MAX_OPTION_GROUPS = 3;
+      const MAX_OPTION_GROUPS = 2;
 
       const optionGroups = [
         { name: "사이즈", values: [] },
@@ -1659,7 +1659,7 @@
           .then(function (result) {
             if (result.success) {
               alert("상품이 등록되었습니다. (상품번호 " + result.productNo + ")");
-              window.location.href = "${pageContext.request.contextPath}/vendor_products.jsp";
+              window.location.href = "${pageContext.request.contextPath}/vendor/product";
             } else {
               alert(result.message || "상품 등록에 실패했습니다.");
             }
