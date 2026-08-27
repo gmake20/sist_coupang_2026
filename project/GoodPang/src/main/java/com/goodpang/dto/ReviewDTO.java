@@ -1,6 +1,9 @@
 package com.goodpang.dto;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,11 +15,18 @@ import lombok.Setter;
 public class ReviewDTO {
     
 	private int reviewNo;
-    private int rating;
-    private String ratingStars;   // "★★★★☆" 형태로 이미 만들어둔 문자열
+    private int productRating;
+    private Integer serviceRating;
     private String reviewContent;
-    private String reviewDate;    // "2026.07.03" 형태로 이미 포맷된 문자열
-    private String maskedName;    // "고*미"
-    private String optionText;    // "사이즈 M" 같은 표시용 문자열 (없으면 빈 문자열)
+    private String reviewSummary;
+    private Date reviewDate;
+    private int memberNo;
+    private int orderDetailNo;
     
+    private String ratingStars;
+    private String maskedName;
+    private String optionText;
+    
+    private int productNo;
+    private String productName;
 }
