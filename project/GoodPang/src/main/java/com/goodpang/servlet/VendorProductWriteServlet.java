@@ -58,6 +58,12 @@ public class VendorProductWriteServlet extends HttpServlet {
 			return;
 		}
 
+		if (loginSeller.getZipcode() == null || loginSeller.getZipcode().isBlank()
+				|| loginSeller.getBusinessAddress() == null || loginSeller.getBusinessAddress().isBlank()) {
+			writeJson(response, 400, new Result(false, "사업자 정보에 출고지/반품지 주소가 등록되어 있지 않습니다. 판매자센터에서 사업자 정보를 먼저 등록해주세요.", 0));
+			return;
+		}
+
 		try {
 			ProductWriteDTO dto = buildProductWriteDTO(request, loginSeller);
 
@@ -73,6 +79,9 @@ public class VendorProductWriteServlet extends HttpServlet {
 			int productNo = productWriteDAO.insertProduct(dto);
 			writeJson(response, 200, new Result(true, null, productNo));
 
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+			writeJson(response, 400, new Result(false, "첨부 이미지의 개수 또는 용량이 너무 큽니다. 이미지 수를 줄이거나 용량을 낮춰 다시 시도해주세요.", 0));
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			writeJson(response, 400, new Result(false, "입력값을 다시 확인해주세요.", 0));
@@ -133,12 +142,12 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		int optionCount = parseIntOrZero(request.getParameter("optionCount"));
 		for (int i = 0; i < optionCount; i++) {
-			dto.getOptions().add(buildOptionDTO(request, i));
+			dto.getOptions().add(buildOptionDTO(request, i, loginSeller.getSellerNo()));
 		}
 
 		int descImageCount = parseIntOrZero(request.getParameter("descImageCount"));
 		for (int i = 0; i < descImageCount; i++) {
-			String url = saveUploadedImage(request, "descImage_" + i);
+			String url = saveUploadedImage(request, "descImage_" + i, loginSeller.getSellerNo());
 			if (url != null) {
 				dto.getDetailImageUrls().add(url);
 			}
@@ -147,7 +156,7 @@ public class VendorProductWriteServlet extends HttpServlet {
 		return dto;
 	}
 
-	private ProductOptionWriteDTO buildOptionDTO(HttpServletRequest request, int index) throws IOException, ServletException {
+	private ProductOptionWriteDTO buildOptionDTO(HttpServletRequest request, int index, int sellerNo) throws IOException, ServletException {
 
 		ProductOptionWriteDTO option = new ProductOptionWriteDTO();
 
@@ -165,11 +174,11 @@ public class VendorProductWriteServlet extends HttpServlet {
 		option.setModelNo(blankToNull(request.getParameter("option_" + index + "_modelNo")));
 		option.setBarcode(blankToNull(request.getParameter("option_" + index + "_barcode")));
 
-		option.setMainImageUrl(saveUploadedImage(request, "option_" + index + "_mainImage"));
+		option.setMainImageUrl(saveUploadedImage(request, "option_" + index + "_mainImage", sellerNo));
 
 		int extraCount = parseIntOrZero(request.getParameter("option_" + index + "_extraImageCount"));
 		for (int j = 0; j < extraCount; j++) {
-			String extraUrl = saveUploadedImage(request, "option_" + index + "_extraImage_" + j);
+			String extraUrl = saveUploadedImage(request, "option_" + index + "_extraImage_" + j, sellerNo);
 			if (extraUrl != null) {
 				option.getExtraImageUrls().add(extraUrl);
 			}
@@ -178,7 +187,7 @@ public class VendorProductWriteServlet extends HttpServlet {
 		return option;
 	}
 
-	private String saveUploadedImage(HttpServletRequest request, String partName) throws IOException, ServletException {
+	private String saveUploadedImage(HttpServletRequest request, String partName, int sellerNo) throws IOException, ServletException {
 
 		Part part = request.getPart(partName);
 
@@ -197,7 +206,7 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		String savedName = UUID.randomUUID() + ext;
 
-		String uploadDir = getServletContext().getRealPath("/upload");
+		String uploadDir = getServletContext().getRealPath("/upload/" + sellerNo);
 		File uploadDirFile = new File(uploadDir);
 
 		if (!uploadDirFile.exists()) {
@@ -206,7 +215,7 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		part.write(uploadDir + File.separator + savedName);
 
-		return "upload/" + savedName;
+		return "upload/" + sellerNo + "/" + savedName;
 	}
 
 	private void writeJson(HttpServletResponse response, int status, Result result) throws IOException {

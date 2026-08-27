@@ -8,7 +8,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="./css/vendor_dashboard.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/vendor_dashboard.css">
   <title>굿팡 판매자 대시보드</title>
 
 </head>
@@ -189,7 +189,7 @@
 
           <div class="panel-head">
             <h2>주문/배송 현황</h2>
-            <a href="#" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
+            <a href="${pageContext.request.contextPath}/vendor/order" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
           </div>
 
           <ul class="status-list">
@@ -274,7 +274,7 @@
 
           <div class="panel-head">
             <h2>인기 상품 TOP 5</h2>
-            <a href="#" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
+            <a href="${pageContext.request.contextPath}/vendor/product" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
           </div>
 
           <table class="top-table">
@@ -393,7 +393,7 @@
   </div>
 
 
-  <script src="js/vendor-common.js"></script>
+  <script src="${pageContext.request.contextPath}/js/vendor-common.js"></script>
   <script>
 
     /* =========================================================

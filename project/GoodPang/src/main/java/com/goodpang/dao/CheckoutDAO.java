@@ -13,507 +13,673 @@ import com.goodpang.util.ConnectionProvider;
 public class CheckoutDAO {
 
 	public CheckoutDTO getCheckout(
-	        int checkoutNo,
-	        int memberNo) {
+			int checkoutNo,
+			int memberNo) {
 
-	    CheckoutDTO dto = null;
+		CheckoutDTO dto = null;
 
-	    String sql = """
-	        SELECT
-	            CHECKOUT_NO,
-	            MEMBER_NO,
-	            PRODUCT_AMOUNT,
-	            INSTANT_DISCOUNT,
-	            COUPON_DISCOUNT,
-	            CASH_USED,
-	            DELIVERY_FEE,
-	            TOTAL_PRICE
-	        FROM CHECKOUT
-	        WHERE CHECKOUT_NO = ?
-	          AND MEMBER_NO = ?
-	        """;
+		String sql = """
+				SELECT
+				    CHECKOUT_NO,
+				    MEMBER_NO,
+				    PRODUCT_AMOUNT,
+				    INSTANT_DISCOUNT,
+				    COUPON_DISCOUNT,
+				    CASH_USED,
+				    DELIVERY_FEE,
+				    TOTAL_PRICE
+				FROM CHECKOUT
+				WHERE CHECKOUT_NO = ?
+				  AND MEMBER_NO = ?
+				""";
 
-	    try (
-	        Connection conn =
-	                ConnectionProvider.getConnection();
+		try (
+				Connection conn =
+				ConnectionProvider.getConnection();
 
-	        PreparedStatement pstmt =
-	                conn.prepareStatement(sql);
-	    ) {
+				PreparedStatement pstmt =
+						conn.prepareStatement(sql);
+				) {
 
-	        pstmt.setInt(1, checkoutNo);
-	        pstmt.setInt(2, memberNo);
+			pstmt.setInt(1, checkoutNo);
+			pstmt.setInt(2, memberNo);
 
-	        try (ResultSet rs = pstmt.executeQuery()) {
+			try (ResultSet rs = pstmt.executeQuery()) {
 
-	            if (rs.next()) {
+				if (rs.next()) {
 
-	                dto = new CheckoutDTO();
+					dto = new CheckoutDTO();
 
-	                dto.setCheckoutNo(
-	                        rs.getInt("CHECKOUT_NO")
-	                );
+					dto.setCheckoutNo(
+							rs.getInt("CHECKOUT_NO")
+							);
 
-	                dto.setMemberNo(
-	                        rs.getInt("MEMBER_NO")
-	                );
+					dto.setMemberNo(
+							rs.getInt("MEMBER_NO")
+							);
 
-	                dto.setProductAmount(
-	                        rs.getInt("PRODUCT_AMOUNT")
-	                );
+					dto.setProductAmount(
+							rs.getInt("PRODUCT_AMOUNT")
+							);
 
-	                dto.setInstantDiscount(
-	                        rs.getInt("INSTANT_DISCOUNT")
-	                );
+					dto.setInstantDiscount(
+							rs.getInt("INSTANT_DISCOUNT")
+							);
 
-	                dto.setCouponDiscount(
-	                        rs.getInt("COUPON_DISCOUNT")
-	                );
+					dto.setCouponDiscount(
+							rs.getInt("COUPON_DISCOUNT")
+							);
 
-	                dto.setCashUsed(
-	                        rs.getInt("CASH_USED")
-	                );
+					dto.setCashUsed(
+							rs.getInt("CASH_USED")
+							);
 
-	                dto.setDeliveryFee(
-	                        rs.getInt("DELIVERY_FEE")
-	                );
+					dto.setDeliveryFee(
+							rs.getInt("DELIVERY_FEE")
+							);
 
-	                dto.setTotalPrice(
-	                        rs.getInt("TOTAL_PRICE")
-	                );
-	            }
-	        }
+					dto.setTotalPrice(
+							rs.getInt("TOTAL_PRICE")
+							);
+				}
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    return dto;
+		return dto;
 	}
-	
+
 	public List<CheckoutItemDTO> getCheckoutItems(
-	        int checkoutNo) {
+			int checkoutNo) {
 
-	    List<CheckoutItemDTO> list =
-	            new ArrayList<>();
+		List<CheckoutItemDTO> list =
+				new ArrayList<>();
 
-	    String sql = """
-	        SELECT
-	            CHECKOUT_ITEM_NO,
-	            CHECKOUT_NO,
-	            PRODUCT_NO,
-	            OPTION_ID,
-	            ORDER_QTY,
-	            PRICE
-	        FROM CHECKOUT_ITEM
-	        WHERE CHECKOUT_NO = ?
-	        ORDER BY CHECKOUT_ITEM_NO
-	        """;
+		String sql = """
+				SELECT
+				    CHECKOUT_ITEM_NO,
+				    CHECKOUT_NO,
+				    PRODUCT_NO,
+				    OPTION_ID,
+				    ORDER_QTY,
+				    PRICE
+				FROM CHECKOUT_ITEM
+				WHERE CHECKOUT_NO = ?
+				ORDER BY CHECKOUT_ITEM_NO
+				""";
 
-	    try (
-	        Connection conn =
-	                ConnectionProvider.getConnection();
+		try (
+				Connection conn =
+				ConnectionProvider.getConnection();
 
-	        PreparedStatement pstmt =
-	                conn.prepareStatement(sql);
-	    ) {
+				PreparedStatement pstmt =
+						conn.prepareStatement(sql);
+				) {
 
-	        pstmt.setInt(1, checkoutNo);
+			pstmt.setInt(1, checkoutNo);
 
-	        try (ResultSet rs =
-	                     pstmt.executeQuery()) {
+			try (ResultSet rs =
+					pstmt.executeQuery()) {
 
-	            while (rs.next()) {
+				while (rs.next()) {
 
-	                CheckoutItemDTO dto =
-	                        new CheckoutItemDTO();
+					CheckoutItemDTO dto =
+							new CheckoutItemDTO();
 
-	                dto.setCheckoutItemNo(
-	                        rs.getInt(
-	                                "CHECKOUT_ITEM_NO"
-	                        )
-	                );
+					dto.setCheckoutItemNo(
+							rs.getInt(
+									"CHECKOUT_ITEM_NO"
+									)
+							);
 
-	                dto.setCheckoutNo(
-	                        rs.getInt(
-	                                "CHECKOUT_NO"
-	                        )
-	                );
+					dto.setCheckoutNo(
+							rs.getInt(
+									"CHECKOUT_NO"
+									)
+							);
 
-	                dto.setProductNo(
-	                        rs.getInt(
-	                                "PRODUCT_NO"
-	                        )
-	                );
+					dto.setProductNo(
+							rs.getInt(
+									"PRODUCT_NO"
+									)
+							);
 
-	                int optionId =
-	                        rs.getInt(
-	                                "OPTION_ID"
-	                        );
+					int optionId =
+							rs.getInt(
+									"OPTION_ID"
+									);
 
-	                if (!rs.wasNull()) {
-	                    dto.setOptionId(
-	                            optionId
-	                    );
-	                }
+					if (!rs.wasNull()) {
+						dto.setOptionId(
+								optionId
+								);
+					}
 
-	                dto.setOrderQty(
-	                        rs.getInt(
-	                                "ORDER_QTY"
-	                        )
-	                );
+					dto.setOrderQty(
+							rs.getInt(
+									"ORDER_QTY"
+									)
+							);
 
-	                dto.setPrice(
-	                        rs.getInt(
-	                                "PRICE"
-	                        )
-	                );
+					dto.setPrice(
+							rs.getInt(
+									"PRICE"
+									)
+							);
 
-	                list.add(dto);
-	            }
-	        }
+					list.add(dto);
+				}
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    return list;
+		return list;
 	}
-	
+
 	public List<CheckoutItemDTO> getCheckoutItemsPRODUCT(
-	        int checkoutNo) {
+			int checkoutNo) {
 
-	    List<CheckoutItemDTO> list =
-	            new ArrayList<>();
+		List<CheckoutItemDTO> list =
+				new ArrayList<>();
 
-	    String sql = """
-		        SELECT
-		            ci.CHECKOUT_ITEM_NO,
-		            ci.CHECKOUT_NO,
-		            ci.PRODUCT_NO,
-		            ci.OPTION_ID,
-		            ci.ORDER_QTY,
-		            ci.PRICE,
-		            p.PRODUCT_NAME,
-		            p.PRODUCT_IMAGE
-		        FROM CHECKOUT_ITEM ci
-		        JOIN PRODUCT p
-		          ON ci.PRODUCT_NO = p.PRODUCT_NO
-		        WHERE ci.CHECKOUT_NO = ?
-		        ORDER BY ci.CHECKOUT_ITEM_NO
-		        """;
+		String sql = """
+				SELECT
+				    ci.CHECKOUT_ITEM_NO,
+				    ci.CHECKOUT_NO,
+				    ci.PRODUCT_NO,
+				    ci.OPTION_ID,
+				    ci.ORDER_QTY,
+				    ci.PRICE,
+				    p.PRODUCT_NAME,
+				    p.PRODUCT_IMAGE
+				FROM CHECKOUT_ITEM ci
+				JOIN PRODUCT p
+				  ON ci.PRODUCT_NO = p.PRODUCT_NO
+				WHERE ci.CHECKOUT_NO = ?
+				ORDER BY ci.CHECKOUT_ITEM_NO
+				""";
 
-	    try (
-	        Connection conn =
-	                ConnectionProvider.getConnection();
+		try (
+				Connection conn =
+				ConnectionProvider.getConnection();
 
-	        PreparedStatement pstmt =
-	                conn.prepareStatement(sql);
-	    ) {
+				PreparedStatement pstmt =
+						conn.prepareStatement(sql);
+				) {
 
-	        pstmt.setInt(
-	                1,
-	                checkoutNo
-	        );
+			pstmt.setInt(
+					1,
+					checkoutNo
+					);
 
-	        try (ResultSet rs =
-	                     pstmt.executeQuery()) {
+			try (ResultSet rs =
+					pstmt.executeQuery()) {
 
-	            while (rs.next()) {
+				while (rs.next()) {
 
-	                CheckoutItemDTO dto =
-	                        new CheckoutItemDTO();
+					CheckoutItemDTO dto =
+							new CheckoutItemDTO();
 
-	                dto.setCheckoutItemNo(
-	                        rs.getInt(
-	                                "CHECKOUT_ITEM_NO"
-	                        )
-	                );
+					dto.setCheckoutItemNo(
+							rs.getInt(
+									"CHECKOUT_ITEM_NO"
+									)
+							);
 
-	                dto.setCheckoutNo(
-	                        rs.getInt(
-	                                "CHECKOUT_NO"
-	                        )
-	                );
+					dto.setCheckoutNo(
+							rs.getInt(
+									"CHECKOUT_NO"
+									)
+							);
 
-	                dto.setProductNo(
-	                        rs.getInt(
-	                                "PRODUCT_NO"
-	                        )
-	                );
+					dto.setProductNo(
+							rs.getInt(
+									"PRODUCT_NO"
+									)
+							);
 
-	                int optionId =
-	                        rs.getInt(
-	                                "OPTION_ID"
-	                        );
+					int optionId =
+							rs.getInt(
+									"OPTION_ID"
+									);
 
-	                if (!rs.wasNull()) {
-	                    dto.setOptionId(
-	                            optionId
-	                    );
-	                }
+					if (!rs.wasNull()) {
+						dto.setOptionId(
+								optionId
+								);
+					}
 
-	                dto.setOrderQty(
-	                        rs.getInt(
-	                                "ORDER_QTY"
-	                        )
-	                );
+					dto.setOrderQty(
+							rs.getInt(
+									"ORDER_QTY"
+									)
+							);
 
-	                dto.setPrice(
-	                        rs.getInt(
-	                                "PRICE"
-	                        )
-	                );
+					dto.setPrice(
+							rs.getInt(
+									"PRICE"
+									)
+							);
 
-	                dto.setProductName(
-	                        rs.getString(
-	                                "PRODUCT_NAME"
-	                        )
-	                );
+					dto.setProductName(
+							rs.getString(
+									"PRODUCT_NAME"
+									)
+							);
 
 					/*
 					 * dto.setProductImage( rs.getString( "PRODUCT_IMAGE" ) );
 					 */
 
-	                list.add(dto);
-	            }
-	        }
+					list.add(dto);
+				}
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    return list;
+		return list;
 	}
-	
+
 	public int getProductPrice(
-	        Connection conn,
-	        int productNo)
-	        throws Exception {
+			Connection conn,
+			int productNo)
+					throws Exception {
 
-	    String sql = """
-	            SELECT PRODUCT_PRICE
-	            FROM PRODUCT
-	            WHERE PRODUCT_NO = ?
-	            """;
+		String sql = """
+				SELECT PRODUCT_PRICE
+				FROM PRODUCT
+				WHERE PRODUCT_NO = ?
+				""";
 
-	    try (
-	        PreparedStatement pstmt =
-	                conn.prepareStatement(sql)
-	    ) {
+		try (
+				PreparedStatement pstmt =
+				conn.prepareStatement(sql)
+				) {
 
-	        pstmt.setInt(
-	                1,
-	                productNo
-	        );
+			pstmt.setInt(
+					1,
+					productNo
+					);
 
-	        try (
-	            ResultSet rs =
-	                    pstmt.executeQuery()
-	        ) {
+			try (
+					ResultSet rs =
+					pstmt.executeQuery()
+					) {
 
-	            if (rs.next()) {
+				if (rs.next()) {
 
-	                return rs.getInt(
-	                        "PRODUCT_PRICE"
-	                );
-	            }
-	        }
-	    }
+					return rs.getInt(
+							"PRODUCT_PRICE"
+							);
+				}
+			}
+		}
 
-	    return -1;
+		return -1;
 	}
-	
+
 	public int insertCheckout(
-	        Connection conn,
-	        int memberNo,
-	        int productAmount,
-	        int instantDiscount,
-	        int couponDiscount,
-	        int cashUsed,
-	        int deliveryFee,
-	        int totalPrice)
-	        throws Exception {
+			Connection conn,
+			int memberNo,
+			int productAmount,
+			int instantDiscount,
+			int couponDiscount,
+			int cashUsed,
+			int deliveryFee,
+			int totalPrice)
+					throws Exception {
 
-	    int checkoutNo;
+		int checkoutNo;
 
-	    String seqSql = """
-	            SELECT SEQ_CHECKOUT_NO.NEXTVAL
-	            FROM DUAL
-	            """;
+		String seqSql = """
+				SELECT SEQ_CHECKOUT_NO.NEXTVAL
+				FROM DUAL
+				""";
 
-	    try (
-	        PreparedStatement pstmt =
-	                conn.prepareStatement(seqSql);
+		try (
+				PreparedStatement pstmt =
+				conn.prepareStatement(seqSql);
 
-	        ResultSet rs =
-	                pstmt.executeQuery()
-	    ) {
+				ResultSet rs =
+						pstmt.executeQuery()
+				) {
 
-	        if (!rs.next()) {
+			if (!rs.next()) {
 
-	            throw new Exception(
-	                    "CHECKOUT_NO 생성 실패"
-	            );
-	        }
+				throw new Exception(
+						"CHECKOUT_NO 생성 실패"
+						);
+			}
 
-	        checkoutNo =
-	                rs.getInt(1);
-	    }
+			checkoutNo =
+					rs.getInt(1);
+		}
 
-	    String sql = """
-	            INSERT INTO CHECKOUT (
-	                CHECKOUT_NO,
-	                MEMBER_NO,
-	                CREATED_AT,
-	                PRODUCT_AMOUNT,
-	                INSTANT_DISCOUNT,
-	                COUPON_DISCOUNT,
-	                CASH_USED,
-	                DELIVERY_FEE,
-	                TOTAL_PRICE
-	            )
-	            VALUES (
-	                ?,
-	                ?,
-	                SYSDATE,
-	                ?,
-	                ?,
-	                ?,
-	                ?,
-	                ?,
-	                ?
-	            )
-	            """;
+		String sql = """
+				INSERT INTO CHECKOUT (
+				    CHECKOUT_NO,
+				    MEMBER_NO,
+				    CREATED_AT,
+				    PRODUCT_AMOUNT,
+				    INSTANT_DISCOUNT,
+				    COUPON_DISCOUNT,
+				    CASH_USED,
+				    DELIVERY_FEE,
+				    TOTAL_PRICE
+				)
+				VALUES (
+				    ?,
+				    ?,
+				    SYSDATE,
+				    ?,
+				    ?,
+				    ?,
+				    ?,
+				    ?,
+				    ?
+				)
+				""";
 
-	    try (
-	        PreparedStatement pstmt =
-	                conn.prepareStatement(sql)
-	    ) {
+		try (
+				PreparedStatement pstmt =
+				conn.prepareStatement(sql)
+				) {
 
-	        pstmt.setInt(
-	                1,
-	                checkoutNo
-	        );
+			pstmt.setInt(
+					1,
+					checkoutNo
+					);
 
-	        pstmt.setInt(
-	                2,
-	                memberNo
-	        );
+			pstmt.setInt(
+					2,
+					memberNo
+					);
 
-	        pstmt.setInt(
-	                3,
-	                productAmount
-	        );
+			pstmt.setInt(
+					3,
+					productAmount
+					);
 
-	        pstmt.setInt(
-	                4,
-	                instantDiscount
-	        );
+			pstmt.setInt(
+					4,
+					instantDiscount
+					);
 
-	        pstmt.setInt(
-	                5,
-	                couponDiscount
-	        );
+			pstmt.setInt(
+					5,
+					couponDiscount
+					);
 
-	        pstmt.setInt(
-	                6,
-	                cashUsed
-	        );
+			pstmt.setInt(
+					6,
+					cashUsed
+					);
 
-	        pstmt.setInt(
-	                7,
-	                deliveryFee
-	        );
+			pstmt.setInt(
+					7,
+					deliveryFee
+					);
 
-	        pstmt.setInt(
-	                8,
-	                totalPrice
-	        );
-
-
-	        int result =
-	                pstmt.executeUpdate();
+			pstmt.setInt(
+					8,
+					totalPrice
+					);
 
 
-	        if (result != 1) {
+			int result =
+					pstmt.executeUpdate();
 
-	            throw new Exception(
-	                    "CHECKOUT INSERT 실패"
-	            );
-	        }
-	    }
-	    return checkoutNo;
+
+			if (result != 1) {
+
+				throw new Exception(
+						"CHECKOUT INSERT 실패"
+						);
+			}
+		}
+		return checkoutNo;
 	}
-	
+
 	public int insertCheckoutItem(
-	        Connection conn,
-	        int checkoutNo,
-	        int productNo,
-	        Integer optionId,
-	        int quantity,
-	        int price)
-	        throws Exception {
+			Connection conn,
+			int checkoutNo,
+			int productNo,
+			Integer optionId,
+			int quantity,
+			int price)
+					throws Exception {
 
-	    String sql = """
-	            INSERT INTO CHECKOUT_ITEM (
-	                CHECKOUT_ITEM_NO,
-	                CHECKOUT_NO,
-	                PRODUCT_NO,
-	                OPTION_ID,
-	                ORDER_QTY,
-	                PRICE
-	            )
-	            VALUES (
-	                SEQ_CHECKOUT_ITEM_NO.NEXTVAL,
-	                ?,
-	                ?,
-	                ?,
-	                ?,
-	                ?
-	            )
-	            """;
+		String sql = """
+				INSERT INTO CHECKOUT_ITEM (
+				    CHECKOUT_ITEM_NO,
+				    CHECKOUT_NO,
+				    PRODUCT_NO,
+				    OPTION_ID,
+				    ORDER_QTY,
+				    PRICE
+				)
+				VALUES (
+				    SEQ_CHECKOUT_ITEM_NO.NEXTVAL,
+				    ?,
+				    ?,
+				    ?,
+				    ?,
+				    ?
+				)
+				""";
 
-	    try (
-	        PreparedStatement pstmt =
-	                conn.prepareStatement(sql)
-	    ) {
+		try (
+				PreparedStatement pstmt =
+				conn.prepareStatement(sql)
+				) {
 
-	        pstmt.setInt(
-	                1,
-	                checkoutNo
-	        );
+			pstmt.setInt(
+					1,
+					checkoutNo
+					);
 
-	        pstmt.setInt(
-	                2,
-	                productNo
-	        );
+			pstmt.setInt(
+					2,
+					productNo
+					);
 
-	        if (optionId == null) {
+			if (optionId == null) {
 
-	            pstmt.setNull(
-	                    3,
-	                    java.sql.Types.NUMERIC
-	            );
+				pstmt.setNull(
+						3,
+						java.sql.Types.NUMERIC
+						);
 
-	        } else {
+			} else {
 
-	            pstmt.setInt(
-	                    3,
-	                    optionId
-	            );
-	        }
+				pstmt.setInt(
+						3,
+						optionId
+						);
+			}
 
-	        pstmt.setInt(
-	                4,
-	                quantity
-	        );
+			pstmt.setInt(
+					4,
+					quantity
+					);
 
-	        pstmt.setInt(
-	                5,
-	                price
-	        );
-	        return pstmt.executeUpdate();
-	    }
+			pstmt.setInt(
+					5,
+					price
+					);
+			return pstmt.executeUpdate();
+		}
+	}
+
+	public int createCheckout(int memberNo) {
+
+		int checkoutNo = 0;
+
+		String seqSql = """
+				SELECT SEQ_CHECKOUT_NO.NEXTVAL
+				FROM DUAL
+				""";
+
+		String insertSql = """
+				INSERT INTO CHECKOUT (
+				CHECKOUT_NO,
+				MEMBER_NO
+				)
+				VALUES (
+				?,
+				?
+				)
+				""";
+
+		try (
+				Connection conn =
+				ConnectionProvider.getConnection()
+				) {
+
+			try (
+					PreparedStatement pstmt =
+					conn.prepareStatement(seqSql);
+					ResultSet rs =
+							pstmt.executeQuery()
+					) {
+
+				if (rs.next()) {
+					checkoutNo = rs.getInt(1);
+				}
+
+			}
+
+			try (
+					PreparedStatement pstmt =
+					conn.prepareStatement(insertSql)
+					) {
+
+				pstmt.setInt(1, checkoutNo);
+				pstmt.setInt(2, memberNo);
+
+				int rowCount =
+						pstmt.executeUpdate();
+
+				if (rowCount == 0) {
+					throw new RuntimeException(
+							"CHECKOUT 생성 실패"
+							);
+				}
+
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			throw new RuntimeException(
+					"CHECKOUT 생성 중 오류가 발생했습니다.",
+					e
+					);
+
+		}
+
+		return checkoutNo;
+	}
+
+	public int addCheckoutItem(
+			int checkoutNo,
+			int optionId,
+			int quantity) {
+
+		String sql = """
+				INSERT INTO CHECKOUT_ITEM (
+				CHECKOUT_ITEM_NO,
+				CHECKOUT_NO,
+				PRODUCT_NO,
+				OPTION_ID,
+				ORDER_QTY,
+				PRICE
+				)
+				SELECT
+				SEQ_CHECKOUT_ITEM_NO.NEXTVAL,
+				?,
+				p.PRODUCT_NO,
+				po.OPTION_ID,
+				?,
+				p.PRODUCT_PRICE + NVL(po.PRICE, 0)
+				FROM PRODUCT_OPTION po
+				JOIN PRODUCT p
+				ON po.PRODUCT_NO = p.PRODUCT_NO
+				WHERE po.OPTION_ID = ?
+				""";
+
+		try (
+				Connection conn =
+				ConnectionProvider.getConnection();
+
+				PreparedStatement pstmt =
+						conn.prepareStatement(sql)
+				) {
+
+			pstmt.setInt(1, checkoutNo);
+			pstmt.setInt(2, quantity);
+			pstmt.setInt(3, optionId);
+
+			return pstmt.executeUpdate();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			throw new RuntimeException(
+					"CHECKOUT_ITEM 등록 실패",
+					e
+					);
+
+		}
+	}
+
+	public int updateCheckoutAmount(int checkoutNo) {
+
+		String sql = """
+				UPDATE CHECKOUT c
+				SET
+				c.PRODUCT_AMOUNT = (
+				SELECT NVL(SUM(ci.PRICE * ci.ORDER_QTY), 0)
+				FROM CHECKOUT_ITEM ci
+				WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+				),
+				c.TOTAL_PRICE = (
+				SELECT NVL(SUM(ci.PRICE * ci.ORDER_QTY), 0)
+				FROM CHECKOUT_ITEM ci
+				WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+				)
+				WHERE c.CHECKOUT_NO = ?
+				""";
+
+		try (
+				Connection conn =
+				ConnectionProvider.getConnection();
+
+				PreparedStatement pstmt =
+						conn.prepareStatement(sql)
+				) {
+
+			pstmt.setInt(1, checkoutNo);
+
+			return pstmt.executeUpdate();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			throw new RuntimeException(
+					"CHECKOUT 금액 업데이트 실패",
+					e
+					);
+
+		}
 	}
 }
