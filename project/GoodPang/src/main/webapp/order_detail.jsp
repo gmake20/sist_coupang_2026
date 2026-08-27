@@ -41,6 +41,7 @@
 
 <body>
 	<jsp:include page="/inc/header.jsp" />
+	<script src="${pageContext.request.contextPath}/js/header.js"></script>
 	<div class="order-detail-wrap">
 
 		<!-- =========================
@@ -301,6 +302,63 @@
 
 			</section>
 
+		
+
+		
+			<!-- 배송상품 주문상태 안내 -->
+			<div class="delivery-step-box">
+				<div class="step-head">
+					<span>배송상품 주문상태 안내</span> <a href="#" class="link-more">자세한 내용
+						더보기 &gt;</a>
+				</div>
+				<div class="step-flow">
+					<div class="step-item">
+						<div class="icon-circle">💳</div>
+						<strong>결제완료</strong>
+						<p>주문·결제 확인이 완료되었습니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">📦</div>
+						<strong>상품준비중</strong>
+						<p>판매자가 발송할 상품을 준비중입니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">🚚</div>
+						<strong>배송시작</strong>
+						<p>상품준비가 완료되어 곧 배송될 예정입니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">🚛</div>
+						<strong>배송중</strong>
+						<p>상품이 고객님께 배송중입니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">🎁</div>
+						<strong>배송완료</strong>
+						<p>상품이 주문자에게 전달완료되었습니다.</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- 취소/반품/교환 안내 -->
+			<div class="notice-info-box">
+				<p class="notice-title">⚠ 취소/반품/교환 신청전 확인해주세요!</p>
+
+				<div class="notice-sec">
+					<h4>취소</h4>
+					<ul>
+						<li>여행/레저/숙박 상품은 취소 시 수수료가 발생할 수 있으며,</li>
+						<li>취소수수료를 확인하여 2일 이내(주말,공휴일 제외 처리결과)를 문자로 안내드립니다.(당일 접수 기준,
+							마감시간 오후 4시)</li>
+						<li>문화 상품은 사용 전날 24시까지 취소 신청 시 취소수수료가 발생되지 않습니다.</li>
+					</ul>
+				</div>
+			</div>
+
 		</main>
 
 
@@ -368,7 +426,7 @@
 
 	</div>
 	<jsp:include page="/inc/footer.jsp" />
-	<script src="${pageContext.request.contextPath}/js/header.js"></script>
+	
 
 </body>
 </html>

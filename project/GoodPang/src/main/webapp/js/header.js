@@ -34,7 +34,7 @@ if (categoryMenu) {
 }
 
 function renderCategoryMenu(data) {
-	console.log("call renderCategoryMenu");
+
   const mainList = data['1'] || [];
   const midList = data['2'] || [];
   const subList = data['3'] || [];
