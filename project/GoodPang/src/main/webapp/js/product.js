@@ -334,7 +334,19 @@ function setupReviewTools() {
 
 
   /* 정렬 — 카드 순서를 바꿔서 다시 꽂아넣음.
-     "베스트순" 기준은 원본이 비공개라 지금은 data-helpful(더미 "도움돼요" 수)로 대신함 */
+      "베스트순" 기준은 원본이 비공개라 지금은 data-helpful(더미 "도움돼요" 수)로 대
+  신함
+
+       ★ 2026-08-27 버그 수정: insertBefore 의 기준 노드로 emptyMsg 를 썼는데, 리뷰가
+  있으면
+         product.jsp 가 .review-empty 자체를 안 찍어서(<c:otherwise>) emptyMsg 가 null
+   임.
+         insertBefore(el, null) 은 "맨 끝에 붙이기"랑 같아서, 카드들이 .review-list 의
+   진짜 마지막
+         자식인 <nav class="review-pagination"> 뒤로 밀려나가 정렬할 때마다 페이지네이
+  션이
+         리뷰 위로 올라가 보였음. emptyMsg 가 없으면 pager 앞에 꽂도록 기준을 바꿔서
+  고침 */ 
   function sortBy(key) {
     const sorted = items().sort(function (a, b) {
       if (key === 'latest') {
@@ -342,8 +354,9 @@ function setupReviewTools() {
       }
       return (Number(b.dataset.helpful) || 0) - (Number(a.dataset.helpful) || 0);
     });
-    sorted.forEach(function (el) { list.insertBefore(el, emptyMsg); });
-  }
+	const anchor = emptyMsg || pager || null;
+	sorted.forEach(function (el) { list.insertBefore(el, anchor); });
+	  }
 
   /* ★ 정렬·검색·별점필터·페이지 이동이 전부 한 함수(render)를 거치게 만든 이유:
        따로 만들면 "2페이지를 보다가 검색어를 치면 2페이지가 그대로 남아 아무것도 안 보이는"
@@ -352,15 +365,16 @@ function setupReviewTools() {
   const PAGE_SIZE = 3;    // 한 페이지에 리뷰 3개 (더미가 5개라 2페이지가 됨)
   let page = 1;
 
-  /* ★ 2026-08-26 수정: DB 붙이면서 .review-headline(제목)이 마크업에서 아예 빠짐
-     (product.jsp 리뷰 카드엔 .review-text 만 있음) — 원래 코드가 그걸 그대로 찾다가
-     null.textContent 로 터졌음. 검색은 이제 review-text 하나만 봄.
-     혹시 나중에 헤드라인이 다시 생기면 optional chaining(?.)으로 안전하게 더할 것 */
+    /* 2026-08-27 수정: REVIEW_SUMMARY(한줄요약) 연동하면서 .review-headline 이 리뷰
+  카드에
+       다시 생김(product.jsp) — 있는 리뷰만 나오므로 null-safe(?.)하게 검색 대상에 같
+  이 넣음 */
   function passesFilter(item) {
     const q = searchBox.value.trim().toLowerCase();
     const rating = ratingSel.value;   // '' = 모든 별점
+	const headlineEl = item.querySelector('.review-headline');
 	const textEl = item.querySelector('.review-text');
-	const text = (textEl ? textEl.textContent : '').toLowerCase();
+	const text = ((headlineEl ? headlineEl.textContent : '') + ' ' + (textEl ? textEl.textContent : '')).toLowerCase();
 	    return (!q || text.includes(q)) && (!rating || ratingOf(item) === Number(rating));
   }
 

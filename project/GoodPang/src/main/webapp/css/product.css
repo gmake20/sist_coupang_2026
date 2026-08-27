@@ -397,12 +397,23 @@
   border-color: #999;
 }
 
-/* 별점 줄 */
+/* 별점 줄
+   2026-08-27: 별이 스프라이트(.star-rating, display:block)로 바뀌면서 display:flex
+추가함 —
+   안 그러면 block 요소가 자기 줄을 차지해버려서 뒤의 (리뷰수) 링크가 아래줄로 떨어
+짐.
+   review-score(1184행 근처)도 같은 이유로 이미 flex 로 돼 있었음 */
 .product-page .review-atf {
+  display: flex;
+  align-items: center;
   margin-top: 4px;
   line-height: 17px;
 }
-
+/* 2026-08-27: 유니코드 별(.stars) → 리뷰 카드와 같은 스프라이트(.star-rating, 1596
+행 근처)로
+   교체함. 이 규칙은 이제 안 쓰지만 삭제 대신 남겨둠 — 나중에 브라우저 확인하다 크기
+가
+   원본과 안 맞으면 스프라이트 대신 다시 이 방식으로 돌아올 수도 있어서 */
 .product-page .review-atf .stars {
   color: #ffa620;            /* 별 노란색 — 메인페이지 상품카드와 같은 색 */
   letter-spacing: -1px;
@@ -1180,7 +1191,8 @@
   flex: none;
   width: 300px;
 }
-
+/* 2026-08-27: 위 .review-atf .stars 와 같은 이유로 지금은 안 씀(.star-rating 스프
+라이트로 교체) */
 .product-page .review-score {
   display: flex;
   align-items: center;

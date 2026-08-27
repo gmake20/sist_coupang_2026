@@ -18,7 +18,7 @@ public class ReviewDAO {
         // (지금은 상품 상세페이지라 값이 페이지 전체에서 다 같지만, 리뷰 카드 자체에도 있어야 한다는
         //  요구라 조인해서 내려줌 — PRODUCT/SELLER 는 od.PRODUCT_NO 기준으로 항상 있는 값이라 INNER JOIN)
         String sql = """
-            SELECT r.REVIEW_NO, r.PRODUCT_RATING, r.REVIEW_CONTENT, r.REVIEW_DATE,
+            SELECT r.REVIEW_NO, r.PRODUCT_RATING, r.REVIEW_CONTENT, r.REVIEW_DATE, r.REVIEW_SUMMARY,
                    m.MEMBER_NAME,
                    p.PRODUCT_NAME,
                    s.STORE_NAME,
@@ -53,6 +53,7 @@ public class ReviewDAO {
                     dto.setRating(rs.getInt("PRODUCT_RATING"));
 
                     dto.setReviewContent(rs.getString("REVIEW_CONTENT"));
+                    dto.setReviewContent(rs.getString("REVIEW_SUMMARY"));
                     dto.setReviewDate(sdf.format(rs.getDate("REVIEW_DATE")));
                     dto.setMaskedName(maskName(rs.getString("MEMBER_NAME")));
                     dto.setProductName(rs.getString("PRODUCT_NAME"));
