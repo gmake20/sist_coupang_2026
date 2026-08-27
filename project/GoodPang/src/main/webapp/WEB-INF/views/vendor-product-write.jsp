@@ -1659,7 +1659,7 @@
           .then(function (result) {
             if (result.success) {
               alert("상품이 등록되었습니다. (상품번호 " + result.productNo + ")");
-              window.location.href = "${pageContext.request.contextPath}/vendor_products.jsp";
+              window.location.href = "${pageContext.request.contextPath}/vendor/product";
             } else {
               alert(result.message || "상품 등록에 실패했습니다.");
             }

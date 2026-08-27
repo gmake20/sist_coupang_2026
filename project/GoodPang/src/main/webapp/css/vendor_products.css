@@ -935,6 +935,11 @@ th.col-check input {
   color: #f4514a;
 }
 
+.status-wait {
+  background: #e8f0ff;
+  color: #4285f4;
+}
+
 .btn-more {
   color: #555;
 }

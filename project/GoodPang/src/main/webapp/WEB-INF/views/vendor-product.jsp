@@ -1,4 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -7,7 +10,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="./css/vendor_products.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/vendor_products.css">
   <title>굿팡 판매자 상품 관리</title>
 
 </head>
@@ -36,7 +39,7 @@
         <div class="page-actions">
           <button class="btn btn-outline" type="button">엑셀 다운로드</button>
           <button class="btn btn-outline" type="button">엑셀 업로드</button>
-          <a class="btn btn-primary" href="/vendor/product/write">상품 등록</a>
+          <a class="btn btn-primary" href="${pageContext.request.contextPath}/vendor/product/write">상품 등록</a>
         </div>
 
       </div>
@@ -50,7 +53,7 @@
             <span class="stat-label">전체 상품</span>
             <span class="stat-icon stat-icon-blue"><svg class="icon"><use href="#ic-box" /></svg></span>
           </div>
-          <div class="stat-value">1,248 <small>개</small></div>
+          <div class="stat-value">${fn:length(productList)} <small>개</small></div>
           <a href="#" class="stat-link">전체보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
         </article>
 
@@ -191,7 +194,7 @@
 
       <!-- 결과 툴바 -->
       <div class="result-toolbar">
-        <p class="result-count">검색 결과 <strong>1,248</strong>개</p>
+        <p class="result-count">검색 결과 <strong>${fn:length(productList)}</strong>개</p>
 
         <div class="result-controls">
           <select class="input select select-sm">
@@ -227,130 +230,88 @@
           </thead>
           <tbody>
 
-            <tr>
-              <td class="col-check"><input type="checkbox"></td>
-              <td class="col-info">
-                <div class="product-cell">
-                  <span class="thumb"></span>
-                  <div class="product-text">
-                    <p class="product-name">쿠팡프레시 공기청정기 A3</p>
-                    <p class="product-sku">SKU 8801234567890</p>
-                    <p class="product-cat">가전디지털 &gt; 계절가전 &gt; 공기청정기</p>
-                  </div>
-                </div>
-              </td>
-              <td class="col-price">₩239,000</td>
-              <td class="col-stock">128</td>
-              <td class="col-status"><span class="status-badge status-active">판매 중</span></td>
-              <td class="col-date">2025-05-18<br><span class="time">10:30</span></td>
-              <td class="col-date">2025-05-18<br><span class="time">14:20</span></td>
-              <td class="col-manage">
-                <button class="btn btn-outline btn-sm" type="button">수정</button>
-                <button class="btn btn-outline btn-sm btn-more" type="button">
-                  더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg>
-                </button>
-              </td>
-            </tr>
+            <c:choose>
 
-            <tr>
-              <td class="col-check"><input type="checkbox"></td>
-              <td class="col-info">
-                <div class="product-cell">
-                  <span class="thumb"></span>
-                  <div class="product-text">
-                    <p class="product-name">코팅이강한 IH 냄비 24cm</p>
-                    <p class="product-sku">SKU 8801234567891</p>
-                    <p class="product-cat">주방용품 &gt; 냄비/프라이팬 &gt; 냄비</p>
-                  </div>
-                </div>
-              </td>
-              <td class="col-price">₩29,900</td>
-              <td class="col-stock">0</td>
-              <td class="col-status"><span class="status-badge status-soldout">품절</span></td>
-              <td class="col-date">2025-05-17<br><span class="time">09:15</span></td>
-              <td class="col-date">2025-05-17<br><span class="time">11:05</span></td>
-              <td class="col-manage">
-                <button class="btn btn-outline btn-sm" type="button">수정</button>
-                <button class="btn btn-outline btn-sm btn-more" type="button">
-                  더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg>
-                </button>
-              </td>
-            </tr>
+              <c:when test="${empty productList}">
+                <tr>
+                  <td colspan="8" class="empty" style="text-align: center; padding: 60px 0; color: #999;">
+                    등록된 상품이 없습니다.
+                  </td>
+                </tr>
+              </c:when>
 
-            <tr>
-              <td class="col-check"><input type="checkbox"></td>
-              <td class="col-info">
-                <div class="product-cell">
-                  <span class="thumb"></span>
-                  <div class="product-text">
-                    <p class="product-name">탐사수 2L x 6개입</p>
-                    <p class="product-sku">SKU 8801234567892</p>
-                    <p class="product-cat">식품 &gt; 생수/음료 &gt; 생수</p>
-                  </div>
-                </div>
-              </td>
-              <td class="col-price">₩4,800</td>
-              <td class="col-stock">356</td>
-              <td class="col-status"><span class="status-badge status-active">판매 중</span></td>
-              <td class="col-date">2025-05-16<br><span class="time">16:40</span></td>
-              <td class="col-date">2025-05-18<br><span class="time">09:10</span></td>
-              <td class="col-manage">
-                <button class="btn btn-outline btn-sm" type="button">수정</button>
-                <button class="btn btn-outline btn-sm btn-more" type="button">
-                  더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg>
-                </button>
-              </td>
-            </tr>
+              <c:otherwise>
+                <c:forEach var="product" items="${productList}">
+                  <tr>
+                    <td class="col-check"><input type="checkbox"></td>
+                    <td class="col-info">
+                      <div class="product-cell">
+                        <c:choose>
+                          <c:when test="${not empty product.thumbnailUrl}">
+                            <span class="thumb">
+                              <img src="${pageContext.request.contextPath}/${product.thumbnailUrl}"
+                                   alt="${product.productName}"
+                                   style="width:100%; height:100%; object-fit:cover; border-radius:6px;">
+                            </span>
+                          </c:when>
+                          <c:otherwise>
+                            <span class="thumb"></span>
+                          </c:otherwise>
+                        </c:choose>
+                        <div class="product-text">
+                          <p class="product-name">${product.productName}</p>
+                          <p class="product-sku">상품번호 ${product.productNo}</p>
+                          <p class="product-cat">${product.mainCategoryName} &gt; ${product.midCategoryName} &gt; ${product.subCategoryName}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="col-price">
+                      <c:choose>
+                        <c:when test="${product.minPrice eq product.maxPrice}">
+                          ₩<fmt:formatNumber value="${product.minPrice}" pattern="#,##0" />
+                        </c:when>
+                        <c:otherwise>
+                          ₩<fmt:formatNumber value="${product.minPrice}" pattern="#,##0" /> ~
+                          ₩<fmt:formatNumber value="${product.maxPrice}" pattern="#,##0" />
+                        </c:otherwise>
+                      </c:choose>
+                    </td>
+                    <td class="col-stock">${product.totalQuantity}</td>
+                    <td class="col-status">
+                      <c:choose>
+                        <c:when test="${product.saleStatus == '판매 중'}">
+                          <span class="status-badge status-active">판매 중</span>
+                        </c:when>
+                        <c:when test="${product.saleStatus == '품절'}">
+                          <span class="status-badge status-soldout">품절</span>
+                        </c:when>
+                        <c:when test="${product.saleStatus == '판매 중지'}">
+                          <span class="status-badge status-stopped">판매 중지</span>
+                        </c:when>
+                        <c:otherwise>
+                          <span class="status-badge status-wait">${product.saleStatus}</span>
+                        </c:otherwise>
+                      </c:choose>
+                    </td>
+                    <td class="col-date">
+                      <fmt:formatDate value="${product.createdDate}" pattern="yyyy-MM-dd" /><br>
+                      <span class="time"><fmt:formatDate value="${product.createdDate}" pattern="HH:mm" /></span>
+                    </td>
+                    <td class="col-date">
+                      <fmt:formatDate value="${product.updatedDate}" pattern="yyyy-MM-dd" /><br>
+                      <span class="time"><fmt:formatDate value="${product.updatedDate}" pattern="HH:mm" /></span>
+                    </td>
+                    <td class="col-manage">
+                      <button class="btn btn-outline btn-sm" type="button">수정</button>
+                      <button class="btn btn-outline btn-sm btn-more" type="button">
+                        더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg>
+                      </button>
+                    </td>
+                  </tr>
+                </c:forEach>
+              </c:otherwise>
 
-            <tr>
-              <td class="col-check"><input type="checkbox"></td>
-              <td class="col-info">
-                <div class="product-cell">
-                  <span class="thumb"></span>
-                  <div class="product-text">
-                    <p class="product-name">컴포트 메쉬 사무용 의자</p>
-                    <p class="product-sku">SKU 8801234567893</p>
-                    <p class="product-cat">가구/인테리어 &gt; 의자 &gt; 사무용 의자</p>
-                  </div>
-                </div>
-              </td>
-              <td class="col-price">₩89,000</td>
-              <td class="col-stock">27</td>
-              <td class="col-status"><span class="status-badge status-active">판매 중</span></td>
-              <td class="col-date">2025-05-15<br><span class="time">13:20</span></td>
-              <td class="col-date">2025-05-18<br><span class="time">10:50</span></td>
-              <td class="col-manage">
-                <button class="btn btn-outline btn-sm" type="button">수정</button>
-                <button class="btn btn-outline btn-sm btn-more" type="button">
-                  더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg>
-                </button>
-              </td>
-            </tr>
-
-            <tr>
-              <td class="col-check"><input type="checkbox"></td>
-              <td class="col-info">
-                <div class="product-cell">
-                  <span class="thumb"></span>
-                  <div class="product-text">
-                    <p class="product-name">로지택 무선 마우스 M331</p>
-                    <p class="product-sku">SKU 8801234567894</p>
-                    <p class="product-cat">가전디지털 &gt; PC주변기기 &gt; 마우스</p>
-                  </div>
-                </div>
-              </td>
-              <td class="col-price">₩19,900</td>
-              <td class="col-stock">63</td>
-              <td class="col-status"><span class="status-badge status-stopped">판매 중지</span></td>
-              <td class="col-date">2025-05-14<br><span class="time">11:10</span></td>
-              <td class="col-date">2025-05-16<br><span class="time">17:30</span></td>
-              <td class="col-manage">
-                <button class="btn btn-outline btn-sm" type="button">수정</button>
-                <button class="btn btn-outline btn-sm btn-more" type="button">
-                  더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg>
-                </button>
-              </td>
-            </tr>
+            </c:choose>
 
           </tbody>
         </table>
@@ -362,12 +323,6 @@
           </button>
 
           <button class="page-num active" type="button">1</button>
-          <button class="page-num" type="button">2</button>
-          <button class="page-num" type="button">3</button>
-          <button class="page-num" type="button">4</button>
-          <button class="page-num" type="button">5</button>
-          <span class="page-ellipsis">…</span>
-          <button class="page-num" type="button">63</button>
 
           <button class="page-arrow" type="button" aria-label="다음 페이지">
             <svg class="icon rotate-180"><use href="#ic-chevron-left" /></svg>
@@ -381,7 +336,7 @@
   </div>
 
 
-  <script src="js/vendor-common.js"></script>
+  <script src="${pageContext.request.contextPath}/js/vendor-common.js"></script>
   <script>
 
     /* =========================================================

@@ -112,7 +112,7 @@ public class VendorBusinessInfoServlet extends HttpServlet {
 			SellerDTO refreshed = dao.findByEmail(loginSeller.getEmail());
 			session.setAttribute("loginSeller", refreshed);
 
-			response.sendRedirect(request.getContextPath() + "/vendor_dashboard.jsp");
+			response.sendRedirect(request.getContextPath() + "/vendor/dashboard");
 
 		} else {
 
