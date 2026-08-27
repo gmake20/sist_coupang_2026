@@ -709,18 +709,19 @@
 	<c:choose>
 	    <c:when test="${not empty reviews}">
 	        <c:forEach items="${reviews}" var="r">
-	        <article class="review-item">
+	        <article class="review-item" data-rating="${r.rating}" data-review-id="${r.reviewNo}">
 	            <div class="review-head">
 	                <span class="review-avatar"></span>
 	                <div class="review-writer">
 	                    <strong class="name">${r.maskedName}</strong>
+	                    <span class="seller">${r.storeName}</span>
 	                    <div class="meta">
-	                        <span class="stars">${r.ratingStars}</span> <span class="date">${r.reviewDate}</span>
+	                        <span class="star-rating" aria-label="별점 ${r.rating}점"><em style="width:${r.rating * 20}%"></em></span> <span class="date">${r.reviewDate}</span>
 	                    </div>
 	                </div>
 	            </div>
-	            <c:if test="${not empty r.optionText}">
-	            <p class="review-option">${r.optionText}</p>
+	            <c:if test="${not empty r.productName}">
+	            <p class="review-option">${r.productName}<c:if test="${not empty r.optionText}"> · ${r.optionText}</c:if></p>
 	            </c:if>
 	            <p class="review-text">${r.reviewContent}</p>
 	            <div class="review-foot">

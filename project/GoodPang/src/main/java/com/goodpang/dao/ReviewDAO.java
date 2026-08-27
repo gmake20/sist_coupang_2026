@@ -14,13 +14,20 @@ public class ReviewDAO {
 
     public List<ReviewDTO> selectReviewsByProductNo(int productNo) {
 
+        // 2026-08-27: 리뷰 카드에 판매자 상호명·상품명도 나와야 해서 PRODUCT·SELLER 조인 추가.
+        // (지금은 상품 상세페이지라 값이 페이지 전체에서 다 같지만, 리뷰 카드 자체에도 있어야 한다는
+        //  요구라 조인해서 내려줌 — PRODUCT/SELLER 는 od.PRODUCT_NO 기준으로 항상 있는 값이라 INNER JOIN)
         String sql = """
-            SELECT r.REVIEW_NO, r.RATING, r.REVIEW_CONTENT, r.REVIEW_DATE,
+            SELECT r.REVIEW_NO, r.PRODUCT_RATING, r.REVIEW_CONTENT, r.REVIEW_DATE,
                    m.MEMBER_NAME,
+                   p.PRODUCT_NAME,
+                   s.STORE_NAME,
                    po.OPTION1_TYPE, po.OPTION1_VALUE, po.OPTION2_TYPE, po.OPTION2_VALUE
             FROM REVIEW r
             JOIN ORDER_DETAIL od ON r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO
             JOIN MEMBER m ON r.MEMBER_NO = m.MEMBER_NO
+            JOIN PRODUCT p ON od.PRODUCT_NO = p.PRODUCT_NO
+            JOIN SELLER s ON p.SELLER_NO = s.SELLER_NO
             LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID
             WHERE od.PRODUCT_NO = ?
             ORDER BY r.REVIEW_DATE DESC
@@ -40,16 +47,16 @@ public class ReviewDAO {
                     ReviewDTO dto = new ReviewDTO();
                     dto.setReviewNo(rs.getInt("REVIEW_NO"));
 
-                    int rating = rs.getInt("RATING");
-                    dto.setRating(rating);
-                    StringBuilder stars = new StringBuilder();
-                    for (int i = 0; i < rating; i++) stars.append("★");
-                    for (int i = rating; i < 5; i++) stars.append("☆");
-                    dto.setRatingStars(stars.toString());
+                    /* 2026-08-27: 별점을 "★★★★☆" 문자열로 미리 만들어두던 것 → 화면이
+                       스프라이트 이미지(width%)로 바뀌면서 필요없어짐. rating 정수만 내려주면
+                       product.jsp 에서 ${r.rating * 20}% 로 그때그때 계산해서 씀 */
+                    dto.setRating(rs.getInt("PRODUCT_RATING"));
 
                     dto.setReviewContent(rs.getString("REVIEW_CONTENT"));
                     dto.setReviewDate(sdf.format(rs.getDate("REVIEW_DATE")));
                     dto.setMaskedName(maskName(rs.getString("MEMBER_NAME")));
+                    dto.setProductName(rs.getString("PRODUCT_NAME"));
+                    dto.setStoreName(rs.getString("STORE_NAME"));
 
                     String o1v = rs.getString("OPTION1_VALUE");
                     String o2v = rs.getString("OPTION2_VALUE");

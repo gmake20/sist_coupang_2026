@@ -323,13 +323,15 @@ function setupReviewTools() {
     return Array.from(list.querySelectorAll('.review-item'));
   }
 
-  /* 별점 — 화면에 이미 있는 "★★★★☆" 글자를 세서 씀.
-     data-rating 을 따로 안 둔 이유: 값이 두 군데(글자·속성)에 있으면
-     둘이 어긋날 수 있어서 (수량→가격 만들 때 겪은 것과 같은 종류의 실수) */
+  /* 별점 — 2026-08-27: 원본과 별 아이콘을 맞추면서 별을 글자(★★★★☆)가 아니라
+     스프라이트 이미지(.star-rating em 의 width%)로 그리게 바꿈 — 그러면 화면엔 셀 수 있는
+     글자가 없어져서, article 태그에 심어둔 data-rating(product.jsp 에서 ${r.rating} 그대로 찍음)
+     을 읽음. "두 군데 값이 어긋날 수 있다"던 예전 우려는 이제 해당 없음 — 화면(width%)과
+     data-rating 이 둘 다 서버에서 같은 ${r.rating} 값 하나로 같이 찍히기 때문 */
   function ratingOf(item) {
-    const stars = item.querySelector('.stars');
-    return stars ? (stars.textContent.match(/★/g) || []).length : 0;
+    return Number(item.dataset.rating) || 0;
   }
+
 
   /* 정렬 — 카드 순서를 바꿔서 다시 꽂아넣음.
      "베스트순" 기준은 원본이 비공개라 지금은 data-helpful(더미 "도움돼요" 수)로 대신함 */
@@ -607,18 +609,23 @@ function setupReviewGallery() {
     /* 이 사진이 달린 리뷰 카드를 id 로 찾아서 글자를 그대로 가져옴.
        리뷰 내용을 뷰어에 또 적어두지 않는 이유: 같은 글이 두 군데 있으면
        한쪽만 고쳤을 때 어긋남 (수량→가격 만들 때 겪은 것과 같은 종류의 실수) */
-    const card = document.querySelector('.review-item[data-review-id="' + p.reviewId + '"]');
-    const pick = function (sel) {
-      const el = card && card.querySelector(sel);
-      return el ? el.textContent.trim() : '';
-    };
-    viewer.querySelector('.viewer-writer .name').textContent  = pick('.name');
-    viewer.querySelector('.viewer-writer .stars').textContent = pick('.stars');
-    viewer.querySelector('.viewer-writer .date').textContent  = pick('.date');
-    viewer.querySelector('.viewer-option').textContent        = pick('.review-option');
-    viewer.querySelector('.viewer-text').textContent          = pick('.review-text');
-    viewer.dataset.reviewId = p.reviewId;
-  }
+	   const card = document.querySelector('.review-item[data-review-id="' + p.reviewId + '"]');
+	       const pick = function (sel) {
+	         const el = card && card.querySelector(sel);
+	         return el ? el.textContent.trim() : '';
+	       };
+	  viewer.querySelector('.viewer-writer .name').textContent  = pick('.name');
+ 	  viewer.querySelector('.viewer-writer .date').textContent  = pick('.date');
+
+      /* 별점은 글자가 아니라 스프라이트(.star-rating > em 의 width%)라 textContent 로는
+          못 옮김 — 원본 카드의 em width 를 그대로 복사함 (2026-08-27) */
+      const srcStar = card && card.querySelector('.star-rating em');
+      const dstStar = viewer.querySelector('.viewer-writer .star-rating em');
+       if (dstStar) dstStar.style.width = srcStar ? srcStar.style.width : '0%';
+      viewer.querySelector('.viewer-option').textContent        = pick('.review-option');
+      viewer.querySelector('.viewer-text').textContent          = pick('.review-text');
+      viewer.dataset.reviewId = p.reviewId;
+	     }
 
   function closeViewer() { viewer.hidden = true; lockScroll(); }
   function closeAll()    { viewer.hidden = true; modal.hidden = true; lockScroll(); }
