@@ -13,6 +13,24 @@
   <link rel="stylesheet" href="${pageContext.request.contextPath}/css/vendor_products.css">
   <title>굿팡 판매자 상품 관리</title>
 
+  <style>
+    .view-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .view-tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      background: #fff;
+      border: 1px solid #ddd;
+    }
+    .view-tab.active {
+      background: #346aff;
+      border-color: #346aff;
+      color: #fff;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -42,6 +60,15 @@
           <a class="btn btn-primary" href="${pageContext.request.contextPath}/vendor/product/write">상품 등록</a>
         </div>
 
+      </div>
+
+
+      <!-- 노출중/숨김 탭 -->
+      <div class="view-tabs">
+        <a class="view-tab ${not hiddenView ? 'active' : ''}"
+           href="${pageContext.request.contextPath}/vendor/product">노출 중</a>
+        <a class="view-tab ${hiddenView ? 'active' : ''}"
+           href="${pageContext.request.contextPath}/vendor/product?view=hidden">숨김</a>
       </div>
 
 
@@ -235,7 +262,10 @@
               <c:when test="${empty productList}">
                 <tr>
                   <td colspan="8" class="empty" style="text-align: center; padding: 60px 0; color: #999;">
-                    등록된 상품이 없습니다.
+                    <c:choose>
+                      <c:when test="${hiddenView}">숨긴 상품이 없습니다.</c:when>
+                      <c:otherwise>등록된 상품이 없습니다.</c:otherwise>
+                    </c:choose>
                   </td>
                 </tr>
               </c:when>
@@ -307,7 +337,25 @@
                     <td class="col-manage">
                       <a class="btn btn-outline btn-sm"
                          href="${pageContext.request.contextPath}/vendor/product/detail?productNo=${product.productNo}">상세보기</a>
-                      <button class="btn btn-outline btn-sm" type="button">수정</button>
+                      <c:choose>
+                        <c:when test="${hiddenView}">
+                          <form method="post" action="${pageContext.request.contextPath}/vendor/product/visibility" style="display:inline;">
+                            <input type="hidden" name="productNo" value="${product.productNo}">
+                            <input type="hidden" name="displayYn" value="Y">
+                            <button class="btn btn-primary btn-sm" type="submit">숨김 해제</button>
+                          </form>
+                        </c:when>
+                        <c:otherwise>
+                          <button class="btn btn-outline btn-sm" type="button">수정</button>
+                          <form method="post" action="${pageContext.request.contextPath}/vendor/product/visibility"
+                                style="display:inline;"
+                                onsubmit="return confirm('이 상품을 목록에서 숨기시겠습니까?\n판매자 상품 목록에서만 보이지 않게 되며, 기존 구매자의 주문내역에는 영향이 없습니다.');">
+                            <input type="hidden" name="productNo" value="${product.productNo}">
+                            <input type="hidden" name="displayYn" value="N">
+                            <button class="btn btn-outline btn-sm" type="submit">숨김</button>
+                          </form>
+                        </c:otherwise>
+                      </c:choose>
                     </td>
                   </tr>
                 </c:forEach>

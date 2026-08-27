@@ -64,6 +64,7 @@ public class VendorProductDetailDTO {
     private int returnShippingFee;
 
     private String saleStatus;
+    private String displayYn;
     private Date createdDate;
     private Date updatedDate;
 

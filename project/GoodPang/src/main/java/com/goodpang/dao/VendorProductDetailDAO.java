@@ -53,7 +53,7 @@ public class VendorProductDetailDAO {
                 P.LEAD_TIME_INPUT_TYPE, P.LEAD_TIME_DAYS, P.SAME_DAY_SHIP_YN, P.SAME_DAY_CUTOFF_TIME,
                 P.RETURN_ZIPCODE, P.RETURN_ADDRESS, P.RETURN_DETAIL_ADDRESS,
                 P.INITIAL_SHIPPING_FEE, P.RETURN_SHIPPING_FEE,
-                P.SALE_STATUS, P.CREATED_DATE, P.UPDATED_DATE
+                P.SALE_STATUS, P.DISPLAY_YN, P.CREATED_DATE, P.UPDATED_DATE
             FROM PRODUCT P
                 JOIN CATEGORY C3 ON P.SUB_CATEGORY_NO = C3.CATEGORY_NO
                 LEFT JOIN CATEGORY C2 ON C2.CATEGORY_NO = C3.PARENT_CATEGORY_NO
@@ -253,6 +253,7 @@ public class VendorProductDetailDAO {
         dto.setReturnShippingFee(rs.getInt("RETURN_SHIPPING_FEE"));
 
         dto.setSaleStatus(rs.getString("SALE_STATUS"));
+        dto.setDisplayYn(rs.getString("DISPLAY_YN"));
         dto.setCreatedDate(rs.getTimestamp("CREATED_DATE"));
         dto.setUpdatedDate(rs.getTimestamp("UPDATED_DATE"));
 

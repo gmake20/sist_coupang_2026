@@ -89,6 +89,11 @@
         </div>
 
         <div class="page-actions">
+
+          <c:if test="${product.displayYn == 'N'}">
+            <span class="status-badge status-stopped">숨김됨 (목록 미노출)</span>
+          </c:if>
+
           <c:choose>
             <c:when test="${product.saleStatus == '판매 중'}">
               <span class="status-badge status-active">판매 중</span>
@@ -103,6 +108,25 @@
               <span class="status-badge status-wait">${product.saleStatus}</span>
             </c:otherwise>
           </c:choose>
+
+          <c:choose>
+            <c:when test="${product.displayYn == 'N'}">
+              <form method="post" action="${pageContext.request.contextPath}/vendor/product/visibility" style="display:inline;">
+                <input type="hidden" name="productNo" value="${product.productNo}">
+                <input type="hidden" name="displayYn" value="Y">
+                <button class="btn btn-primary btn-sm" type="submit">숨김 해제</button>
+              </form>
+            </c:when>
+            <c:otherwise>
+              <form method="post" action="${pageContext.request.contextPath}/vendor/product/visibility" style="display:inline;"
+                    onsubmit="return confirm('이 상품을 목록에서 숨기시겠습니까?\n판매자 상품 목록에서만 보이지 않게 되며, 기존 구매자의 주문내역에는 영향이 없습니다.');">
+                <input type="hidden" name="productNo" value="${product.productNo}">
+                <input type="hidden" name="displayYn" value="N">
+                <button class="btn btn-outline btn-sm" type="submit">상품 숨기기</button>
+              </form>
+            </c:otherwise>
+          </c:choose>
+
         </div>
 
       </div>

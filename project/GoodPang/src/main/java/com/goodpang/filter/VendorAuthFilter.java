@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpSession;
         "/vendor/product",
         "/vendor/product/write",
         "/vendor/product/detail",
+        "/vendor/product/visibility",
         "/vendor/order"
 })
 public class VendorAuthFilter implements Filter {
