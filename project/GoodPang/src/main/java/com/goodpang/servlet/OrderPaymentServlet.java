@@ -54,6 +54,73 @@ public class OrderPaymentServlet extends HttpServlet {
 
 		String cardCompany =
 				request.getParameter("cardCompany");
+		
+		
+		Integer paymentMethodNo = null;
+
+
+		if ("BANK".equals(paymentMethod)) {
+
+		    String paymentMethodNoParam =
+		            request.getParameter(
+		                    "paymentMethodNo"
+		            );
+
+		    if (paymentMethodNoParam == null
+		            || paymentMethodNoParam.isBlank()) {
+
+		        response.sendError(
+		                HttpServletResponse.SC_BAD_REQUEST,
+		                "계좌를 선택해주세요."
+		        );
+
+		        return;
+		    }
+		
+		    paymentMethodNo =
+		            Integer.valueOf(
+		                    paymentMethodNoParam
+		            );
+
+		} else if ("CARD".equals(paymentMethod)) {
+
+		    String paymentMethodNoParam =
+		            request.getParameter(
+		                    "cardPaymentMethodNo"
+		            );
+
+		    if (paymentMethodNoParam == null
+		            || paymentMethodNoParam.isBlank()) {
+
+		        response.sendError(
+		                HttpServletResponse.SC_BAD_REQUEST,
+		                "카드를 선택해주세요."
+		        );
+
+		        return;
+		    }
+
+		    paymentMethodNo =
+		            Integer.valueOf(
+		                    paymentMethodNoParam
+		            );
+
+		} else if ("COUPAY_MONEY".equals(
+		        paymentMethod)) {
+
+		    // 쿠페이머니는 PAYMENT_METHOD 테이블의
+		    // 등록 카드/계좌가 아니므로 null
+		    paymentMethodNo = null;
+
+		} else {
+
+		    response.sendError(
+		            HttpServletResponse.SC_BAD_REQUEST,
+		            "지원하지 않는 결제수단입니다."
+		    );
+
+		    return;
+		}
 
 
 		if (checkoutNoParam == null
@@ -120,13 +187,14 @@ public class OrderPaymentServlet extends HttpServlet {
 							memberNo
 							);
 			int orderNo =
-					dao.insertOrderFromCheckout(
-							conn,
-							checkoutNo,
-							memberNo,
-							orderAddressNo,
-							paymentMethod
-							);
+			        dao.insertOrderFromCheckout(
+			                conn,
+			                checkoutNo,
+			                memberNo,
+			                orderAddressNo,
+			                paymentMethod,
+			                paymentMethodNo
+			        );
 
 
 			if (orderNo <= 0) {
