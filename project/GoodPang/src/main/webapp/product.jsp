@@ -161,15 +161,9 @@
 					<!-- ② 가격 -->
 					<div class="price-container">
 						<div class="price-now">
-<<<<<<< HEAD
-							<span class="discount">15%</span> <strong class="total-price"
-								data-unit-price="19900">19,900원</strong> <span
-								class="badge-rocket">로켓배송</span> <span class="badge-tomorrow">내일도착</span>
-=======
 							<!-- <span class="discount">15%</span> <strong class="total-price" data-unit-price="19900">19,900원</strong> -->
 							<span class="discount">15%</span> <strong class="total-price" data-unit-price="${p.productPrice}">${p.productPrice}원</strong>
 							<span class="badge-rocket">로켓배송</span> <span class="badge-tomorrow">내일도착</span>
->>>>>>> f2cb06e81ef9f420cd97f24d394c76cbfd7be73b
 						</div>
 						<!-- 원가 취소선 (#768695 + line-through) -->
 						<div class="price-origin">
@@ -193,14 +187,9 @@
 							<em class="txt-bold">무료배송</em> (로켓배송 상품 19,800원 이상 구매 시)
 						</p>
 						<p class="delivery-date">
-<<<<<<< HEAD
-							<em class="txt-green">내일(목) 8/20</em> <em
-								class="txt-green-normal">도착 보장</em> <span class="txt-sub">(11시간
-								20분 내 주문 시 / 서울·경기 기준)</span>
-=======
+
 							<em class="txt-green">${deliveryDate}</em> <em class="txt-green-normal">도착
 								보장</em> <span class="txt-sub">(11시간 20분 내 주문 시 / 서울·경기 기준)</span>
->>>>>>> f2cb06e81ef9f420cd97f24d394c76cbfd7be73b
 						</p>
 
 						<!-- 배송 방법 선택 (2026-08-21 추가)
@@ -357,7 +346,6 @@
 				<!-- .is-cut = 넘치는 부분을 잘라내는 상자. 안쪽 ul 이 옆으로 밀리며 움직임 -->
 				<div class="sdp-ads__body">
 					<ul class="sdp-ads__list">
-<<<<<<< HEAD
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
 									src="${pageContext.request.contextPath}/images/product-detail/ad-1.jpg"
@@ -444,7 +432,8 @@
 							</span> <span class="ad-item__tag">무료배송</span> <span
 								class="ad-item__ship">모레(금) 도착 예정</span> <span
 								class="ad-item__rating"><em class="stars">★★★★☆</em>(682)</span>
-=======
+								
+								
 						<li class="ad-item"><a href="#">
 								<span class="ad-item__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/ad-1.jpg" alt=""></span>
 								<span class="ad-item__name">베스티하루 로카티 ROKA 반팔 티셔츠</span>
@@ -531,7 +520,6 @@
 								<span class="ad-item__tag">무료배송</span>
 								<span class="ad-item__ship">${deliveryDate} 도착 예정</span>
 								<span class="ad-item__rating"><em class="stars">★★★★☆</em>(682)</span>
->>>>>>> f2cb06e81ef9f420cd97f24d394c76cbfd7be73b
 						</a></li>
 					</ul>
 					<button type="button" class="sdp-ads__next">
@@ -553,7 +541,6 @@
 				</div>
 
 				<ul class="gw-deal__list">
-<<<<<<< HEAD
 					<li class="gw-card"><a href="#"> <span
 							class="gw-card__thumb"><img
 								src="${pageContext.request.contextPath}/images/product-detail/gw-1.jpg"
@@ -566,55 +553,8 @@
 							<span class="gw-card__stock"><span class="bar"><i
 									style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
-					<li class="gw-card"><a href="#"> <span
-							class="gw-card__thumb"><img
-								src="${pageContext.request.contextPath}/images/product-detail/gw-2.jpg"
-								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
-							class="gw-card__name">NEOX 네옥스 밀리터리 디지털 기능성 V넥 쿨론 반팔 티셔츠</span> <span
-							class="gw-card__was">할인 <em>68%</em> <del>24,500</del></span> <strong
-							class="gw-card__price">7,670원</strong> <span
-							class="gw-card__ship">내일(목) 도착 보장</span> <span
-							class="gw-card__rating"><em class="stars">★★★★☆</em>(44)</span> <!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i
-									style="width: 94%"></i></span>94 % 남음</span>
-					</a></li>
-					<li class="gw-card"><a href="#"> <span
-							class="gw-card__thumb"><img
-								src="${pageContext.request.contextPath}/images/product-detail/gw-3.jpg"
-								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
-							class="gw-card__name">인디오 남성용 빅사이즈 밀리터리 카모플라쥬 쿨링 반팔티셔츠</span> <span
-							class="gw-card__was">할인 <em>10%</em> <del>10,800</del></span> <strong
-							class="gw-card__price">9,720원</strong> <span
-							class="gw-card__ship">내일(목) 도착 보장</span> <span
-							class="gw-card__rating"><em class="stars">★★★★☆</em>(26)</span> <!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i
-									style="width: 99%"></i></span>99 % 남음</span>
-					</a></li>
-					<li class="gw-card"><a href="#"> <span
-							class="gw-card__thumb"><img
-								src="${pageContext.request.contextPath}/images/product-detail/gw-4.jpg"
-								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
-							class="gw-card__name">NEOX 네옥스 쿨론 밀리터리 디지털 라운드넥 로카 런닝</span> <span
-							class="gw-card__was">할인 <em>80%</em> <del>34,900</del></span> <strong
-							class="gw-card__price">6,950원</strong> <span
-							class="gw-card__ship">내일(목) 도착 보장</span> <span
-							class="gw-card__rating"><em class="stars">★★★★☆</em>(14)</span> <!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i
-									style="width: 99%"></i></span>99 % 남음</span>
-					</a></li>
-					<li class="gw-card"><a href="#"> <span
-							class="gw-card__thumb"><img
-								src="${pageContext.request.contextPath}/images/product-detail/gw-5.jpg"
-								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
-							class="gw-card__name">FLY 남녀공용 기능성 드라이 스포츠 반팔 티셔츠 헬스 러닝</span> <span
-							class="gw-card__was">할인 <em>11%</em> <del>6,490</del></span> <strong
-							class="gw-card__price">5,770원</strong> <span
-							class="gw-card__ship">내일(목) 도착 보장</span> <span
-							class="gw-card__rating"><em class="stars">★★★★☆</em>(216)</span>
-							<!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:${d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i
-									style="width: 96%"></i></span>96 % 남음</span>
-=======
+
+
 					<li class="gw-card"><a href="#">
 							<span class="gw-card__thumb"><img src="${pageContext.request.contextPath}/images/product-detail/gw-1.jpg" alt=""></span>
 							<span class="gw-card__tag">특가진행중</span>
@@ -659,7 +599,6 @@
 							<strong class="gw-card__price">5,770원</strong>
 							<span class="gw-card__ship">${deliveryDate} 도착 보장</span>
 							<span class="gw-card__rating"><em class="stars">★★★★☆</em>(216)</span>
->>>>>>> f2cb06e81ef9f420cd97f24d394c76cbfd7be73b
 					</a></li>
 				</ul>
 			</section>
@@ -676,16 +615,12 @@
 			<!-- ★ 스크롤을 내려도 화면 위에 붙어 있음(sticky) + 지금 보고 있는 구간에 따라
 			     활성 탭이 저절로 바뀜(scroll-spy). 원본이 그렇게 동작함 (2026-08-21 반영) -->
 			<nav class="detail-tabs">
-<<<<<<< HEAD
-				<a href="#detail" class="is-on">상품상세</a> <a href="#reviews">상품평
-					(2,033)</a> <a href="#qna">상품문의</a> <a href="#delivery">배송/교환/반품 안내</a>
-=======
+
 				<a href="#detail" class="is-on">상품상세</a>
 				<!-- <a href="#reviews">상품평 (2,033)</a> -->
 				<a href="#reviews">상품평 (${reviewCount})</a>
 				<a href="#qna">상품문의</a>
 				<a href="#delivery">배송/교환/반품 안내</a>
->>>>>>> f2cb06e81ef9f420cd97f24d394c76cbfd7be73b
 			</nav>
 
 			<!-- ===== 필수 표기 정보 =====
@@ -926,227 +861,6 @@
                    **모자란 게 아니라 개수만 다른 것.** 카드 하나의 구조·크기는 원본과 같음.
                    DB 를 붙이면 &lt;c:forEach&gt; 가 리뷰 수만큼 찍어내므로 저절로 채워짐 —
                    지금 개수를 늘리려고 카드를 복붙할 필요 없음 (2026-08-21 확인) -->
-<<<<<<< HEAD
-						<article class="review-item" data-review-id="r1" data-helpful="8">
-							<div class="review-head">
-								<span class="review-avatar"></span>
-								<div class="review-writer">
-									<strong class="name">고*미</strong>
-									<div class="meta">
-										<span class="stars">★★★★★</span> <span class="date">2026.06.16</span>
-									</div>
-									<span class="seller">판매자: 빅토리샵</span>
-								</div>
-							</div>
-							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 화이트, 95</p>
-							<ul class="review-photos">
-								<li><img
-									src="${pageContext.request.contextPath}/images/product-detail/review-1.jpg"
-									alt=""></li>
-								<li><img
-									src="${pageContext.request.contextPath}/images/product-detail/review-2.jpg"
-									alt=""></li>
-								<li><img
-									src="${pageContext.request.contextPath}/images/product-detail/review-3.jpg"
-									alt=""></li>
-							</ul>
-							<strong class="review-headline">국내원단 대만족</strong>
-							<p class="review-text">쿠팡에서 의류제품 3중포장으로 이렇게까지 깔끔하게 받아본건
-								처음입니다~~~ 여름용이라 시원하게 입어야해서 원단비교를 꼼꼼하게 했어요. 확실히 국내원단 사용해서인지 가볍고
-								시원해요~</p>
-							<dl class="review-attr">
-								<div>
-									<dt>평소 사이즈</dt>
-									<dd>105</dd>
-								</div>
-								<div>
-									<dt>키</dt>
-									<dd>178</dd>
-								</div>
-								<div>
-									<dt>색상</dt>
-									<dd>화면과 같아요</dd>
-								</div>
-								<div>
-									<dt>사이즈</dt>
-									<dd>정사이즈예요</dd>
-								</div>
-							</dl>
-							<div class="review-foot">
-								<button type="button" class="btn-helpful">도움이 돼요</button>
-								<a href="#" class="btn-report">신고하기</a>
-							</div>
-						</article>
-
-						<article class="review-item" data-review-id="r2" data-helpful="15">
-							<div class="review-head">
-								<span class="review-avatar"></span>
-								<div class="review-writer">
-									<strong class="name">박*훈</strong>
-									<div class="meta">
-										<span class="stars">★★★★☆</span> <span class="date">2026.06.02</span>
-									</div>
-									<span class="seller">판매자: 빅토리샵</span>
-								</div>
-							</div>
-							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 그레이, 100</p>
-							<strong class="review-headline">가격 대비 만족합니다</strong>
-							<p class="review-text">3장에 이 가격이면 괜찮은 것 같아요. 목 늘어남 없이 잘 입고
-								있습니다. 다만 흰색은 살짝 비치는 편이라 안에 하나 더 입어야 할 듯요.</p>
-							<dl class="review-attr">
-								<div>
-									<dt>평소 사이즈</dt>
-									<dd>100</dd>
-								</div>
-								<div>
-									<dt>키</dt>
-									<dd>175</dd>
-								</div>
-								<div>
-									<dt>색상</dt>
-									<dd>화면과 비슷해요</dd>
-								</div>
-								<div>
-									<dt>사이즈</dt>
-									<dd>정사이즈예요</dd>
-								</div>
-							</dl>
-							<div class="review-foot">
-								<button type="button" class="btn-helpful">도움이 돼요</button>
-								<a href="#" class="btn-report">신고하기</a>
-							</div>
-						</article>
-
-						<article class="review-item" data-review-id="r3" data-helpful="3">
-							<div class="review-head">
-								<span class="review-avatar"></span>
-								<div class="review-writer">
-									<strong class="name">이*연</strong>
-									<div class="meta">
-										<span class="stars">★★★☆☆</span> <span class="date">2026.05.28</span>
-									</div>
-									<span class="seller">판매자: 빅토리샵</span>
-								</div>
-							</div>
-							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 블랙, 105</p>
-							<strong class="review-headline">사이즈가 조금 작아요</strong>
-							<p class="review-text">평소 105 입는데 어깨가 살짝 낍니다. 한 치수 크게 사시는 걸
-								추천드려요. 원단이랑 배송은 만족합니다.</p>
-							<dl class="review-attr">
-								<div>
-									<dt>평소 사이즈</dt>
-									<dd>105</dd>
-								</div>
-								<div>
-									<dt>키</dt>
-									<dd>182</dd>
-								</div>
-								<div>
-									<dt>색상</dt>
-									<dd>화면과 같아요</dd>
-								</div>
-								<div>
-									<dt>사이즈</dt>
-									<dd>작아요</dd>
-								</div>
-							</dl>
-							<div class="review-foot">
-								<button type="button" class="btn-helpful">도움이 돼요</button>
-								<a href="#" class="btn-report">신고하기</a>
-							</div>
-						</article>
-
-						<!-- ★ 아래 2개는 2026-08-24 에 페이지네이션(다음 참고)을 실제로 보여주려고 추가한 더미.
-						     리뷰가 3개뿐이면 항상 1페이지 안에 다 들어가서 "다음 페이지" 버튼이 아예 동작을 안 함 -->
-						<article class="review-item" data-review-id="r4" data-helpful="5">
-							<div class="review-head">
-								<span class="review-avatar"></span>
-								<div class="review-writer">
-									<strong class="name">최*영</strong>
-									<div class="meta">
-										<span class="stars">★★★★★</span> <span class="date">2026.07.20</span>
-									</div>
-									<span class="seller">판매자: 빅토리샵</span>
-								</div>
-							</div>
-							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 블랙, 100</p>
-							<ul class="review-photos">
-								<li><img
-									src="${pageContext.request.contextPath}/images/product-detail/review-4.jpg"
-									alt=""></li>
-							</ul>
-							<!-- ★ 이 리뷰의 글은 사진(review-4.jpg = 쿠팡 봉투에 담긴 포장 상태)에 맞춰 씀.
-							     전에는 "블랙이 화면보다 더 고급스럽게 나왔어요" 였는데 사진은 민트색 포장이라 안 맞았음
-							     (2026-08-24 사용자가 지적). 더미 데이터라도 사진과 글은 맞춰두는 게 맞음 -->
-							<strong class="review-headline">포장이 깔끔해요</strong>
-							<p class="review-text">봉투 그대로 왔고 비닐도 안 찢어져 있었어요. 주문 다음 날 바로
-								도착했습니다. 마감도 깔끔하네요.</p>
-							<dl class="review-attr">
-								<div>
-									<dt>평소 사이즈</dt>
-									<dd>100</dd>
-								</div>
-								<div>
-									<dt>키</dt>
-									<dd>173</dd>
-								</div>
-								<div>
-									<dt>색상</dt>
-									<dd>화면과 같아요</dd>
-								</div>
-								<div>
-									<dt>사이즈</dt>
-									<dd>정사이즈예요</dd>
-								</div>
-							</dl>
-							<div class="review-foot">
-								<button type="button" class="btn-helpful">도움이 돼요</button>
-								<a href="#" class="btn-report">신고하기</a>
-							</div>
-						</article>
-
-						<article class="review-item" data-review-id="r5" data-helpful="1">
-							<div class="review-head">
-								<span class="review-avatar"></span>
-								<div class="review-writer">
-									<strong class="name">정*수</strong>
-									<div class="meta">
-										<span class="stars">★★★☆☆</span> <span class="date">2026.05.15</span>
-									</div>
-									<span class="seller">판매자: 빅토리샵</span>
-								</div>
-							</div>
-							<p class="review-option">무형광 남성 반팔 라운드 티셔츠 3종 세트, 네이비, 110</p>
-							<strong class="review-headline">그냥 무난해요</strong>
-							<p class="review-text">가격 생각하면 나쁘지 않은데 배송이 하루 늦게 왔어요. 옷 자체는
-								평범합니다.</p>
-							<dl class="review-attr">
-								<div>
-									<dt>평소 사이즈</dt>
-									<dd>110</dd>
-								</div>
-								<div>
-									<dt>키</dt>
-									<dd>185</dd>
-								</div>
-								<div>
-									<dt>색상</dt>
-									<dd>화면과 비슷해요</dd>
-								</div>
-								<div>
-									<dt>사이즈</dt>
-									<dd>정사이즈예요</dd>
-								</div>
-							</dl>
-							<div class="review-foot">
-								<button type="button" class="btn-helpful">도움이 돼요</button>
-								<a href="#" class="btn-report">신고하기</a>
-							</div>
-						</article>
-
-						<!-- 검색·필터 결과가 0개일 때만 JS 가 보여줌 (평소엔 CSS 로 감춰둠) -->
-						<p class="review-empty">조건에 맞는 후기가 없어요</p>
-=======
 	<c:choose>
 	    <c:when test="${not empty reviews}">
 	        <c:forEach items="${reviews}" var="r">
@@ -1175,7 +889,6 @@
 	        <p class="review-empty">조건에 맞는 후기가 없어요</p>
 	    </c:otherwise>
 	</c:choose>
->>>>>>> f2cb06e81ef9f420cd97f24d394c76cbfd7be73b
 
 						<!-- 페이지네이션 — 원본 실측(ref/product/vp_05_review2.jpeg): "‹ (1) 2 ›" 모양,
 						     지금 고른 페이지만 파란 원 테두리.

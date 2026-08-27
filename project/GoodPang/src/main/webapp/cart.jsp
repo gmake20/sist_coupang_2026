@@ -170,7 +170,7 @@
 	</main>
 	
 	<script>
-const contextPath = "${pageContext.request.contextPath}";
+	const contextPath = "${pageContext.request.contextPath}";
 </script>
 
 	<script src="${pageContext.request.contextPath}/js/cart.js"></script>
