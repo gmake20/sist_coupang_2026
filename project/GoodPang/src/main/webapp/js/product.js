@@ -31,8 +31,9 @@ function setupQuantity() {
   const priceEl = document.querySelector('.total-price');
   const unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
 
+  //여기 재고수량에 맞게 수정해야함
   const MIN = 1;
-  const MAX = 10;
+  const MAX = 20;
 
   /* 화면에 숫자를 다시 그리고, 버튼을 켤지 끌지 정하는 함수.
      "값을 바꾸는 곳"과 "화면을 고치는 곳"을 한 군데로 모아두면
@@ -349,12 +350,16 @@ function setupReviewTools() {
   const PAGE_SIZE = 3;    // 한 페이지에 리뷰 3개 (더미가 5개라 2페이지가 됨)
   let page = 1;
 
+  /* ★ 2026-08-26 수정: DB 붙이면서 .review-headline(제목)이 마크업에서 아예 빠짐
+     (product.jsp 리뷰 카드엔 .review-text 만 있음) — 원래 코드가 그걸 그대로 찾다가
+     null.textContent 로 터졌음. 검색은 이제 review-text 하나만 봄.
+     혹시 나중에 헤드라인이 다시 생기면 optional chaining(?.)으로 안전하게 더할 것 */
   function passesFilter(item) {
     const q = searchBox.value.trim().toLowerCase();
     const rating = ratingSel.value;   // '' = 모든 별점
-    const text = (item.querySelector('.review-headline').textContent
-                + item.querySelector('.review-text').textContent).toLowerCase();
-    return (!q || text.includes(q)) && (!rating || ratingOf(item) === Number(rating));
+	const textEl = item.querySelector('.review-text');
+	const text = (textEl ? textEl.textContent : '').toLowerCase();
+	    return (!q || text.includes(q)) && (!rating || ratingOf(item) === Number(rating));
   }
 
   function render() {
@@ -369,7 +374,9 @@ function setupReviewTools() {
       item.classList.toggle('is-hidden', !onThisPage);
     });
 
-    emptyMsg.style.display = kept.length === 0 ? 'block' : 'none';
+	/* product.jsp 는 리뷰가 있으면 <c:otherwise> 쪽(.review-empty)을 아예 안 찍음 —
+	       그래서 리뷰가 있을 땐 emptyMsg 가 null 일 수 있음. null-safe 하게 처리 */
+	if (emptyMsg) emptyMsg.style.display = kept.length === 0 ? 'block' : 'none';
     renderPager(totalPages);
   }
 
