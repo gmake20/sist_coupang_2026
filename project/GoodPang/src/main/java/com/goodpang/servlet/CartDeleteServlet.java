@@ -63,12 +63,9 @@ public class CartDeleteServlet extends HttpServlet {
 					HttpServletResponse.SC_BAD_REQUEST,
 					"잘못된 상품 정보입니다."
 					);
-
 			return;
 		}
-
-
-		// 로그인 회원
+		
 		if (loginMember != null) {
 
 			cartDAO.deleteCart(
@@ -81,16 +78,11 @@ public class CartDeleteServlet extends HttpServlet {
 					cartDAO.getCartCount(
 							loginMember.getMemberNo()
 							);
-
 			session.setAttribute(
 					"cartCount",
 					cartCount
 					);
-
 		}
-
-
-		// 비회원
 		else {
 
 			@SuppressWarnings("unchecked")
@@ -109,16 +101,11 @@ public class CartDeleteServlet extends HttpServlet {
 						);
 
 			}
-
 		}
-
-
 		// 다시 장바구니 페이지로 이동
 		response.sendRedirect(
 				request.getContextPath()
 				+ "/cart"
 				);
-
 	}
-
 }

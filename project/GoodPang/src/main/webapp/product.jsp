@@ -265,6 +265,8 @@
 					<!-- ⑥ 수량 + 구매 버튼 (원본 실측: 전부 높이 42px) -->
 					<form class="prod-buy-quantity-and-footer" method="post"
 						action="${pageContext.request.contextPath}/cart/add">
+						
+						<!-- 옵션 넘버 들어와야 할 곳 -->
 						<!-- 실제 CART에 저장할 OPTION_ID -->
 						<input type="hidden" name="optionId" id="selectedOptionId"
 							value="25">
