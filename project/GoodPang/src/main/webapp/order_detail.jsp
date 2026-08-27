@@ -107,14 +107,15 @@
 				<h1>주문상세</h1>
 
 				<div class="order-info">
-					<strong><fmt:formatDate value="${orderInfo.orderDate}" pattern="yyyy. M. d" /></strong></strong> 주문 <span class="dot">·</span> 주문번호 <span
+					<strong><fmt:formatDate value="${orderInfo.orderDate}"
+							pattern="yyyy. M. d" /></strong></strong> 주문 <span class="dot">·</span> 주문번호 <span
 						class="order-number">${orderInfo.orderNo}</span>
 				</div>
 
 			</section>
 
 
-<!-- =========================
+			<!-- =========================
      배송 상품 리스트 (JSTL 반복문)
 ========================== -->
 			<c:forEach var="item" items="${detailList}">
@@ -137,7 +138,7 @@
 							<div class="product-info">
 
 								<div class="product-name">
-								
+
 									<span class="rocket">🚀 로켓배송</span> ${item.productName}
 								</div>
 
@@ -147,18 +148,20 @@
 								</div>
 
 								<!-- 옵션 정보 동적 출력 -->
-										<c:if test="${not empty item.option1Value or not empty item.option2Value}">
-											<div class="product-option">
-												<span>옵션: </span>
-												<c:if test="${not empty item.option1Value}">
-													<c:if test="${not empty item.option1Type}">${item.option1Type}: </c:if>${item.option1Value}
+								<c:if
+									test="${not empty item.option1Value or not empty item.option2Value}">
+									<div class="product-option">
+										<span>옵션: </span>
+										<c:if test="${not empty item.option1Value}">
+											<c:if test="${not empty item.option1Type}">${item.option1Type}: </c:if>${item.option1Value}
 												</c:if>
-												<c:if test="${not empty item.option1Value and not empty item.option2Value}"> / </c:if>
-												<c:if test="${not empty item.option2Value}">
-													<c:if test="${not empty item.option2Type}">${item.option2Type}: </c:if>${item.option2Value}
+										<c:if
+											test="${not empty item.option1Value and not empty item.option2Value}"> / </c:if>
+										<c:if test="${not empty item.option2Value}">
+											<c:if test="${not empty item.option2Type}">${item.option2Type}: </c:if>${item.option2Value}
 												</c:if>
-											</div>
-										</c:if>
+									</div>
+								</c:if>
 
 							</div>
 
@@ -210,8 +213,8 @@
 
 					<div class="info-row">
 						<div class="info-title">받는주소</div>
-						<div class="info-value">${orderInfo.address} ${orderInfo.detailAddress}
-						</div>
+						<div class="info-value">${orderInfo.address}
+							${orderInfo.detailAddress}</div>
 					</div>
 
 					<div class="info-row">
@@ -228,7 +231,7 @@
 			<!-- =========================
              결제 정보
         ========================== -->
-			<section class="detail-section payment-section">
+			<%-- <section class="detail-section payment-section">
 
 				<h2>결제 정보</h2>
 
@@ -265,7 +268,64 @@
 				</div>
 
 			</section>
+ --%>
+			<section class="detail-section payment-section">
+				<h2>결제 정보</h2>
+				<div class="section-line"></div>
 
+				<div class="payment-box">
+
+					<div class="payment-method">
+						<c:choose>
+							<c:when test="${orderInfo.paymentMethod eq 'CARD'}">
+								${orderInfo.cardCompanyName} / 일시불
+								</c:when>
+							<c:when test="${orderInfo.paymentMethod eq 'BANK'}">
+								${orderInfo.bankName} / 계좌이체
+								</c:when>
+							<c:otherwise>
+								${orderInfo.paymentMethod}
+								</c:otherwise>
+						</c:choose>
+					</div>
+					<div class="payment-price">
+						<div class="price-row">
+							<span>총 상품가격</span> <strong> <fmt:formatNumber
+									value="${orderInfo.totalPrice}" pattern="#,###" /> 원
+							</strong>
+						</div>
+						<div class="price-row">
+							<span>배송비</span> <strong> <fmt:formatNumber
+									value="${orderInfo.deliveryFee}" pattern="#,###" /> 원
+							</strong>
+						</div>
+					</div>
+				</div>
+				<div class="payment-total">
+					<div>
+						<c:choose>
+							<c:when test="${orderInfo.paymentMethod eq 'CARD'}">
+								${orderInfo.cardCompanyName} / 일시불
+								</c:when>
+							<c:when test="${orderInfo.paymentMethod eq 'BANK'}">
+								${orderInfo.bankName} / 계좌이체
+								</c:when>
+							<c:otherwise>
+								${orderInfo.paymentMethod}
+								</c:otherwise>
+						</c:choose>
+					</div>
+
+					<div>
+						<span>총 결제금액</span> <strong> <fmt:formatNumber
+								value="${orderInfo.totalPrice + orderInfo.deliveryFee}"
+								pattern="#,###" /> 원
+						</strong>
+					</div>
+
+				</div>
+
+			</section>
 
 
 			<!-- =========================
@@ -299,9 +359,9 @@
 
 			</section>
 
-		
 
-		
+
+
 			<!-- 배송상품 주문상태 안내 -->
 			<div class="delivery-step-box">
 				<div class="step-head">
@@ -423,7 +483,7 @@
 
 	</div>
 	<jsp:include page="/inc/footer.jsp" />
-	
+
 
 </body>
 </html>
