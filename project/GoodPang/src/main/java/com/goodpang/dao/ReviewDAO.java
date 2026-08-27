@@ -288,7 +288,7 @@ public class ReviewDAO {
 	                    dto.setRating(rs.getInt("PRODUCT_RATING"));
 
 	                    dto.setReviewContent(rs.getString("REVIEW_CONTENT"));
-	                    dto.setReviewContent(rs.getString("REVIEW_SUMMARY"));
+	                    dto.setReviewSummary(rs.getString("REVIEW_SUMMARY"));
 	                    dto.setReviewDate(sdf.format(rs.getDate("REVIEW_DATE")));
 	                    dto.setMaskedName(maskName(rs.getString("MEMBER_NAME")));
 	                    dto.setProductName(rs.getString("PRODUCT_NAME"));
