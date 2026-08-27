@@ -259,7 +259,10 @@
                           </c:otherwise>
                         </c:choose>
                         <div class="product-text">
-                          <p class="product-name">${product.productName}</p>
+                          <p class="product-name">
+                            <a href="${pageContext.request.contextPath}/vendor/product/detail?productNo=${product.productNo}"
+                               style="color:inherit; text-decoration:none;">${product.productName}</a>
+                          </p>
                           <p class="product-sku">상품번호 ${product.productNo}</p>
                           <p class="product-cat">${product.mainCategoryName} &gt; ${product.midCategoryName} &gt; ${product.subCategoryName}</p>
                         </div>
@@ -302,10 +305,9 @@
                       <span class="time"><fmt:formatDate value="${product.updatedDate}" pattern="HH:mm" /></span>
                     </td>
                     <td class="col-manage">
+                      <a class="btn btn-outline btn-sm"
+                         href="${pageContext.request.contextPath}/vendor/product/detail?productNo=${product.productNo}">상세보기</a>
                       <button class="btn btn-outline btn-sm" type="button">수정</button>
-                      <button class="btn btn-outline btn-sm btn-more" type="button">
-                        더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg>
-                      </button>
                     </td>
                   </tr>
                 </c:forEach>
