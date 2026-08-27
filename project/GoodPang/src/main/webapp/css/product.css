@@ -1585,9 +1585,31 @@
   margin-top: 2px;
 }
 
-.product-page .review-writer .stars {
-  color: #ffa620;
-  letter-spacing: -1px;
+/* ★ 2026-08-27: 별점을 유니코드 글자(★★★★☆)로 그리면 폰트마다 생김새가 달라져서
+   원본이랑 다르게 보임. 원본(ref/product/coupang_product.html) 실제로 열어서 대조해보니
+   원본은 글자가 아니라 스프라이트 이미지 2장을 겹쳐서 씀 —
+     ① 바깥(.star-rating): 회색 빈 별 5개짜리 배경 (60x12, 스프라이트 아래쪽 절반)
+     ② 안쪽(em, width:rating*20%): 주황 채운 별 배경을 rating 비율만큼만 폭을 줘서
+        위에 겹쳐 보이게 함(별도 position 없이, 안쪽 요소가 그리는 순서상 위에 그려짐)
+   이미지는 원본 CDN(img1a.coupangcdn.com, CLAUDE.md 6장에서 승인된 도메인)에서 받아둔 것
+   (images/icons/star_rating_improve_design.png) */
+.product-page .star-rating {
+  display: block;
+  width: 60px;
+  height: 12px;
+  background-image: url(../images/icons/star_rating_improve_design.png);
+  background-repeat: no-repeat;
+  background-size: 60px 24px;
+  background-position: 0 -12px;   /* 아래쪽 절반 = 빈 별(회색) */
+}
+
+.product-page .star-rating em {
+  display: block;
+  height: 12px;
+  background-image: url(../images/icons/star_rating_improve_design.png);
+  background-repeat: no-repeat;
+  background-size: 60px 24px;
+  background-position: 0 0;       /* 위쪽 절반 = 채운 별(주황) */
 }
 
 .product-page .review-writer .date {
@@ -2695,11 +2717,8 @@ body.is-modal-open {
   margin-top: 2px;
 }
 
-.viewer-writer .stars {
-  font-size: 13px;
-  color: #ff9d5c;      /* 별 색은 본문 리뷰와 같게 */
-  letter-spacing: -1px;
-}
+/* 2026-08-27: 별 아이콘은 .product-page .star-rating (전역 규칙)이 그대로 적용됨 —
+   본문 리뷰 카드의 .star-rating 안쪽 em(width) 을 JS(showPhoto)가 그대로 복사해옴 */
 
 .viewer-writer .date {
   font-size: 12px;

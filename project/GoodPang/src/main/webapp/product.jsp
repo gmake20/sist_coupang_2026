@@ -161,13 +161,14 @@
 					<!-- ② 가격 -->
 					<div class="price-container">
 						<div class="price-now">
-							<!-- <span class="discount">15%</span> <strong class="total-price" data-unit-price="19900">19,900원</strong> -->
+							<!-- 여기가 product_option의 price -->
 							<span class="discount">15%</span> <strong class="total-price" data-unit-price="${p.productPrice}">${p.productPrice}원</strong>
 							<span class="badge-rocket">로켓배송</span> <span class="badge-tomorrow">내일도착</span>
 						</div>
 						<!-- 원가 취소선 (#768695 + line-through) -->
 						<div class="price-origin">
-							<span class="origin-price">23,400원</span>
+						<!-- 여기가 product_price -->
+							<span class="origin-price">${p.productPrice}원</span>
 							<!-- 원본에 있는 ⓘ — 눌러도 아무 일 없는 안내 아이콘. 이미지 없이 글자로 그림 -->
 							<button type="button" class="price-info">
 								<span class="blind">가격 안내</span>
@@ -854,7 +855,6 @@
 								<option value="1">1점</option>
 							</select>
 						</div>
-
 						<!-- 리뷰 카드
                  ▶JSP: &lt;c:forEach items="{reviews}" var="r"&gt; 로 감쌀 자리.
                    그래서 3개를 **완전히 같은 구조**로 만들어둠 (안에 든 글자만 다름)
@@ -866,18 +866,19 @@
 	<c:choose>
 	    <c:when test="${not empty reviews}">
 	        <c:forEach items="${reviews}" var="r">
-	        <article class="review-item">
+	        <article class="review-item" data-rating="${r.rating}" data-review-id="${r.reviewNo}">
 	            <div class="review-head">
 	                <span class="review-avatar"></span>
 	                <div class="review-writer">
 	                    <strong class="name">${r.maskedName}</strong>
+	                    <span class="seller">${r.storeName}</span>
 	                    <div class="meta">
-	                        <span class="stars">${r.ratingStars}</span> <span class="date">${r.reviewDate}</span>
+	                        <span class="star-rating" aria-label="별점 ${r.rating}점"><em style="width:${r.rating * 20}%"></em></span> <span class="date">${r.reviewDate}</span>
 	                    </div>
 	                </div>
 	            </div>
-	            <c:if test="${not empty r.optionText}">
-	            <p class="review-option">${r.optionText}</p>
+	            <c:if test="${not empty r.productName}">
+	            <p class="review-option">${r.productName}<c:if test="${not empty r.optionText}"> · ${r.optionText}</c:if></p>
 	            </c:if>
 	            <p class="review-text">${r.reviewContent}</p>
 	            <div class="review-foot">
@@ -891,7 +892,6 @@
 	        <p class="review-empty">조건에 맞는 후기가 없어요</p>
 	    </c:otherwise>
 	</c:choose>
-
 						<!-- 페이지네이션 — 원본 실측(ref/product/vp_05_review2.jpeg): "‹ (1) 2 ›" 모양,
 						     지금 고른 페이지만 파란 원 테두리.
 						     번호 버튼은 JS(setupReviewTools)가 리뷰 개수를 보고 그때그때 새로 그림 —
@@ -909,7 +909,6 @@
 					<!-- //.review-list -->
 				</div>
 			</section>
-
 
 			<!-- ===== 상품문의 =====
            원본: div#btf-qna (높이 500px)
@@ -1072,24 +1071,6 @@
 									및 환불/교환에 대한 문의는 마이굿팡-고객센터 내 상담하기를 이용해주세요.</span>
 							</td>
 						</tr>
-						<!-- <tr>
-							<th>상호/대표자</th>
-							<td>베이직스 / 김미영</td>
-							<th>사업장 소재지</th>
-							<td>경기도 부천시 원미구 중동로 108 114동 1904호</td>
-						</tr>
-						<tr>
-							<th>e-mail</th>
-							<td>help@basics.co.kr</td>
-							<th>연락처</th>
-							<td>010-0000-0000</td>
-						</tr>
-						<tr>
-							<th>통신판매업 신고번호</th>
-							<td>2026-부천원미-1026</td>
-							<th>사업자번호</th>
-							<td>886-34-01859</td>
-						</tr> -->
 						 <tr>
 					    <th>상호/대표자</th>
 					    <td>${p.storeName} / ${p.ceoName}</td>
