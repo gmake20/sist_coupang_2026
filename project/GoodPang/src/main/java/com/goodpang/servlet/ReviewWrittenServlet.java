@@ -6,7 +6,6 @@ import java.util.List;
 import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.ReviewAvailableDTO;
-import com.goodpang.dto.ReviewItemDTO;
 import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
@@ -15,8 +14,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/review/available")
-public class ReviewAvailableServlet extends HttpServlet {
+@WebServlet("/review/written")
+public class ReviewWrittenServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
@@ -24,8 +23,7 @@ public class ReviewAvailableServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		MemberDTO loginMember =
-				LoginUtil.requireLogin(request, response);
+		MemberDTO loginMember = LoginUtil.requireLogin(request, response);
 
 		if (loginMember == null) {
 			return;
@@ -34,30 +32,20 @@ public class ReviewAvailableServlet extends HttpServlet {
 		int memberNo = loginMember.getMemberNo();
 
 		ReviewDAO reviewDAO = new ReviewDAO();
+		List<ReviewAvailableDTO> reviewList = reviewDAO.getReviewStatus(memberNo);
 
-		List<ReviewAvailableDTO> reviewList =
-				reviewDAO.getReviewStatus(memberNo);
-
-		int availableCount = 0;
 		int writtenCount = 0;
 
 		for (ReviewAvailableDTO review : reviewList) {
-
 			if (review.isReviewWritten()) {
 				writtenCount++;
-			} else {
-				availableCount++;
 			}
-
 		}
 
 		request.setAttribute("reviewList", reviewList);
-		
-		request.setAttribute("availableCount", availableCount);
-		
 		request.setAttribute("writtenCount", writtenCount);
 
-		request.getRequestDispatcher("/review_available.jsp")
+		request.getRequestDispatcher("/review_written.jsp")
 		.forward(request, response);
 	}
 }

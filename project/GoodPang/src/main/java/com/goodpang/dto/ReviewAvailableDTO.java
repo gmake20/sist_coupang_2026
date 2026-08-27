@@ -1,5 +1,7 @@
 package com.goodpang.dto;
 
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +13,10 @@ public class ReviewAvailableDTO {
     private int productNo;
     private String productName;
     private boolean reviewWritten;
+    
+    private String productImage;
+    private Date orderDate;
+    private Date deliveryDate;
 
     public boolean isReviewWritten() {
         return reviewWritten;
