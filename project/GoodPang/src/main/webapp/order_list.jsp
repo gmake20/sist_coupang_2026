@@ -34,7 +34,7 @@
 <body>
 	<jsp:include page="/inc/header.jsp" />
 	<script src="${pageContext.request.contextPath}/js/header.js"></script>
-	
+
 	<div class="category-layer" id="wa-pc-category"></div>
 
 	<!-- =========================
@@ -81,8 +81,7 @@
 			<div class="side-help">
 				<a href="#"> <span class="help-icon">📝</span> <span>쿠팡문의</span>
 				</a> <a href="#"> <span class="help-icon">📢</span> <span>고객의
-						소리<br>
-					<small>제안·칭찬·불편신고</small>
+						소리<br> <small>제안·칭찬·불편신고</small>
 				</span>
 				</a> <a href="#"> <span class="help-icon">📦</span> <span>취소/반품
 						안내</span>
@@ -183,22 +182,26 @@
 												<fmt:formatNumber value="${item.totalPrice}" pattern="#,###" />
 												원 <span>·</span> ${item.quantity}개
 											</div>
-										<c:if test="${not empty item.option1Value or not empty item.option2Value}">
-                <div class="product-option" style="font-size: 12px; color: #666; margin-top: 4px;">
-                    <span>옵션: </span>
-                    <c:if test="${not empty item.option1Value}">
-                        <c:if test="${not empty item.option1Type}">${item.option1Type}: </c:if>${item.option1Value}
-                    </c:if>
-                    <c:if test="${not empty item.option1Value and not empty item.option2Value}"> / </c:if>
-                    <c:if test="${not empty item.option2Value}">
-                        <c:if test="${not empty item.option2Type}">${item.option2Type}: </c:if>${item.option2Value}
-                    </c:if>
-                </div>
-            </c:if>
-        </div> <!-- // .product-info 닫기 -->
-        </div>
-        
-									
+											<c:if
+												test="${not empty item.option1Value or not empty item.option2Value}">
+												<div class="product-option"
+													style="font-size: 12px; color: #666; margin-top: 4px;">
+													<span>옵션: </span>
+													<c:if test="${not empty item.option1Value}">
+														<c:if test="${not empty item.option1Type}">${item.option1Type}: </c:if>${item.option1Value}
+                    								</c:if>
+													<c:if
+														test="${not empty item.option1Value and not empty item.option2Value}"> / </c:if>
+													<c:if test="${not empty item.option2Value}">
+														<c:if test="${not empty item.option2Type}">${item.option2Type}: </c:if>${item.option2Value}
+                    								</c:if>
+												</div>
+											</c:if>
+										</div>
+										<!-- // .product-info 닫기 -->
+									</div>
+
+
 									<!-- 3종 하단 액션 버튼 그룹 -->
 									<div class="delivery-buttons"
 										style="display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
@@ -210,18 +213,41 @@
 											onclick="location.href='${pageContext.request.contextPath}/order/claim?orderNo=${item.orderNo}'"
 											style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
 											교환, 반품 신청</button>
-										<button type="button" class="delivery-btn btn-action"
-											onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${item.orderDetailNo}&productNo=${item.productNo}'"
-											style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-											리뷰 작성하기</button>
+
+										<%-- ========================================
+								         현재 상품의 리뷰 작성 여부 확인
+								         ======================================== --%>
+										<c:set var="isReviewWritten" value="false" />
+										<c:forEach var="review" items="${reviewList}">
+											<c:if
+												test="${review.orderDetailNo eq item.orderDetailNo
+                     								and review.reviewWritten}">
+												<c:set var="isReviewWritten" value="true" />
+											</c:if>
+										</c:forEach>
+										<%-- 리뷰 버튼 --%>
+										<c:choose>
+											<%-- 이미 리뷰를 작성한 상품 --%>
+											<c:when test="${isReviewWritten}">
+												<button type="button" class="delivery-btn btn-action"
+													onclick="location.href='${pageContext.request.contextPath}/review/available'"
+													style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
+													작성한 리뷰 보기</button>
+											</c:when>
+											<%-- 아직 리뷰를 작성하지 않은 상품 --%>
+											<c:otherwise>
+												<button type="button" class="delivery-btn btn-action"
+													onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${item.orderDetailNo}&productNo=${item.productNo}'"
+													style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
+													리뷰 작성하기</button>
+											</c:otherwise>
+										</c:choose>
 									</div>
 								</div>
-
 							</section>
-
 						</c:forEach>
 					</c:when>
-					
+
 					<c:otherwise>
 						<div class="empty-order-container"
 							style="text-align: center; padding: 60px 0;">
