@@ -204,6 +204,9 @@
       <section class="panel detail-section">
         <h2>옵션 목록 (${fn:length(product.options)}개)</h2>
 
+        <p class="sub">기본 상품가격: <strong><fmt:formatNumber value="${product.productPrice}" pattern="#,##0" />원</strong>
+          (옵션 판매가는 이 기본가에 더해지는 가감액이며, 최종가 = 기본가 + 옵션 판매가입니다.)</p>
+
         <c:choose>
           <c:when test="${empty product.options}">
             <p class="desc-empty">등록된 옵션이 없습니다.</p>
@@ -216,7 +219,8 @@
                     <th>이미지</th>
                     <th>옵션</th>
                     <th>정상가</th>
-                    <th>판매가</th>
+                    <th>판매가(가감액)</th>
+                    <th>최종가</th>
                     <th>재고</th>
                     <th>판매자상품코드</th>
                     <th>모델번호</th>
@@ -248,7 +252,8 @@
                           <c:otherwise>-</c:otherwise>
                         </c:choose>
                       </td>
-                      <td><fmt:formatNumber value="${option.price}" pattern="#,##0" />원</td>
+                      <td>${option.price > 0 ? '+' : ''}<fmt:formatNumber value="${option.price}" pattern="#,##0" />원</td>
+                      <td><fmt:formatNumber value="${product.productPrice + option.price}" pattern="#,##0" />원</td>
                       <td>${option.quantity}</td>
                       <td>${not empty option.sellerProductCode ? option.sellerProductCode : '-'}</td>
                       <td>${not empty option.modelNo ? option.modelNo : '-'}</td>

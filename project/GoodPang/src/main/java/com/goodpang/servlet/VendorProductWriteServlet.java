@@ -10,6 +10,7 @@ import com.goodpang.dao.ProductWriteDAO;
 import com.goodpang.dto.ProductOptionWriteDTO;
 import com.goodpang.dto.ProductWriteDTO;
 import com.goodpang.dto.SellerDTO;
+import com.goodpang.util.UploadPaths;
 import com.google.gson.Gson;
 
 import jakarta.servlet.ServletException;
@@ -72,6 +73,10 @@ public class VendorProductWriteServlet extends HttpServlet {
 				writeJson(response, 400, new Result(false, "노출상품명을 입력해주세요.", 0));
 				return;
 			}
+			if (dto.getProductPrice() <= 0) {
+				writeJson(response, 400, new Result(false, "기본 상품가격을 입력해주세요.", 0));
+				return;
+			}
 			if (dto.getOptions().isEmpty()) {
 				writeJson(response, 400, new Result(false, "옵션을 최소 1개 이상 추가해주세요.", 0));
 				return;
@@ -106,6 +111,7 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		dto.setSellerNo(loginSeller.getSellerNo());
 		dto.setSubCategoryNo(Integer.parseInt(request.getParameter("categoryNo")));
+		dto.setProductPrice(parseIntOrZero(request.getParameter("productPrice")));
 
 		dto.setSaleMethod("판매자배송");
 
@@ -215,7 +221,7 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		String savedName = UUID.randomUUID() + ext;
 
-		String uploadDir = getServletContext().getRealPath("/upload/" + sellerNo);
+		String uploadDir = UploadPaths.resolveBaseDir(getServletContext()) + "/" + sellerNo;
 		File uploadDirFile = new File(uploadDir);
 
 		if (!uploadDirFile.exists()) {

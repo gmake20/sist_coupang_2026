@@ -22,6 +22,7 @@ public class ProductWriteDTO {
     private String noBrandYn;
     private String productName;
     private String internalName;
+    private int productPrice;
 
     private String manufacturer;
     private String compositionType;
