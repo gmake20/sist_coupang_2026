@@ -39,8 +39,26 @@ public class VendorProductServlet extends HttpServlet {
 				? productListDAO.findHiddenBySellerNo(loginSeller.getSellerNo())
 				: productListDAO.findBySellerNo(loginSeller.getSellerNo());
 
+		int saleCount = 0;
+		int soldOutCount = 0;
+		int stoppedCount = 0;
+		int pendingCount = 0;
+
+		for (VendorProductListDTO product : productList) {
+			switch (product.getSaleStatus()) {
+				case "판매 중" -> saleCount++;
+				case "품절" -> soldOutCount++;
+				case "판매 중지" -> stoppedCount++;
+				case "승인 대기" -> pendingCount++;
+			}
+		}
+
 		request.setAttribute("productList", productList);
 		request.setAttribute("hiddenView", hiddenView);
+		request.setAttribute("saleCount", saleCount);
+		request.setAttribute("soldOutCount", soldOutCount);
+		request.setAttribute("stoppedCount", stoppedCount);
+		request.setAttribute("pendingCount", pendingCount);
 
 		request.getRequestDispatcher("/WEB-INF/views/vendor-product.jsp").forward(request, response);
 	}

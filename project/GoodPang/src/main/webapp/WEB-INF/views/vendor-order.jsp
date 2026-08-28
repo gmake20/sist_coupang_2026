@@ -248,7 +248,7 @@
                           </div>
                         </td>
                         <td class="col-price">
-                          <p class="price"><fmt:formatNumber value="${order.price}" pattern="#,##0" />원</p>
+                          <p class="price"><fmt:formatNumber value="${order.price * order.orderQty}" pattern="#,##0" />원</p>
                         </td>
                         <td class="col-status"><span class="status-badge">${order.orderStatus}</span></td>
                         <td class="col-date">

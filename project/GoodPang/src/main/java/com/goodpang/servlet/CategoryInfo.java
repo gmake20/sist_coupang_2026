@@ -52,6 +52,8 @@ public class CategoryInfo extends HttpServlet {
 				CONNECT BY PRIOR category_no = parent_category_no
 				       AND LEVEL <= 3
 				ORDER SIBLINGS BY category_no
+				
+				
 				""";
 
 		List<CategoryDTO> categoryList = new ArrayList<>();
