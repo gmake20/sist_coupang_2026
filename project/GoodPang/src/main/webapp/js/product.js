@@ -10,8 +10,12 @@
 
 
 /* ── 1. 수량 + / - (+ 가격 연동) ──────────────────
-   최소 1개, 최대 10개로 제한.
-   1일 때는 - 버튼을 disabled 로 막음 (CSS 가 회색으로 흐리게 보여줌)
+   최소 1개, 최대는 "지금 고른 옵션의 남은 재고"만큼.
+   1일 때는 - 버튼을, 재고만큼 채웠으면 + 버튼을 disabled 로 막음 (CSS 가 회색으로 흐리게 보여줌)
+
+   ★ 2026-08-28 — 원래 MAX 가 20 으로 박혀 있었는데(CLAUDE.md 에 "DB 연동할 때 고치기"로 적혀있던 것),
+     이제 PRODUCT_OPTION.QUANTITY 가 옵션 JSON 에 같이 실려오므로 옵션마다 다른 재고를 쓸 수 있음.
+     옵션을 바꾸면 setupOptionSelect() 가 setStock() 을 불러서 최대값을 갈아끼움.
 
    ★ 2026-08-21 추가 — 수량을 바꾸면 위 가격(.total-price)도 같이 바뀌게 함.
      원래 이름이 "total-price" 인데 실제로는 "단가"만 찍혀있어서 이름값을 못 했음.
@@ -19,8 +23,7 @@
 
      단가는 .total-price 의 data-unit-price 에서 읽음 (예: "19900").
      화면 글자(예: "19,900원")를 다시 파싱하면 두 번째 클릭부터
-     "39,800원" 을 단가로 잘못 읽는 사고가 나서, 원래 값을 data 속성에 따로 저장해둠.
-     ▶JSP 로 가면: <strong class="total-price" data-unit-price="${p.price}">${p.priceText}</strong> */
+     "39,800원" 을 단가로 잘못 읽는 사고가 나서, 원래 값을 data 속성에 따로 저장해둠. */
 function setupQuantity() {
   const box = document.querySelector('.product-quantity');
   if (!box) return;                     // 이 페이지에 수량박스가 없으면 아무것도 안 함
@@ -31,9 +34,10 @@ function setupQuantity() {
   const priceEl = document.querySelector('.total-price');
   const unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
 
-  //여기 재고수량에 맞게 수정해야함
   const MIN = 1;
-  const MAX = 20;
+  /* 옵션이 없는 상품(재고 정보가 안 내려오는 경우)을 위한 기본값.
+     옵션이 있으면 페이지가 열릴 때 setStock() 이 진짜 재고로 덮어씀 */
+  let max = 20;
 
   /* 화면에 숫자를 다시 그리고, 버튼을 켤지 끌지 정하는 함수.
      "값을 바꾸는 곳"과 "화면을 고치는 곳"을 한 군데로 모아두면
@@ -41,7 +45,7 @@ function setupQuantity() {
   function render(n) {
     input.value = n;
     minus.disabled = (n <= MIN);
-    plus.disabled  = (n >= MAX);
+    plus.disabled  = (n >= max);
 
     /* 품절이면 가격을 안 건드림 — CSS 가 이미 회색으로 처리하고 있고,
        0원으로 다시 그리면 "품절인데 원가는 남아있는" 원본 화면과 달라짐 */
@@ -57,40 +61,50 @@ function setupQuantity() {
 
   plus.addEventListener('click', function () {
     const n = Number(input.value) + 1;
-    if (n <= MAX) render(n);
+    if (n <= max) render(n);
   });
 
   render(Number(input.value) || MIN);    // 페이지가 열릴 때 버튼 상태를 한 번 맞춰둠
+
+  /* 옵션이 바뀔 때마다 setupOptionSelect() 가 이 함수를 불러줌.
+     지금 담아둔 수량이 새 재고보다 많으면 재고만큼으로 줄임
+     (예: 10개 담아뒀는데 재고 3개짜리 옵션으로 바꾸면 3으로) */
+  return function setStock(stock) {
+    max = Math.max(stock, MIN);          // 재고 0 이어도 max 는 1 — 품절 처리는 updateFromSelects 가 따로 함
+    const now = Number(input.value) || MIN;
+    render(Math.min(now, max));
+  };
 }
 
 
 /* ── 2. 썸네일 → 큰 이미지 ───────────────────────
    썸네일을 누르면 ① 파란 테두리가 그쪽으로 옮겨가고 ② 큰 이미지가 그 사진으로 바뀜.
-   사진은 images/product-detail/photo-1~3.jpg (2026-08-20 부터 실제 사진)
-   ※ images/products/ 는 메인페이지 상품카드 전용이라 여기서 쓰지 않음 */
+
+   2026-08-28: li 하나하나에 클릭을 붙이는 대신 목록(ul) 하나에만 붙이는 방식(이벤트 위임)으로 바꿈 —
+   옵션 드롭박스(사이즈/색상 등)를 바꾸면 setupOptionSelect() 가 이 목록의 li 들을 통째로 새로 그리는데,
+   li 마다 붙여둔 클릭은 새로 그려지면 사라지지만 ul 에 붙여둔 클릭은 안 사라지기 때문. */
 function setupThumbs() {
   const list = document.querySelector('.product-image__thumbs');
   if (!list) return;
 
-  const items = list.querySelectorAll('li');
+  list.addEventListener('click', function (e) {
+    const li = e.target.closest('li');
+    if (!li || !list.contains(li)) return;
 
-  items.forEach(function (li) {
-    li.addEventListener('click', function (e) {
-      e.preventDefault();               // <a href="#"> 때문에 맨 위로 튀는 것 방지
+    e.preventDefault();                 // <a href="#"> 때문에 맨 위로 튀는 것 방지
 
-      /* 파란 테두리(.is-on)를 전부 떼고, 누른 것에만 다시 붙임.
-         "하나만 켜기"는 전부 끄고 → 하나 켜기 순서가 제일 간단함 */
-      items.forEach(function (other) {
-        other.classList.remove('is-on');
-      });
-      li.classList.add('is-on');
-
-      /* 누른 썸네일의 사진을 큰 이미지 자리에 그대로 넣음.
-         썸네일(1000x1000)과 큰 이미지가 같은 파일이라 새로 받아올 게 없어 즉시 바뀜 */
-      const main = document.querySelector('.product-image__main img');
-      const picked = li.querySelector('img');
-      if (main && picked) main.src = picked.src;
+    /* 파란 테두리(.is-on)를 전부 떼고, 누른 것에만 다시 붙임.
+       "하나만 켜기"는 전부 끄고 → 하나 켜기 순서가 제일 간단함 */
+    list.querySelectorAll('li').forEach(function (other) {
+      other.classList.remove('is-on');
     });
+    li.classList.add('is-on');
+
+    /* 누른 썸네일의 사진을 큰 이미지 자리에 그대로 넣음.
+       썸네일과 큰 이미지가 같은 파일이라 새로 받아올 게 없어 즉시 바뀜 */
+    const main = document.querySelector('.product-image__main img');
+    const picked = li.querySelector('img');
+    if (main && picked) main.src = picked.src;
   });
 }
 
@@ -137,78 +151,186 @@ function setupAdSlider() {
 }
 
 
-/* ── 4. 색상 고르기 ─────────────────────────────
-   색상 칩을 누르면 ① 파란 테두리가 그쪽으로 옮겨가고
-   ② 위 라벨("색상: 화이트")이 바뀌고
-   ③ (2026-08-24 추가) 큰 사진도 그 색상으로 바뀜.
+/* ── 4. 옵션 고르기 ─────────────────────────────
+   2026-08-28(3차): "1번 축은 드롭박스, 2번째 이후 축은 사진 있으면 칩(원본이 그랬음), 없으면 드롭박스".
+   상품 29번(사이즈×색상)으로 확인해보니 ① 하나로 합친 드롭박스는 색상이 텍스트 속에 묻히고,
+   ② 두 축을 그냥 다 드롭박스로 하면 원본에 있던 "색상 사진 칩" UI가 사라짐 — 그래서 이렇게 정리함.
 
-   ★ 왜 "화이트만" 제대로 된 사진 세트인가:
-     처음에 받아둔 사진이 photo-1~3(1000x1000, 화이트 한 벌을 여러 각도로 찍은 것) 뿐이고
-     네이비·블랙은 옵션칩 사진(option-1/2, 200x200, 색상당 1장)밖에 없음.
-     그래서 네이비/블랙을 고르면:
-       - 큰 사진과 첫 썸네일을 그 칩 사진(option-N.jpg)으로 바꾸고
-       - 나머지 썸네일 2장은 숨김 (화이트 각도별 사진이라 색이 안 맞음)
-     화이트로 돌아오면 원래 photo-1~3 세 장으로 복귀.
+   #productOptionsData 에 "조합 하나(OPTION_ID) = 객체 하나" 형태의 JSON 이 들어있음.
+   ProductServlet 이 ProductOptionDTO 리스트를 Gson 으로 그대로 바꾼 것이라 이름이 DB 컬럼과 같음:
+   {optionId:69, option1Type:'사이즈', option1Value:'M', option2Type:'색상', option2Value:'Black',
+    images:[{imageUrl:'upload/5/....jpg', imagePurpose:'대표', ...}, ...]}
 
-   ★ 썸네일 "줄" 자체는 절대 숨기지 말 것 —
-     처음엔 통째로 display:none 으로 했는데, 그 70px 자리가 사라지면서
-     큰 사진이 600 → 680 으로 커져 화면이 덜컹 움직였음(실측). 칸은 남기고 안쪽만 비우는 게 맞음.
+   ★ 칩 사진은 "그 값 하나"의 사진이 아니라 "조합 하나(OPTION_ID)"에 딸려있음 — 예를 들어
+     색상 칩 하나에 보여줄 사진은 (지금 고른 사이즈 + 이 색상) 조합의 사진을 씀. 사이즈를 바꾸면
+     색상 칩 사진도 그 사이즈 기준으로 다시 그림(refreshChipThumbnails) */
+function setupOptionSelect(setStock) {
+  const dataEl = document.getElementById('productOptionsData');
+  const box = document.getElementById('fashionOption');
+  if (!dataEl || !box) return;
 
-   ▶JSP: 옵션(itemId)마다 사진 배열이 DB에 따로 있으면 이 분기 자체가 필요없어짐 —
-     ${item.images} 를 그대로 큰사진+썸네일에 채우면 됨. */
-function setupColorChips() {
-  const list = document.querySelector('.option-chips');
-  if (!list) return;
+  const combos = JSON.parse(dataEl.textContent);
+  if (!combos.length) return;
 
-  const chips    = list.querySelectorAll('li');
-  const label    = document.querySelector('.option-value');
-  const mainImg  = document.querySelector('.product-image__main img');
-  const thumbBox = document.querySelector('.product-image__thumbs');
-  const thumbs   = thumbBox ? Array.from(thumbBox.querySelectorAll('li')) : [];
-
-  /* 원래 썸네일 3장의 주소를 미리 적어둠 — 화이트로 돌아올 때 되돌리려면 필요함.
-     (한 번 src 를 바꿔버리면 원래 값이 사라지므로 시작할 때 챙겨두는 것) */
-  const whiteSrcs = thumbs.map(function (li) {
-    const img = li.querySelector('img');
-    return img ? img.src : '';
-  });
-
-  chips.forEach(function (li) {
-    li.addEventListener('click', function (e) {
-      e.preventDefault();
-
-      chips.forEach(function (other) { other.classList.remove('is-on'); });
-      li.classList.add('is-on');
-
-      const color   = li.dataset.color;
-      const chipImg = li.querySelector('img');
-      if (label && color) label.textContent = color;
-
-      /* 장바구니/바로구매 폼의 hidden input 에도 같이 반영 (2026-08-24).
-         아래 mainImg/chipImg 체크보다 위에 두는 이유: 그 체크에 걸려 함수가
-         일찍 끝나도 색상 값은 항상 갱신되게 하려는 것 */
-      const colorInput = document.getElementById('selectedColor');
-      if (colorInput && color) colorInput.value = color;
-
-      if (!mainImg || !chipImg || !thumbs.length) return;
-
-      const isWhite = (color === '화이트');
-
-      thumbs.forEach(function (t, i) {
-        const img = t.querySelector('img');
-        if (i === 0) {
-          if (img) img.src = isWhite ? whiteSrcs[0] : chipImg.src;
-        } else {
-          /* 사진이 1장뿐인 색상에서는 2·3번째 썸네일을 감춤 */
-          t.classList.toggle('is-hidden', !isWhite);
-          if (img && isWhite) img.src = whiteSrcs[i];
-        }
-        t.classList.toggle('is-on', i === 0);
-      });
-
-      mainImg.src = thumbs[0].querySelector('img').src;
+  /* DB 의 IMAGE_URL 은 "upload/5/xxx.jpg" 처럼 앞부분이 없어서 톰캣 주소(contextPath)를 붙여야 함.
+     여기서 한 번에 "바로 쓸 수 있는 주소 배열"로 바꿔두면 아래 코드가 단순해짐 */
+  const contextPath = dataEl.dataset.contextPath || '';
+  combos.forEach(function (c) {
+    c.imageUrls = (c.images || []).map(function (img) {
+      return contextPath + '/' + img.imageUrl;
     });
   });
+
+  // 이 상품이 실제로 쓰는 축 목록. option1 은 항상 있고, option2/option3 는 있을 때만
+  const axes = [];
+  [1, 2, 3].forEach(function (n) {
+    if (combos[0]['option' + n + 'Type']) {
+      axes.push({ key: 'option' + n + 'Value', type: combos[0]['option' + n + 'Type'] });
+    }
+  });
+
+  // 이 상품에 사진이 하나라도 딸린 조합이 있는지 — 2번째 이후 축을 칩으로 할지 드롭박스로 할지 판단 기준
+  const anyImages = combos.some(function (c) { return c.imageUrls.length; });
+
+  const optionIdInput = document.getElementById('selectedOptionId');
+  const colorInput    = document.getElementById('selectedColor');
+  const thumbBox      = document.querySelector('.product-image__thumbs');
+  const mainImg       = document.querySelector('.product-image__main img');
+
+  const controls = [];   // { axisKey, getValue(), root, chipList(옵션) }
+
+  // 지금 각 축에서 고른 값과 정확히 일치하는 조합(OPTION_ID)을 찾음
+  function findPickedCombo() {
+    return combos.find(function (c) {
+      return controls.every(function (ctl) { return c[ctl.axisKey] === ctl.getValue(); });
+    });
+  }
+
+  // 칩 축의 사진들을 "지금 다른 축에서 고른 값"기준으로 다시 그림 (사이즈 바꾸면 색상칩 사진도 갱신)
+  function refreshChipThumbnails(chipControl) {
+    chipControl.root.querySelectorAll('li').forEach(function (li) {
+      const testCombo = combos.find(function (c) {
+        if (c[chipControl.axisKey] !== li.dataset.value) return false;
+        return controls.every(function (other) {
+          return other === chipControl || c[other.axisKey] === other.getValue();
+        });
+      });
+      const img = li.querySelector('img');
+      if (img && testCombo && testCombo.imageUrls.length) img.src = testCombo.imageUrls[0];
+    });
+  }
+
+  function updateFromSelects() {
+    controls.forEach(function (ctl) { if (ctl.chipList) refreshChipThumbnails(ctl); });
+
+    const picked = findPickedCombo();
+    if (!picked) return;   // 이론상 항상 찾아져야 함(모든 조합이 다 있다고 가정) — 방어코드
+
+    if (optionIdInput) optionIdInput.value = picked.optionId;
+    if (colorInput) {
+      // 원래 "색상"만 담던 자리인데, 지금은 고른 값들을 다 이어붙여서 담음 (예: "M / Black")
+      colorInput.value = controls.map(function (ctl) { return ctl.getValue(); }).join(' / ');
+    }
+
+    /* 재고/품절 — 옵션마다 재고가 다르므로 고를 때마다 다시 판단.
+       STATUS 가 'N'(판매중지)이거나 재고가 0이면 품절로 봄 */
+    const soldout = (picked.quantity <= 0) || (picked.status === 'N');
+    document.body.classList.toggle('is-soldout', soldout);
+    if (setStock) setStock(picked.quantity);
+
+    if (!picked.imageUrls.length || !thumbBox || !mainImg) return;
+
+    thumbBox.innerHTML = picked.imageUrls.map(function (url, i) {
+      return '<li class="' + (i === 0 ? 'is-on' : '') + '">'
+           +   '<a href="#"><img src="' + url + '" alt=""></a>'
+           + '</li>';
+    }).join('');
+
+    mainImg.src = picked.imageUrls[0];
+  }
+
+  axes.forEach(function (axis, axisIndex) {
+    // 이 축에서 실제로 쓰인 값만 중복 없이 뽑음 (등장한 순서 그대로 유지)
+    const values = [];
+    combos.forEach(function (c) {
+      if (c[axis.key] && values.indexOf(c[axis.key]) === -1) values.push(c[axis.key]);
+    });
+
+    const section = document.createElement('section');
+    section.className = 'option-row';
+
+    const useChips = axisIndex > 0 && anyImages;   // 1번 축은 무조건 드롭박스
+
+    if (useChips) {
+      const label = document.createElement('div');
+      label.innerHTML = axis.type + ': <span class="option-value">' + values[0] + '</span>';
+      label.className = 'option-label';
+      section.appendChild(label);
+
+      const ul = document.createElement('ul');
+      ul.className = 'option-chips';
+
+      values.forEach(function (v, i) {
+        const li = document.createElement('li');
+        li.dataset.value = v;
+        if (i === 0) li.classList.add('is-on');
+        li.innerHTML = '<a href="#"><img src="" alt="' + v + '"></a>';
+        li.addEventListener('click', function (e) {
+          e.preventDefault();
+          ul.querySelectorAll('li').forEach(function (o) { o.classList.remove('is-on'); });
+          li.classList.add('is-on');
+          const valueLabel = label.querySelector('.option-value');
+          if (valueLabel) valueLabel.textContent = v;
+          updateFromSelects();
+        });
+        ul.appendChild(li);
+      });
+
+      section.appendChild(ul);
+      box.appendChild(section);
+
+      controls.push({
+        axisKey: axis.key,
+        root: ul,
+        chipList: true,
+        getValue: function () {
+          const on = ul.querySelector('li.is-on');
+          return on ? on.dataset.value : values[0];
+        }
+      });
+
+    } else {
+      const label = document.createElement('div');
+      label.className = 'option-label';
+      label.textContent = axis.type;
+      section.appendChild(label);
+
+      const wrap = document.createElement('div');
+      wrap.className = 'option-select';
+
+      const select = document.createElement('select');
+      values.forEach(function (v) {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        select.appendChild(opt);
+      });
+      select.addEventListener('change', updateFromSelects);
+
+      wrap.appendChild(select);
+      section.appendChild(wrap);
+      box.appendChild(section);
+
+      controls.push({
+        axisKey: axis.key,
+        root: select,
+        chipList: false,
+        getValue: function () { return select.value; }
+      });
+    }
+  });
+
+  updateFromSelects();   // 페이지 처음 열렸을 때도 hidden input·칩 사진을 첫 조합 값으로 맞춰둠
 }
 
 
@@ -483,28 +605,22 @@ function setupDeliveryOption() {
 
 /* ── 7. 품절 상태 ───────────────────────────────
    <body class="page-product is-soldout"> 가 붙으면 화면이 품절 모습으로 바뀜.
-   (실제로 바꾸는 건 css/product.css 9장 — 여기서는 클래스만 붙이고 뗌)
+   (실제로 바꾸는 건 css/product.css 9장 — 클래스만 붙이고 뗌)
 
-   지금은 확인용으로 주소 뒤에 ?soldout=1 을 붙이면 켜지게 해둠.
-   ▶JSP 로 가면 이 함수는 필요 없음. <body> 태그에서 바로 정하면 됨:
-       <body class="page-product ${p.stock == 0 ? 'is-soldout' : ''}">
-     서버가 재고를 알고 있으니 화면을 켜고 끄는 데 JS 가 낄 이유가 없음 */
-function setupSoldout() {
-  const soldout = new URLSearchParams(location.search).get('soldout') === '1';
-  document.body.classList.toggle('is-soldout', soldout);
-
-  if (soldout) {
-    /* 수량을 0 으로 고정 — 원본도 품절이면 0 */
-    const input = document.querySelector('.qty-input');
-    if (input) input.value = 0;
-  }
-}
+   ★ 2026-08-28: 예전에 확인용으로 주소 뒤에 ?soldout=1 을 붙이면 켜지던 setupSoldout() 함수를 지웠음.
+     그 함수가 초기화 목록에서 setupOptionSelect() 보다 뒤에 실행되면서
+     classList.toggle('is-soldout', false) 로 방금 붙인 클래스를 도로 떼버려서,
+     "첫 화면에서는 품절이 안 뜨고 옵션을 눌러야 뜨는" 사고가 났음.
+     이제 품절 판정은 setupOptionSelect() 안의 updateFromSelects() 한 군데에서만 함
+     (그 옵션의 QUANTITY 가 0 이거나 STATUS 가 'N' 이면 품절). */
 
 
-setupQuantity();
+/* setupQuantity() 가 "재고를 바꾸는 함수"를 돌려주고, 그걸 setupOptionSelect() 에 넘겨줌 —
+   옵션을 고를 때마다 그 옵션의 재고로 수량 최대값이 바뀌게 하려는 것 (2026-08-28) */
+const setStock = setupQuantity();
 setupThumbs();
 setupAdSlider();
-setupColorChips();
+setupOptionSelect(setStock);
 setupReviewTools();
 setupDeliveryOption();
 /* ── 9. 리뷰 사진 갤러리 (2단 모달) ────────────────
@@ -687,5 +803,4 @@ function setupReviewGallery() {
 setupItemBriefMore();
 setupSurveyMore();
 setupTabSpy();
-setupSoldout();
 setupReviewGallery();
