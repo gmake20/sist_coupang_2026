@@ -1,17 +1,21 @@
 @charset "UTF-8";
 
 /* =========================================================
-   배송지 관리 전체 레이아웃
-   140 + 20 + 745 + 20 + 95 = 1020px
+   전체 배송지 관리 페이지
+   헤더 기준 폭: 1020px
+   왼쪽 메뉴 140px + 중앙 콘텐츠 880px
+   오른쪽 광고는 1020px 바깥에 배치
    ========================================================= */
 
 .addressbook-page {
-    width: 1025px;
+    position: relative;
+
+    width: 1020px;
     margin: 18px auto 90px;
 
     display: grid;
-    grid-template-columns: 140px 745px 95px;
-    column-gap: 20px;
+    grid-template-columns: 140px 880px;
+    column-gap: 0;
     align-items: start;
 
     color: #111;
@@ -19,19 +23,16 @@
     font-size: 13px;
 }
 
-/* 페이지 내부 box-sizing */
 .addressbook-page,
 .addressbook-page * {
     box-sizing: border-box;
 }
 
-/* 링크 */
 .addressbook-page a {
     color: inherit;
     text-decoration: none;
 }
 
-/* 버튼 */
 .addressbook-page button {
     font: inherit;
     cursor: pointer;
@@ -44,6 +45,7 @@
 
 .addressbook-page .left-menu {
     width: 140px;
+
     margin: 0;
     padding: 0;
 
@@ -54,6 +56,7 @@
 .addressbook-page .mypang-title {
     width: 100%;
     height: 52px;
+
     padding: 15px 14px;
 
     background: #2877bf;
@@ -119,7 +122,7 @@
    ========================================================= */
 
 .addressbook-page .content-area {
-    width: 745px;
+    width: 880px;
     min-width: 0;
 
     margin: 0;
@@ -132,7 +135,7 @@
    ========================================================= */
 
 .addressbook-page .benefit-bar {
-    width: 745px;
+    width: 880px;
     height: 52px;
 
     margin: 0 0 34px;
@@ -173,13 +176,13 @@
 
 /* =========================================================
    배송지 패널
-   중앙 745px
-   패널 715px
-   좌우 15px씩
+   중앙 880px
+   실제 패널 850px
+   좌우 15px
    ========================================================= */
 
 .addressbook-page .address-panel {
-    width: 715px;
+    width: 850px;
 
     margin: 0 auto;
     padding: 0;
@@ -265,6 +268,7 @@
     padding: 2px 6px;
 
     border-radius: 10px;
+
     background: #fff;
 
     font-size: 9px;
@@ -331,16 +335,17 @@
     justify-content: center;
 
     color: #999;
+
     font-size: 13px;
 }
 
 
 /* =========================================================
-   배송지 추가 버튼
+   배송지 추가
    ========================================================= */
 
 .addressbook-page .add-address {
-    width: 715px;
+    width: 850px;
     height: 44px;
 
     margin: 9px auto 0;
@@ -371,12 +376,15 @@
 
 
 /* =========================================================
-   오른쪽 배너
-   grid 3번째 열
+   오른쪽 광고
+   헤더 1020px 바깥쪽으로 배치
    ========================================================= */
 
 .addressbook-page .right-banner {
-    position: static;
+    position: absolute;
+
+    top: 0;
+    left: calc(100% + 20px);
 
     width: 95px;
 
@@ -446,6 +454,19 @@
 
 /* =========================================================
    반응형
+   광고까지 표시하려면 약 1150px 이상 필요
+   ========================================================= */
+
+@media (max-width: 1160px) {
+
+    .addressbook-page .right-banner {
+        display: none;
+    }
+}
+
+
+/* =========================================================
+   태블릿
    ========================================================= */
 
 @media (max-width: 1060px) {
@@ -456,7 +477,7 @@
         grid-template-columns:
             140px minmax(0, 1fr);
 
-        column-gap: 20px;
+        column-gap: 0;
     }
 
     .addressbook-page .content-area,
@@ -467,10 +488,6 @@
     .addressbook-page .address-panel,
     .addressbook-page .add-address {
         width: calc(100% - 30px);
-    }
-
-    .addressbook-page .right-banner {
-        display: none;
     }
 }
 
@@ -486,7 +503,7 @@
 
         width: calc(100% - 24px);
 
-        margin-top: 15px;
+        margin: 15px auto 60px;
     }
 
     .addressbook-page .left-menu {
@@ -501,6 +518,7 @@
     .addressbook-page .address-panel,
     .addressbook-page .add-address {
         width: 100%;
+
         margin-left: 0;
         margin-right: 0;
     }
