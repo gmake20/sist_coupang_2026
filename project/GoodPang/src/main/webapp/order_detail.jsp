@@ -280,7 +280,7 @@
 							<c:when test="${orderInfo.paymentMethod eq 'CARD'}">
 								${orderInfo.cardCompanyName} / 일시불
 								</c:when>
-							<c:when test="${orderInfo.paymentMethod eq 'BANK'}">
+							<c:when test="${orderInfo.paymentMethod eq 'BANK_TRANSFER'}">
 								${orderInfo.bankName} / 계좌이체
 								</c:when>
 							<c:otherwise>
@@ -307,7 +307,7 @@
 							<c:when test="${orderInfo.paymentMethod eq 'CARD'}">
 								${orderInfo.cardCompanyName} / 일시불
 								</c:when>
-							<c:when test="${orderInfo.paymentMethod eq 'BANK'}">
+							<c:when test="${orderInfo.paymentMethod eq 'BANK_TRANSFER'}">
 								${orderInfo.bankName} / 계좌이체
 								</c:when>
 							<c:otherwise>

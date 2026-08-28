@@ -101,7 +101,7 @@
 
 						<!-- 계좌이체 -->
 						<label class="pay-radio-row account-row"> <input
-							type="radio" name="paymentMethod" value="BANK" form="paymentForm"
+							type="radio" name="paymentMethod" value="BANK_TRANSFER" form="paymentForm"
 							checked> <span class="pay-title">계좌이체</span>
 						</label>
 
@@ -675,7 +675,7 @@ function changePaymentMethod(paymentMethod) {
 	const cardSetting = document.getElementById("cardSetting");
 	const cardCompany = document.getElementById("cardCompany");
 
-	if (paymentMethod === "BANK") {
+	if (paymentMethod === "BANK_TRANSFER") {
 		bankSetting.classList.remove("hidden");
 
 		if (bankCode) {
@@ -733,7 +733,7 @@ function validatePayment() {
 		return false;
 	}
 
-	if (paymentMethod.value === "BANK") {
+	if (paymentMethod.value === "BANK_TRANSFER") {
 
 		const bankCode =
 			document.getElementById("bankCode").value;
@@ -1155,7 +1155,7 @@ function addBankPaymentMethod() {
 
 	const bankRadio =
 		document.querySelector(
-			'input[name="paymentMethod"][value="BANK"]'
+			'input[name="paymentMethod"][value="BANK_TRANSFER"]'
 		);
 
 	if (bankRadio) {
