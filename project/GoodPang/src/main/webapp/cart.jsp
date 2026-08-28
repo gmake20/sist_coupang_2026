@@ -101,8 +101,10 @@
 							전체 선택 ( <span class="selected-count"> ${cartCount} </span> / <span
 							class="total-count"> ${cartCount} </span> )
 						</label>
+						
 						<button type="button" class="btn-action" id="btn-delete-selected">
 							선택삭제</button>
+							
 					</div>
 				</c:if>
 			</section>
@@ -171,7 +173,89 @@
 	
 	<script>
 	const contextPath = "${pageContext.request.contextPath}";
+	
+	const checkAll =
+	    document.getElementById("chk-all");
+
+	const itemCheckboxes =
+	    document.querySelectorAll(".item-chk");
+
+	if (checkAll) {
+
+	    checkAll.addEventListener(
+	        "change",
+	        function() {
+
+	            itemCheckboxes.forEach(
+	                function(item) {
+
+	                    item.checked =
+	                        checkAll.checked;
+	                }
+	            );
+
+	            updateSelectedCount();
+	        }
+	    );
+	}
+	
+	const deleteSelectedBtn =
+	    document.getElementById("btn-delete-selected");
+
+	if (deleteSelectedBtn) {
+
+	    deleteSelectedBtn.addEventListener(
+	        "click",
+	        function() {
+
+	            const checkedItems =
+	                document.querySelectorAll(
+	                    ".item-chk:checked"
+	                );
+
+	            if (checkedItems.length === 0) {
+	                alert("삭제할 상품을 선택해주세요.");
+	                return;
+	            }
+
+	            if (!confirm(
+	                    "선택한 상품을 삭제하시겠습니까?"
+	            )) {
+	                return;
+	            }
+
+	            const form =
+	                document.createElement("form");
+
+	            form.method = "post";
+	            form.action =
+	                contextPath
+	                + "/cart/delete-selected";
+
+	            checkedItems.forEach(
+	                function(item) {
+
+	                    const input =
+	                        document.createElement(
+	                            "input"
+	                        );
+
+	                    input.type = "hidden";
+	                    input.name = "optionId";
+	                    input.value = item.value;
+
+	                    form.appendChild(input);
+	                }
+	            );
+
+	            document.body.appendChild(form);
+
+	            form.submit();
+	        }
+	    );
+	}
 </script>
+
 
 	<script src="${pageContext.request.contextPath}/js/cart.js"></script>
 

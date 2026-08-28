@@ -401,4 +401,54 @@ public class CartDAO {
 
 		return 0;
 	}
+	
+	public int deleteSelected(
+	        int memberNo,
+	        int[] optionIds)
+	        throws Exception {
+
+	    String sql = """
+	            DELETE FROM CART
+	            WHERE MEMBER_NO = ?
+	              AND OPTION_ID = ?
+	            """;
+	    int deletedCount = 0;
+	    try (
+	        Connection conn =
+	                ConnectionProvider.getConnection();
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        try {
+	            conn.setAutoCommit(false);
+	            for (int optionId : optionIds) {
+	                pstmt.setInt(
+	                        1,
+	                        memberNo
+	                );
+	                pstmt.setInt(
+	                        2,
+	                        optionId
+	                );
+	                pstmt.addBatch();
+	            }
+	            int[] results =
+	                    pstmt.executeBatch();
+	            for (int result : results) {
+	                if (result > 0) {
+	                    deletedCount += result;
+	                }
+	            }
+	            conn.commit();
+	        } catch (Exception e) {
+	            conn.rollback();
+	            throw e;
+	        } finally {
+
+	            conn.setAutoCommit(true);
+	        }
+	    }
+	    return deletedCount;
+	}
 }
