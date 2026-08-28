@@ -32,27 +32,7 @@ public class CartAddServlet extends HttpServlet {
 
 		int optionId;
 		int quantity;
-
-		System.out.println(
-				"productNo = "
-						+ request.getParameter("productNo")
-				);
-
-		System.out.println(
-				"optionId = "
-						+ request.getParameter("optionId")
-				);
-
-		System.out.println(
-				"color = "
-						+ request.getParameter("color")
-				);
-
-		System.out.println(
-				"quantity = "
-						+ request.getParameter("quantity")
-				);
-
+		
 		try {
 
 			optionId =

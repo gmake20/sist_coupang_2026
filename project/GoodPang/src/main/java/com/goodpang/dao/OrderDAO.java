@@ -1063,16 +1063,6 @@ public class OrderDAO {
 		        }
 		    }
 
-
-		    System.out.println(
-		            "[DEBUG OrderDAO] orderNo = "
-		            + orderNo
-		            + ", paymentMethod = "
-		            + paymentMethod
-		            + ", paymentMethodNo = "
-		            + paymentMethodNo
-		    );
-
 		    return orderNo;
 		}
 	 
