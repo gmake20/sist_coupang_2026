@@ -34,8 +34,8 @@ public class OrderDetailDTO {
     private String phone;
     
     
+    // 포맷 관련 필드 추가
+    private String cardCompanyName;
+    private String bankName;
     
-    
-    
-   
 }

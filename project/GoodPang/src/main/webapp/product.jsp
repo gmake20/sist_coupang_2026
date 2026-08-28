@@ -154,9 +154,10 @@
 						</div>
 
 						<!-- 별점 + 리뷰수. 리뷰 영역으로 이동하는 링크(#reviews)
-                 ▶JSP: 별은 평점으로 계산, 숫자는 {p.reviewCount} -->
+                           2026-08-27: 유니코드 별(★★★★☆) → 리뷰 카드와 같은 스프라이트(.star-rating)로 통일.
+                 여기 별은 "이 리뷰 하나"가 아니라 "이 상품 전체 평균 평점"이라 avgRating(서버가 reviews 리스트로 계산해서 내려줌, ProductServlet)을 씀 -->
 						<div class="review-atf">
-							<span class="stars">★★★★☆</span> <a href="#reviews" class="count">(${reviewCount})</a>
+		              <span class="star-rating" aria-label="평점 ${avgRating}점"><em style="width:${avgRating * 20}%"></em></span> <a href="#reviews" class="count">(${reviewCount})</a>
 						</div>
 					</div>
 
@@ -744,7 +745,7 @@
                    (JSON-LD 의 ratingValue 4.2 / ratingCount 17 로 확인).
                    별 그림이 평점을, 숫자가 개수를 나타내는 구조 -->
 						<div class="review-score">
-							<span class="stars">★★★★☆</span> <strong>${reviewCount}</strong>
+							<span class="star-rating" aria-label="평점 ${avgRating}점"><em style="width:${avgRating * 20}%"></em></span> <strong>${reviewCount}</strong>
 						</div>
 
 						<!-- 별점 분포 막대
@@ -887,6 +888,11 @@
 	                    </div>
 	                </div>
 	            </div>
+	             <!-- 한줄요약(REVIEW.REVIEW_SUMMARY) — 2026-08-27 추가. 없는(NULL) 리뷰도 있어서
+                   있을 때만 보여줌. .review-headline 은 예전에 더미 리뷰에 있다가 DB 연동하면서 한 번 빠졌던 자리(js/product.js 354행 주석 참고) —그 자리 그대로 씀 -->
+              <c:if test="${not empty r.reviewSummary}">
+              <p class="review-headline">${r.reviewSummary}</p>
+              </c:if>
 	            <c:if test="${not empty r.productName}">
 	            <p class="review-option">${r.productName}<c:if test="${not empty r.optionText}"> · ${r.optionText}</c:if></p>
 	            </c:if>

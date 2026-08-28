@@ -72,6 +72,16 @@ public class ProductServlet extends HttpServlet {
                 List<ReviewDTO> reviews = reviewDAO.selectReviewsByProductNo(productNo);
                 request.setAttribute("reviews", reviews);
                 request.setAttribute("reviewCount", reviews.size());
+                // 평균 평점 — 2026-08-27: 별점 UI를 두 자리 다 스프라이트 이미지로 바꾸면서 필요해짐
+                // (review-atf/review-score 는 "리뷰 개별 별점"이 아니라 "상품 전체 평균 별점"을 보여주는 자리라
+                //  이미 읽어온 reviews 리스트에서 바로 평균을 냄 — DB 를 한 번 더 조회할 필요 없음)
+                double avgRating = 0;
+                if (!reviews.isEmpty()) {
+                    int sum = 0;
+                    for (ReviewDTO r : reviews) sum += r.getRating();
+                    avgRating = Math.round((double) sum / reviews.size() * 10) / 10.0;   // 소수 첫째자리까지
+                }
+                request.setAttribute("avgRating", avgRating);
             }
 
         } catch (NumberFormatException e) {

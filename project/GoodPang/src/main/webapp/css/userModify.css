@@ -43,7 +43,7 @@
 ========================================================= */
 
 .user-modify-layout {
-    width: 1140px;
+    width: 1025px;
     margin: 0 auto;
     display: flex;
     align-items: flex-start;
@@ -51,11 +51,20 @@
 }
 
 .member-container {
-    width: 980px;
+    width: 890px;
+    flex: 0 0 890px;
     min-height: 760px;
     padding: 50px 50px 42px;
     background: #fff;
     border: 1px solid #cfcfcf;
+}
+
+.right-banner {
+    width: 102px;
+    flex: 0 0 102px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .member-title {
@@ -187,30 +196,48 @@
 }
 
 .password-form {
-    width: 380px;
+    width: 100%;
+    max-width: 600px;
 }
 
 .password-input-row {
-    height: 33px;
-    display: flex;
+    min-height: 36px;
+    display: grid;
+    grid-template-columns: 102px 160px minmax(0, 1fr);
     align-items: center;
+    column-gap: 10px;
 }
 
 .password-input-row label {
-    width: 102px;
-    flex: 0 0 102px;
+    width: auto;
     color: #777;
     font-size: 12px;
+    white-space: nowrap;
 }
 
 .password-input-row input {
-    width: 140px;
-    height: 24px;
-    padding: 3px 6px;
+    width: 160px;
+    height: 28px;
+    padding: 3px 7px;
+    border: 1px solid #c9c9c9;
+    background: #fff;
+    outline: none;
+}
+
+.password-input-row input:focus {
+    border-color: #0073e9;
+}
+
+.password-guide {
+    margin: 0;
+    color: #8a8f98;
+    font-size: 11px;
+    line-height: 1.35;
+    white-space: nowrap;
 }
 
 .password-button-row {
-    margin: 12px 0 0 102px;
+    margin: 12px 0 0 112px;
 }
 
 /* =========================================================

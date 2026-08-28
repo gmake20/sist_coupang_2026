@@ -13,35 +13,36 @@ public class ProductDAO {
     public ProductDTO selectProduct(int productNo) {
 
         String sql = """
-        	    SELECT
-        	        P.PRODUCT_NO,
-        	        P.PRODUCT_NAME,
-        	        P.PRODUCT_DESC,
-        	        P.PRODUCT_PRICE,
-        	        P.QUANTITY,
-        	        P.SELLER_NO,
-        	        S.STORE_NAME,
-        	        S.CEO_NAME,
-        	        S.BUSINESS_ADDRESS,
-        	        S.BUSINESS_DETAIL_ADDRESS,
-        	        S.EMAIL,
-        	        S.PHONE,
-        	        S.MAIL_ORDER_NO,
-        	        S.BUSINESS_NO,
-        	        P.SUB_CATEGORY_NO,
-        	        SC.SUB_CATEGORY_NAME,
-        	        MC.MID_CATEGORY_NAME,
-        	        MAINC.MAIN_CATEGORY_NAME
-        	    FROM PRODUCT P
-        	    JOIN SELLER S
-        	        ON P.SELLER_NO = S.SELLER_NO
-        	    JOIN SUB_CATEGORY SC
-        	        ON P.SUB_CATEGORY_NO = SC.SUB_CATEGORY_NO
-        	    JOIN MID_CATEGORY MC
-        	        ON SC.MID_CATEGORY_NO = MC.MID_CATEGORY_NO
-        	    JOIN MAIN_CATEGORY MAINC
-        	        ON MC.MAIN_CATEGORY_NO = MAINC.MAIN_CATEGORY_NO
-        	    WHERE P.PRODUCT_NO = ?
+ 
+SELECT
+    P.PRODUCT_NO,
+    P.PRODUCT_NAME,
+    P.PRODUCT_DESC,
+    P.PRODUCT_PRICE,
+    P.QUANTITY,
+    P.SELLER_NO,
+    S.STORE_NAME,
+    S.CEO_NAME,
+    S.BUSINESS_ADDRESS,
+    S.BUSINESS_DETAIL_ADDRESS,
+    S.EMAIL,
+    S.PHONE,
+    S.MAIL_ORDER_NO,
+    S.BUSINESS_NO,
+    P.SUB_CATEGORY_NO,
+    SC.CATEGORY_NAME    AS SUB_CATEGORY_NAME,
+    MC.CATEGORY_NAME    AS MID_CATEGORY_NAME,
+    MAINC.CATEGORY_NAME AS MAIN_CATEGORY_NAME
+FROM PRODUCT P
+JOIN SELLER S
+    ON P.SELLER_NO = S.SELLER_NO
+JOIN CATEGORY SC
+    ON P.SUB_CATEGORY_NO = SC.CATEGORY_NO        
+JOIN CATEGORY MC
+    ON SC.PARENT_CATEGORY_NO = MC.CATEGORY_NO   
+JOIN CATEGORY MAINC
+    ON MC.PARENT_CATEGORY_NO = MAINC.CATEGORY_NO 
+WHERE P.PRODUCT_NO = ?
         	    """;
         
         try (
