@@ -19,6 +19,13 @@
 | `/admin/products` | GET | `AdminProductListServlet` | `admin-product-list.jsp` | 상품 목록 조회 ('승인 대기' 상품이 위로 정렬됨) |
 | `/admin/product-approve` | POST | `AdminProductApprovalServlet` | - | 상품 승인/반려 처리 (`action=approve`→`판매 중`, `action=reject`→`판매 중지`) |
 
+## 배송 관련
+
+| URL | Method | 서블릿 | View | 설명 |
+|---|---|---|---|---|
+| `/admin/deliveries` | GET | `AdminDeliveryListServlet` | `admin-delivery-list.jsp` | 배송중(`DELIVERY_STATUS='배송중'`)인 상품 목록 조회 |
+| `/admin/delivery-complete` | POST | `AdminDeliveryCompleteServlet` | - | 배송완료 처리 — `DELIVERY.DELIVERY_STATUS`를 `배송완료`로, `DELIVERY_END_DATE`를 `SYSDATE`로, `ORDERS.ORDER_STATUS`도 `배송완료`로 함께 갱신 |
+
 ### 상품 승인/반려 관련 스키마 제약
 
 `PRODUCT.SALE_STATUS`는 CHECK 제약상 `'판매 중'/'품절'/'판매 중지'/'승인 대기'`만 허용되고, 판매자(`SELLER`)와 달리 별도의 `'반려'` 상태값이나 반려사유 컬럼(`REJECT_REASON`)이 없습니다. 그래서 상품 "반려"는 기존에 허용된 `'판매 중지'`로 전환하는 것으로 대신하며, 반려 사유 입력란은 없습니다.
@@ -31,6 +38,10 @@
 - `project/GoodPang/src/main/java/com/goodpang/servlet/AdminProductListServlet.java`
 - `project/GoodPang/src/main/java/com/goodpang/servlet/AdminProductApprovalServlet.java`
 - `project/GoodPang/src/main/java/com/goodpang/dao/AdminProductDAO.java`
+- `project/GoodPang/src/main/java/com/goodpang/servlet/AdminDeliveryListServlet.java`
+- `project/GoodPang/src/main/java/com/goodpang/servlet/AdminDeliveryCompleteServlet.java`
+- `project/GoodPang/src/main/java/com/goodpang/dao/AdminDeliveryDAO.java`
 - `project/GoodPang/src/main/webapp/WEB-INF/views/admin-seller-list.jsp`
 - `project/GoodPang/src/main/webapp/WEB-INF/views/admin-seller-detail.jsp`
 - `project/GoodPang/src/main/webapp/WEB-INF/views/admin-product-list.jsp`
+- `project/GoodPang/src/main/webapp/WEB-INF/views/admin-delivery-list.jsp`

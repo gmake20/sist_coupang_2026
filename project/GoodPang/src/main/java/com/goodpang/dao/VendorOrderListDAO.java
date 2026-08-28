@@ -65,6 +65,118 @@ public class VendorOrderListDAO {
         return list;
     }
 
+    /*
+     * 결제완료 -> 배송중 전환 + DELIVERY 행 생성(송장번호 저장), 하나의 트랜잭션으로 처리.
+     * ORDERS에는 seller_no가 없어서, 이 주문에 이 판매자의 상품이 실제로 포함돼 있는지
+     * ORDER_DETAIL/PRODUCT로 확인한 뒤에만 처리한다.
+     */
+    public boolean shipOrder(int orderNo, int sellerNo, String invoiceNo) {
+
+        try (Connection conn = ConnectionProvider.getConnection()) {
+
+            conn.setAutoCommit(false);
+
+            try {
+                String deliveryServiceCode = findDeliveryServiceCode(conn, orderNo, sellerNo);
+
+                if (deliveryServiceCode == null) {
+                    conn.rollback();
+                    return false;
+                }
+
+                insertDelivery(conn, orderNo, deliveryServiceCode, invoiceNo);
+
+                boolean updated = updateStatusToShipping(conn, orderNo, sellerNo);
+
+                if (!updated) {
+                    conn.rollback();
+                    return false;
+                }
+
+                conn.commit();
+                return true;
+
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // 이 판매자가 이 주문에 등록한 상품 중 하나의 택배사 코드를 대표로 사용
+    private String findDeliveryServiceCode(Connection conn, int orderNo, int sellerNo) throws Exception {
+
+        String sql = """
+            SELECT P.DELIVERY_SERVICE_CODE
+            FROM ORDER_DETAIL OD
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+            WHERE OD.ORDER_NO = ?
+              AND P.SELLER_NO = ?
+              AND ROWNUM = 1
+            """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, orderNo);
+            pstmt.setInt(2, sellerNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next() ? rs.getString("DELIVERY_SERVICE_CODE") : null;
+            }
+        }
+    }
+
+    private void insertDelivery(Connection conn, int orderNo, String deliveryServiceCode, String invoiceNo) throws Exception {
+
+        String sql = """
+            INSERT INTO DELIVERY (
+                DELIVERY_NO, ORDER_NO, DELIVERY_SERVICE_CODE, INVOICE_NO,
+                DELIVERY_STATUS, DELIVERY_START_DATE, DELIVERY_END_DATE,
+                CREATED_DATE, UPDATED_DATE
+            ) VALUES (
+                SEQ_DELIVERY.NEXTVAL, ?, ?, ?,
+                '배송중', SYSDATE, NULL,
+                SYSDATE, SYSDATE
+            )
+            """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, orderNo);
+            pstmt.setString(2, deliveryServiceCode);
+            pstmt.setString(3, invoiceNo);
+
+            pstmt.executeUpdate();
+        }
+    }
+
+    private boolean updateStatusToShipping(Connection conn, int orderNo, int sellerNo) throws Exception {
+
+        String sql = """
+            UPDATE ORDERS
+            SET ORDER_STATUS = '배송중'
+            WHERE ORDER_NO = ?
+              AND ORDER_STATUS = '결제완료'
+              AND EXISTS (
+                    SELECT 1
+                    FROM ORDER_DETAIL OD
+                        JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                    WHERE OD.ORDER_NO = ORDERS.ORDER_NO
+                      AND P.SELLER_NO = ?
+              )
+            """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, orderNo);
+            pstmt.setInt(2, sellerNo);
+
+            return pstmt.executeUpdate() == 1;
+        }
+    }
+
     private VendorOrderListDTO mapRow(ResultSet rs) throws java.sql.SQLException {
 
         VendorOrderListDTO dto = new VendorOrderListDTO();
