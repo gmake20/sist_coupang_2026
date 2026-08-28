@@ -277,7 +277,7 @@
 						<!-- 옵션 넘버 들어와야 할 곳 -->
 						<!-- 실제 CART에 저장할 OPTION_ID -->
 						<input type="hidden" name="optionId" id="selectedOptionId"
-							value="25">
+							value="59"> <!-- 옵션 번호 하드코딩 -->
 
 						<!-- 화면 표시용 선택 옵션 -->
 						<!-- 상품번호 -->
