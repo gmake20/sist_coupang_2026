@@ -748,4 +748,41 @@ public class CheckoutDAO {
 	        );
 	    }
 	}
+	
+	public int getOptionPrice(
+	        Connection conn,
+	        int productNo,
+	        int optionId) {
+
+	    String sql = """
+	            SELECT NVL(PRICE, 0) AS OPTION_PRICE
+	            FROM PRODUCT_OPTION
+	            WHERE PRODUCT_NO = ?
+	              AND OPTION_ID = ?
+	            """;
+	    try (
+	            PreparedStatement pstmt =
+	                    conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, productNo);
+	        pstmt.setInt(2, optionId);
+	        try (ResultSet rs =
+	                pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getInt(
+	                        "OPTION_PRICE"
+	                );
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException(
+	                "옵션 가격 조회 실패",
+	                e
+	        );
+	    }
+	    throw new RuntimeException(
+	            "존재하지 않는 상품 옵션입니다."
+	    );
+	}
 }

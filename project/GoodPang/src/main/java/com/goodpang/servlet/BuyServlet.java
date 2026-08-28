@@ -46,12 +46,6 @@ public class BuyServlet extends HttpServlet {
         String quantityParam =
                 request.getParameter("quantity");
         
-		/*
-		 * System.out.println( "productNo = " + productNoParam );
-		 * 
-		 * System.out.println( "quantity = " + quantityParam );
-		 */
-
         String optionIdParam =
                 request.getParameter("optionId");
 
@@ -113,8 +107,27 @@ public class BuyServlet extends HttpServlet {
                 );
             }
 
+            int optionPrice = 0;
+
+            if (optionId != null) {
+
+                optionPrice =
+                        dao.getOptionPrice(
+                                conn,
+                                productNo,
+                                optionId
+                        );
+            }
+
+
+            // 실제 구매 단가
+            int unitPrice =
+                    productPrice + optionPrice;
+
+
+            // 수량 포함 상품금액
             int productAmount =
-                    productPrice * quantity;
+                    unitPrice * quantity;
 
 
             int instantDiscount = 0;
@@ -157,7 +170,7 @@ public class BuyServlet extends HttpServlet {
                             productNo,
                             optionId,
                             quantity,
-                            productPrice
+                            unitPrice
                     );
 
             if (itemResult != 1) {
