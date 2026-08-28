@@ -13,6 +13,7 @@ public class ProductDAO {
     public ProductDTO selectProduct(int productNo) {
 
         String sql = """
+
 			        SELECT
 			        P.PRODUCT_NO,
 			        P.PRODUCT_NAME,
@@ -42,6 +43,7 @@ public class ProductDAO {
 			        JOIN CATEGORY MAINC
 			        ON MC.PARENT_CATEGORY_NO = MAINC.CATEGORY_NO 
 			        WHERE P.PRODUCT_NO = ?
+
         	    """;
         
         

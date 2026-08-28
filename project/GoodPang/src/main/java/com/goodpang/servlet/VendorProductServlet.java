@@ -33,9 +33,14 @@ public class VendorProductServlet extends HttpServlet {
 			return;
 		}
 
-		List<VendorProductListDTO> productList = productListDAO.findBySellerNo(loginSeller.getSellerNo());
+		boolean hiddenView = "hidden".equals(request.getParameter("view"));
+
+		List<VendorProductListDTO> productList = hiddenView
+				? productListDAO.findHiddenBySellerNo(loginSeller.getSellerNo())
+				: productListDAO.findBySellerNo(loginSeller.getSellerNo());
 
 		request.setAttribute("productList", productList);
+		request.setAttribute("hiddenView", hiddenView);
 
 		request.getRequestDispatcher("/WEB-INF/views/vendor-product.jsp").forward(request, response);
 	}
