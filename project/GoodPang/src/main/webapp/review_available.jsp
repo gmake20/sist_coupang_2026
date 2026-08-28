@@ -64,8 +64,8 @@
 					<div class="profile-name">
 						<c:choose>
 							<c:when test="${not empty sessionScope.loginMember}">
-${sessionScope.loginMember.memberName}
-</c:when>
+								${sessionScope.loginMember.memberName}
+								</c:when>
 							<c:otherwise>회원</c:otherwise>
 						</c:choose>
 					</div>

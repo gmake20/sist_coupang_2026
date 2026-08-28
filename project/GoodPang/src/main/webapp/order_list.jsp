@@ -73,7 +73,9 @@
 			<div class="side-section">
 				<h3>MY 정보</h3>
 				<a href="${pageContext.request.contextPath}/member/modify">개인정보확인/수정</a>
-				<a href="#">결제수단·쿠페이 관리</a> <a href="#">배송지 관리</a> <a href="#">패스키
+				<a href="#">결제수단·쿠페이 관리</a>
+				 <a href="${pageContext.request.contextPath}/address/list">배송지 관리</a> 
+				 <a href="#">패스키
 					관리</a> <a href="#">회원 탈퇴</a>
 			</div>
 

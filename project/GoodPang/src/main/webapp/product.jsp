@@ -82,32 +82,47 @@
 			<div class="prod-atf">
 
 				<!-- ── 왼쪽: 상품 이미지 ────────────────────────── -->
+				<c:set var="mainOption" value="${options[0]}" />
 				<div class="product-image">
 
 					<!-- 썸네일 세로 목록 (원본 실측 70 x 70, 아래 여백 4px)
-               사진 파일은 images/product-detail/photo-1~3.jpg (1000x1000).
-                 썸네일과 큰 이미지가 **같은 파일**을 씀 — 누르면 JS 가 큰 이미지의 src 를 갈아끼움.
+             썸네일과 큰 이미지가 **같은 파일**을 씀 — 누르면 JS 가 큰 이미지의 src 를 갈아끼움.
                  alt="" 인 이유: 옆의 큰 이미지가 같은 사진이라 화면낭독기가 두 번 읽으면 방해됨
-                 ※ 상세페이지 사진은 images/products/ 가 아니라 images/product-detail/ 를 씀.
-                   images/products/ 는 메인페이지 상품카드 전용 (2026-08-20 분리) -->
+
+             2026-08-28: PRODUCT_IMAGE(맨 처음 옵션의 대표/추가 사진) 연동함.
+             옵션 드롭박스(#optionSelect)를 바꾸면 js/product.js 가 그 옵션의 사진으로 이 목록을 바꿔치기함.
+             ★ 임시 ★ 이 옵션에 등록된 사진이 없으면(대부분 아직 없음) 옛날 더미 photo-1.jpg 로 대체 -->
 					<ul class="product-image__thumbs">
-						<li class="is-on"><a href="#"><img
-								src="${pageContext.request.contextPath}/images/product-detail/photo-1.jpg"
-								alt=""></a></li>
-						<li><a href="#"><img
-								src="${pageContext.request.contextPath}/images/product-detail/photo-2.jpg"
-								alt=""></a></li>
-						<li><a href="#"><img
-								src="${pageContext.request.contextPath}/images/product-detail/photo-3.jpg"
-								alt=""></a></li>
+						<c:choose>
+							<c:when test="${not empty mainOption.images}">
+								<c:forEach items="${mainOption.images}" var="img" varStatus="loop">
+									<li class="${loop.first ? 'is-on' : ''}"><a href="#"><img
+											src="${pageContext.request.contextPath}/${img.imageUrl}"
+											alt=""></a></li>
+								</c:forEach>
+							</c:when>
+							<c:otherwise>
+								<li class="is-on"><a href="#"><img
+										src="${pageContext.request.contextPath}/images/product-detail/photo-1.jpg"
+										alt=""></a></li>
+							</c:otherwise>
+						</c:choose>
 					</ul>
 
-					<!-- 큰 이미지 (정사각형)
-               ★ 임시 ★ 위와 같음 -->
+					<!-- 큰 이미지 (정사각형) — 썸네일 첫 번째와 같은 사진으로 시작 -->
 					<div class="product-image__main">
-						<img
-							src="${pageContext.request.contextPath}/images/product-detail/photo-1.jpg"
-							alt="무형광 남성 반팔 라운드 티셔츠 3종 세트">
+						<c:choose>
+							<c:when test="${not empty mainOption.images}">
+								<img
+									src="${pageContext.request.contextPath}/${mainOption.images[0].imageUrl}"
+									alt="${p.productName}">
+							</c:when>
+							<c:otherwise>
+								<img
+									src="${pageContext.request.contextPath}/images/product-detail/photo-1.jpg"
+									alt="${p.productName}">
+							</c:otherwise>
+						</c:choose>
 					</div>
 				</div>
 
@@ -220,42 +235,23 @@
 						</ul>
 					</div>
 
-					<!-- ④ 옵션 — 원본은 section 을 옵션 종류만큼 반복함
-               ▶JSP: &lt;c:forEach items="{p.options}"&gt; 로 감쌀 자리.
-                 그래서 두 덩어리를 일부러 똑같은 모양으로 만들어둠 -->
-					<div class="fashion-option">
+					<!-- ④ 옵션 — "1번 축은 드롭박스, 그 다음 축은 사진 있으면 칩" (원본과 같은 모양)
+             PRODUCT_OPTION 은 "조합 하나(사이즈+색상 등) = 행 하나"로 저장돼 있어서, 축마다 중복 없는
+             값 목록을 뽑는 건 JSTL 보다 JS 가 훨씬 간단함 — 그래서 여기선 데이터만 넘기고
+             실제 화면은 js/product.js 의 setupOptionSelect() 가 그림.
+             options[0].option1Type 이 없으면(=옵션 자체가 없는 상품) 섹션 전체를 안 그림 -->
+					<c:if test="${not empty options && not empty options[0].option1Type}">
+						<div class="fashion-option" id="fashionOption"></div>
 
-						<!-- 옵션 1: 굵기 — 원본은 select 처럼 생긴 상자(실측 93 x 36) -->
-						<section class="option-row">
-							<div class="option-label">사이즈</div>
-							<div class="option-select">
-								<select>
-									<option>95</option>
-									<option>100</option>
-									<option>105</option>
-									<option>110</option>
-								</select>
-							</div>
-						</section>
-
-						<!-- 옵션 2: 색상 — 48 x 48 칩. 지금 고른 것에 .is-on -->
-						<section class="option-row">
-							<div class="option-label">
-								색상: <span class="option-value">화이트</span>
-							</div>
-							<ul class="option-chips">
-								<li data-color="블랙"><a href="#"><img
-										src="${pageContext.request.contextPath}/images/product-detail/option-1.jpg"
-										alt="블랙"></a></li>
-								<li data-color="네이비"><a href="#"><img
-										src="${pageContext.request.contextPath}/images/product-detail/option-2.jpg"
-										alt="네이비"></a></li>
-								<li class="is-on" data-color="화이트"><a href="#"><img
-										src="${pageContext.request.contextPath}/images/product-detail/option-3.jpg"
-										alt="화이트"></a></li>
-							</ul>
-						</section>
-					</div>
+						<!-- 화면엔 안 보임 — js 가 읽어가는 원본 데이터 자리.
+                 JSON 은 ProductServlet 에서 Gson 으로 만들어 optionsJson 에 담아 보내줌
+                 (JSP 에서 손으로 조립하면 값에 따옴표가 들어갈 때 깨져서).
+                 type="application/json" 이라 브라우저가 스크립트로 실행하지 않고 텍스트로만 취급함.
+                 data-context-path: 사진 주소가 DB엔 "upload/5/..." 처럼 앞부분 없이 저장돼 있어서
+                 js 가 앞에 붙일 수 있게 같이 넘겨줌 -->
+						<script id="productOptionsData" type="application/json"
+							data-context-path="${pageContext.request.contextPath}">${optionsJson}</script>
+					</c:if>
 
 					<!-- ⑤ 적립 혜택 -->
 					<div class="conditional-benefits">
@@ -274,15 +270,19 @@
 					<form class="prod-buy-quantity-and-footer" method="post"
 						action="${pageContext.request.contextPath}/cart/add">
 
-						<!-- 옵션 넘버 들어와야 할 곳 -->
-						<!-- 실제 CART에 저장할 OPTION_ID -->
+						<!-- 실제 CART에 저장할 OPTION_ID
+                 2026-08-28: 하드코딩(25) 대신 첫 번째 옵션 값으로 시작, #optionSelect 를 바꾸면
+                 js/product.js 가 이 값을 그 옵션의 OPTION_ID 로 갈아끼움 -->
 						<input type="hidden" name="optionId" id="selectedOptionId"
-							value="25">
+							value="${not empty options ? options[0].optionId : ''}">
 
 						<!-- 화면 표시용 선택 옵션 -->
 						<!-- 상품번호 -->
 						<input type="hidden" name="productNo" value="${p.productNo}">
-						<input type="hidden" name="color" id="selectedColor" value="화이트">
+						<!-- 원래 "색상"만 담던 자리인데, 옵션이 색상이 아닐 수도 있어서
+                 지금은 선택한 옵션 조합 전체 라벨(예: "블랙 / S")을 담음 -->
+						<input type="hidden" name="color" id="selectedColor"
+							value="${not empty options ? options[0].label : ''}">
 
 						<!-- 수량 -->
 						<div class="product-quantity">
@@ -300,13 +300,32 @@
 						</div>
 
 						<!-- 장바구니 -->
-						<button type="submit" class="prod-cart-btn">장바구니 담기</button>
+						<button type="button"
+						        class="prod-cart-btn"
+						        id="cartAddBtn">
+						    장바구니 담기
+						</button>
+						<div id="cartAddedPopup"
+						     class="cart-added-popup">
+						
+						    <button type="button"
+						            class="cart-popup-close"
+						            id="cartPopupClose">
+						        ×
+						    </button>
+						
+						    <p>상품이 장바구니에 담겼습니다.</p>
+						
+						    <a href="${pageContext.request.contextPath}/cart"
+						       class="cart-popup-link">
+						        장바구니 바로가기 &gt;
+						    </a>
+						</div>
 
 						<!-- 바로구매 -->
 						<button type="submit" class="prod-buy-btn"
 							formaction="${pageContext.request.contextPath}/order/buy"
 							formmethod="post">
-
 							바로구매 <i class="arrow-right"></i>
 
 						</button>
@@ -698,30 +717,42 @@
 
 			<!-- ===== 상세설명 =====
            원본: div.product-detail-content — 이 페이지에서 제일 긴 영역(10,140px)인데
-                 구조는 제일 단순함. 판매자가 올린 **긴 이미지 3장**이 전부.
+                 구조는 제일 단순함. 판매자가 올린 **긴 이미지 여러 장**이 전부.
                  폭 780px 고정 + 가운데 정렬(margin:0 auto).
 
-           ★ 임시 ★ 이미지가 없어서 회색 상자로 대신함.
-             원본 이미지는 780 x 3661 / 780 x 3661 / 780 x 2818 이었음.
-             우리 상자는 780 x 1200 으로 잡아둠 (그대로 흉내내면 화면이 너무 길어져서 확인이 힘듦)
-             ▶JSP: &lt;c:forEach items="{p.detailImages}"&gt; 로 감쌀 자리 —
-                   상세설명 이미지는 상품마다 장수가 다름 -->
+           2026-08-28: PRODUCT_IMAGE(OPTION_ID 가 null, IMAGE_PURPOSE='상세설명') 연동함.
+           ★ 임시 ★ 아직 등록된 사진이 없는 상품(대부분)은 회색 상자 대신 옛날 더미 3장으로 대체 —
+             익스포트.sql 스냅샷 기준으로는 27번 상품에만 실제 상세설명 사진이 있음
+             (라이브 DB엔 더 있을 수 있음, CLAUDE.md 참고). -->
 			<div class="product-detail-content">
-				<div class="detail-image">
-					<img
-						src="${pageContext.request.contextPath}/images/product-detail/detail-1.jpg"
-						alt="">
-				</div>
-				<div class="detail-image">
-					<img
-						src="${pageContext.request.contextPath}/images/product-detail/detail-2.jpg"
-						alt="">
-				</div>
-				<div class="detail-image">
-					<img
-						src="${pageContext.request.contextPath}/images/product-detail/detail-3.jpg"
-						alt="">
-				</div>
+				<c:choose>
+					<c:when test="${not empty detailImages}">
+						<c:forEach items="${detailImages}" var="img">
+							<div class="detail-image">
+								<img
+									src="${pageContext.request.contextPath}/${img.imageUrl}"
+									alt="">
+							</div>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						<div class="detail-image">
+							<img
+								src="${pageContext.request.contextPath}/images/product-detail/detail-1.jpg"
+								alt="">
+						</div>
+						<div class="detail-image">
+							<img
+								src="${pageContext.request.contextPath}/images/product-detail/detail-2.jpg"
+								alt="">
+						</div>
+						<div class="detail-image">
+							<img
+								src="${pageContext.request.contextPath}/images/product-detail/detail-3.jpg"
+								alt="">
+						</div>
+					</c:otherwise>
+				</c:choose>
 			</div>
 
 

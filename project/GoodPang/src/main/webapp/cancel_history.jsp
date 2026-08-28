@@ -1,5 +1,7 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -7,7 +9,18 @@
 
 <title>취소/반품/교환/환불 내역</title>
 
-<link rel="stylesheet" href="css/reset.css"> 
+<!-- 기본 초기화 CSS -->
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/reset.css">
+<!-- 공통 CSS -->
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/common.css">
+
+<!-- jQuery -->
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
 
 <style>
 
@@ -221,26 +234,7 @@ a {
     align-items: center;
 }
 
-.product-img {
-    width: 75px;
-    height: 75px;
 
-    margin-right: 15px;
-
-    background: #f5f5f5;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
-}
-
-.product-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
 
 .product-text {
     flex: 1;
@@ -397,7 +391,7 @@ footer {
     <aside class="side-menu">
 
         <div class="side-title">
-            MY쿠팡
+            MY굿팡
         </div>
 
 
@@ -409,7 +403,7 @@ footer {
                 주문목록/배송조회
             </a>
 
-            <a href="${pageContext.request.contextPath}/cancel_history.jsp"
+            <a href="${pageContext.request.contextPath}/order/cancel_history"
                class="active">
                 취소/반품/교환/환불 내역
             </a>
@@ -503,323 +497,93 @@ footer {
         </div>
 
 
+<c:choose>
+            <c:when test="${not empty cancelList}">
+                <c:forEach var="checkList" items="${cancelList}">
+                    <div class="order-box">
 
-        <!-- =========================
-             주문 1
-             ========================= -->
+                        <div class="order-header">
 
-        <div class="order-box">
+                            <span>취소접수일 : ${checkList.requestDate}</span>
 
-            <div class="order-header">
+                            <span class="bar">|</span>
 
-                <span>취소접수일 : 2026/08/18</span>
+                            <span>주문일 : <fmt:formatDate value="${checkList.orderDate}" pattern="yyyy/MM/dd" /></span>
 
-                <span class="bar">|</span>
+                            <span class="bar">|</span>
 
-                <span>주문일 : 2026/08/17</span>
+                            <span>주문번호 : ${checkList.orderNo}</span>
 
-                <span class="bar">|</span>
-
-                <span>주문번호 : 2026081712847392</span>
-
-            </div>
+                        </div>
 
 
-            <div class="order-body">
+                        <div class="order-body">
 
 
-                <div class="product-info">
+                            <div class="product-info">
 
-                    <div class="product-img">
+                                <div class="product-text">
 
-                        <img src="${pageContext.request.contextPath}/images/clothes1.jpg"
-                             alt="여성 니트">
+                                    <p class="product-name">
+                                        ${checkList.productName}
+                                    </p>
 
-                    </div>
+                                    <!-- 옵션 1, 2 동적 출력 구문 (checkList 기준) -->
+                                    <c:if test="${not empty checkList.option1Value or not empty checkList.option2Value}">
+                                        <p class="product-option">
+                                            <span>옵션: </span>
+                                            <c:if test="${not empty checkList.option1Value}">
+                                                <c:if test="${not empty checkList.option1Type}">${checkList.option1Type}: </c:if>${checkList.option1Value}
+                                            </c:if>
+                                            <c:if test="${not empty checkList.option1Value and not empty checkList.option2Value}"> / </c:if>
+                                            <c:if test="${not empty checkList.option2Value}">
+                                                <c:if test="${not empty checkList.option2Type}">${checkList.option2Type}: </c:if>${checkList.option2Value}
+                                            </c:if>
+                                        </p>
+                                    </c:if>
 
+                                </div>
 
-                    <div class="product-text">
-
-                        <p class="product-name">
-                            여성 데일리 라운드 니트
-                        </p>
-
-                        <p class="product-option">
-                            아이보리 / FREE / 1개
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="product-price">
-
-                    <span>1개</span>
-
-                    <strong>29,900원</strong>
-
-                </div>
+                            </div>
 
 
-                <div class="cancel-status">
+                            <div class="product-price">
 
-                    <strong>취소완료</strong>
+                                <span>${checkList.quantity}개</span>
 
-                    <p>
-                        8/18(화) 취소 완료
-                    </p>
+                                <strong><fmt:formatNumber value="${checkList.totalPrice}" pattern="#,###" />원</strong>
 
-                    <button type="button"
-                            class="detail-btn">
-                        취소상세
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
+                            </div>
 
 
+                            <div class="cancel-status">
 
-        <!-- =========================
-             주문 2
-             ========================= -->
+                                <strong>${checkList.orderStatus}</strong>
 
-        <div class="order-box">
+                                <p>
+                                    <c:if test="${not empty checkList.expectedCancelDate}">
+                                        <fmt:formatDate value="${checkList.expectedCancelDate}" pattern="M/dd(E)" /> 취소 완료 예정
+                                    </c:if>
+                                </p>
 
-            <div class="order-header">
+                                <!-- 이동 링크 제거 및 단순 버튼으로 수정 -->
+                                <button type="button" class="detail-btn">
+                                    취소상세
+                                </button>
 
-                <span>취소접수일 : 2026/08/12</span>
+                            </div>
 
-                <span class="bar">|</span>
-
-                <span>주문일 : 2026/08/11</span>
-
-                <span class="bar">|</span>
-
-                <span>주문번호 : 2026081119375026</span>
-
-            </div>
-
-
-            <div class="order-body">
-
-
-                <div class="product-info">
-
-                    <div class="product-img">
-
-                        <img src="${pageContext.request.contextPath}/images/clothes2.jpg"
-                             alt="남성 셔츠">
+                        </div>
 
                     </div>
-
-
-                    <div class="product-text">
-
-                        <p class="product-name">
-                            남성 오버핏 스트라이프 셔츠
-                        </p>
-
-                        <p class="product-option">
-                            블루 / L / 1개
-                        </p>
-
-                    </div>
-
+                </c:forEach>
+            </c:when>
+            <c:otherwise>
+                <div class="empty-box">
+                    <p>취소/반품/교환 내역이 존재하지 않습니다.</p>
                 </div>
-
-
-                <div class="product-price">
-
-                    <span>1개</span>
-
-                    <strong>34,500원</strong>
-
-                </div>
-
-
-                <div class="cancel-status">
-
-                    <strong>취소완료</strong>
-
-                    <p>
-                        8/12(수) 취소 완료
-                    </p>
-
-                    <button type="button"
-                            class="detail-btn">
-                        취소상세
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- =========================
-             주문 3
-             ========================= -->
-
-        <div class="order-box">
-
-            <div class="order-header">
-
-                <span>취소접수일 : 2026/08/05</span>
-
-                <span class="bar">|</span>
-
-                <span>주문일 : 2026/08/04</span>
-
-                <span class="bar">|</span>
-
-                <span>주문번호 : 2026080415629084</span>
-
-            </div>
-
-
-            <div class="order-body">
-
-
-                <div class="product-info">
-
-                    <div class="product-img">
-
-                        <img src="${pageContext.request.contextPath}/images/clothes3.jpg"
-                             alt="여성 청바지">
-
-                    </div>
-
-
-                    <div class="product-text">
-
-                        <p class="product-name">
-                            여성 스트레이트 데님 팬츠
-                        </p>
-
-                        <p class="product-option">
-                            중청 / M / 1개
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="product-price">
-
-                    <span>1개</span>
-
-                    <strong>42,000원</strong>
-
-                </div>
-
-
-                <div class="cancel-status">
-
-                    <strong>취소완료</strong>
-
-                    <p>
-                        8/05(수) 취소 완료
-                    </p>
-
-                    <button type="button"
-                            class="detail-btn">
-                        취소상세
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- =========================
-             주문 4
-             ========================= -->
-
-        <div class="order-box">
-
-            <div class="order-header">
-
-                <span>취소접수일 : 2026/07/28</span>
-
-                <span class="bar">|</span>
-
-                <span>주문일 : 2026/07/27</span>
-
-                <span class="bar">|</span>
-
-                <span>주문번호 : 2026072718473165</span>
-
-            </div>
-
-
-            <div class="order-body">
-
-
-                <div class="product-info">
-
-                    <div class="product-img">
-
-                        <img src="${pageContext.request.contextPath}/images/clothes4.jpg"
-                             alt="여성 린넨 원피스">
-
-                    </div>
-
-
-                    <div class="product-text">
-
-                        <p class="product-name">
-                            여성 여름 린넨 셔츠 원피스
-                        </p>
-
-                        <p class="product-option">
-                            베이지 / FREE / 1개
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="product-price">
-
-                    <span>1개</span>
-
-                    <strong>51,900원</strong>
-
-                </div>
-
-
-                <div class="cancel-status">
-
-                    <strong>취소완료</strong>
-
-                    <p>
-                        7/28(화) 취소 완료
-                    </p>
-
-                    <button type="button"
-                            class="detail-btn">
-                        취소상세
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
+            </c:otherwise>
+        </c:choose>
         <!-- =========================
              페이지
              ========================= -->
