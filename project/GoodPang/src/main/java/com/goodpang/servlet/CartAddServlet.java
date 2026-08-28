@@ -117,14 +117,26 @@ public class CartAddServlet extends HttpServlet {
 					cartCount
 					);
 
-			System.out.println(
-					"비회원 guestCart = " + guestCart
-					);
+		}
+		
+		boolean ajax =
+		        "XMLHttpRequest".equals(
+		                request.getHeader(
+		                        "X-Requested-With"
+		                )
+		        );
+		
+		if (ajax) {
 
-			System.out.println(
-					"비회원 cartCount = " + cartCount
-					);
+		    response.setContentType(
+		            "application/json; charset=UTF-8"
+		    );
 
+		    response.getWriter().write(
+		            "{\"success\":true}"
+		    );
+
+		    return;
 		}
 
 
