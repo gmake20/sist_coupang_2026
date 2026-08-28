@@ -226,49 +226,6 @@
 
 			</section>
 
-
-
-			<!-- =========================
-             결제 정보
-        ========================== -->
-			<%-- <section class="detail-section payment-section">
-
-				<h2>결제 정보</h2>
-
-				<div class="section-line"></div>
-
-				<div class="payment-box">
-
-					<div class="payment-method">${orderInfo.paymentMethod}</div>
-
-					<div class="payment-price">
-
-						<div class="price-row">
-							<span>총 상품가격</span><strong><fmt:formatNumber value="${orderInfo.totalPrice}" pattern="#,###" /></strong>
-							
-						</div>
-
-						<div class="price-row">
-							<span>배송비</span> <strong>${orderInfo.deliveryFee}</strong>
-						</div>
-
-					</div>
-
-				</div>
-
-
-				<div class="payment-total">
-
-					<div>${orderInfo.paymentMethod}</div>
-
-					<div>
-						<span>총 결제금액</span> <strong><fmt:formatNumber value="${orderInfo.totalPrice + orderInfo.deliveryFee}" pattern="#,###" /> 원</strong>
-					</div>
-
-				</div>
-
-			</section>
- --%>
 			<section class="detail-section payment-section">
 				<h2>결제 정보</h2>
 				<div class="section-line"></div>
