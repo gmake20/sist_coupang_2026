@@ -300,13 +300,32 @@
 						</div>
 
 						<!-- 장바구니 -->
-						<button type="submit" class="prod-cart-btn">장바구니 담기</button>
+						<button type="button"
+						        class="prod-cart-btn"
+						        id="cartAddBtn">
+						    장바구니 담기
+						</button>
+						<div id="cartAddedPopup"
+						     class="cart-added-popup">
+						
+						    <button type="button"
+						            class="cart-popup-close"
+						            id="cartPopupClose">
+						        ×
+						    </button>
+						
+						    <p>상품이 장바구니에 담겼습니다.</p>
+						
+						    <a href="${pageContext.request.contextPath}/cart"
+						       class="cart-popup-link">
+						        장바구니 바로가기 &gt;
+						    </a>
+						</div>
 
 						<!-- 바로구매 -->
 						<button type="submit" class="prod-buy-btn"
 							formaction="${pageContext.request.contextPath}/order/buy"
 							formmethod="post">
-
 							바로구매 <i class="arrow-right"></i>
 
 						</button>

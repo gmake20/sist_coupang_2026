@@ -704,6 +704,100 @@ function setupReviewGallery() {
     modal.hidden = false;
     lockScroll();
   }
+  
+  const cartAddBtn =
+      document.getElementById("cartAddBtn");
+
+  const cartAddedPopup =
+      document.getElementById("cartAddedPopup");
+
+  const cartPopupClose =
+      document.getElementById("cartPopupClose");
+
+  if (cartAddBtn) {
+
+      cartAddBtn.addEventListener("click", function() {
+
+          const form =
+              cartAddBtn.closest("form");
+
+          const formData =
+              new FormData(form);
+
+          const params =
+              new URLSearchParams();
+
+          formData.forEach(function(value, key) {
+              params.append(key, value);
+          });
+
+          console.log(
+              "optionId:",
+              params.get("optionId")
+          );
+
+          console.log(
+              "quantity:",
+              params.get("quantity")
+          );
+
+          cartAddBtn.disabled = true;
+
+          fetch(form.action, {
+              method: "POST",
+              body: params,
+              headers: {
+                  "X-Requested-With":
+                      "XMLHttpRequest"
+              }
+          })
+          .then(function(response) {
+
+              if (!response.ok) {
+                  throw new Error(
+                      "장바구니 담기에 실패했습니다."
+                  );
+              }
+
+              return response.json();
+          })
+          .then(function(data) {
+
+              if (data.success) {
+                  cartAddedPopup.classList.add(
+                      "show"
+                  );
+              }
+
+          })
+          .catch(function(error) {
+
+              console.error(error);
+
+              alert(
+                  "장바구니 담기 중 오류가 발생했습니다."
+              );
+
+          })
+          .finally(function() {
+
+              cartAddBtn.disabled = false;
+          });
+      });
+  }
+
+  if (cartPopupClose) {
+
+      cartPopupClose.addEventListener(
+          "click",
+          function() {
+
+              cartAddedPopup.classList.remove(
+                  "show"
+              );
+          }
+      );
+  }
 
   /* ── ② 사진 뷰어 ── */
   function openViewer(index) {
@@ -800,7 +894,10 @@ function setupReviewGallery() {
 }
 
 
+
 setupItemBriefMore();
 setupSurveyMore();
 setupTabSpy();
 setupReviewGallery();
+
+

@@ -361,9 +361,9 @@
 
 					<div
 						class="address-card
-					${addr.addressNo == address.addressNo
-					? 'selected-address-card'
-					: ''}">
+							${addr.addressNo == address.addressNo
+							? 'selected-address-card'
+							: ''}">
 
 						<div class="address-card-name">${addr.receiverName}</div>
 
@@ -398,7 +398,19 @@
 
 						<div class="address-card-buttons">
 
-							<button type="button" class="address-edit-btn">수정</button>
+							<button type="button"
+							        class="address-edit-btn"
+							        data-address-no="${addr.addressNo}"
+							        data-receiver-name="${fn:escapeXml(addr.receiverName)}"
+							        data-zipcode="${fn:escapeXml(addr.zipcode)}"
+							        data-address="${fn:escapeXml(addr.address)}"
+							        data-detail-address="${fn:escapeXml(addr.detailAddress)}"
+							        data-tel="${fn:escapeXml(addr.tel)}"
+							        data-request-msg="${fn:escapeXml(addr.requestMsg)}"
+							        data-default="${addr.addressDefault}"
+							        onclick="openEditAddressModal(this)">
+							    수정
+							</button>
 
 							<button type="button" class="address-select-btn"
 								data-address-no="${addr.addressNo}"
@@ -433,15 +445,28 @@
 		<div class="address-add-modal" onclick="event.stopPropagation();">
 
 			<div class="address-add-header">
-				<h2>배송지 추가</h2>
+				<h2 id="addressModalTitle">배송지 추가</h2>
 
 				<button type="button" class="address-add-close"
 					onclick="closeAddAddressModal()">×</button>
 			</div>
 
 			<form id="addAddressForm"
-				action="${pageContext.request.contextPath}/address/add"
-				method="post">
+				    action="${pageContext.request.contextPath}/address/add"
+				    method="post">
+				    
+				    <input type="hidden"
+				           name="addressNo"
+				           id="editAddressNo">
+
+				    <!-- 결제 페이지에서 배송지 추가했다는 정보 -->
+				    <input type="hidden"
+				           name="checkoutNo"
+				           value="${checkoutNo}">
+				
+				    <input type="hidden"
+				           name="from"
+				           value="payment">
 
 				<div class="address-add-body">
 
@@ -453,12 +478,17 @@
 					</div>
 
 					<div class="add-address-row postcode-row">
-						<div class="add-address-icon">◉</div>
-
-						<button type="button" class="postcode-search-btn"
-							onclick="findPostcode()">우편번호 찾기</button>
-
-						<input type="hidden" name="zipcode" id="newZipcode">
+					    <div class="add-address-icon">◉</div>
+					
+					    <button type="button"
+					            class="postcode-search-btn"
+					            onclick="findPostcode()">
+					        우편번호 찾기
+					    </button>
+					
+					    <input type="hidden"
+					           name="zipcode"
+					           id="newZipcode">
 					</div>
 
 					<div class="add-address-row address-input-row">
@@ -482,23 +512,31 @@
 
 						<span class="phone-plus">＋</span>
 					</div>
-
-					<button type="button" class="delivery-option-row">
-						<div class="delivery-option-icon">▦</div>
-						<span>일반배송 정보를 선택해 주세요.</span> <strong>〉</strong>
+						<div class="add-address-row hidden"
+						     id="requestMsgDirectArea">
+						
+						    <div class="add-address-icon">✎</div>
+						
+						    <input type="text"
+						           id="newRequestMsg"
+						           name="requestMsg"
+						           placeholder="배송 요청사항을 입력해주세요."
+						           maxlength="100">
+						</div>
+					<label class="default-address-check">
+						    <input type="checkbox"
+						           name="addressDefault"
+						           id="newAddressDefault"
+						           value="Y">
+						
+						    <span class="custom-check"></span>
+						    기본 배송지로 선택
+						</label>
+					<button type="submit"
+					        class="address-save-btn"
+					        id="addressSaveBtn">
+					    저장
 					</button>
-
-					<button type="button" class="delivery-option-row">
-						<div class="delivery-option-icon">▦</div>
-						<span>새벽배송 정보를 선택해 주세요.</span> <strong>〉</strong>
-					</button>
-
-					<label class="default-address-check"> <input
-						type="checkbox" name="addressDefault" value="Y"> <span
-						class="custom-check"></span> 기본 배송지로 선택
-					</label>
-
-					<button type="submit" class="address-save-btn">저장</button>
 
 				</div>
 			</form>
@@ -633,7 +671,11 @@
 			</div>
 		</div>
 	</div>
+	
+	<script src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script>
+
+	
 
 
 
@@ -880,22 +922,85 @@ function selectAddress(button) {
 /* 배송지 추가 */
 function openAddAddressModal() {
 
-	const selectModal =
-		document.getElementById(
-			"addressModalOverlay"
-		);
+    const selectModal =
+        document.getElementById(
+            "addressModalOverlay"
+        );
 
-	selectModal.classList.remove("show");
+    selectModal.classList.remove("show");
 
+    const form =
+        document.getElementById(
+            "addAddressForm"
+        );
 
-	const addModal =
-		document.getElementById(
-			"addAddressModalOverlay"
-		);
+    // 추가 URL로 복구
+    form.action =
+        "${pageContext.request.contextPath}/address/add";
 
-	addModal.classList.add("show");
+    // 제목
+    document.getElementById(
+        "addressModalTitle"
+    ).textContent = "배송지 추가";
 
-	document.body.classList.add("modal-open");
+    // addressNo 제거
+    document.getElementById(
+        "editAddressNo"
+    ).value = "";
+
+    // 입력값 초기화
+    document.getElementById(
+        "newReceiverName"
+    ).value = "";
+
+    document.getElementById(
+        "newZipcode"
+    ).value = "";
+
+    document.getElementById(
+        "newAddress"
+    ).value = "";
+
+    document.getElementById(
+        "newDetailAddress"
+    ).value = "";
+
+    document.getElementById(
+        "newTel"
+    ).value = "";
+
+    const requestMsg =
+        document.getElementById(
+            "newRequestMsg"
+        );
+
+    if (requestMsg) {
+        requestMsg.value = "";
+    }
+
+    const defaultCheckbox =
+        form.querySelector(
+            'input[name="addressDefault"]'
+        );
+
+    if (defaultCheckbox) {
+        defaultCheckbox.checked = false;
+    }
+
+    document.getElementById(
+        "addressSaveBtn"
+    ).textContent = "저장";
+
+    const addModal =
+        document.getElementById(
+            "addAddressModalOverlay"
+        );
+
+    addModal.classList.add("show");
+
+    document.body.classList.add(
+        "modal-open"
+    );
 }
 
 
@@ -919,7 +1024,41 @@ function closeAddAddressModal() {
 
 
 function findPostcode() {
-	alert("우편번호 검색 API를 연결하면 됩니다.");
+
+    new kakao.Postcode({
+
+        oncomplete: function(data) {
+
+            let address = "";
+
+            // 도로명 주소 선택
+            if (data.userSelectedType === "R") {
+
+                address = data.roadAddress;
+
+            // 지번 주소 선택
+            } else {
+
+                address = data.jibunAddress;
+            }
+
+            // 우편번호
+            document.getElementById(
+                "newZipcode"
+            ).value = data.zonecode;
+
+            // 주소
+            document.getElementById(
+                "newAddress"
+            ).value = address;
+
+            // 상세주소로 포커스
+            document.getElementById(
+                "newDetailAddress"
+            ).focus();
+        }
+
+    }).open();
 }
 
 
@@ -1043,6 +1182,88 @@ function selectPaymentAddType(type) {
 
 		paymentType.value = "CARD";
 	}
+}
+
+function openEditAddressModal(button) {
+
+    // 배송지 선택 모달 닫기
+    document
+        .getElementById("addressModalOverlay")
+        .classList.remove("show");
+
+    const editModal =
+        document.getElementById(
+            "addAddressModalOverlay"
+        );
+
+    // 제목 변경
+    document.getElementById(
+        "addressModalTitle"
+    ).textContent = "배송지 수정";
+
+    // form action 변경
+    const form =
+        document.getElementById(
+            "addAddressForm"
+        );
+
+    form.action =
+        "${pageContext.request.contextPath}/address/edit";
+
+    // 기존 데이터 넣기
+    document.getElementById(
+        "editAddressNo"
+    ).value = button.dataset.addressNo;
+
+    document.getElementById(
+        "newReceiverName"
+    ).value = button.dataset.receiverName || "";
+
+    document.getElementById(
+        "newZipcode"
+    ).value = button.dataset.zipcode || "";
+
+    document.getElementById(
+        "newAddress"
+    ).value = button.dataset.address || "";
+
+    document.getElementById(
+        "newDetailAddress"
+    ).value = button.dataset.detailAddress || "";
+
+    document.getElementById(
+        "newTel"
+    ).value = button.dataset.tel || "";
+
+    const requestMsg =
+        document.getElementById("newRequestMsg");
+
+    if (requestMsg) {
+        requestMsg.value =
+            button.dataset.requestMsg || "";
+    }
+
+    // 기본 배송지
+    const defaultCheckbox =
+        form.querySelector(
+            'input[name="addressDefault"]'
+        );
+
+    if (defaultCheckbox) {
+        defaultCheckbox.checked =
+            button.dataset.default === "true";
+    }
+
+    // 저장 → 수정
+    document.getElementById(
+        "addressSaveBtn"
+    ).textContent = "수정";
+
+    editModal.classList.add("show");
+
+    document.body.classList.add(
+        "modal-open"
+    );
 }
 
 function addPaymentMethod() {

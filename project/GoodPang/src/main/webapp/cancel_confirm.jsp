@@ -151,7 +151,7 @@ body {
     <!-- 하단 버튼 영역 -->
     <div class="button-group">
         <!-- 클릭 시 history 페이지로 바로 이동 -->
-        <button type="button" class="btn-history" onclick="location.href='${pageContext.request.contextPath}/cancel_history.jsp';">
+        <button type="button" class="btn-history" onclick="location.href='${pageContext.request.contextPath}/order/cancel_history';">
             취소/반품 내역 보기
         </button>
         <button type="button" class="btn-home" onclick="location.href='${pageContext.request.contextPath}/';">
