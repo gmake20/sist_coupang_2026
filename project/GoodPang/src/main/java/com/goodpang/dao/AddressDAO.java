@@ -180,85 +180,75 @@ public class AddressDAO {
 	    }
 	}
 	
-	public int updateAddress(AddressDTO dto) {
+	public int updateAddress(AddressDTO dto)
+	        throws SQLException, NamingException {
 
-	    int result = 0;
+	    String resetSql = """
+	        UPDATE DELIVERY_ADDRESS
+	        SET ADDRESS_DEFAULT = 'N'
+	        WHERE MEMBER_NO = ?
+	          AND ADDRESS_DEFAULT = 'Y'
+	          AND ADDRESS_NO <> ?
+	        """;
 
-	    String sql = """
-	            UPDATE DELIVERY_ADDRESS
-	            SET
-	                RECEIVER_NAME = ?,
-	                TEL = ?,
-	                ZIPCODE = ?,
-	                ADDRESS = ?,
-	                DETAIL_ADDRESS = ?,
-	                REQUEST_MSG = ?,
-	                ADDRESS_DEFAULT = ?
-	            WHERE ADDRESS_NO = ?
-	              AND MEMBER_NO = ?
-	            """;
+	    String updateSql = """
+	        UPDATE DELIVERY_ADDRESS
+	        SET
+	            RECEIVER_NAME = ?,
+	            TEL = ?,
+	            ZIPCODE = ?,
+	            ADDRESS = ?,
+	            DETAIL_ADDRESS = ?,
+	            REQUEST_MSG = ?,
+	            ADDRESS_DEFAULT = ?
+	        WHERE ADDRESS_NO = ?
+	          AND MEMBER_NO = ?
+	        """;
 
-	    try (
-	        Connection conn =
-	                ConnectionProvider.getConnection();
+	    try (Connection conn = ConnectionProvider.getConnection()) {
 
-	        PreparedStatement pstmt =
-	                conn.prepareStatement(sql)
-	    ) {
+	        try {
+	            conn.setAutoCommit(false);
 
-	        pstmt.setString(
-	                1,
-	                dto.getReceiverName()
-	        );
+	            if ("Y".equals(dto.getAddressDefault())) {
+	                try (PreparedStatement pstmt =
+	                        conn.prepareStatement(resetSql)) {
 
-	        pstmt.setString(
-	                2,
-	                dto.getTel()
-	        );
+	                    pstmt.setInt(1, dto.getMemberNo());
+	                    pstmt.setInt(2, dto.getAddressNo());
+	                    pstmt.executeUpdate();
+	                }
+	            }
 
-	        pstmt.setString(
-	                3,
-	                dto.getZipcode()
-	        );
+	            int result;
 
-	        pstmt.setString(
-	                4,
-	                dto.getAddress()
-	        );
+	            try (PreparedStatement pstmt =
+	                    conn.prepareStatement(updateSql)) {
 
-	        pstmt.setString(
-	                5,
-	                dto.getDetailAddress()
-	        );
+	                pstmt.setString(1, dto.getReceiverName());
+	                pstmt.setString(2, dto.getTel());
+	                pstmt.setString(3, dto.getZipcode());
+	                pstmt.setString(4, dto.getAddress());
+	                pstmt.setString(5, dto.getDetailAddress());
+	                pstmt.setString(6, dto.getRequestMsg());
+	                pstmt.setString(7, dto.getAddressDefault());
+	                pstmt.setInt(8, dto.getAddressNo());
+	                pstmt.setInt(9, dto.getMemberNo());
 
-	        pstmt.setString(
-	                6,
-	                dto.getRequestMsg()
-	        );
+	                result = pstmt.executeUpdate();
+	            }
 
-	        pstmt.setString(
-	                7,
-	                dto.getAddressDefault()
-	        );
+	            conn.commit();
+	            return result;
 
-	        pstmt.setInt(
-	                8,
-	                dto.getAddressNo()
-	        );
+	        } catch (SQLException e) {
+	            conn.rollback();
+	            throw e;
 
-	        pstmt.setInt(
-	                9,
-	                dto.getMemberNo()
-	        );
-
-	        result =
-	                pstmt.executeUpdate();
-
-	    } catch (Exception e) {
-	        e.printStackTrace();
+	        } finally {
+	            conn.setAutoCommit(true);
+	        }
 	    }
-
-	    return result;
 	}
 }
 
