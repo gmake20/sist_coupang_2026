@@ -120,6 +120,39 @@ public class ProductListDAO {
         return false;
     }
 
+    /*
+     * 판매중지/판매재개 토글. '승인 대기'나 '품절' 상태인 상품은 이 토글 대상이 아니므로
+     * 현재 상태가 '판매 중'/'판매 중지'인 행만 바꾸도록 WHERE에 조건을 건다.
+     */
+    public boolean updateSaleStatus(int productNo, int sellerNo, String saleStatus) {
+
+        String sql = """
+            UPDATE PRODUCT
+            SET SALE_STATUS = ?,
+                UPDATED_DATE = SYSDATE
+            WHERE PRODUCT_NO = ?
+              AND SELLER_NO = ?
+              AND SALE_STATUS IN ('판매 중', '판매 중지')
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setString(1, saleStatus);
+            pstmt.setInt(2, productNo);
+            pstmt.setInt(3, sellerNo);
+
+            return pstmt.executeUpdate() == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     private VendorProductListDTO mapRow(ResultSet rs) throws java.sql.SQLException {
 
         VendorProductListDTO dto = new VendorProductListDTO();

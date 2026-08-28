@@ -228,9 +228,14 @@
                   <c:forEach var="option" items="${product.options}">
                     <tr>
                       <td>
-                        <c:if test="${not empty option.mainImageUrl}">
-                          <img class="option-thumb" src="${pageContext.request.contextPath}/${option.mainImageUrl}" alt="">
-                        </c:if>
+                        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                          <c:if test="${not empty option.mainImageUrl}">
+                            <img class="option-thumb" src="${pageContext.request.contextPath}/${option.mainImageUrl}" alt="대표이미지">
+                          </c:if>
+                          <c:forEach var="extraImageUrl" items="${option.extraImageUrls}">
+                            <img class="option-thumb" src="${pageContext.request.contextPath}/${extraImageUrl}" alt="추가이미지">
+                          </c:forEach>
+                        </div>
                       </td>
                       <td>
                         <c:if test="${not empty option.option1Value}">${option.option1Type}: ${option.option1Value}</c:if>

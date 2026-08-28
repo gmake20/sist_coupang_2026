@@ -347,6 +347,22 @@
                         </c:when>
                         <c:otherwise>
                           <button class="btn btn-outline btn-sm" type="button">수정</button>
+                          <c:if test="${product.saleStatus == '판매 중'}">
+                            <form method="post" action="${pageContext.request.contextPath}/vendor/product/status"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('이 상품의 판매를 중지하시겠습니까?');">
+                              <input type="hidden" name="productNo" value="${product.productNo}">
+                              <input type="hidden" name="saleStatus" value="판매 중지">
+                              <button class="btn btn-outline btn-sm" type="submit">판매중지</button>
+                            </form>
+                          </c:if>
+                          <c:if test="${product.saleStatus == '판매 중지'}">
+                            <form method="post" action="${pageContext.request.contextPath}/vendor/product/status" style="display:inline;">
+                              <input type="hidden" name="productNo" value="${product.productNo}">
+                              <input type="hidden" name="saleStatus" value="판매 중">
+                              <button class="btn btn-primary btn-sm" type="submit">판매재개</button>
+                            </form>
+                          </c:if>
                           <form method="post" action="${pageContext.request.contextPath}/vendor/product/visibility"
                                 style="display:inline;"
                                 onsubmit="return confirm('이 상품을 목록에서 숨기시겠습니까?\n판매자 상품 목록에서만 보이지 않게 되며, 기존 구매자의 주문내역에는 영향이 없습니다.');">
