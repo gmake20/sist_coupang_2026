@@ -178,8 +178,9 @@
 						<button type="button" class="delivery-btn primary"
 							id="deliveryBtn">배송 조회</button>
 
-						<button type="button" class="delivery-btn" id="exchangeBtn">
-							교환, 반품 신청</button>
+						<button type="button" class="delivery-btn" id="exchangeBtn" 
+             onclick="location.href='${pageContext.request.contextPath}
+             /order_cancel.jsp?orderNo=${item.orderNo}'">교환, 반품 신청</button>
 
 						<button type="button" class="delivery-btn" id="reviewBtn">
 							리뷰 작성하기</button>
