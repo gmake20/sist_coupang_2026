@@ -8,10 +8,11 @@
 
     <title>GoodPang | 배송지 관리</title>
 
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/reset.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/css/goodpang_addressbook.css">     
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reset.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
+    
 </head>
 <body>
 

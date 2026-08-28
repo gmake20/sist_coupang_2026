@@ -277,7 +277,7 @@
 						<!-- 옵션 넘버 들어와야 할 곳 -->
 						<!-- 실제 CART에 저장할 OPTION_ID -->
 						<input type="hidden" name="optionId" id="selectedOptionId"
-							value="25">
+							value="79"> <!-- 옵션 번호 하드코딩 -->
 
 						<!-- 화면 표시용 선택 옵션 -->
 						<!-- 상품번호 -->
@@ -300,13 +300,32 @@
 						</div>
 
 						<!-- 장바구니 -->
-						<button type="submit" class="prod-cart-btn">장바구니 담기</button>
+						<button type="button"
+						        class="prod-cart-btn"
+						        id="cartAddBtn">
+						    장바구니 담기
+						</button>
+						<div id="cartAddedPopup"
+						     class="cart-added-popup">
+						
+						    <button type="button"
+						            class="cart-popup-close"
+						            id="cartPopupClose">
+						        ×
+						    </button>
+						
+						    <p>상품이 장바구니에 담겼습니다.</p>
+						
+						    <a href="${pageContext.request.contextPath}/cart"
+						       class="cart-popup-link">
+						        장바구니 바로가기 &gt;
+						    </a>
+						</div>
 
 						<!-- 바로구매 -->
 						<button type="submit" class="prod-buy-btn"
 							formaction="${pageContext.request.contextPath}/order/buy"
 							formmethod="post">
-
 							바로구매 <i class="arrow-right"></i>
 
 						</button>

@@ -608,7 +608,7 @@ public class CheckoutDAO {
 				p.PRODUCT_NO,
 				po.OPTION_ID,
 				?,
-				p.PRODUCT_PRICE + NVL(po.PRICE, 0)
+				NVL(p.PRODUCT_PRICE, 0) + NVL(po.PRICE, 0)
 				FROM PRODUCT_OPTION po
 				JOIN PRODUCT p
 				ON po.PRODUCT_NO = p.PRODUCT_NO
@@ -641,45 +641,148 @@ public class CheckoutDAO {
 		}
 	}
 
+	
+//	  public int updateCheckoutAmount(int checkoutNo) {
+//	  
+//	  String sql = """ 
+//	  				UPDATE CHECKOUT c SET c.PRODUCT_AMOUNT = ( SELECT
+//					  NVL(SUM(ci.PRICE * ci.ORDER_QTY), 0) FROM CHECKOUT_ITEM ci WHERE
+//					  ci.CHECKOUT_NO = c.CHECKOUT_NO ), c.TOTAL_PRICE = ( SELECT NVL(SUM(ci.PRICE *
+//					  ci.ORDER_QTY), 0) FROM CHECKOUT_ITEM ci WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+//					  ) WHERE c.CHECKOUT_NO = ? 
+//							  """;
+//	  
+//	  try ( Connection conn = ConnectionProvider.getConnection();
+//	  
+//	  PreparedStatement pstmt = conn.prepareStatement(sql) ) {
+//	  
+//	  pstmt.setInt(1, checkoutNo);
+//	  
+//	  return pstmt.executeUpdate();
+//	 
+//	 } catch (Exception e) {
+//	  
+//	  e.printStackTrace();
+//	  
+//	  throw new RuntimeException( "CHECKOUT 금액 업데이트 실패", e );
+//	  
+//	  } }
+	 
+	
 	public int updateCheckoutAmount(int checkoutNo) {
 
-		String sql = """
-				UPDATE CHECKOUT c
-				SET
-				c.PRODUCT_AMOUNT = (
-				SELECT NVL(SUM(ci.PRICE * ci.ORDER_QTY), 0)
-				FROM CHECKOUT_ITEM ci
-				WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
-				),
-				c.TOTAL_PRICE = (
-				SELECT NVL(SUM(ci.PRICE * ci.ORDER_QTY), 0)
-				FROM CHECKOUT_ITEM ci
-				WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
-				)
-				WHERE c.CHECKOUT_NO = ?
-				""";
+	    String sql = """
+	            UPDATE CHECKOUT c
+	            SET
+	                PRODUCT_AMOUNT = (
+	                    SELECT NVL(
+	                        SUM(ci.PRICE * ci.ORDER_QTY),
+	                        0
+	                    )
+	                    FROM CHECKOUT_ITEM ci
+	                    WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+	                ),
 
-		try (
-				Connection conn =
-				ConnectionProvider.getConnection();
+	                DELIVERY_FEE =
+	                    CASE
+	                        WHEN (
+	                            SELECT NVL(
+	                                SUM(ci.PRICE * ci.ORDER_QTY),
+	                                0
+	                            )
+	                            FROM CHECKOUT_ITEM ci
+	                            WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+	                        ) >= 19800
+	                        THEN 0
+	                        ELSE 3000
+	                    END,
 
-				PreparedStatement pstmt =
-						conn.prepareStatement(sql)
-				) {
+	                TOTAL_PRICE =
+	                    GREATEST(
+	                        0,
 
-			pstmt.setInt(1, checkoutNo);
+	                        (
+	                            SELECT NVL(
+	                                SUM(ci.PRICE * ci.ORDER_QTY),
+	                                0
+	                            )
+	                            FROM CHECKOUT_ITEM ci
+	                            WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+	                        )
 
-			return pstmt.executeUpdate();
+	                        +
 
-		} catch (Exception e) {
+	                        CASE
+	                            WHEN (
+	                                SELECT NVL(
+	                                    SUM(ci.PRICE * ci.ORDER_QTY),
+	                                    0
+	                                )
+	                                FROM CHECKOUT_ITEM ci
+	                                WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+	                            ) >= 19800
+	                            THEN 0
+	                            ELSE 3000
+	                        END
 
-			e.printStackTrace();
+	                        - NVL(c.INSTANT_DISCOUNT, 0)
+	                        - NVL(c.COUPON_DISCOUNT, 0)
+	                        - NVL(c.CASH_USED, 0)
+	                    )
 
-			throw new RuntimeException(
-					"CHECKOUT 금액 업데이트 실패",
-					e
-					);
+	            WHERE c.CHECKOUT_NO = ?
+	            """;
+	    try (
+	            Connection conn =
+	                    ConnectionProvider.getConnection();
+	            PreparedStatement pstmt =
+	                    conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, checkoutNo);
+	        return pstmt.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException(
+	                "CHECKOUT 결제금액 계산 실패",
+	                e
+	        );
+	    }
+	}
+	
+	public int getOptionPrice(
+	        Connection conn,
+	        int productNo,
+	        int optionId) {
 
-		}
+	    String sql = """
+	            SELECT NVL(PRICE, 0) AS OPTION_PRICE
+	            FROM PRODUCT_OPTION
+	            WHERE PRODUCT_NO = ?
+	              AND OPTION_ID = ?
+	            """;
+	    try (
+	            PreparedStatement pstmt =
+	                    conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, productNo);
+	        pstmt.setInt(2, optionId);
+	        try (ResultSet rs =
+	                pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getInt(
+	                        "OPTION_PRICE"
+	                );
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException(
+	                "옵션 가격 조회 실패",
+	                e
+	        );
+	    }
+	    throw new RuntimeException(
+	            "존재하지 않는 상품 옵션입니다."
+	    );
 	}
 }
