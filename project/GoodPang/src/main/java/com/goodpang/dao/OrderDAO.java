@@ -97,100 +97,84 @@ public class OrderDAO {
 		return address;
 	}
 
-	public List<AddressDTO> getAddressList(
-			int memberNo) {
+	public List<AddressDTO> getAddressList(int memberNo) {
 
-		List<AddressDTO> list =
-				new ArrayList<>();
+	    List<AddressDTO> list = new ArrayList<>();
 
-		String sql = """
-				SELECT
-				    ADDRESS_NO,
-				    RECEIVER_NAME,
-				    ADDRESS,
-				    DETAIL_ADDRESS,
-				    TEL,
-				    REQUEST_MSG,
-				    ADDRESS_DEFAULT
-				FROM DELIVERY_ADDRESS
-				WHERE MEMBER_NO = ?
-				ORDER BY
-				    ADDRESS_DEFAULT DESC,
-				    ADDRESS_NO DESC
-				""";
+	    String sql = """
+	            SELECT
+	                ADDRESS_NO,
+	                RECEIVER_NAME,
+	                TEL,
+	                ZIPCODE,
+	                ADDRESS,
+	                DETAIL_ADDRESS,
+	                REQUEST_MSG,
+	                ADDRESS_DEFAULT
+	            FROM DELIVERY_ADDRESS
+	            WHERE MEMBER_NO = ?
+	            ORDER BY
+	                ADDRESS_DEFAULT DESC,
+	                ADDRESS_NO DESC
+	            """;
 
-		try (
-				Connection conn =
-				ConnectionProvider.getConnection();
+	    try (
+	        Connection conn =
+	                ConnectionProvider.getConnection();
 
-				PreparedStatement pstmt =
-						conn.prepareStatement(sql)
-				) {
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
 
-			pstmt.setInt(
-					1,
-					memberNo
-					);
+	        pstmt.setInt(1, memberNo);
 
-			try (
-					ResultSet rs =
-					pstmt.executeQuery()
-					) {
+	        try (ResultSet rs = pstmt.executeQuery()) {
 
-				while (rs.next()) {
+	            while (rs.next()) {
 
-					AddressDTO dto =
-							new AddressDTO();
+	                AddressDTO dto = new AddressDTO();
 
-					dto.setAddressNo(
-							rs.getInt(
-									"ADDRESS_NO"
-									)
-							);
+	                dto.setAddressNo(
+	                        rs.getInt("ADDRESS_NO")
+	                );
 
-					dto.setReceiverName(
-							rs.getString(
-									"RECEIVER_NAME"
-									)
-							);
+	                dto.setReceiverName(
+	                        rs.getString("RECEIVER_NAME")
+	                );
 
-					dto.setAddress(
-							rs.getString(
-									"ADDRESS"
-									)
-							);
+	                dto.setTel(
+	                        rs.getString("TEL")
+	                );
 
-					dto.setDetailAddress(
-							rs.getString(
-									"DETAIL_ADDRESS"
-									)
-							);
+	                dto.setZipcode(
+	                        rs.getString("ZIPCODE")
+	                );
 
-					dto.setTel(
-							rs.getString(
-									"TEL"
-									)
-							);
+	                dto.setAddress(
+	                        rs.getString("ADDRESS")
+	                );
 
-					dto.setRequestMsg(
-							rs.getString(
-									"REQUEST_MSG"
-									)
-							);
+	                dto.setDetailAddress(
+	                        rs.getString("DETAIL_ADDRESS")
+	                );
 
-					dto.setAddressDefault(
-									rs.getString("ADDRESS_DEFAULT")
-							);
+	                dto.setRequestMsg(
+	                        rs.getString("REQUEST_MSG")
+	                );
 
-					list.add(dto);
-				}
-			}
+	                dto.setAddressDefault(
+	                        rs.getString("ADDRESS_DEFAULT")
+	                );
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	                list.add(dto);
+	            }
+	        }
 
-		return list;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return list;
 	}
 
 	/*
