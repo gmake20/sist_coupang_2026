@@ -15,8 +15,17 @@ import com.goodpang.util.ConnectionProvider;
  */
 public class ProductListDAO {
 
-    // 판매자(sellerNo)가 등록한 상품 목록 - 최근 등록순
+    // 판매자(sellerNo)가 등록한 상품 목록(노출 중) - 최근 등록순
     public List<VendorProductListDTO> findBySellerNo(int sellerNo) {
+        return findBySellerNoAndDisplayYn(sellerNo, "Y");
+    }
+
+    // 판매자(sellerNo)가 숨긴 상품 목록 - 최근 등록순
+    public List<VendorProductListDTO> findHiddenBySellerNo(int sellerNo) {
+        return findBySellerNoAndDisplayYn(sellerNo, "N");
+    }
+
+    private List<VendorProductListDTO> findBySellerNoAndDisplayYn(int sellerNo, String displayYn) {
 
         List<VendorProductListDTO> list = new ArrayList<>();
 
@@ -56,6 +65,7 @@ public class ProductListDAO {
                     WHERE IMAGE_PURPOSE = '대표'
                 ) IMG ON IMG.PRODUCT_NO = P.PRODUCT_NO AND IMG.RN = 1
             WHERE P.SELLER_NO = ?
+              AND P.DISPLAY_YN = ?
             ORDER BY P.CREATED_DATE DESC
             """;
 
@@ -65,6 +75,7 @@ public class ProductListDAO {
         ) {
 
             pstmt.setInt(1, sellerNo);
+            pstmt.setString(2, displayYn);
 
             try (ResultSet rs = pstmt.executeQuery()) {
 
@@ -78,6 +89,68 @@ public class ProductListDAO {
         }
 
         return list;
+    }
+
+    // 판매자 상품목록 노출여부 변경 (소프트 삭제/복원). seller_no까지 확인해서 다른 판매자 상품은 못 바꾸게 막는다.
+    public boolean updateDisplayYn(int productNo, int sellerNo, String displayYn) {
+
+        String sql = """
+            UPDATE PRODUCT
+            SET DISPLAY_YN = ?,
+                UPDATED_DATE = SYSDATE
+            WHERE PRODUCT_NO = ?
+              AND SELLER_NO = ?
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setString(1, displayYn);
+            pstmt.setInt(2, productNo);
+            pstmt.setInt(3, sellerNo);
+
+            return pstmt.executeUpdate() == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /*
+     * 판매중지/판매재개 토글. '승인 대기'나 '품절' 상태인 상품은 이 토글 대상이 아니므로
+     * 현재 상태가 '판매 중'/'판매 중지'인 행만 바꾸도록 WHERE에 조건을 건다.
+     */
+    public boolean updateSaleStatus(int productNo, int sellerNo, String saleStatus) {
+
+        String sql = """
+            UPDATE PRODUCT
+            SET SALE_STATUS = ?,
+                UPDATED_DATE = SYSDATE
+            WHERE PRODUCT_NO = ?
+              AND SELLER_NO = ?
+              AND SALE_STATUS IN ('판매 중', '판매 중지')
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setString(1, saleStatus);
+            pstmt.setInt(2, productNo);
+            pstmt.setInt(3, sellerNo);
+
+            return pstmt.executeUpdate() == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     private VendorProductListDTO mapRow(ResultSet rs) throws java.sql.SQLException {
