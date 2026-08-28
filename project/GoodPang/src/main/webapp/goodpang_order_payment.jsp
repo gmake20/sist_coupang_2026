@@ -440,8 +440,17 @@
 			</div>
 
 			<form id="addAddressForm"
-				action="${pageContext.request.contextPath}/address/add"
-				method="post">
+				    action="${pageContext.request.contextPath}/address/add"
+				    method="post">
+				
+				    <!-- 결제 페이지에서 배송지 추가했다는 정보 -->
+				    <input type="hidden"
+				           name="checkoutNo"
+				           value="${checkoutNo}">
+				
+				    <input type="hidden"
+				           name="from"
+				           value="payment">
 
 				<div class="address-add-body">
 
@@ -453,12 +462,17 @@
 					</div>
 
 					<div class="add-address-row postcode-row">
-						<div class="add-address-icon">◉</div>
-
-						<button type="button" class="postcode-search-btn"
-							onclick="findPostcode()">우편번호 찾기</button>
-
-						<input type="hidden" name="zipcode" id="newZipcode">
+					    <div class="add-address-icon">◉</div>
+					
+					    <button type="button"
+					            class="postcode-search-btn"
+					            onclick="findPostcode()">
+					        우편번호 찾기
+					    </button>
+					
+					    <input type="hidden"
+					           name="zipcode"
+					           id="newZipcode">
 					</div>
 
 					<div class="add-address-row address-input-row">
@@ -482,17 +496,18 @@
 
 						<span class="phone-plus">＋</span>
 					</div>
-
-					<button type="button" class="delivery-option-row">
-						<div class="delivery-option-icon">▦</div>
-						<span>일반배송 정보를 선택해 주세요.</span> <strong>〉</strong>
-					</button>
-
-					<button type="button" class="delivery-option-row">
-						<div class="delivery-option-icon">▦</div>
-						<span>새벽배송 정보를 선택해 주세요.</span> <strong>〉</strong>
-					</button>
-
+					ㄴ
+						<div class="add-address-row hidden"
+						     id="requestMsgDirectArea">
+						
+						    <div class="add-address-icon">✎</div>
+						
+						    <input type="text"
+						           id="newRequestMsg"
+						           name="requestMsg"
+						           placeholder="배송 요청사항을 입력해주세요."
+						           maxlength="100">
+						</div>
 					<label class="default-address-check"> <input
 						type="checkbox" name="addressDefault" value="Y"> <span
 						class="custom-check"></span> 기본 배송지로 선택
@@ -633,7 +648,11 @@
 			</div>
 		</div>
 	</div>
+	
+	<script src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script>
+
+	
 
 
 
@@ -919,7 +938,41 @@ function closeAddAddressModal() {
 
 
 function findPostcode() {
-	alert("우편번호 검색 API를 연결하면 됩니다.");
+
+    new kakao.Postcode({
+
+        oncomplete: function(data) {
+
+            let address = "";
+
+            // 도로명 주소 선택
+            if (data.userSelectedType === "R") {
+
+                address = data.roadAddress;
+
+            // 지번 주소 선택
+            } else {
+
+                address = data.jibunAddress;
+            }
+
+            // 우편번호
+            document.getElementById(
+                "newZipcode"
+            ).value = data.zonecode;
+
+            // 주소
+            document.getElementById(
+                "newAddress"
+            ).value = address;
+
+            // 상세주소로 포커스
+            document.getElementById(
+                "newDetailAddress"
+            ).focus();
+        }
+
+    }).open();
 }
 
 
