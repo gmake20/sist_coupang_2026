@@ -59,7 +59,7 @@ public class OrderPaymentServlet extends HttpServlet {
 		Integer paymentMethodNo = null;
 
 
-		if ("BANK".equals(paymentMethod)) {
+		if ("BANK_TRANSFER".equals(paymentMethod)) {
 
 		    String paymentMethodNoParam =
 		            request.getParameter(
