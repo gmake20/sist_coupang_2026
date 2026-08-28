@@ -33,6 +33,12 @@ public class OrderDetailDTO {
     private String memberName;
     private String phone;
     
+ // [취소/반품(PRODUCT_RETURN) 관련 추가 필드]
+    private Long returnNo;
+    private Timestamp requestDate;        // 취소/반품 신청일자
+    private String returnReason;          // 취소/반품 사유
+    private int refundAmount;             // 환불 금액
+    private Timestamp expectedCancelDate; // ★ 신규 추가: 취소 완료 예정일
     
     // 포맷 관련 필드 추가
     private String cardCompanyName;
