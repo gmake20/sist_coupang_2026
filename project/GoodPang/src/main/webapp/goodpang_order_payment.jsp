@@ -101,8 +101,8 @@
 
 						<!-- 계좌이체 -->
 						<label class="pay-radio-row account-row"> <input
-							type="radio" name="paymentMethod" value="BANK_TRANSFER"
-							form="paymentForm" checked> <span class="pay-title">계좌이체</span>
+							type="radio" name="paymentMethod" value="BANK_TRANSFER" form="paymentForm"
+							checked> <span class="pay-title">계좌이체</span>
 						</label>
 
 						<!-- 등록된 계좌 -->
@@ -171,28 +171,38 @@
 											<c:forEach var="card" items="${cardMethods}">
 												<option value="${card.paymentMethodNo}"
 													${card.paymentDefault ? 'selected' : ''}>
+
 													<c:choose>
+														<c:when test="${card.cardCompany eq 'BC'}">
+															비씨카드
+															</c:when>
 														<c:when test="${card.cardCompany eq 'SHINHAN'}">
 															신한카드
-														</c:when>
+															</c:when>
 														<c:when test="${card.cardCompany eq 'KB'}">
 															KB국민카드
-														</c:when>
+															</c:when>
 														<c:when test="${card.cardCompany eq 'SAMSUNG'}">
 															삼성카드
-														</c:when>
+															</c:when>
 														<c:when test="${card.cardCompany eq 'HYUNDAI'}">
 															현대카드
-														</c:when>
+															</c:when>
 														<c:when test="${card.cardCompany eq 'LOTTE'}">
 															롯데카드
-														</c:when>
+															</c:when>
 														<c:when test="${card.cardCompany eq 'HANA'}">
 															하나카드
-														</c:when>
+															</c:when>
+														<c:when test="${card.cardCompany eq 'WOORI'}">
+															우리카드
+															</c:when>
+														<c:when test="${card.cardCompany eq 'NH'}">
+															NH농협카드
+															</c:when>
 														<c:otherwise>
 															${card.cardCompany}
-														</c:otherwise>
+															</c:otherwise>
 													</c:choose> / **** ${card.cardLast4}
 												</option>
 											</c:forEach>
@@ -510,7 +520,7 @@
 					method="post">
 					<input type="hidden" name="checkoutNo" value="${checkoutNo}">
 					<input type="hidden" name="paymentType" id="newPaymentType"
-						value="BANK_TRANSFER">
+						value="BANK">
 
 
 					<!-- 계좌 / 카드 탭 -->
@@ -570,16 +580,19 @@
 
 						<select id="newCardCompany" name="cardCompany"
 							class="payment-add-select">
-
+							
 							<option value="">카드사를 선택해주세요</option>
+							<option value="BC">비씨카드</option>
 							<option value="SHINHAN">신한카드</option>
 							<option value="KB">KB국민카드</option>
 							<option value="SAMSUNG">삼성카드</option>
 							<option value="HYUNDAI">현대카드</option>
 							<option value="LOTTE">롯데카드</option>
 							<option value="HANA">하나카드</option>
-
-						</select>
+							<option value="WOORI">우리카드</option>
+							<option value="NH">NH농협카드</option>
+							
+							</select>
 
 
 						<div class="payment-add-label">카드번호</div>
@@ -1018,7 +1031,7 @@ function selectPaymentAddType(type) {
 		bankArea.classList.remove("hidden");
 		cardArea.classList.add("hidden");
 
-		paymentType.value = "BANK_TRANSFER";
+		paymentType.value = "BANK";
 
 	} else {
 
@@ -1147,7 +1160,7 @@ function addBankPaymentMethod() {
 
 	if (bankRadio) {
 		bankRadio.checked = true;
-		changePaymentMethod("BANK_TRANSFER");
+		changePaymentMethod("BANK");
 	}
 
 	const newDefault =

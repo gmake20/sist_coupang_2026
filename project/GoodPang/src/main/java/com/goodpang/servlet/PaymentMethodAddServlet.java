@@ -100,7 +100,7 @@ public class PaymentMethodAddServlet extends HttpServlet {
 		dto.setPaymentType(paymentType);
 		dto.setPaymentDefault(paymentDefault);
 
-		if ("BANK_TRANSFER".equals(paymentType)) {
+		if ("BANK".equals(paymentType)) {
 
 			if (bankCode == null
 					|| bankCode.isBlank()
@@ -203,7 +203,7 @@ public class PaymentMethodAddServlet extends HttpServlet {
 
 			int result;
 
-			if ("BANK_TRANSFER".equals(paymentType)) {
+			if ("BANK".equals(paymentType)) {
 				result =
 						dao.insertBankAccount(
 								conn,

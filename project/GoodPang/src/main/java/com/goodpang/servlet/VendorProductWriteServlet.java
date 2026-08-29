@@ -65,6 +65,7 @@ public class VendorProductWriteServlet extends HttpServlet {
 		}
 
 		try {
+			request.getParts(); // multipart 파싱 실패를 IllegalStateException으로 먼저 드러내기 위함 (getParameter()는 파싱 실패 시 예외 없이 null만 반환함)
 			ProductWriteDTO dto = buildProductWriteDTO(request, loginSeller);
 
 			if (dto.getProductName() == null || dto.getProductName().isBlank()) {
@@ -81,6 +82,14 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
+			Throwable cause = e.getCause();
+			if (cause != null) {
+				try {
+					Object limit = cause.getClass().getMethod("getLimit").invoke(cause);
+					System.err.println("[DEBUG] " + cause.getClass().getName() + " limit=" + limit);
+				} catch (ReflectiveOperationException ignore) {
+				}
+			}
 			writeJson(response, 400, new Result(false, "첨부 이미지의 개수 또는 용량이 너무 큽니다. 이미지 수를 줄이거나 용량을 낮춰 다시 시도해주세요.", 0));
 		} catch (NumberFormatException e) {
 			e.printStackTrace();

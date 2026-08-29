@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.dto.ReviewAvailableDTO;
 import com.goodpang.dto.ReviewItemDTO;
 import com.goodpang.util.LoginUtil;
 
@@ -15,60 +16,48 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/review/available")
-public class ReviewAvailableServlet
-        extends HttpServlet {
+public class ReviewAvailableServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private final ReviewDAO reviewDAO =
-        new ReviewDAO();
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-    @Override
-    protected void doGet(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
+		MemberDTO loginMember =
+				LoginUtil.requireLogin(request, response);
 
-        MemberDTO loginMember =
-            LoginUtil.requireLogin(
-                request,
-                response
-            );
+		if (loginMember == null) {
+			return;
+		}
 
-        if (loginMember == null) {
-            return;
-        }
+		int memberNo = loginMember.getMemberNo();
 
-        int memberNo =
-            loginMember.getMemberNo();
+		ReviewDAO reviewDAO = new ReviewDAO();
 
-        List<ReviewItemDTO> availableList =
-            reviewDAO
-                .selectAvailableReviewsByMemberNo(
-                    memberNo
-                );
+		List<ReviewAvailableDTO> reviewList =
+				reviewDAO.getReviewStatus(memberNo);
 
-        int reviewCount =
-            reviewDAO
-                .countReviewsByMemberNo(
-                    memberNo
-                );
+		int availableCount = 0;
+		int writtenCount = 0;
 
-        request.setAttribute(
-            "availableList",
-            availableList
-        );
+		for (ReviewAvailableDTO review : reviewList) {
 
-        request.setAttribute(
-            "reviewCount",
-            reviewCount
-        );
+			if (review.isReviewWritten()) {
+				writtenCount++;
+			} else {
+				availableCount++;
+			}
 
-        request.getRequestDispatcher(
-            "/review_available.jsp"
-        ).forward(
-            request,
-            response
-        );
-    }
+		}
+
+		request.setAttribute("reviewList", reviewList);
+		
+		request.setAttribute("availableCount", availableCount);
+		
+		request.setAttribute("writtenCount", writtenCount);
+
+		request.getRequestDispatcher("/review_available.jsp")
+		.forward(request, response);
+	}
 }

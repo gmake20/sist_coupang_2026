@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
+import com.goodpang.dto.ReviewAvailableDTO;
 import com.goodpang.dto.ReviewDTO;
 import com.goodpang.dto.ReviewDTO2;
 import com.goodpang.dto.ReviewItemDTO;
@@ -288,7 +289,7 @@ public class ReviewDAO {
 	                    dto.setRating(rs.getInt("PRODUCT_RATING"));
 
 	                    dto.setReviewContent(rs.getString("REVIEW_CONTENT"));
-	                    dto.setReviewContent(rs.getString("REVIEW_SUMMARY"));
+	                    dto.setReviewSummary(rs.getString("REVIEW_SUMMARY"));
 	                    dto.setReviewDate(sdf.format(rs.getDate("REVIEW_DATE")));
 	                    dto.setMaskedName(maskName(rs.getString("MEMBER_NAME")));
 	                    dto.setProductName(rs.getString("PRODUCT_NAME"));
@@ -1180,6 +1181,69 @@ public class ReviewDAO {
                     dto.setOptionName(
                         option.toString()
                     );
+
+                    list.add(dto);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    public List<ReviewAvailableDTO> getReviewStatus(int memberNo) {
+
+        List<ReviewAvailableDTO> list = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                od.ORDER_DETAIL_NO,
+                od.PRODUCT_NO,
+                p.PRODUCT_NAME,
+                CASE
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM REVIEW r
+                        WHERE r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO
+                    )
+                    THEN 1
+                    ELSE 0
+                END AS REVIEW_WRITTEN
+            FROM ORDER_DETAIL od
+            JOIN ORDERS o
+                ON o.ORDER_NO = od.ORDER_NO
+            JOIN PRODUCT p
+                ON p.PRODUCT_NO = od.PRODUCT_NO
+            WHERE o.MEMBER_NO = ?
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+
+            pstmt.setInt(1, memberNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                while (rs.next()) {
+
+                    ReviewAvailableDTO dto =
+                            new ReviewAvailableDTO();
+
+                    dto.setOrderDetailNo(
+                            rs.getInt("ORDER_DETAIL_NO"));
+
+                    dto.setProductNo(
+                            rs.getInt("PRODUCT_NO"));
+
+                    dto.setProductName(
+                            rs.getString("PRODUCT_NAME"));
+
+                    dto.setReviewWritten(
+                            rs.getInt("REVIEW_WRITTEN") == 1);
 
                     list.add(dto);
                 }
