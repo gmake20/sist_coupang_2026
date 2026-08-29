@@ -3,6 +3,7 @@ package com.goodpang.servlet;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -12,21 +13,22 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
+
 import com.goodpang.dao.ProductDAO;
+import com.goodpang.dao.ProductImageDAO;
+import com.goodpang.dao.ProductOptionDAO;
 import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.ProductDTO;
+import com.goodpang.dto.ProductImageDTO;
+import com.goodpang.dto.ProductOptionDTO;
 import com.goodpang.dto.ReviewDTO;
 
-/*
- * /product?productNo=1 로 들어오면 DB 에서 상품 하나를 읽어서 product.jsp 로 넘겨줌.
- * (OrderDetailServlet.java 와 같은 패턴 — @WebServlet + doGet + forward)
- *
- * ★ 실제 데이터는 PRODUCT_NO 1~21번만 있음 (SEQ_PRODUCT 가 22부터 시작하는 걸로 확인).
- *   product.jsp 에 지금 하드코딩된 productId=25 는 없는 번호라 테스트할 땐
- *   1~21 사이 값으로 접속해볼 것.
- */
+
 @WebServlet("/product")
 public class ProductServlet extends HttpServlet {
+
+    private static final Gson gson = new Gson();
 
     @Override
     protected void doGet(
@@ -64,9 +66,41 @@ public class ProductServlet extends HttpServlet {
                 request.setAttribute("rewardCash", rewardCash);
 
                 request.setAttribute("p", product);
-                
-                request.setAttribute("p", product);
-                
+
+                // 옵션 + 옵션별/상세설명 사진
+                //  옵션 하나(OPTION_ID)마다 대표/추가 사진이 딸려있고, OPTION_ID 가 null 인 사진은
+                //  상세설명용이라 따로 뺌)
+                ProductOptionDAO optionDAO = new ProductOptionDAO();
+                List<ProductOptionDTO> options = optionDAO.selectOptionsByProductNo(productNo);
+
+                ProductImageDAO imageDAO = new ProductImageDAO();
+                List<ProductImageDTO> images = imageDAO.selectImagesByProductNo(productNo);
+
+                List<ProductImageDTO> detailImages = new ArrayList<>();
+
+                for (ProductImageDTO image : images) {
+                    if (image.getOptionId() == null) {
+                        // OPTION_ID 없는 사진 = 상세설명 사진
+                        detailImages.add(image);
+                        continue;
+                    }
+                    // OPTION_ID 있는 사진 = 그 옵션의 대표/추가 사진 → 해당 옵션에 붙여줌
+                    for (ProductOptionDTO option : options) {
+                        if (option.getOptionId() == image.getOptionId()) {
+                            option.getImages().add(image);
+                            break;
+                        }
+                    }
+                }
+
+                request.setAttribute("options", options);
+                request.setAttribute("detailImages", detailImages);
+
+                // 옵션 드롭박스/색상칩은 js 가 그림(js/product.js 의 setupOptionSelect).
+                // JSP 에서 JSON 을 손으로 조립하면 값에 따옴표 같은 게 들어갈 때 깨져서,
+                // Gson 으로 안전하게 만들어 넘김 (Gson 이 <, > 도 이스케이프해줘서 </script> 사고도 없음)
+                request.setAttribute("optionsJson", gson.toJson(options));
+
                 // 리뷰
                 ReviewDAO reviewDAO = new ReviewDAO();
                 List<ReviewDTO> reviews = reviewDAO.selectReviewsByProductNo(productNo);

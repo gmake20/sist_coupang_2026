@@ -46,12 +46,6 @@ public class BuyServlet extends HttpServlet {
         String quantityParam =
                 request.getParameter("quantity");
         
-		/*
-		 * System.out.println( "productNo = " + productNoParam );
-		 * 
-		 * System.out.println( "quantity = " + quantityParam );
-		 */
-
         String optionIdParam =
                 request.getParameter("optionId");
 
@@ -113,9 +107,25 @@ public class BuyServlet extends HttpServlet {
                 );
             }
 
-            int productAmount =
-                    productPrice * quantity;
+            int optionPrice = 0;
 
+            if (optionId != null) {
+
+                optionPrice =
+                        dao.getOptionPrice(
+                                conn,
+                                productNo,
+                                optionId
+                        );
+            }
+
+            // 실제 구매 단가
+            int unitPrice =
+                    productPrice + optionPrice;
+
+            // 수량 포함 상품금액
+            int productAmount =
+                    unitPrice * quantity;
 
             int instantDiscount = 0;
             int couponDiscount = 0;
@@ -149,7 +159,6 @@ public class BuyServlet extends HttpServlet {
                         "CHECKOUT 생성 실패"
                 );
             }
-
             int itemResult =
                     dao.insertCheckoutItem(
                             conn,
@@ -157,7 +166,7 @@ public class BuyServlet extends HttpServlet {
                             productNo,
                             optionId,
                             quantity,
-                            productPrice
+                            unitPrice
                     );
 
             if (itemResult != 1) {
@@ -166,49 +175,33 @@ public class BuyServlet extends HttpServlet {
                         "CHECKOUT_ITEM 생성 실패"
                 );
             }
-
             conn.commit();
-
             response.sendRedirect(
                     request.getContextPath()
                     + "/order/payment?checkoutNo="
                     + checkoutNo
             );
 
-
         } catch (NumberFormatException e) {
-
             rollback(conn);
-
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
                     "잘못된 상품 정보입니다."
             );
-
-
         } catch (Exception e) {
-
             rollback(conn);
-
             e.printStackTrace();
-
             throw new ServletException(
                     "바로구매 처리 중 오류가 발생했습니다.",
                     e
             );
 
-
         } finally {
-
             if (conn != null) {
-
                 try {
-
                     conn.setAutoCommit(true);
                     conn.close();
-
                 } catch (Exception e) {
-
                     e.printStackTrace();
                 }
             }
@@ -218,15 +211,10 @@ public class BuyServlet extends HttpServlet {
 
     private void rollback(
             Connection conn) {
-
         if (conn != null) {
-
             try {
-
                 conn.rollback();
-
             } catch (Exception e) {
-
                 e.printStackTrace();
             }
         }

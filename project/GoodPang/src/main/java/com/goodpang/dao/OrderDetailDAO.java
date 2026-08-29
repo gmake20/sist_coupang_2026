@@ -84,7 +84,6 @@ public class OrderDetailDAO {
                     dto.setOption2Type(rs.getString("OPTION2_TYPE"));
                     dto.setOption2Value(rs.getString("OPTION2_VALUE"));
 
-                    System.out.println("[DEBUG OrderDetailDAO] 주문상세번호 " + dto.getOrderDetailNo());
                     list.add(dto);
                 }
             }
@@ -293,17 +292,6 @@ public class OrderDetailDAO {
                             rs.getString("OPTION2_VALUE")
                     );
 
-
-                    System.out.println(
-                            "[DEBUG OrderDetailDAO] 주문상세번호 = "
-                            + dto.getOrderDetailNo()
-                            + ", 결제수단 = "
-                            + dto.getPaymentMethod()
-                            + ", 카드사 = "
-                            + dto.getCardCompanyName()
-                            + ", 은행 = "
-                            + dto.getBankName()
-                    );
 
                     list.add(dto);
                 }

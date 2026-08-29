@@ -50,6 +50,12 @@ public class AddressAddServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        
+        String checkoutNo =
+                request.getParameter("checkoutNo");
+
+        String from =
+                request.getParameter("from");
 
         MemberDTO loginMember =
                 LoginUtil.requireLogin(
@@ -108,11 +114,24 @@ public class AddressAddServlet extends HttpServlet {
             int result = dao.insertAddress(dto);
 
             if (result > 0) {
+            	
+            	if ("payment".equals(from)
+            	        && checkoutNo != null
+            	        && !checkoutNo.isBlank()) {
 
-                response.sendRedirect(
-                        request.getContextPath()
-                                + "/address/list"
-                );
+            	    response.sendRedirect(
+            	        request.getContextPath()
+            	        + "/order/payment?checkoutNo="
+            	        + checkoutNo
+            	    );
+
+            	} else {
+
+            	    response.sendRedirect(
+            	        request.getContextPath()
+            	        + "/address/list"
+            	    );
+            	}
 
             } else {
 
