@@ -12,6 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/signup")
 public class SignupServlet extends HttpServlet {
@@ -160,20 +161,38 @@ public class SignupServlet extends HttpServlet {
         dto.setRank("USER");
 
         int result = dao.insertMember(dto);
-
+        
         if (result == 1) {
-        	response.sendRedirect(
-        		    request.getContextPath()
-        		    + "/"
-        		);
+        	
+            MemberDTO loginMember =
+                    dao.findByEmail(email);
+            if (loginMember != null) {
+                // 로그인 세션 생성
+                HttpSession session =
+                        request.getSession();
 
+                session.setAttribute(
+                        "loginMember",
+                        loginMember
+                );
+
+                // 메인 페이지 이동
+                response.sendRedirect(
+                        request.getContextPath() + "/"
+                );
+            } else {
+                request.setAttribute(
+                        "error",
+                        "회원가입은 완료되었지만 로그인 처리에 실패했습니다."
+                );
+                request.getRequestDispatcher("/login.jsp")
+                       .forward(request, response);
+            }
         } else {
-
             request.setAttribute(
                     "error",
                     "회원가입에 실패했습니다."
             );
-
             request.getRequestDispatcher("/signup.jsp")
                    .forward(request, response);
         }
