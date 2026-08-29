@@ -708,3 +708,253 @@
 .wow-join-submit:hover {
     background: #1259b5;
 }
+
+/* ==========================
+   WOW 결제
+========================== */
+
+.wow-payment-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 25px 0;
+    padding: 20px;
+    background: #f0f7ff;
+    border-radius: 10px;
+}
+
+.wow-payment-price span {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.wow-payment-price strong {
+    color: #1769d2;
+    font-size: 25px;
+}
+
+.wow-payment-method-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wow-payment-method {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 17px;
+    border: 1px solid #d8dee7;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.wow-payment-method:hover {
+    border-color: #1769d2;
+}
+
+.wow-payment-method:has(input:checked) {
+    border-color: #1769d2;
+    background: #f2f7ff;
+}
+
+.wow-payment-method input {
+    width: 18px;
+    height: 18px;
+}
+
+.wow-payment-method-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wow-payment-method-info strong {
+    color: #222;
+    font-size: 15px;
+}
+
+.wow-payment-method-info span {
+    color: #777;
+    font-size: 13px;
+}
+
+.wow-payment-agree {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 25px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+    color: #555;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.wow-payment-agree input {
+    width: 16px;
+    height: 16px;
+}
+
+.wow-payment-empty {
+    padding: 30px 15px;
+    text-align: center;
+    color: #777;
+}
+
+.wow-payment-empty a {
+    display: block;
+    margin-top: 10px;
+    color: #1769d2;
+    font-weight: 700;
+}
+
+.payment-add-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 300000;
+}
+
+.payment-add-modal {
+    position: relative;
+    width: 430px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 14px;
+    box-sizing: border-box;
+}
+
+.payment-add-close {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    border: 0;
+    background: transparent;
+    color: #777;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.payment-add-title {
+    margin: 0 0 25px;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.payment-type-tabs {
+    display: flex;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #ddd;
+}
+
+.payment-type-tab {
+    flex: 1;
+    height: 45px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: #fff;
+    color: #777;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.payment-type-tab.active {
+    border-bottom-color: #1769d2;
+    color: #1769d2;
+}
+
+.payment-form-row {
+    margin-bottom: 18px;
+}
+
+.payment-form-row label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.payment-form-row input,
+.payment-form-row select {
+    width: 100%;
+    height: 46px;
+    padding: 0 12px;
+    border: 1px solid #ccd2da;
+    border-radius: 7px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.payment-default-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 20px 0;
+    font-size: 13px;
+}
+
+.payment-add-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.payment-add-buttons button {
+    flex: 1;
+    height: 48px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.payment-add-cancel {
+    border: 1px solid #ccd2da;
+    background: #fff;
+}
+
+.payment-add-submit {
+    border: 0;
+    background: #1769d2;
+    color: #fff;
+}
+
+.card-number-group {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.payment-form-row .card-number-group .card-number-input {
+    flex: 1;
+    width: 0;
+    min-width: 0;
+    height: 46px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    text-align: center;
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
+.card-number-group span {
+    flex: 0 0 auto;
+    color: #777;
+    font-size: 16px;
+}
+
+.wow-payment-method-list {
+    max-height: 240px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px;
+}

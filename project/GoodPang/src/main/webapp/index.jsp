@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
 <!DOCTYPE html>
 
@@ -3201,11 +3201,10 @@
 	<script src="js/main.js"></script>
 
 	<!-- 와우 가입 모달 -->
-<!-- 	<div id="wowModal" class="wow-modal-overlay">
+	<!-- 	<div id="wowModal" class="wow-modal-overlay">
  -->
- 	<div id="wowModal"
-     class="wow-modal-overlay"
-     <c:if test="${sessionScope.loginMember.rank eq 'WOW'}">
+	<div id="wowModal" class="wow-modal-overlay"
+		<c:if test="${sessionScope.loginMember.rank eq 'WOW'}">
          style="display:none;"
      </c:if>>
 
@@ -3299,13 +3298,10 @@
 			<div class="wow-modal-buttons">
 				<button type="button" id="wowLaterBtn" class="wow-later-btn">
 					나중에 보기</button>
-<%-- 				<a href="${pageContext.request.contextPath}/wow/join"
+				<%-- 				<a href="${pageContext.request.contextPath}/wow/join"
 					class="wow-join-btn"> 와우 가입하기 </a> --%>
-					<button type="button"
-					        id="wowJoinOpenBtn"
-					        class="wow-join-btn">
-					    와우 가입하기
-					</button>
+				<button type="button" id="wowJoinOpenBtn" class="wow-join-btn">
+					와우 가입하기</button>
 				<div class="wow-today-close">
 					<label> <input type="checkbox" id="wowTodayCheck">
 						오늘 하루 보지 않기
@@ -3315,154 +3311,367 @@
 			<p class="wow-modal-notice">언제든 해지 가능하며, 해지 시 멤버십 혜택이 종료됩니다.</p>
 		</div>
 	</div>
-	
+
 	<!-- 와우 가입 모달 -->
-<div id="wowJoinModal" class="wow-join-overlay">
-    <div class="wow-join-modal">
+	<div id="wowJoinModal" class="wow-join-overlay">
+		<div class="wow-join-modal">
 
-        <button type="button"
-                id="wowJoinCloseBtn"
-                class="wow-join-close">
-            &times;
-        </button>
-        <div class="wow-join-logo">
-            WOW
-        </div>
-        <h2 class="wow-join-title">
-            와우 멤버십 가입
-        </h2>
-        <p class="wow-join-description">
-            와우 멤버십으로 빠른 배송부터 다양한 혜택까지 이용해보세요.
-        </p>
-        <div class="wow-member-box">
-            <strong>
-                <c:out value="${sessionScope.loginMember.memberName}" />
-            </strong>
-            님의 와우 멤버십 가입
-        </div>
+			<button type="button" id="wowJoinCloseBtn" class="wow-join-close">&times;</button>
 
-        <ul class="wow-join-benefits">
-            <li>
-                <span class="benefit-icon">🚀</span>
-                <div>
-                    <strong>로켓배송 무료배송</strong>
-                    <p>와우회원 전용 무료배송 혜택</p>
-                </div>
-            </li>
-            <li>
-                <span class="benefit-icon">📦</span>
-                <div>
-                    <strong>30일 무료반품</strong>
-                    <p>편리하게 반품할 수 있습니다.</p>
-                </div>
-            </li>
-            <li>
-                <span class="benefit-icon">🌿</span>
-                <div>
-                    <strong>로켓프레시</strong>
-                    <p>신선식품 새벽배송 혜택</p>
-                </div>
-            </li>
-            <li>
-                <span class="benefit-icon">▶</span>
-                <div>
-                    <strong>쿠팡플레이</strong>
-                    <p>영화와 콘텐츠를 자유롭게</p>
-                </div>
-            </li>
-        </ul>
-        <div class="wow-join-price">
-            <span>월 멤버십</span>
-            <strong>7,890원</strong>
-        </div>
-        <form action="${pageContext.request.contextPath}/wow/join"
-              method="post">
-            <div class="wow-join-buttons">
-                <button type="button"
-                        id="wowJoinCancelBtn"
-                        class="wow-join-cancel">
-                    취소
-                </button>
-                <button type="submit"
-                        class="wow-join-submit">
-                    와우 멤버십 가입하기
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-	
-<script>
+			<!-- STEP 1 : 가입 안내 -->
+			<div id="wowJoinStep1">
+				<div class="wow-join-logo">WOW</div>
+
+				<h2 class="wow-join-title">와우 멤버십 가입</h2>
+
+				<p class="wow-join-description">와우 멤버십으로 빠른 배송부터 다양한 혜택까지
+					이용해보세요.</p>
+
+				<div class="wow-member-box">
+					<strong><c:out
+							value="${sessionScope.loginMember.memberName}" /></strong> 님의 와우 멤버십 가입
+				</div>
+
+				<ul class="wow-join-benefits">
+					<li><span class="benefit-icon">🚀</span>
+						<div>
+							<strong>로켓배송 무료배송</strong>
+							<p>와우회원 전용 무료배송 혜택</p>
+						</div></li>
+
+					<li><span class="benefit-icon">📦</span>
+						<div>
+							<strong>30일 무료반품</strong>
+							<p>편리하게 반품할 수 있습니다.</p>
+						</div></li>
+
+					<li><span class="benefit-icon">🌿</span>
+						<div>
+							<strong>로켓프레시</strong>
+							<p>신선식품 새벽배송 혜택</p>
+						</div></li>
+
+					<li><span class="benefit-icon">▶</span>
+						<div>
+							<strong>쿠팡플레이</strong>
+							<p>영화와 콘텐츠를 자유롭게</p>
+						</div></li>
+				</ul>
+
+				<div class="wow-join-price">
+					<span>월 멤버십</span> <strong>7,890원</strong>
+				</div>
+
+				<div class="wow-join-buttons">
+					<button type="button" id="wowJoinCancelBtn" class="wow-join-cancel">취소</button>
+					<button type="button" id="wowJoinNextBtn" class="wow-join-submit">와우
+						멤버십 가입하기</button>
+				</div>
+			</div>
+
+			<div id="wowJoinStep2" style="display: none;">
+				<div class="wow-join-logo">WOW</div>
+
+				<h2 class="wow-join-title">결제수단 선택</h2>
+
+				<p class="wow-join-description">와우 멤버십 이용을 위해 결제수단을 선택해주세요.</p>
+
+				<div class="wow-payment-price">
+					<span>결제 금액</span> <strong>7,890원</strong>
+				</div>
+
+				<form action="${pageContext.request.contextPath}/wow/join"
+					method="post" id="wowPaymentForm">
+					<!-- 기존 결제수단 목록 -->
+					<div id="wowPaymentMethodList" class="wow-payment-method-list">
+						결제수단을 불러오는 중입니다...</div>
+					 <button type="button" id="wowPaymentAddOpenBtn" class="wow-payment-add-open">
+			        <span>새 결제수단</span>
+			        <strong>+</strong>
+			    </button>
+					<label class="wow-payment-agree"> <input type="checkbox"
+						id="wowPaymentAgree" required> <span>와우 멤버십 월
+							7,890원 결제에 동의합니다.</span>
+					</label>
+					<div class="wow-join-buttons">
+						<button type="button" id="wowJoinBackBtn" class="wow-join-cancel">
+							이전</button>
+						<button type="submit" class="wow-join-submit">7,890원 결제하고
+							가입하기</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div id="paymentAddModal" class="payment-add-overlay">
+		<div class="payment-add-modal">
+			<button type="button" id="paymentAddCloseBtn"
+				class="payment-add-close">&times;</button>
+
+			<h2 class="payment-add-title">새 결제수단 등록</h2>
+
+			<div class="payment-type-tabs">
+				<button type="button" class="payment-type-tab active"
+					data-type="BANK">계좌</button>
+				<button type="button" class="payment-type-tab" data-type="CARD">카드</button>
+			</div>
+
+			<form id="paymentAddForm">
+				<input type="hidden" id="paymentType" name="paymentType"
+					value="BANK">
+
+				<div id="bankPaymentArea">
+					<div class="payment-form-row">
+						<label for="bankCode">은행</label> <select id="bankCode"
+							name="bankCode">
+							<option value="">은행 선택</option>
+							<option value="SHINHAN">신한은행</option>
+							<option value="KB">KB국민은행</option>
+							<option value="WOORI">우리은행</option>
+							<option value="NH">NH농협은행</option>
+							<option value="HANA">하나은행</option>
+							<option value="KAKAO">카카오뱅크</option>
+							<option value="TOSS">토스뱅크</option>
+						</select>
+					</div>
+
+					<div class="payment-form-row">
+						<label for="accountNumber">계좌번호</label> <input type="text"
+							id="accountNumber" name="accountNumber" maxlength="16"
+							inputmode="numeric" placeholder="'-' 없이 입력">
+					</div>
+
+					<div class="payment-form-row">
+						<label for="accountHolder">예금주</label> <input type="text"
+							id="accountHolder" name="accountHolder" maxlength="30"
+							placeholder="예금주 이름">
+					</div>
+				</div>
+
+				<div id="cardPaymentArea" style="display: none;">
+					<div class="payment-form-row">
+						<label for="cardCompany">카드사</label> <select id="cardCompany"
+							name="cardCompany">
+							<option value="">카드사 선택</option>
+							<option value="SHINHAN">신한카드</option>
+							<option value="KB">KB국민카드</option>
+							<option value="SAMSUNG">삼성카드</option>
+							<option value="HYUNDAI">현대카드</option>
+							<option value="LOTTE">롯데카드</option>
+							<option value="HANA">하나카드</option>
+						</select>
+					</div>
+
+					<div class="payment-form-row">
+						<label>카드번호</label>
+						<div class="card-number-group">
+							<input type="text" id="cardNumber1" class="card-number-input"
+								maxlength="4" inputmode="numeric"> <span>-</span> <input
+								type="text" id="cardNumber2" class="card-number-input"
+								maxlength="4" inputmode="numeric"> <span>-</span> <input
+								type="text" id="cardNumber3" class="card-number-input"
+								maxlength="4" inputmode="numeric"> <span>-</span> <input
+								type="text" id="cardNumber4" class="card-number-input"
+								maxlength="4" inputmode="numeric">
+						</div>
+						<input type="hidden" id="cardNumber" name="cardNumber">
+					</div>
+				</div>
+
+				<label class="payment-default-row"> <input type="checkbox"
+					name="paymentDefault" value="Y"> 기본 결제수단으로 설정
+				</label>
+
+				<div class="payment-add-buttons">
+					<button type="button" id="paymentAddCancelBtn"
+						class="payment-add-cancel">취소</button>
+					<button type="submit" class="payment-add-submit">등록하기</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script>
+const isLogin =
+    ${not empty sessionScope.loginMember};
+
 const isWowMember =
     ${not empty sessionScope.loginMember
       and sessionScope.loginMember.rank eq 'WOW'};
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const modal =
-        document.getElementById("wowModal");
+    const modal = document.getElementById("wowModal");
+    const closeBtn = document.getElementById("wowModalClose");
+    const laterBtn = document.getElementById("wowLaterBtn");
+    const todayCheck = document.getElementById("wowTodayCheck");
 
-    const closeBtn =
-        document.getElementById("wowModalClose");
+    const joinModal = document.getElementById("wowJoinModal");
+    const joinOpenBtn = document.getElementById("wowJoinOpenBtn");
+    const joinCloseBtn = document.getElementById("wowJoinCloseBtn");
+    const joinCancelBtn = document.getElementById("wowJoinCancelBtn");
 
-    const laterBtn =
-        document.getElementById("wowLaterBtn");
+    const joinStep1 = document.getElementById("wowJoinStep1");
+    const joinStep2 = document.getElementById("wowJoinStep2");
+    const joinNextBtn = document.getElementById("wowJoinNextBtn");
+    const joinBackBtn = document.getElementById("wowJoinBackBtn");
+    
+    
+    const paymentMethodList = document.getElementById("wowPaymentMethodList");
 
-    const todayCheck =
-        document.getElementById("wowTodayCheck");
+    const paymentAddOpenBtn = document.getElementById("wowPaymentAddOpenBtn");
+    const paymentAddModal = document.getElementById("paymentAddModal");
+    const paymentAddCloseBtn = document.getElementById("paymentAddCloseBtn");
+    const paymentAddCancelBtn = document.getElementById("paymentAddCancelBtn");
+    const paymentAddForm = document.getElementById("paymentAddForm");
 
-    const joinModal =
-        document.getElementById("wowJoinModal");
+    const paymentTypeInput = document.getElementById("paymentType");
+    const paymentTypeTabs = document.querySelectorAll(".payment-type-tab");
 
-    const joinOpenBtn =
-        document.getElementById("wowJoinOpenBtn");
+    const bankPaymentArea = document.getElementById("bankPaymentArea");
+    const cardPaymentArea = document.getElementById("cardPaymentArea");
 
-    const joinCloseBtn =
-        document.getElementById("wowJoinCloseBtn");
+    const accountNumber = document.getElementById("accountNumber");
 
-    const joinCancelBtn =
-        document.getElementById("wowJoinCancelBtn");
+    const cardNumber1 = document.getElementById("cardNumber1");
+    const cardNumber2 = document.getElementById("cardNumber2");
+    const cardNumber3 = document.getElementById("cardNumber3");
+    const cardNumber4 = document.getElementById("cardNumber4");
+    const cardNumber = document.getElementById("cardNumber");
 
-    /*
-     * WOW 회원이면 모든 가입 모달 숨김
-     */
+    const cardNumberInputs = [
+        cardNumber1,
+        cardNumber2,
+        cardNumber3,
+        cardNumber4
+    ];
+    
+    
+  
+    cardNumberInputs.forEach(function(input, index) {
+        input.addEventListener("input", function() {
+            this.value = this.value.replace(/[^0-9]/g, "").slice(0, 4);
+
+            if (this.value.length === 4 && index < 3) {
+                cardNumberInputs[index + 1].focus();
+            }
+
+            updateCardNumber();
+        });
+
+        input.addEventListener("keydown", function(event) {
+            if (event.key === "Backspace" && this.value.length === 0 && index > 0) {
+                cardNumberInputs[index - 1].focus();
+            }
+        });
+    });
+
+    function updateCardNumber() {
+        cardNumber.value = cardNumber1.value + cardNumber2.value + cardNumber3.value + cardNumber4.value;
+    }
+
+    
+    accountNumber.addEventListener("input", function() {
+        this.value = this.value
+            .replace(/[^0-9]/g, "")
+            .slice(0, 16);
+    });
+    
+    paymentAddOpenBtn.addEventListener("click", function () {
+        paymentAddModal.style.display = "flex";
+    });
+    
+    function closePaymentAddModal() {
+        paymentAddModal.style.display = "none";
+    }
+
+    paymentAddCloseBtn.addEventListener("click", closePaymentAddModal);
+    paymentAddCancelBtn.addEventListener("click", closePaymentAddModal);
+
+    paymentAddModal.addEventListener("click", function(event) {
+        if (event.target === paymentAddModal) {
+            closePaymentAddModal();
+        }
+    });
+    
+    paymentTypeTabs.forEach(function(tab) {
+        tab.addEventListener("click", function() {
+            const selectedType = this.dataset.type;
+
+            paymentTypeInput.value = selectedType;
+
+            paymentTypeTabs.forEach(function(item) {
+                item.classList.remove("active");
+            });
+
+            this.classList.add("active");
+
+            if (selectedType === "BANK") {
+                bankPaymentArea.style.display = "block";
+                cardPaymentArea.style.display = "none";
+            } else {
+                bankPaymentArea.style.display = "none";
+                cardPaymentArea.style.display = "block";
+            }
+        });
+    });
+
+
+    function getToday() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month =
+            String(now.getMonth() + 1).padStart(2, "0");
+        const day =
+            String(now.getDate()).padStart(2, "0");
+
+        return year + "-" + month + "-" + day;
+    }
+
     if (isWowMember) {
         modal.style.display = "none";
         joinModal.style.display = "none";
-
-        return;
-    }
-    /*
-     * 오늘 날짜
-     */
-    function getToday() {
-        const now = new Date();
-        const year =
-            now.getFullYear();
-        const month =
-            String(now.getMonth() + 1)
-                .padStart(2, "0");
-        const day =
-            String(now.getDate())
-                .padStart(2, "0");
-        return year + "-" + month + "-" + day;
-    }
-    /*
-     * 오늘 하루 보지 않기 확인
-     */
-    const hideDate =
-        localStorage.getItem(
-            "wowModalHideDate"
-        );
-    if (hideDate === getToday()) {
-        modal.style.display = "none";
     } else {
-        modal.style.display = "flex";
-    }
+        const hideDate =
+            localStorage.getItem("wowModalHideDate");
 
+        if (hideDate === getToday()) {
+            modal.style.display = "none";
+        } else {
+            modal.style.display = "flex";
+        }
+    }
     /*
-     * 홍보 모달 닫기
+     * 홍보 모달 → 가입 모달
      */
+    joinOpenBtn.addEventListener("click", function () {
+
+        /*
+         * 이미 WOW 회원
+         */
+        if (isWowMember) {
+            alert("이미 와우 회원입니다.");
+            return;
+        }
+
+        /*
+         * 비로그인
+         */
+        if (!isLogin) {
+            window.location.href =
+                "${pageContext.request.contextPath}/login";
+            return;
+        }
+
+        modal.style.display = "none";
+        joinModal.style.display = "flex";
+
+        joinStep1.style.display = "block";
+        joinStep2.style.display = "none";
+    });
+
+
     function closeWowModal() {
         if (todayCheck.checked) {
             localStorage.setItem(
@@ -3470,72 +3679,237 @@ document.addEventListener("DOMContentLoaded", function () {
                 getToday()
             );
         }
+
         modal.style.display = "none";
     }
+
     closeBtn.addEventListener(
         "click",
         closeWowModal
     );
+
     laterBtn.addEventListener(
         "click",
         closeWowModal
     );
-    modal.addEventListener(
-        "click",
-        function (event) {
 
-            if (event.target === modal) {
-                closeWowModal();
-            }
+    modal.addEventListener("click", function (event) {
+        if (event.target === modal) {
+            closeWowModal();
         }
-    );
+    });
 
-    document.addEventListener(
-        "keydown",
-        function (event) {
-            if (event.key === "Escape") {
-                modal.style.display = "none";
-                joinModal.style.display = "none";
-            }
-        }
-    );
 
     /*
-     * 와우 가입하기
+     * STEP 1 → 결제
      */
-    joinOpenBtn.addEventListener(
-        "click",
-        function () {
+    joinNextBtn.addEventListener("click", async function () {
 
-            modal.style.display = "none";
-            joinModal.style.display = "flex";
+        paymentMethodList.innerHTML =
+            "결제수단을 불러오는 중입니다...";
+
+        try {
+            const response = await fetch(
+                "${pageContext.request.contextPath}/wow/join",
+                {
+                    method: "GET"
+                }
+            );
+
+            if (response.status === 401) {
+                window.location.href =
+                    "${pageContext.request.contextPath}/login";
+                return;
+            }
+
+            if (response.status === 409) {
+                alert("이미 와우 회원입니다.");
+                window.location.href =
+                    "${pageContext.request.contextPath}/";
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    "결제수단 조회 실패"
+                );
+            }
+
+            const html =
+                await response.text();
+
+            paymentMethodList.innerHTML = html;
+
+            joinStep1.style.display = "none";
+            joinStep2.style.display = "block";
+
+        } catch (error) {
+            console.error(error);
+
+            paymentMethodList.innerHTML =
+                "결제수단을 불러오지 못했습니다.";
         }
-    );
+    });
+
+
     /*
-     * 가입 모달 닫기
+     * 결제 → 이전
      */
+    joinBackBtn.addEventListener("click", function () {
+        joinStep2.style.display = "none";
+        joinStep1.style.display = "block";
+    });
+
+
     function closeJoinModal() {
         joinModal.style.display = "none";
+        joinStep1.style.display = "block";
+        joinStep2.style.display = "none";
     }
+
     joinCloseBtn.addEventListener(
         "click",
         closeJoinModal
     );
+
     joinCancelBtn.addEventListener(
         "click",
         closeJoinModal
     );
-    joinModal.addEventListener(
-        "click",
-        function (event) {
 
-            if (event.target === joinModal) {
-                closeJoinModal();
+    joinModal.addEventListener("click", function (event) {
+        if (event.target === joinModal) {
+            closeJoinModal();
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            modal.style.display = "none";
+            joinModal.style.display = "none";
+        }
+    });
+    paymentAddForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const selectedType = paymentTypeInput.value;
+
+        if (selectedType === "BANK") {
+            const bankCode = document.getElementById("bankCode");
+            const accountHolder = document.getElementById("accountHolder");
+
+            if (!bankCode.value) {
+                alert("은행을 선택해주세요.");
+                bankCode.focus();
+                return;
+            }
+
+            if (!accountNumber.value.trim()) {
+                alert("계좌번호를 입력해주세요.");
+                accountNumber.focus();
+                return;
+            }
+
+            if (!accountHolder.value.trim()) {
+                alert("예금주를 입력해주세요.");
+                accountHolder.focus();
+                return;
             }
         }
-    );
+
+        if (selectedType === "CARD") {
+            const cardCompany = document.getElementById("cardCompany");
+
+            if (!cardCompany.value) {
+                alert("카드사를 선택해주세요.");
+                cardCompany.focus();
+                return;
+            }
+
+            updateCardNumber();
+
+            if (cardNumber.value.length !== 16) {
+                alert("카드번호 16자리를 모두 입력해주세요.");
+                return;
+            }
+        }
+
+        const params = new URLSearchParams();
+        params.set("paymentType", selectedType);
+
+        const paymentDefault = paymentAddForm.querySelector("[name='paymentDefault']");
+        params.set("paymentDefault", paymentDefault.checked ? "Y" : "N");
+
+        if (selectedType === "BANK") {
+            params.set("bankCode", document.getElementById("bankCode").value);
+            params.set("accountNumber", document.getElementById("accountNumber").value);
+            params.set("accountHolder", document.getElementById("accountHolder").value);
+        }
+
+        if (selectedType === "CARD") {
+            params.set("cardCompany", document.getElementById("cardCompany").value);
+            params.set("cardNumber", cardNumber.value);
+        }
+
+        try {
+            const response = await fetch("${pageContext.request.contextPath}/wow/payment-method", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                body: params.toString()
+            });
+
+            if (response.status === 401) {
+                window.location.href = "${pageContext.request.contextPath}/login";
+                return;
+            }
+
+            if (!response.ok) {
+                const message = await response.text();
+                throw new Error(message || "결제수단 등록에 실패했습니다.");
+            }
+
+            await loadWowPaymentMethods();
+            closePaymentAddModal();
+
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
+        }
+    });
+    async function loadWowPaymentMethods() {
+
+        paymentMethodList.innerHTML =
+            "결제수단을 불러오는 중입니다...";
+
+        const response = await fetch(
+            "${pageContext.request.contextPath}/wow/payment-method",
+            {
+                method: "GET"
+            }
+        );
+
+        if (response.status === 401) {
+            window.location.href =
+                "${pageContext.request.contextPath}/login";
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                "결제수단을 불러오지 못했습니다."
+            );
+        }
+
+        const html = await response.text();
+
+        paymentMethodList.innerHTML = html;
+    }
+
 
 });
+
 </script>
 </body>
 
