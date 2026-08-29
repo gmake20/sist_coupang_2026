@@ -32,6 +32,8 @@
 
 <!-- 3. 메인페이지 전용 -->
 
+<link rel="stylesheet"
+      href="${pageContext.request.contextPath}/css/wow_modal.css">
 </head>
 
 <body>
@@ -3384,6 +3386,7 @@
        ↑ 화살표는 이미지가 아니라 CSS 로 그림 (테두리 2개만 남기고 45도 회전 —
 
          장바구니 ›, 오늘의 발견 > 와 같은 기법). 글자는 화면낭독기용으로만 남겨둠 -->
+         
 
 	<button type="button" id="goto-top" class="goto-top">
 
@@ -3405,12 +3408,231 @@
 
 
 
-	<!-- JS는 </body> 바로 앞에! HTML을 다 읽은 뒤에 실행되게 하려고 -->
+	<!-- JS는 >> 바로 앞에! HTML을 다 읽은 뒤에 실행되게 하려고 -->
 
 	<script src="js/header.js"></script>
 
 	<script src="js/main.js"></script>
+	
+	<!-- 와우 가입 모달 -->
+<div id="wowModal" class="wow-modal-overlay">
 
+    <div class="wow-modal">
+
+        <!-- 닫기 -->
+        <button type="button"
+                class="wow-modal-close"
+                id="wowModalClose">
+            &times;
+        </button>
+
+        <div class="wow-modal-content">
+
+            <!-- 왼쪽 -->
+            <div class="wow-modal-left">
+
+                <div class="wow-badge">
+                    WOW
+                </div>
+
+                <h2 class="wow-title">
+                    쿠팡 와우 멤버십 가입
+                </h2>
+
+                <p class="wow-subtitle">
+                    와우회원이 되면
+                    <strong>더 많은 혜택</strong>을
+                    누릴 수 있어요!
+                </p>
+
+                <div class="wow-benefit-list">
+
+                    <div class="wow-benefit">
+                        <div class="wow-benefit-icon">
+                            🚀
+                        </div>
+
+                        <div>
+                            <strong>
+                                로켓배송 무료배송
+                            </strong>
+
+                            <p>
+                                강력한 로켓배송을 무료로!
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="wow-benefit">
+                        <div class="wow-benefit-icon">
+                            📦
+                        </div>
+
+                        <div>
+                            <strong>
+                                30일 무료반품
+                            </strong>
+
+                            <p>
+                                마음 편히 최대 30일 무료반품!
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="wow-benefit">
+                        <div class="wow-benefit-icon">
+                            🌿
+                        </div>
+
+                        <div>
+                            <strong>
+                                로켓프레시 혜택
+                            </strong>
+
+                            <p>
+                                신선식품 새벽/당일배송!
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="wow-benefit">
+                        <div class="wow-benefit-icon">
+                            ▶
+                        </div>
+
+                        <div>
+                            <strong>
+                                쿠팡플레이 이용
+                            </strong>
+
+                            <p>
+                                영화, 드라마, 예능을 마음껏!
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- 오른쪽 -->
+            <div class="wow-modal-right">
+
+                <div class="wow-crown">
+                    👑
+                </div>
+
+                <div class="wow-logo-box">
+                    WOW
+                </div>
+
+                <div class="wow-box">
+                    <div class="wow-box-items">
+                        🚀 🛍️ 🌿
+                    </div>
+
+                    <div class="wow-box-body">
+                        coupang
+                    </div>
+                </div>
+
+                <div class="wow-delivery">
+                    🚚
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- 버튼 -->
+        <div class="wow-modal-buttons">
+
+            <button type="button"
+                    id="wowLaterBtn"
+                    class="wow-later-btn">
+                나중에 보기
+            </button>
+
+            <a href="${pageContext.request.contextPath}/wow/join"
+               class="wow-join-btn">
+                와우 가입하기
+            </a>
+
+        </div>
+
+        <p class="wow-modal-notice">
+            언제든 해지 가능하며,
+            해지 시 멤버십 혜택이 종료됩니다.
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const modal =
+        document.getElementById("wowModal");
+
+    const closeBtn =
+        document.getElementById("wowModalClose");
+
+    const laterBtn =
+        document.getElementById("wowLaterBtn");
+
+
+    function closeWowModal() {
+
+        modal.style.display = "none";
+    }
+
+
+    closeBtn.addEventListener(
+        "click",
+        closeWowModal
+    );
+
+
+    laterBtn.addEventListener(
+        "click",
+        closeWowModal
+    );
+
+
+    /*
+     * 검은 배경 클릭 시 닫기
+     */
+    modal.addEventListener(
+        "click",
+        function (e) {
+
+            if (e.target === modal) {
+
+                closeWowModal();
+            }
+        }
+    );
+
+
+    /*
+     * ESC 키
+     */
+    document.addEventListener(
+        "keydown",
+        function (e) {
+
+            if (e.key === "Escape") {
+
+                closeWowModal();
+            }
+        }
+    );
+
+});
+</script>
 </body>
 
 </html>
