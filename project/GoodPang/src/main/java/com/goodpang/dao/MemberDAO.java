@@ -415,4 +415,31 @@ public class MemberDAO {
 	        return pstmt.executeUpdate();
 	    }
 	}
+	
+	public int updateToWow(int memberNo) {
+
+	    String sql = """
+	        UPDATE MEMBER
+	        SET RANK = 'WOW'
+	        WHERE MEMBER_NO = ?
+	        """;
+	    int rowCount = 0;
+	    try (
+	        Connection conn =
+	            ConnectionProvider.getConnection();
+	        PreparedStatement pstmt =
+	            conn.prepareStatement(sql);
+	    ) {
+	        pstmt.setInt(1, memberNo);
+	        rowCount =
+	            pstmt.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException(
+	            "와우 회원 변경 중 오류가 발생했습니다.",
+	            e
+	        );
+	    }
+	    return rowCount;
+	}
 }

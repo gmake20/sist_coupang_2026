@@ -1,4 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <!DOCTYPE html>
 
@@ -17,7 +19,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <link rel="stylesheet"
-
 	href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap">
 
 <link rel="stylesheet" href="css/reset.css">
@@ -33,21 +34,22 @@
 <!-- 3. 메인페이지 전용 -->
 
 <link rel="stylesheet"
-      href="${pageContext.request.contextPath}/css/wow_modal.css">
+	href="${pageContext.request.contextPath}/css/wow_modal.css">
 </head>
 
 <body>
-<!-- 최상단 배너 -->
+	<!-- 최상단 배너 -->
 	<div class="coupang-top-banner">
 		<div class="banner-middle">
 			<a href="#"> <span class="top-banner-placeholder"
-				style="background: #b5f3fe; color: #0b3d5c"> 오늘 밤 12시까지 주문해도 로켓배송은 내일 도착! <i class="arrow"></i>
+				style="background: #b5f3fe; color: #0b3d5c"> 오늘 밤 12시까지 주문해도
+					로켓배송은 내일 도착! <i class="arrow"></i>
 			</span></a> <a href="#"> <span class="top-banner-placeholder"
-				style="background: #80daff; color: #0b2d45"> <i	class="arrow"></i></span></a>
+				style="background: #80daff; color: #0b2d45"> <i class="arrow"></i></span></a>
 		</div>
 	</div>
-	 <!-- HEADER — 페이지 맨 위. 로고 / 검색 / 메뉴 -->
-		<jsp:include page="/inc/header.jsp" />
+	<!-- HEADER — 페이지 맨 위. 로고 / 검색 / 메뉴 -->
+	<jsp:include page="/inc/header.jsp" />
 
 	<!-- ==================================================
 
@@ -86,19 +88,13 @@
 				<!-- 배경 6장. 지금은 1번만 .is-on -->
 
 				<img class="main-today__bg is-on" src="images/banners/hero-bg-1.jpg"
-
 					alt=""> <img class="main-today__bg"
-
 					src="images/banners/hero-bg-2.jpg" alt=""> <img
-
 					class="main-today__bg" src="images/banners/hero-bg-3.jpg" alt="">
 
 				<img class="main-today__bg" src="images/banners/hero-bg-4.jpg"
-
 					alt=""> <img class="main-today__bg"
-
 					src="images/banners/hero-bg-5.jpg" alt=""> <img
-
 					class="main-today__bg" src="images/banners/hero-bg-6.jpg" alt="">
 
 				<div class="main-today__selected-product">
@@ -132,39 +128,28 @@
 						<li class="todayshot-right-thumbnail first-item today-selected">
 
 							<a href="#"><img src="images/banners/hero-thumb-1.jpg"
-
 								width="180" height="60" alt="1번 배너"><span class="mask"></span></a>
 
 						</li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-
 								src="images/banners/hero-thumb-2.jpg" width="180" height="60"
-
 								alt="2번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-
 								src="images/banners/hero-thumb-3.jpg" width="180" height="60"
-
 								alt="3번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-
 								src="images/banners/hero-thumb-4.jpg" width="180" height="60"
-
 								alt="4번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-
 								src="images/banners/hero-thumb-5.jpg" width="180" height="60"
-
 								alt="5번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-
 								src="images/banners/hero-thumb-6.jpg" width="180" height="60"
-
 								alt="6번 배너"><span class="mask"></span></a></li>
 
 					</ul>
@@ -232,7 +217,6 @@
 						<ul class="banner-list prod-list">
 
 							<li class="half-width"><a href="#"> <span
-
 									class="tti-placeholder"></span>
 
 									<div class="go-btn">
@@ -244,7 +228,6 @@
 							</a></li>
 
 							<li class="half-width"><a href="#"> <span
-
 									class="tti-placeholder"></span>
 
 									<div class="go-btn">
@@ -256,7 +239,6 @@
 							</a></li>
 
 							<li class="quarter-width"><a href="#"> <span
-
 									class="tti-placeholder"></span>
 
 									<div class="go-btn">
@@ -268,7 +250,6 @@
 							</a></li>
 
 							<li class="quarter-width"><a href="#"> <span
-
 									class="tti-placeholder"></span>
 
 									<div class="go-btn">
@@ -280,7 +261,6 @@
 							</a></li>
 
 							<li class="quarter-width"><a href="#"> <span
-
 									class="tti-placeholder"></span>
 
 									<div class="go-btn">
@@ -292,7 +272,6 @@
 							</a></li>
 
 							<li class="quarter-width"><a href="#"> <span
-
 									class="tti-placeholder"></span>
 
 									<div class="go-btn">
@@ -306,7 +285,6 @@
 							<!-- 3행 시작 — half + quarter + quarter (원본 li 순서 그대로) -->
 
 							<li class="half-width"><a href="#"> <span
-
 									class="tti-placeholder"></span>
 
 									<div class="go-btn">
@@ -318,7 +296,6 @@
 							</a></li>
 
 							<li class="quarter-width"><a href="#"> <span
-
 									class="tti-placeholder"></span>
 
 									<div class="go-btn">
@@ -330,7 +307,6 @@
 							</a></li>
 
 							<li class="quarter-width"><a href="#"> <span
-
 									class="tti-placeholder"></span>
 
 									<div class="go-btn">
@@ -370,7 +346,6 @@
 						<div class="ad-carousel-body">
 
 							<a href="#" class="move preview">이전 상품</a> <a href="#"
-
 								class="move next">다음 상품</a>
 
 							<ul class="ad-list">
@@ -378,7 +353,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">저자극 약산성 폼클렌저 300ml, 1개</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -398,7 +372,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">보습 크림 앰플 세럼 50ml, 2개</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -418,7 +391,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">진정 판테놀 수딩젤 300ml, 1개</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -438,7 +410,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">콜라겐 리프팅 마스크팩 10매, 1box</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -458,7 +429,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">무향 저자극 선크림 SPF50+ 50ml</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -478,7 +448,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">브라이트닝 앰플 세트 3종</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -498,7 +467,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">수분 진정 토너패드 70매</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -518,7 +486,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">탄력 넥크림 목주름 케어 50ml</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -538,7 +505,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">저자극 클렌징 오일 200ml</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -558,7 +524,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">비타민C 브라이트닝 세럼 30ml</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -578,7 +543,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">모공 케어 클레이 마스크 100ml</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -598,7 +562,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">약산성 바디워시 500ml, 2개</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -618,7 +581,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">데일리 립밤 3종 세트</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -638,7 +600,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">각질 제거 필링 젤 150ml</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -658,7 +619,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-name">수분 아이크림 30ml, 1개</span> <span
-
 										class="ad-tag ad-tag--free">무료배송</span>
 
 										<div class="ad-price">
@@ -696,7 +656,6 @@
 						<div class="ad-carousel-body">
 
 							<a href="#" class="move preview">이전 상품</a> <a href="#"
-
 								class="move next">다음 상품</a>
 
 							<ul class="ad-list">
@@ -1056,7 +1015,6 @@
 						<div class="ad-carousel-body">
 
 							<a href="#" class="move preview">이전 상품</a> <a href="#"
-
 								class="move next">다음 상품</a>
 
 							<ul class="ad-list">
@@ -1064,7 +1022,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">상덕 반려동물 높이조절 2구 식기 스테인리스</span>
 
 										<div class="ad-price">
@@ -1084,7 +1041,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">냉동 오징어링 4kg 소사이즈 튀김 짬뽕 절단</span>
 
 										<div class="ad-price">
@@ -1104,7 +1060,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">라프레슈 카이막 200g 천상의 맛 수제 디저트</span>
 
 										<div class="ad-price">
@@ -1124,7 +1079,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">갈치 튀김용 10마리 1kg 국내산</span>
 
 										<div class="ad-price">
@@ -1144,7 +1098,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">한입 콩가루 크레페 인절미 과자 개별포장 100개</span>
 
 										<div class="ad-price">
@@ -1164,7 +1117,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">국내산 손질 오징어 1kg 냉동</span>
 
 										<div class="ad-price">
@@ -1184,7 +1136,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">제주 감귤 5kg 가정용</span>
 
 										<div class="ad-price">
@@ -1204,7 +1155,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">수제 떡갈비 800g 냉동</span>
 
 										<div class="ad-price">
@@ -1224,7 +1174,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">건조 미역 300g 국내산</span>
 
 										<div class="ad-price">
@@ -1244,7 +1193,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">냉동 만두 왕교자 1.4kg 2봉</span>
 
 										<div class="ad-price">
@@ -1264,7 +1212,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">무항생제 계란 30구 특란</span>
 
 										<div class="ad-price">
@@ -1284,7 +1231,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">수제 유과 선물세트 1kg</span>
 
 										<div class="ad-price">
@@ -1304,7 +1250,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">훈제오리 슬라이스 500g 2팩</span>
 
 										<div class="ad-price">
@@ -1324,7 +1269,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">국산 콩 두부 5모 세트</span>
 
 										<div class="ad-price">
@@ -1344,7 +1288,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<span class="ad-tag ad-tag--sale">특가진행중</span> <span
-
 										class="ad-name">생연어 슬라이스 500g 냉동</span>
 
 										<div class="ad-price">
@@ -1386,7 +1329,6 @@
 						<div class="ad-carousel-body">
 
 							<a href="#" class="move preview">이전 상품</a> <a href="#"
-
 								class="move next">다음 상품</a>
 
 							<ul class="ad-list">
@@ -1394,7 +1336,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 36% 할인 중</div> <span
-
 										class="ad-name">로지텍 마우스 장패드, 2개, 블랙</span>
 
 										<div class="ad-price">
@@ -1414,7 +1355,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 73% 할인 중</div> <span
-
 										class="ad-name">Siemzon 반영구 스텐 수세미 주방 청소 걸레</span>
 
 										<div class="ad-price">
@@ -1434,7 +1374,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 52% 할인 중</div> <span
-
 										class="ad-name">SMABAT 무선 블루투스 이어폰 타입C 노이즈캔슬링</span>
 
 										<div class="ad-price">
@@ -1454,7 +1393,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 92% 할인 중</div> <span
-
 										class="ad-name">ROUJUN 남여공용 접이식 편광선글라스</span>
 
 										<div class="ad-price">
@@ -1474,7 +1412,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 18% 할인 중</div> <span
-
 										class="ad-name">Tiger Pavilion 3단4단5단원터치 접이식 철제 스탠드 선반</span>
 
 										<div class="ad-price">
@@ -1494,7 +1431,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 44% 할인 중</div> <span
-
 										class="ad-name">무선 게이밍 키보드 마우스 세트</span>
 
 										<div class="ad-price">
@@ -1514,7 +1450,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 61% 할인 중</div> <span
-
 										class="ad-name">접이식 우산 자동 3단 방풍</span>
 
 										<div class="ad-price">
@@ -1534,7 +1469,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 55% 할인 중</div> <span
-
 										class="ad-name">스마트워치 방수 심박측정</span>
 
 										<div class="ad-price">
@@ -1554,7 +1488,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 40% 할인 중</div> <span
-
 										class="ad-name">차량용 무선충전 거치대</span>
 
 										<div class="ad-price">
@@ -1574,7 +1507,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 28% 할인 중</div> <span
-
 										class="ad-name">휴대용 미니 프린터</span>
 
 										<div class="ad-price">
@@ -1594,7 +1526,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 33% 할인 중</div> <span
-
 										class="ad-name">USB C타입 멀티허브 7in1</span>
 
 										<div class="ad-price">
@@ -1614,7 +1545,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 47% 할인 중</div> <span
-
 										class="ad-name">블루투스 스피커 방수 IPX7</span>
 
 										<div class="ad-price">
@@ -1634,7 +1564,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 25% 할인 중</div> <span
-
 										class="ad-name">노트북 파우치 15.6인치</span>
 
 										<div class="ad-price">
@@ -1654,7 +1583,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 20% 할인 중</div> <span
-
 										class="ad-name">무선 이어폰 케이스 실리콘</span>
 
 										<div class="ad-price">
@@ -1674,7 +1602,6 @@
 								<li class="ad-card"><a href="#"> <span class="ad-thumb"></span>
 
 										<div class="ad-discount-line">지금 38% 할인 중</div> <span
-
 										class="ad-name">접이식 캠핑 의자 초경량</span>
 
 										<div class="ad-price">
@@ -1704,9 +1631,7 @@
 				<section class="gw-line-banners">
 
 					<a href="#" class="move preview">이전 배너</a> <a href="#"
-
 						class="move next">다음 배너</a> <a href="#" class="line-banner is-on"
-
 						style="background: #f6a623"> <strong>오뚜기 · 집으로 오는 나만의
 
 							맛집</strong> <span class="desc">줄 서지 말고, 집에서 편하게 만나보세요</span>
@@ -1778,7 +1703,6 @@
 						<div class="category-menu beauty" id="categoryBestMenu">
 
 							<a href="#cat-beauty" class="category-anchor beauty on">뷰티</a> <a
-
 								href="#cat-womanclothe" class="category-anchor womanclothe">여성패션</a>
 
 							<a href="#cat-manclothe" class="category-anchor manclothe">남성패션</a>
@@ -1814,11 +1738,9 @@
 									<dd class="hot-keyword">
 
 										<strong class="hot-keyword-title">HOT키워드</strong> <a href="#"
-
 											class="keyword">#수분토너</a> <a href="#" class="keyword">#에센스/세럼/앰플</a>
 
 										<a href="#" class="keyword">#아이라이너</a> <a href="#"
-
 											class="keyword">#립틴트</a> <a href="#" class="keyword">#톤업크림</a>
 
 										<a href="#" class="keyword">#클렌징티슈</a>
@@ -1834,31 +1756,25 @@
 							<div class="promotion">
 
 								<a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">헤어&바디케어 베스트템</strong> <span
-
 										class="promotion-description">지금 구매하기</span>
 
 								</span>
 
 								</a> <a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">여름 필수템 자외선 차단</strong> <span
-
 										class="promotion-description">선크림 / 선쿠션 모음</span>
 
 								</span>
 
 								</a> <a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">클렌징 기획전</strong> <span
-
 										class="promotion-description">1+1 인기 상품 모아보기</span>
 
 								</span>
@@ -1868,7 +1784,6 @@
 								<!-- 좌우 화살표 + 페이지 동그라미. 동그라미 개수는 JS 가 배너 수에 맞춰 만듦 -->
 
 								<a href="#" class="move preview">이전 배너</a> <a href="#"
-
 									class="move next">다음 배너</a>
 
 								<ol class="dot-navi"></ol>
@@ -1884,13 +1799,11 @@
                  글자는 CSS text-indent 로 화면 밖에 보내 숨김(화면낭독기는 읽음) -->
 
 								<a href="#" class="move preview">이전 상품</a> <a href="#"
-
 									class="move next">다음 상품</a>
 
 								<ul class="prod-list">
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">글로스앤글로우
 
 												국내생산 핫컬링 뿌리볼륨 롤브러쉬 1호 16파이, 블랙, 1개</span>
@@ -1898,9 +1811,7 @@
 											<div class="price">
 
 												<span class="discount">24%</span><strong>8,200원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -1914,7 +1825,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">코멧
 
 												3겹 데코 크린 롤화장지, 30m, 30롤</span>
@@ -1922,7 +1832,6 @@
 											<div class="price">
 
 												<strong>15,900원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -1936,7 +1845,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">탐사수
 
 												무라벨 生수, 500ml, 40개</span>
@@ -1944,9 +1852,7 @@
 											<div class="price">
 
 												<span class="discount">45%</span><strong>7,690원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -1960,7 +1866,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">삼다수
 
 												무라벨 生수 2L, 12개</span>
@@ -1968,7 +1873,6 @@
 											<div class="price">
 
 												<strong>11,900원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -1982,7 +1886,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">곰곰
 
 												국내산 백미, 10kg, 1개</span>
@@ -1990,7 +1893,6 @@
 											<div class="price">
 
 												<span class="discount">8%</span><strong>29,900원</strong><span
-
 													class="badge-rocket">로켓배송</span>
 
 											</div>
@@ -2004,7 +1906,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">애플
 
 												2024 맥북 에어 13 M3, 스페이스 그레이, 256GB, 8GB</span>
@@ -2024,7 +1925,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">메디힐
 
 												티트리 진정 마스크팩 10매</span>
@@ -2032,9 +1932,7 @@
 											<div class="price">
 
 												<span class="discount">18%</span><strong>12,900원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2048,7 +1946,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">보습
 
 												히알루론산 수분크림 50ml, 2개</span>
@@ -2068,7 +1965,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">데일리
 
 												클렌징 폼 150ml, 3개입</span>
@@ -2076,9 +1972,7 @@
 											<div class="price">
 
 												<span class="discount">18%</span><strong>9,900원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2092,7 +1986,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">무향
 
 												저자극 선크림 SPF50+ 50ml</span>
@@ -2112,7 +2005,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">픽싱
 
 												파우더 팩트 12g, 21호</span>
@@ -2132,7 +2024,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">손상모발
 
 												케어 헤어 에센스 100ml</span>
@@ -2140,7 +2031,6 @@
 											<div class="price">
 
 												<strong>13,800원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2188,11 +2078,9 @@
 									<dd class="hot-keyword">
 
 										<strong class="hot-keyword-title">HOT키워드</strong> <a href="#"
-
 											class="keyword">#원피스</a> <a href="#" class="keyword">#블라우스/셔츠</a>
 
 										<a href="#" class="keyword">#티셔츠</a> <a href="#"
-
 											class="keyword">#스커트</a> <a href="#" class="keyword">#스니커즈</a>
 
 										<a href="#" class="keyword">#가방</a>
@@ -2206,21 +2094,17 @@
 							<div class="promotion">
 
 								<a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">장마 대비 아이템 SALE</strong> <span
-
 										class="promotion-description">레인부츠 / 우산 / 우비 외</span>
 
 								</span>
 
 								</a> <a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">오늘의 원피스 특가</strong> <span
-
 										class="promotion-description">지금 가장 많이 담은 상품</span>
 
 								</span>
@@ -2230,7 +2114,6 @@
 								<!-- 좌우 화살표 + 페이지 동그라미. 동그라미 개수는 JS 가 배너 수에 맞춰 만듦 -->
 
 								<a href="#" class="move preview">이전 배너</a> <a href="#"
-
 									class="move next">다음 배너</a>
 
 								<ol class="dot-navi"></ol>
@@ -2244,13 +2127,11 @@
                  글자는 CSS text-indent 로 화면 밖에 보내 숨김(화면낭독기는 읽음) -->
 
 								<a href="#" class="move preview">이전 상품</a> <a href="#"
-
 									class="move next">다음 상품</a>
 
 								<ul class="prod-list">
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">코멧
 
 												3겹 데코 크린 롤화장지, 30m, 30롤</span>
@@ -2258,9 +2139,7 @@
 											<div class="price">
 
 												<span class="discount">45%</span><strong>15,900원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2274,7 +2153,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">글로스앤글로우
 
 												국내생산 핫컬링 뿌리볼륨 롤브러쉬 1호 16파이, 블랙, 1개</span>
@@ -2282,7 +2160,6 @@
 											<div class="price">
 
 												<strong>8,200원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2296,7 +2173,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">애플
 
 												2024 맥북 에어 13 M3, 스페이스 그레이, 256GB, 8GB</span>
@@ -2316,7 +2192,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">삼다수
 
 												무라벨 生수 2L, 12개</span>
@@ -2324,7 +2199,6 @@
 											<div class="price">
 
 												<strong>11,900원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2338,7 +2212,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">탐사수
 
 												무라벨 生수, 500ml, 40개</span>
@@ -2346,9 +2219,7 @@
 											<div class="price">
 
 												<span class="discount">18%</span><strong>7,690원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2362,7 +2233,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">곰곰
 
 												국내산 백미, 10kg, 1개</span>
@@ -2382,7 +2252,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">여름
 
 												냉감 카라 반팔 니트, 아이보리</span>
@@ -2390,9 +2259,7 @@
 											<div class="price">
 
 												<span class="discount">36%</span><strong>21,900원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2406,7 +2273,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">하이웨스트
 
 												와이드 슬랙스, 블랙</span>
@@ -2426,7 +2292,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">플리츠
 
 												롱스커트, 베이지, 1개</span>
@@ -2446,7 +2311,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">린넨
 
 												셔츠 원피스, 스카이블루</span>
@@ -2454,7 +2318,6 @@
 											<div class="price">
 
 												<strong>32,400원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2468,7 +2331,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">쿠션
 
 												스니커즈 데일리 운동화, 화이트, 235</span>
@@ -2476,7 +2338,6 @@
 											<div class="price">
 
 												<span class="discount">36%</span><strong>29,900원</strong><span
-
 													class="badge-rocket">로켓배송</span>
 
 											</div>
@@ -2490,7 +2351,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">여성
 
 												크로스백 미니 숄더백, 브라운</span>
@@ -2498,7 +2358,6 @@
 											<div class="price">
 
 												<strong>24,600원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2548,11 +2407,9 @@
 									<dd class="hot-keyword">
 
 										<strong class="hot-keyword-title">HOT키워드</strong> <a href="#"
-
 											class="keyword">#반팔티셔츠</a> <a href="#" class="keyword">#반바지</a>
 
 										<a href="#" class="keyword">#셔츠</a> <a href="#"
-
 											class="keyword">#슬랙스</a> <a href="#" class="keyword">#운동화</a>
 
 										<a href="#" class="keyword">#백팩</a>
@@ -2566,31 +2423,25 @@
 							<div class="promotion">
 
 								<a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">여름 남친룩 완성</strong> <span
-
 										class="promotion-description">티셔츠 / 반바지 최대 50%</span>
 
 								</span>
 
 								</a> <a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">남성 신발 브랜드전</strong> <span
-
 										class="promotion-description">운동화 / 샌들 최대 40%</span>
 
 								</span>
 
 								</a> <a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">여름 이너웨어 모음</strong> <span
-
 										class="promotion-description">쿨링 소재 기획전</span>
 
 								</span>
@@ -2600,7 +2451,6 @@
 								<!-- 좌우 화살표 + 페이지 동그라미. 동그라미 개수는 JS 가 배너 수에 맞춰 만듦 -->
 
 								<a href="#" class="move preview">이전 배너</a> <a href="#"
-
 									class="move next">다음 배너</a>
 
 								<ol class="dot-navi"></ol>
@@ -2614,13 +2464,11 @@
                  글자는 CSS text-indent 로 화면 밖에 보내 숨김(화면낭독기는 읽음) -->
 
 								<a href="#" class="move preview">이전 상품</a> <a href="#"
-
 									class="move next">다음 상품</a>
 
 								<ul class="prod-list">
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">무형광
 
 												남성 반팔 라운드 티셔츠 3종 세트, 화이트/그레이/블랙</span>
@@ -2628,9 +2476,7 @@
 											<div class="price">
 
 												<span class="discount">15%</span><strong>19,900원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2644,7 +2490,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">쿨링
 
 												스판 남성 밴딩 슬랙스, 블랙, 1개</span>
@@ -2664,7 +2509,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">데일리
 
 												남성 옥스포드 긴팔 셔츠, 라이트블루</span>
@@ -2672,9 +2516,7 @@
 											<div class="price">
 
 												<span class="discount">8%</span><strong>27,500원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2688,7 +2530,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">경량
 
 												남성 러닝화 운동화, 다크그레이, 265</span>
@@ -2708,7 +2549,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">남성
 
 												여름 린넨 반바지, 베이지, 1개</span>
@@ -2716,7 +2556,6 @@
 											<div class="price">
 
 												<span class="discount">36%</span><strong>16,900원</strong><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2730,7 +2569,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">대용량
 
 												남성 노트북 백팩 15.6인치, 블랙</span>
@@ -2738,7 +2576,6 @@
 											<div class="price">
 
 												<strong>41,200원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2752,7 +2589,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">남성
 
 												무지 맨투맨 기모, 차콜, 1개</span>
@@ -2760,7 +2596,6 @@
 											<div class="price">
 
 												<span class="discount">36%</span><strong>24,900원</strong><span
-
 													class="badge-rocket">로켓배송</span>
 
 											</div>
@@ -2774,7 +2609,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">스판
 
 												치노 팬츠 여름용, 베이지</span>
@@ -2782,7 +2616,6 @@
 											<div class="price">
 
 												<strong>28,700원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2796,7 +2629,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">남성
 
 												카라 피케 티셔츠 2종, 네이비/화이트</span>
@@ -2804,7 +2636,6 @@
 											<div class="price">
 
 												<span class="discount">20%</span><strong>31,000원</strong><span
-
 													class="badge-rocket">로켓배송</span>
 
 											</div>
@@ -2818,7 +2649,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">가벼운
 
 												남성 여름 자켓, 라이트그레이</span>
@@ -2838,7 +2668,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">남성
 
 												5족 세트 발목 양말, 블랙</span>
@@ -2846,9 +2675,7 @@
 											<div class="price">
 
 												<span class="discount">24%</span><strong>8,900원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -2862,7 +2689,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">가죽
 
 												벨트 자동버클, 브라운</span>
@@ -2916,11 +2742,9 @@
 									<dd class="hot-keyword">
 
 										<strong class="hot-keyword-title">HOT키워드</strong> <a href="#"
-
 											class="keyword">#무선이어폰</a> <a href="#" class="keyword">#로봇청소기</a>
 
 										<a href="#" class="keyword">#모니터</a> <a href="#"
-
 											class="keyword">#커피머신</a> <a href="#" class="keyword">#선풍기</a>
 
 										<a href="#" class="keyword">#보조배터리</a>
@@ -2934,31 +2758,25 @@
 							<div class="promotion">
 
 								<a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">여름 필수 가전 특가</strong> <span
-
 										class="promotion-description">에어서큘레이터 / 제습기</span>
 
 								</span>
 
 								</a> <a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">노트북 / 태블릿 특가</strong> <span
-
 										class="promotion-description">학생 인증 추가 할인</span>
 
 								</span>
 
 								</a> <a href="#" class="promotion-link"> <span
-
 									class="promo-placeholder"></span> <span class="caption">
 
 										<strong class="promotion-title">여름 냉방가전 기획전</strong> <span
-
 										class="promotion-description">에어컨 / 서큘레이터</span>
 
 								</span>
@@ -2968,7 +2786,6 @@
 								<!-- 좌우 화살표 + 페이지 동그라미. 동그라미 개수는 JS 가 배너 수에 맞춰 만듦 -->
 
 								<a href="#" class="move preview">이전 배너</a> <a href="#"
-
 									class="move next">다음 배너</a>
 
 								<ol class="dot-navi"></ol>
@@ -2982,13 +2799,11 @@
                  글자는 CSS text-indent 로 화면 밖에 보내 숨김(화면낭독기는 읽음) -->
 
 								<a href="#" class="move preview">이전 상품</a> <a href="#"
-
 									class="move next">다음 상품</a>
 
 								<ul class="prod-list">
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">노이즈캔슬링
 
 												블루투스 무선 이어폰, 화이트</span>
@@ -2996,9 +2811,7 @@
 											<div class="price">
 
 												<span class="discount">8%</span><strong>89,000원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -3012,7 +2825,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">27인치
 
 												QHD 75Hz 컴퓨터 모니터, 블랙</span>
@@ -3032,7 +2844,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">저소음
 
 												BLDC 에어서큘레이터 선풍기, 아이보리</span>
@@ -3040,9 +2851,7 @@
 											<div class="price">
 
 												<span class="discount">15%</span><strong>59,900원</strong><span
-
 													class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -3056,7 +2865,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">10000mAh
 
 												고속충전 보조배터리 C타입, 그레이</span>
@@ -3064,7 +2872,6 @@
 											<div class="price">
 
 												<strong>21,900원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -3078,7 +2885,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">물걸레
 
 												겸용 로봇청소기, 화이트, 1개</span>
@@ -3098,7 +2904,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">전자동
 
 												캡슐 커피머신, 블랙</span>
@@ -3118,7 +2923,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">가정용
 
 												미니 제습기 2L, 화이트</span>
@@ -3126,7 +2930,6 @@
 											<div class="price">
 
 												<span class="discount">8%</span><strong>79,000원</strong><span
-
 													class="badge-rocket">로켓배송</span>
 
 											</div>
@@ -3140,7 +2943,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">USB
 
 												C타입 65W 고속 충전기</span>
@@ -3148,7 +2950,6 @@
 											<div class="price">
 
 												<strong>24,900원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -3162,7 +2963,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">게이밍
 
 												기계식 키보드 적축, 블랙</span>
@@ -3170,7 +2970,6 @@
 											<div class="price">
 
 												<span class="discount">15%</span><strong>58,000원</strong><span
-
 													class="badge-rocket">로켓배송</span>
 
 											</div>
@@ -3184,7 +2983,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">무선
 
 												마우스 저소음 블루투스, 그레이</span>
@@ -3192,7 +2990,6 @@
 											<div class="price">
 
 												<strong>16,900원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -3206,7 +3003,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">휴대용
 
 												블루투스 스피커 방수, 네이비</span>
@@ -3226,7 +3022,6 @@
 									</a></li>
 
 									<li><a href="#" class="product-unit"> <span
-
 											class="thumb-placeholder"></span> <span class="name">스마트폰
 
 												거치대 겸용 무선충전 패드</span>
@@ -3234,7 +3029,6 @@
 											<div class="price">
 
 												<strong>19,800원</strong><span class="badge-rocket">로켓배송</span><span
-
 													class="badge-tomorrow">내일도착</span>
 
 											</div>
@@ -3270,7 +3064,6 @@
          카테고리를 더 늘리면 "여행" 유닛 바로 뒤로 옮기면 됨 -->
 
 				<a href="#" class="bottom-cta-banner"> <span>쿠팡트래블 메가위크</span> <span
-
 					class="desc">여름휴가 항공·숙소 최대 8% 특가</span> <span class="arrow">></span>
 
 				</a>
@@ -3310,41 +3103,34 @@
 		<ul class="promotion-banner">
 
 			<li><a href="#" class="banner-link"><span
-
 					class="wing-placeholder">분식집 맛<br>그대로
 
 				</span></a></li>
 
 			<li><a href="#" class="banner-link"><span
-
 					class="wing-placeholder">그릭요거트<br>샤베트
 
 				</span></a></li>
 
 			<li><a href="#" class="banner-link"><span
-
 					class="wing-placeholder">쿠팡 only</span></a></li>
 
 			<li><a href="#" class="banner-link"><span
-
 					class="wing-placeholder">여행 선착순<br>반값 할인
 
 				</span></a></li>
 
 			<li><a href="#" class="banner-link"><span
-
 					class="wing-placeholder">쿠팡이 직접<br>수입했어요!
 
 				</span></a></li>
 
 			<li><a href="#" class="banner-link"><span
-
 					class="wing-placeholder">금주의<br>특가왕
 
 				</span></a></li>
 
 			<li><a href="#" class="banner-link"><span
-
 					class="wing-placeholder">쿠팡에서<br>판매시작하기
 
 				</span></a></li>
@@ -3386,7 +3172,7 @@
        ↑ 화살표는 이미지가 아니라 CSS 로 그림 (테두리 2개만 남기고 45도 회전 —
 
          장바구니 ›, 오늘의 발견 > 와 같은 기법). 글자는 화면낭독기용으로만 남겨둠 -->
-         
+
 
 	<button type="button" id="goto-top" class="goto-top">
 
@@ -3404,7 +3190,7 @@
 
        ================================================== -->
 
-		<jsp:include page="/inc/footer.jsp" />
+	<jsp:include page="/inc/footer.jsp" />
 
 
 
@@ -3413,165 +3199,204 @@
 	<script src="js/header.js"></script>
 
 	<script src="js/main.js"></script>
+
+	<!-- 와우 가입 모달 -->
+<!-- 	<div id="wowModal" class="wow-modal-overlay">
+ -->
+ 	<div id="wowModal"
+     class="wow-modal-overlay"
+     <c:if test="${sessionScope.loginMember.rank eq 'WOW'}">
+         style="display:none;"
+     </c:if>>
+
+		<div class="wow-modal">
+
+			<!-- 닫기 -->
+			<button type="button" class="wow-modal-close" id="wowModalClose">
+				&times;</button>
+
+			<div class="wow-modal-content">
+
+				<!-- 왼쪽 -->
+				<div class="wow-modal-left">
+
+					<div class="wow-badge">WOW</div>
+
+					<h2 class="wow-title">쿠팡 와우 멤버십 가입</h2>
+
+					<p class="wow-subtitle">
+						와우회원이 되면 <strong>더 많은 혜택</strong>을 누릴 수 있어요!
+					</p>
+
+					<div class="wow-benefit-list">
+
+						<div class="wow-benefit">
+							<div class="wow-benefit-icon">🚀</div>
+
+							<div>
+								<strong> 로켓배송 무료배송 </strong>
+
+								<p>강력한 로켓배송을 무료로!</p>
+							</div>
+						</div>
+
+						<div class="wow-benefit">
+							<div class="wow-benefit-icon">📦</div>
+
+							<div>
+								<strong> 30일 무료반품 </strong>
+
+								<p>마음 편히 최대 30일 무료반품!</p>
+							</div>
+						</div>
+
+						<div class="wow-benefit">
+							<div class="wow-benefit-icon">🌿</div>
+
+							<div>
+								<strong> 로켓프레시 혜택 </strong>
+
+								<p>신선식품 새벽/당일배송!</p>
+							</div>
+						</div>
+
+						<div class="wow-benefit">
+							<div class="wow-benefit-icon">▶</div>
+
+							<div>
+								<strong> 쿠팡플레이 이용 </strong>
+
+								<p>영화, 드라마, 예능을 마음껏!</p>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+
+
+				<!-- 오른쪽 -->
+				<div class="wow-modal-right">
+
+					<div class="wow-crown">👑</div>
+
+					<div class="wow-logo-box">WOW</div>
+
+					<div class="wow-box">
+						<div class="wow-box-items">🚀 🛍️ 🌿</div>
+
+						<div class="wow-box-body">coupang</div>
+					</div>
+
+					<div class="wow-delivery">🚚</div>
+
+				</div>
+
+			</div>
+
+
+			<!-- 버튼 -->
+			<div class="wow-modal-buttons">
+				<button type="button" id="wowLaterBtn" class="wow-later-btn">
+					나중에 보기</button>
+<%-- 				<a href="${pageContext.request.contextPath}/wow/join"
+					class="wow-join-btn"> 와우 가입하기 </a> --%>
+					<button type="button"
+					        id="wowJoinOpenBtn"
+					        class="wow-join-btn">
+					    와우 가입하기
+					</button>
+				<div class="wow-today-close">
+					<label> <input type="checkbox" id="wowTodayCheck">
+						오늘 하루 보지 않기
+					</label>
+				</div>
+			</div>
+			<p class="wow-modal-notice">언제든 해지 가능하며, 해지 시 멤버십 혜택이 종료됩니다.</p>
+		</div>
+	</div>
 	
 	<!-- 와우 가입 모달 -->
-<div id="wowModal" class="wow-modal-overlay">
+<div id="wowJoinModal" class="wow-join-overlay">
+    <div class="wow-join-modal">
 
-    <div class="wow-modal">
-
-        <!-- 닫기 -->
         <button type="button"
-                class="wow-modal-close"
-                id="wowModalClose">
+                id="wowJoinCloseBtn"
+                class="wow-join-close">
             &times;
         </button>
-
-        <div class="wow-modal-content">
-
-            <!-- 왼쪽 -->
-            <div class="wow-modal-left">
-
-                <div class="wow-badge">
-                    WOW
-                </div>
-
-                <h2 class="wow-title">
-                    쿠팡 와우 멤버십 가입
-                </h2>
-
-                <p class="wow-subtitle">
-                    와우회원이 되면
-                    <strong>더 많은 혜택</strong>을
-                    누릴 수 있어요!
-                </p>
-
-                <div class="wow-benefit-list">
-
-                    <div class="wow-benefit">
-                        <div class="wow-benefit-icon">
-                            🚀
-                        </div>
-
-                        <div>
-                            <strong>
-                                로켓배송 무료배송
-                            </strong>
-
-                            <p>
-                                강력한 로켓배송을 무료로!
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="wow-benefit">
-                        <div class="wow-benefit-icon">
-                            📦
-                        </div>
-
-                        <div>
-                            <strong>
-                                30일 무료반품
-                            </strong>
-
-                            <p>
-                                마음 편히 최대 30일 무료반품!
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="wow-benefit">
-                        <div class="wow-benefit-icon">
-                            🌿
-                        </div>
-
-                        <div>
-                            <strong>
-                                로켓프레시 혜택
-                            </strong>
-
-                            <p>
-                                신선식품 새벽/당일배송!
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="wow-benefit">
-                        <div class="wow-benefit-icon">
-                            ▶
-                        </div>
-
-                        <div>
-                            <strong>
-                                쿠팡플레이 이용
-                            </strong>
-
-                            <p>
-                                영화, 드라마, 예능을 마음껏!
-                            </p>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- 오른쪽 -->
-            <div class="wow-modal-right">
-
-                <div class="wow-crown">
-                    👑
-                </div>
-
-                <div class="wow-logo-box">
-                    WOW
-                </div>
-
-                <div class="wow-box">
-                    <div class="wow-box-items">
-                        🚀 🛍️ 🌿
-                    </div>
-
-                    <div class="wow-box-body">
-                        coupang
-                    </div>
-                </div>
-
-                <div class="wow-delivery">
-                    🚚
-                </div>
-
-            </div>
-
+        <div class="wow-join-logo">
+            WOW
         </div>
-
-
-        <!-- 버튼 -->
-        <div class="wow-modal-buttons">
-
-            <button type="button"
-                    id="wowLaterBtn"
-                    class="wow-later-btn">
-                나중에 보기
-            </button>
-
-            <a href="${pageContext.request.contextPath}/wow/join"
-               class="wow-join-btn">
-                와우 가입하기
-            </a>
-
-        </div>
-
-        <p class="wow-modal-notice">
-            언제든 해지 가능하며,
-            해지 시 멤버십 혜택이 종료됩니다.
+        <h2 class="wow-join-title">
+            와우 멤버십 가입
+        </h2>
+        <p class="wow-join-description">
+            와우 멤버십으로 빠른 배송부터 다양한 혜택까지 이용해보세요.
         </p>
+        <div class="wow-member-box">
+            <strong>
+                <c:out value="${sessionScope.loginMember.memberName}" />
+            </strong>
+            님의 와우 멤버십 가입
+        </div>
 
+        <ul class="wow-join-benefits">
+            <li>
+                <span class="benefit-icon">🚀</span>
+                <div>
+                    <strong>로켓배송 무료배송</strong>
+                    <p>와우회원 전용 무료배송 혜택</p>
+                </div>
+            </li>
+            <li>
+                <span class="benefit-icon">📦</span>
+                <div>
+                    <strong>30일 무료반품</strong>
+                    <p>편리하게 반품할 수 있습니다.</p>
+                </div>
+            </li>
+            <li>
+                <span class="benefit-icon">🌿</span>
+                <div>
+                    <strong>로켓프레시</strong>
+                    <p>신선식품 새벽배송 혜택</p>
+                </div>
+            </li>
+            <li>
+                <span class="benefit-icon">▶</span>
+                <div>
+                    <strong>쿠팡플레이</strong>
+                    <p>영화와 콘텐츠를 자유롭게</p>
+                </div>
+            </li>
+        </ul>
+        <div class="wow-join-price">
+            <span>월 멤버십</span>
+            <strong>7,890원</strong>
+        </div>
+        <form action="${pageContext.request.contextPath}/wow/join"
+              method="post">
+            <div class="wow-join-buttons">
+                <button type="button"
+                        id="wowJoinCancelBtn"
+                        class="wow-join-cancel">
+                    취소
+                </button>
+                <button type="submit"
+                        class="wow-join-submit">
+                    와우 멤버십 가입하기
+                </button>
+            </div>
+        </form>
     </div>
-
 </div>
-
+	
 <script>
+const isWowMember =
+    ${not empty sessionScope.loginMember
+      and sessionScope.loginMember.rank eq 'WOW'};
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const modal =
@@ -3583,50 +3408,129 @@ document.addEventListener("DOMContentLoaded", function () {
     const laterBtn =
         document.getElementById("wowLaterBtn");
 
+    const todayCheck =
+        document.getElementById("wowTodayCheck");
 
-    function closeWowModal() {
+    const joinModal =
+        document.getElementById("wowJoinModal");
 
+    const joinOpenBtn =
+        document.getElementById("wowJoinOpenBtn");
+
+    const joinCloseBtn =
+        document.getElementById("wowJoinCloseBtn");
+
+    const joinCancelBtn =
+        document.getElementById("wowJoinCancelBtn");
+
+    /*
+     * WOW 회원이면 모든 가입 모달 숨김
+     */
+    if (isWowMember) {
         modal.style.display = "none";
+        joinModal.style.display = "none";
+
+        return;
+    }
+    /*
+     * 오늘 날짜
+     */
+    function getToday() {
+        const now = new Date();
+        const year =
+            now.getFullYear();
+        const month =
+            String(now.getMonth() + 1)
+                .padStart(2, "0");
+        const day =
+            String(now.getDate())
+                .padStart(2, "0");
+        return year + "-" + month + "-" + day;
+    }
+    /*
+     * 오늘 하루 보지 않기 확인
+     */
+    const hideDate =
+        localStorage.getItem(
+            "wowModalHideDate"
+        );
+    if (hideDate === getToday()) {
+        modal.style.display = "none";
+    } else {
+        modal.style.display = "flex";
     }
 
-
+    /*
+     * 홍보 모달 닫기
+     */
+    function closeWowModal() {
+        if (todayCheck.checked) {
+            localStorage.setItem(
+                "wowModalHideDate",
+                getToday()
+            );
+        }
+        modal.style.display = "none";
+    }
     closeBtn.addEventListener(
         "click",
         closeWowModal
     );
-
-
     laterBtn.addEventListener(
         "click",
         closeWowModal
     );
-
-
-    /*
-     * 검은 배경 클릭 시 닫기
-     */
     modal.addEventListener(
         "click",
-        function (e) {
+        function (event) {
 
-            if (e.target === modal) {
-
+            if (event.target === modal) {
                 closeWowModal();
             }
         }
     );
 
-
-    /*
-     * ESC 키
-     */
     document.addEventListener(
         "keydown",
-        function (e) {
+        function (event) {
+            if (event.key === "Escape") {
+                modal.style.display = "none";
+                joinModal.style.display = "none";
+            }
+        }
+    );
 
-            if (e.key === "Escape") {
+    /*
+     * 와우 가입하기
+     */
+    joinOpenBtn.addEventListener(
+        "click",
+        function () {
 
-                closeWowModal();
+            modal.style.display = "none";
+            joinModal.style.display = "flex";
+        }
+    );
+    /*
+     * 가입 모달 닫기
+     */
+    function closeJoinModal() {
+        joinModal.style.display = "none";
+    }
+    joinCloseBtn.addEventListener(
+        "click",
+        closeJoinModal
+    );
+    joinCancelBtn.addEventListener(
+        "click",
+        closeJoinModal
+    );
+    joinModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (event.target === joinModal) {
+                closeJoinModal();
             }
         }
     );

@@ -513,3 +513,198 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* 오늘 하루 보지 않기 */
+.wow-today-close {
+    margin-top: 15px;
+
+    text-align: left;
+
+    color: #666;
+
+    font-size: 14px;
+}
+
+.wow-today-close label {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    cursor: pointer;
+
+    user-select: none;
+}
+
+.wow-today-close input {
+    width: 16px;
+    height: 16px;
+
+    cursor: pointer;
+}
+
+/* ==============================
+   와우 가입 모달
+================================ */
+
+.wow-join-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+}
+
+.wow-join-modal {
+    position: relative;
+    width: 560px;
+    max-width: calc(100% - 40px);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    box-sizing: border-box;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.28);
+    animation: wowJoinShow 0.25s ease;
+}
+
+@keyframes wowJoinShow {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.wow-join-close {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    border: 0;
+    background: transparent;
+    color: #777;
+    font-size: 34px;
+    cursor: pointer;
+}
+
+.wow-join-logo {
+    display: inline-block;
+    padding: 7px 18px;
+    margin-bottom: 18px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #4285f4, #1764d6);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.wow-join-title {
+    margin: 0 0 10px;
+    color: #0b1f44;
+    font-size: 30px;
+}
+
+.wow-join-description {
+    margin: 0 0 25px;
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.wow-member-box {
+    margin-bottom: 25px;
+    padding: 18px;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #334155;
+}
+
+.wow-join-benefits {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.wow-join-benefits li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 0;
+    border-bottom: 1px solid #edf0f3;
+}
+
+.wow-join-benefits .benefit-icon {
+    width: 40px;
+    font-size: 26px;
+    text-align: center;
+}
+
+.wow-join-benefits strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 16px;
+}
+
+.wow-join-benefits p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.wow-join-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 10px;
+    background: #f0f7ff;
+}
+
+.wow-join-price span {
+    font-weight: 700;
+}
+
+.wow-join-price strong {
+    color: #1769d2;
+    font-size: 23px;
+}
+
+.wow-join-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.wow-join-buttons button {
+    flex: 1;
+    height: 52px;
+    border-radius: 9px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.wow-join-cancel {
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #334155;
+}
+
+.wow-join-submit {
+    border: 0;
+    background: #1769d2;
+    color: #fff;
+}
+
+.wow-join-submit:hover {
+    background: #1259b5;
+}
