@@ -23,7 +23,11 @@
 
      단가는 .total-price 의 data-unit-price 에서 읽음 (예: "19900").
      화면 글자(예: "19,900원")를 다시 파싱하면 두 번째 클릭부터
-     "39,800원" 을 단가로 잘못 읽는 사고가 나서, 원래 값을 data 속성에 따로 저장해둠. */
+     "39,800원" 을 단가로 잘못 읽는 사고가 나서, 원래 값을 data 속성에 따로 저장해둠.
+
+     ★ 2026-08-30 확정 — PRODUCT_OPTION.PRICE/NORMAL_PRICE 는 PRODUCT_PRICE(기본가)에 더해지는 "추가금".
+       옵션을 바꾸면 setupOptionSelect() 가 아래 setPrice() 를 불러서 판매가/정상가/할인율을 다시 그림.
+       판매가 = basePrice + 옵션의 PRICE, 정상가 = basePrice + 옵션의 NORMAL_PRICE(없으면 할인 표시 안 함). */
 function setupQuantity() {
   const box = document.querySelector('.product-quantity');
   if (!box) return;                     // 이 페이지에 수량박스가 없으면 아무것도 안 함
@@ -32,7 +36,11 @@ function setupQuantity() {
   const minus = box.querySelector('.qty-minus');
   const plus  = box.querySelector('.qty-plus');
   const priceEl = document.querySelector('.total-price');
-  const unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
+  const discountEl = document.querySelector('.discount');
+  const originBox = document.querySelector('.price-origin');
+  const originPriceEl = originBox ? originBox.querySelector('.origin-price') : null;
+  const basePrice = priceEl ? Number(priceEl.dataset.basePrice) || 0 : 0;
+  let unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
 
   const MIN = 1;
   /* 옵션이 없는 상품(재고 정보가 안 내려오는 경우)을 위한 기본값.
@@ -69,11 +77,36 @@ function setupQuantity() {
   /* 옵션이 바뀔 때마다 setupOptionSelect() 가 이 함수를 불러줌.
      지금 담아둔 수량이 새 재고보다 많으면 재고만큼으로 줄임
      (예: 10개 담아뒀는데 재고 3개짜리 옵션으로 바꾸면 3으로) */
-  return function setStock(stock) {
+  function setStock(stock) {
     max = Math.max(stock, MIN);          // 재고 0 이어도 max 는 1 — 품절 처리는 updateFromSelects 가 따로 함
     const now = Number(input.value) || MIN;
     render(Math.min(now, max));
-  };
+  }
+
+  /* 옵션이 바뀔 때마다 setupOptionSelect() 가 그 옵션의 price/normalPrice 를 넘겨서 불러줌.
+     판매가 = basePrice + optionPrice, 정상가 = basePrice + optionNormalPrice —
+     ProductServlet 의 displayPrice/displayNormalPrice 계산과 똑같은 공식. */
+  function setPrice(optionPrice, optionNormalPrice) {
+    unitPrice = basePrice + (optionPrice || 0);
+
+    const normalPrice = (optionNormalPrice != null) ? basePrice + optionNormalPrice : null;
+    const hasDiscount = normalPrice != null && normalPrice > unitPrice;
+
+    if (discountEl) {
+      discountEl.style.display = hasDiscount ? '' : 'none';
+      if (hasDiscount) {
+        discountEl.textContent = Math.round((1 - unitPrice / normalPrice) * 100) + '%';
+      }
+    }
+    if (originBox) originBox.style.display = hasDiscount ? '' : 'none';
+    if (hasDiscount && originPriceEl) {
+      originPriceEl.textContent = normalPrice.toLocaleString('ko-KR') + '원';
+    }
+
+    render(Number(input.value) || MIN);   // 단가가 바뀌었으니 화면 가격도 다시 그림
+  }
+
+  return { setStock: setStock, setPrice: setPrice };
 }
 
 
@@ -164,7 +197,7 @@ function setupAdSlider() {
    ★ 칩 사진은 "그 값 하나"의 사진이 아니라 "조합 하나(OPTION_ID)"에 딸려있음 — 예를 들어
      색상 칩 하나에 보여줄 사진은 (지금 고른 사이즈 + 이 색상) 조합의 사진을 씀. 사이즈를 바꾸면
      색상 칩 사진도 그 사이즈 기준으로 다시 그림(refreshChipThumbnails) */
-function setupOptionSelect(setStock) {
+function setupOptionSelect(setStock, setPrice) {
   const dataEl = document.getElementById('productOptionsData');
   const box = document.getElementById('fashionOption');
   if (!dataEl || !box) return;
@@ -237,6 +270,7 @@ function setupOptionSelect(setStock) {
     const soldout = (picked.quantity <= 0) || (picked.status === 'N');
     document.body.classList.toggle('is-soldout', soldout);
     if (setStock) setStock(picked.quantity);
+    if (setPrice) setPrice(picked.price, picked.normalPrice);
 
     if (!picked.imageUrls.length || !thumbBox || !mainImg) return;
 
@@ -615,12 +649,12 @@ function setupDeliveryOption() {
      (그 옵션의 QUANTITY 가 0 이거나 STATUS 가 'N' 이면 품절). */
 
 
-/* setupQuantity() 가 "재고를 바꾸는 함수"를 돌려주고, 그걸 setupOptionSelect() 에 넘겨줌 —
-   옵션을 고를 때마다 그 옵션의 재고로 수량 최대값이 바뀌게 하려는 것 (2026-08-28) */
-const setStock = setupQuantity();
+/* setupQuantity() 가 "재고/가격을 바꾸는 함수" 두 개를 돌려주고, 그걸 setupOptionSelect() 에 넘겨줌 —
+   옵션을 고를 때마다 그 옵션의 재고·가격으로 화면이 바뀌게 하려는 것 */
+const quantityControls = setupQuantity() || {};
 setupThumbs();
 setupAdSlider();
-setupOptionSelect(setStock);
+setupOptionSelect(quantityControls.setStock, quantityControls.setPrice);
 setupReviewTools();
 setupDeliveryOption();
 /* ── 9. 리뷰 사진 갤러리 (2단 모달) ────────────────

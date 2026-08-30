@@ -179,17 +179,20 @@
 					<!-- ② 가격 -->
 					<div class="price-container">
 						<div class="price-now">
-							<!-- <span class="discount">15%</span> <strong class="total-price" data-unit-price="19900">19,900원</strong> -->
-							<span class="discount">15%</span> <strong class="total-price"
-								data-unit-price="${p.productPrice}">${p.productPrice}원</strong>
+							<!-- 2026-08-30 확정 — PRODUCT_OPTION.PRICE/NORMAL_PRICE 는 PRODUCT_PRICE(기본가)에 더해지는
+							     "추가금". 판매가/정상가 둘 다 ProductServlet 이 기본가+추가금으로 계산해둔 값을 씀.
+							     정상가가 없으면(NORMAL_PRICE 미입력) 할인 표시 자체를 숨김. 옵션 바꾸면 product.js 의
+							     setPrice() 가 이 태그들 글자·style 을 그대로 갈아끼움 -->
+							<span class="discount"${empty displayNormalPrice ? ' style="display:none"' : ''}>${discountRate}%</span>
+							<strong class="total-price" data-unit-price="${displayPrice}"
+								data-base-price="${p.productPrice}">${displayPrice}원</strong>
 							<span class="badge-rocket">로켓배송</span> <span
 								class="badge-tomorrow">내일도착</span>
 
 						</div>
-						<!-- 원가 취소선 (#768695 + line-through) -->
-						<div class="price-origin">
-						<!-- 여기가 product_price -->
-							<span class="origin-price">${p.productPrice}원</span>
+						<!-- 원가 취소선 (#768695 + line-through). 정상 추가금(NORMAL_PRICE) 입력 안 한 옵션이면 안 보임 -->
+						<div class="price-origin"${empty displayNormalPrice ? ' style="display:none"' : ''}>
+							<span class="origin-price">${displayNormalPrice}원</span>
 							<!-- 원본에 있는 ⓘ — 눌러도 아무 일 없는 안내 아이콘. 이미지 없이 글자로 그림 -->
 							<button type="button" class="price-info">
 								<span class="blind">가격 안내</span>
