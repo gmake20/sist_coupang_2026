@@ -277,37 +277,6 @@ public class PaymentMethodDAO {
 	    }
 	}
 
-	/*
-	 * 주문할 때 해당 회원의 결제수단인지 검사
-	 */
-	public boolean existsPaymentMethod(
-			Connection conn,
-			int paymentMethodNo,
-			int memberNo)
-					throws Exception {
-
-		String sql = """
-				SELECT 1
-				FROM PAYMENT_METHOD
-				WHERE PAYMENT_METHOD_NO = ?
-				  AND MEMBER_NO = ?
-				  AND PAYMENT_TYPE = 'BANK'
-				""";
-
-		try (PreparedStatement pstmt =
-				conn.prepareStatement(sql)) {
-
-			pstmt.setInt(1, paymentMethodNo);
-			pstmt.setInt(2, memberNo);
-
-			try (ResultSet rs =
-					pstmt.executeQuery()) {
-
-				return rs.next();
-			}
-		}
-	}
-
 	public int insertCard(
 			Connection conn,
 			PaymentMethodDTO dto)

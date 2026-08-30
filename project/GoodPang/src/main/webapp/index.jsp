@@ -3547,7 +3547,24 @@ document.addEventListener("DOMContentLoaded", function () {
         cardNumber4
     ];
     
-    
+    const wowWelcomeBanner = document.getElementById("wowWelcomeBanner");
+    const wowWelcomeClose = document.getElementById("wowWelcomeClose");
+
+    if (wowWelcomeBanner) {
+        function closeWowWelcomeBanner() {
+            wowWelcomeBanner.classList.add("hide");
+
+            setTimeout(function() {
+                wowWelcomeBanner.remove();
+            }, 300);
+        }
+
+        if (wowWelcomeClose) {
+            wowWelcomeClose.addEventListener("click", closeWowWelcomeBanner);
+        }
+
+        setTimeout(closeWowWelcomeBanner, 4000);
+    }
   
     cardNumberInputs.forEach(function(input, index) {
         input.addEventListener("input", function() {
@@ -3789,67 +3806,70 @@ document.addEventListener("DOMContentLoaded", function () {
             joinModal.style.display = "none";
         }
     });
+   
     paymentAddForm.addEventListener("submit", async function(event) {
         event.preventDefault();
 
         const selectedType = paymentTypeInput.value;
 
-        if (selectedType === "BANK") {
-            const bankCode = document.getElementById("bankCode");
-            const accountHolder = document.getElementById("accountHolder");
+        console.log("선택된 paymentType =", selectedType);
 
-            if (!bankCode.value) {
-                alert("은행을 선택해주세요.");
-                bankCode.focus();
-                return;
-            }
-
-            if (!accountNumber.value.trim()) {
-                alert("계좌번호를 입력해주세요.");
-                accountNumber.focus();
-                return;
-            }
-
-            if (!accountHolder.value.trim()) {
-                alert("예금주를 입력해주세요.");
-                accountHolder.focus();
-                return;
-            }
-        }
-
-        if (selectedType === "CARD") {
-            const cardCompany = document.getElementById("cardCompany");
-
-            if (!cardCompany.value) {
-                alert("카드사를 선택해주세요.");
-                cardCompany.focus();
-                return;
-            }
-
-            updateCardNumber();
-
-            if (cardNumber.value.length !== 16) {
-                alert("카드번호 16자리를 모두 입력해주세요.");
-                return;
-            }
+        if (selectedType !== "BANK" && selectedType !== "CARD") {
+            alert("결제수단 종류를 선택해주세요.");
+            return;
         }
 
         const params = new URLSearchParams();
         params.set("paymentType", selectedType);
 
         const paymentDefault = paymentAddForm.querySelector("[name='paymentDefault']");
-        params.set("paymentDefault", paymentDefault.checked ? "Y" : "N");
+        params.set("paymentDefault", paymentDefault && paymentDefault.checked ? "Y" : "N");
 
         if (selectedType === "BANK") {
-            params.set("bankCode", document.getElementById("bankCode").value);
-            params.set("accountNumber", document.getElementById("accountNumber").value);
-            params.set("accountHolder", document.getElementById("accountHolder").value);
+            const bankCode = document.getElementById("bankCode");
+            const accountNumber = document.getElementById("accountNumber");
+            const accountHolder = document.getElementById("accountHolder");
+
+            if (!bankCode.value) {
+                alert("은행을 선택해주세요.");
+                return;
+            }
+
+            if (!accountNumber.value.trim()) {
+                alert("계좌번호를 입력해주세요.");
+                return;
+            }
+
+            if (!accountHolder.value.trim()) {
+                alert("예금주를 입력해주세요.");
+                return;
+            }
+
+            params.set("bankCode", bankCode.value);
+            params.set("accountNumber", accountNumber.value);
+            params.set("accountHolder", accountHolder.value);
         }
 
         if (selectedType === "CARD") {
-            params.set("cardCompany", document.getElementById("cardCompany").value);
+            const cardCompany = document.getElementById("cardCompany");
+
+            updateCardNumber();
+
+            if (!cardCompany.value) {
+                alert("카드사를 선택해주세요.");
+                return;
+            }
+
+            if (cardNumber.value.length !== 16) {
+                alert("카드번호 16자리를 모두 입력해주세요.");
+                return;
+            }
+
+            params.set("cardCompany", cardCompany.value);
             params.set("cardNumber", cardNumber.value);
         }
+
+        console.log("전송 데이터 =", params.toString());
 
         try {
             const response = await fetch("${pageContext.request.contextPath}/wow/payment-method", {
@@ -3906,11 +3926,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
         paymentMethodList.innerHTML = html;
     }
+    
+    const wowPaymentForm = document.getElementById("wowPaymentForm");
 
+    wowPaymentForm.addEventListener("submit", function(event) {
+        const selectedPayment = document.querySelector(
+            'input[name="paymentMethodNo"]:checked'
+        );
+
+        if (!selectedPayment) {
+            event.preventDefault();
+            alert("결제수단을 선택해주세요.");
+            return;
+        }
+
+        console.log("선택된 결제수단 번호:", selectedPayment.value);
+    });
 
 });
 
+
 </script>
+
+<c:if test="${param.wowJoined eq 'Y'}">
+    <div id="wowWelcomeBanner" class="wow-welcome-banner">
+        <div class="wow-welcome-content">
+            <div class="wow-welcome-icon">WOW</div>
+
+            <div class="wow-welcome-text">
+                <strong>와우 멤버십 가입을 환영합니다!</strong>
+                <span>이제 굿팡의 다양한 와우 혜택을 이용하실 수 있습니다.</span>
+            </div>
+
+            <button type="button" id="wowWelcomeClose" class="wow-welcome-close">&times;</button>
+        </div>
+    </div>
+</c:if>
 </body>
 
 </html>

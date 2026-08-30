@@ -958,3 +958,92 @@
     overflow-x: hidden;
     padding-right: 6px;
 }
+
+.wow-welcome-banner {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 520px;
+    max-width: calc(100% - 40px);
+    z-index: 500000;
+    animation: wowWelcomeDown 0.4s ease;
+}
+
+.wow-welcome-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #6c3cff, #1769d2);
+    color: #fff;
+    border-radius: 14px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.wow-welcome-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    background: #fff;
+    color: #6c3cff;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.wow-welcome-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 4px;
+}
+
+.wow-welcome-text strong {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.wow-welcome-text span {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.wow-welcome-close {
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+@keyframes wowWelcomeDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.wow-welcome-banner.hide {
+    animation: wowWelcomeUp 0.3s ease forwards;
+}
+
+@keyframes wowWelcomeUp {
+    from {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+}

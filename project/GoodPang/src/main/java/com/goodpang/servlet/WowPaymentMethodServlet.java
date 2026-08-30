@@ -40,8 +40,13 @@ public class WowPaymentMethodServlet extends HttpServlet {
             return;
         }
 
+		/*
+		 * List<PaymentMethodDTO> paymentMethods = paymentMethodDAO.getBankAccounts(
+		 * loginMember.getMemberNo() );
+		 */
+        
         List<PaymentMethodDTO> paymentMethods =
-                paymentMethodDAO.getBankAccounts(
+                paymentMethodDAO.getPaymentMethods(
                         loginMember.getMemberNo()
                 );
 
@@ -65,6 +70,8 @@ public class WowPaymentMethodServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
         
+        
+        
         HttpSession session = request.getSession(false);
 
         MemberDTO loginMember =
@@ -78,7 +85,6 @@ public class WowPaymentMethodServlet extends HttpServlet {
         }
 
         String paymentType = request.getParameter("paymentType");
-        
 
         String error =
                 PaymentMethodValidator.validatePaymentType(paymentType);
