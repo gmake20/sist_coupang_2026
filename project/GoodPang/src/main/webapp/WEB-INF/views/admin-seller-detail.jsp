@@ -32,6 +32,12 @@
     .doc-link { display: inline-block; margin-right: 12px; padding: 8px 14px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #111; }
     .doc-link.disabled { color: #bbb; border-color: #eee; pointer-events: none; }
 
+    .doc-preview { display: inline-block; margin-right: 16px; text-align: center; }
+    .doc-preview img { display: block; width: 140px; height: 140px; object-fit: cover; border: 1px solid #ddd; border-radius: 6px; }
+    .doc-preview span { display: block; margin-top: 6px; font-size: 13px; color: #333; }
+    .doc-preview.disabled span { color: #bbb; }
+    .doc-preview-empty { display: inline-block; width: 140px; height: 140px; border: 1px dashed #eee; border-radius: 6px; color: #bbb; font-size: 13px; text-align: center; line-height: 140px; }
+
     .action-row { display: flex; gap: 10px; align-items: flex-start; }
     .action-row form { display: flex; gap: 8px; align-items: center; }
     .btn { padding: 10px 18px; border-radius: 6px; border: none; font-size: 14px; cursor: pointer; }
@@ -161,21 +167,33 @@
 
     <c:choose>
       <c:when test="${not empty seller.businessCertUrl}">
-        <a class="doc-link" target="_blank"
-          href="${pageContext.request.contextPath}/${seller.businessCertUrl}">사업자등록증 보기</a>
+        <a class="doc-preview" target="_blank"
+          href="${pageContext.request.contextPath}/${seller.businessCertUrl}">
+          <img src="${pageContext.request.contextPath}/${seller.businessCertUrl}" alt="사업자등록증">
+          <span>사업자등록증 보기</span>
+        </a>
       </c:when>
       <c:otherwise>
-        <span class="doc-link disabled">사업자등록증 미첨부</span>
+        <div class="doc-preview disabled">
+          <div class="doc-preview-empty">미첨부</div>
+          <span>사업자등록증</span>
+        </div>
       </c:otherwise>
     </c:choose>
 
     <c:choose>
       <c:when test="${not empty seller.mailOrderCertUrl}">
-        <a class="doc-link" target="_blank"
-          href="${pageContext.request.contextPath}/${seller.mailOrderCertUrl}">통신판매신고증 보기</a>
+        <a class="doc-preview" target="_blank"
+          href="${pageContext.request.contextPath}/${seller.mailOrderCertUrl}">
+          <img src="${pageContext.request.contextPath}/${seller.mailOrderCertUrl}" alt="통신판매신고증">
+          <span>통신판매신고증 보기</span>
+        </a>
       </c:when>
       <c:otherwise>
-        <span class="doc-link disabled">통신판매신고증 미첨부</span>
+        <div class="doc-preview disabled">
+          <div class="doc-preview-empty">미첨부</div>
+          <span>통신판매신고증</span>
+        </div>
       </c:otherwise>
     </c:choose>
 
