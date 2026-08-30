@@ -443,4 +443,24 @@ public class MemberDAO {
 	        );
 	    }
 	}
+	
+	public int cancelWow(int memberNo) {
+	    String sql = """
+	        UPDATE MEMBER
+	        SET RANK = 'USER'
+	        WHERE MEMBER_NO = ?
+	          AND RANK = 'WOW'
+	        """;
+
+	    try (
+	        Connection conn = ConnectionProvider.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, memberNo);
+	        return pstmt.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException("와우 멤버십 해지 중 오류가 발생했습니다.", e);
+	    }
+	}
 }
