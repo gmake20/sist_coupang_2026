@@ -1,6 +1,7 @@
 package com.goodpang.dto;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +33,7 @@ public class OrderDetailDTO {
     private String detailAddress;
     private String memberName;
     private String phone;
+ 
     
  // [취소/반품(PRODUCT_RETURN) 관련 추가 필드]
     private Long returnNo;
@@ -43,5 +45,11 @@ public class OrderDetailDTO {
     // 포맷 관련 필드 추가
     private String cardCompanyName;
     private String bankName;
+    
+ // [★ 배송조회 추가 필드]
+    private String invoiceNo;            // 송장번호 (DELIVERY.INVOICE_NO)
+    private List<DeliveryLogDTO> logList; // 시간대별 배송 이력 리스트
+    
+    private String receiveLocation; // 수령방법 (ORDER_ADDRESS.RECEIVE_LOCATION)
     
 }

@@ -53,7 +53,7 @@
 				<h3>MY 쇼핑</h3>
 				<li class="active"><a
 					href="${pageContext.request.contextPath}/order/order_list">주문목록/배송조회</a></li>
-				<a href="${pageContext.request.contextPath}/cancel_history.jsp">취소/반품/교환/환불
+				<a href="${pageContext.request.contextPath}/order/cancel_history">취소/반품/교환/환불
 					내역</a> <a href="#">와우 멤버십</a> <a href="#">구독 서비스 <span class="new">N</span></a>
 				<a href="#">로켓프레시 프레시백 <span class="new">N</span></a> <a href="#">영수증
 					조회/출력</a>
@@ -208,7 +208,7 @@
 									<div class="delivery-buttons"
 										style="display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
 										<button type="button" class="delivery-btn btn-action primary"
-											onclick="location.href='${pageContext.request.contextPath}/order/tracking?orderNo=${item.orderNo}'"
+											onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${item.orderNo}'"
 											style="flex: 1; padding: 8px; border: 1px solid #0073e9; color: #0073e9; background: #fff; border-radius: 4px; cursor: pointer;">
 											배송 조회</button>
 										<button type="button" class="delivery-btn btn-action"
