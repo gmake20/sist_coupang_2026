@@ -12,8 +12,6 @@
 <link rel="stylesheet"
       href="${pageContext.request.contextPath}/css/common.css">
 <link rel="stylesheet"
-      href="${pageContext.request.contextPath}/css/order_list.css">
-<link rel="stylesheet"
       href="${pageContext.request.contextPath}/css/wow_membership.css">
 </head>
 <body>

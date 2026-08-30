@@ -1,10 +1,24 @@
 @charset "UTF-8";
 
+/* =========================================================
+   기본
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
 body {
     margin: 0;
+    padding: 0;
+}
+
+body {
     background: #fff;
     color: #111;
     font-family: Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    font-size: 13px;
 }
 
 a {
@@ -18,163 +32,433 @@ ul {
     list-style: none;
 }
 
-.wow-page {
-    display: flex;
-    width: 1100px;
-    margin: 30px auto 60px;
-    gap: 24px;
+button {
+    font-family: inherit;
 }
 
-.wow-sidebar {
-    width: 180px;
+/* =========================================================
+   전체 레이아웃
+   header 내부 폭 1020px과 동일
+========================================================= */
+
+.wow-page,
+.mypage-container {
+    width: 1025px !important;
+    margin: 25px auto 80px !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 20px !important;
+}
+
+/* =========================================================
+   왼쪽 MY쿠팡
+========================================================= */
+
+.wow-sidebar,
+.mycoupang-side {
+    width: 135px !important;
+    flex: 0 0 135px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: 1px solid #ddd !important;
+    background: #fff !important;
+}
+
+/* MY쿠팡 파란 제목 */
+
+.wow-sidebar-top,
+.side-title {
+    width: 100% !important;
+    height: 54px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #2673b9 !important;
+    color: #fff !important;
+
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
+/* 메뉴 묶음 */
+
+.wow-menu-group,
+.side-section {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 20px 15px 17px !important;
+
+    border-top: 0 !important;
+    border-bottom: 1px solid #ddd !important;
+}
+
+/* 메뉴 제목 */
+
+.wow-menu-group h3,
+.side-section h3 {
+    margin: 0 0 12px !important;
+    padding: 0 !important;
+
+    color: #111 !important;
+
+    font-size: 13px !important;
+    font-weight: bold !important;
+}
+
+/* 혹시 ul/li 구조면 */
+
+.wow-menu-group ul {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+.wow-menu-group li {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 메뉴 링크 */
+
+.wow-menu-group a,
+.side-section a {
+    display: block !important;
+
+    margin: 0 0 7px !important;
+    padding: 0 !important;
+
+    color: #222 !important;
+
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+
+    text-decoration: none !important;
+}
+
+.wow-menu-group a:hover,
+.side-section a:hover {
+    text-decoration: underline !important;
+}
+
+.wow-menu-group a.active,
+.side-section a.active {
+    color: #1675d1 !important;
+    font-weight: bold !important;
+}
+
+/* N 표시 */
+
+.new {
+    display: inline-flex;
+
+    width: 12px;
+    height: 12px;
+
+    margin-left: 2px;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #e5003d;
+    color: #fff;
+
+    font-size: 8px;
+    font-weight: bold;
+}
+
+/* =========================================================
+   왼쪽 하단 고객센터
+========================================================= */
+
+.side-help {
+    margin-top: 9px;
+
     border: 1px solid #ddd;
     background: #fff;
 }
 
-.wow-sidebar-top {
-    padding: 14px 18px;
-    background: #2c7ecb;
-    color: #fff;
-    font-size: 18px;
-    font-weight: 700;
-}
+.side-help a {
+    min-height: 62px;
 
-.wow-menu-group {
-    padding: 18px 14px;
-    border-top: 1px solid #eee;
-}
-
-.wow-menu-group h3 {
-    margin: 0 0 12px;
-    font-size: 15px;
-    font-weight: 700;
-}
-
-.wow-menu-group li {
-    margin-bottom: 8px;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.wow-menu-group a {
-    color: #333;
-}
-
-.wow-menu-group a.active {
-    color: #2c7ecb;
-    font-weight: 700;
-}
-
-.wow-content {
-    flex: 1;
-}
-
-.wow-summary-bar {
-    display: flex;
-    border: 1px solid #cfe0ef;
-    background: #8fb9d8;
-    color: #fff;
-}
-
-.wow-summary-item {
-    flex: 1;
-    display: flex;
-    justify-content: space-between;
-    padding: 16px 24px;
-    font-size: 15px;
-    box-sizing: border-box;
-}
-
-.wow-title-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin: 28px 0 14px;
+
+    padding: 8px 7px;
+
+    border-bottom: 1px solid #ddd;
+
+    color: #2673b9;
+
+    font-size: 11px;
+    font-weight: bold;
+
+    text-decoration: none;
 }
 
-.wow-title-row h2 {
-    margin: 0;
-    font-size: 24px;
-    font-weight: 800;
+.side-help a:last-child {
+    border-bottom: 0;
+}
+
+.help-icon {
+    width: 35px;
+
+    margin-right: 4px;
+
+    font-size: 23px;
+    text-align: center;
+}
+
+.side-help small {
+    font-size: 9px;
+    font-weight: normal;
+}
+
+/* =========================================================
+   오른쪽 본문
+========================================================= */
+
+.wow-content,
+.mypage-main,
+.wow-membership-main {
+    flex: 1 1 auto !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* =========================================================
+   쿠페이 머니 / 쿠팡캐시
+========================================================= */
+
+.wow-summary-bar,
+.mypage-cash-bar {
+    width: 100% !important;
+    height: 54px !important;
+
+    margin: 0 0 25px !important;
+    padding: 0 20px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    border: 1px solid #cfe0ef !important;
+    border-radius: 2px !important;
+
+    background: #8fb9d8 !important;
+    color: #fff !important;
+}
+
+.wow-summary-item,
+.cash-col {
+    flex: 1 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    margin: 0 !important;
+    padding: 0 5px !important;
+
+    color: #fff !important;
+
+    font-size: 13px !important;
+}
+
+.wow-summary-item strong,
+.cash-col strong {
+    font-weight: bold;
+}
+
+.wow-summary-item span,
+.cash-val {
+    color: #fff !important;
+    font-weight: bold !important;
+}
+
+.cash-divider {
+    width: 1px;
+    height: 18px;
+
+    margin: 0 20px;
+
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* =========================================================
+   제목
+========================================================= */
+
+.wow-title-row {
+    width: 100% !important;
+    height: 42px !important;
+
+    margin: 0 0 10px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.wow-title-row h2,
+.content-heading {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #111 !important;
+
+    font-size: 20px !important;
+    font-weight: bold !important;
 }
 
 .wow-title-actions {
-    display: flex;
-    gap: 8px;
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 8px !important;
 }
 
+/* 버튼 */
+
 .wow-outline-btn {
-    min-width: 108px;
+    min-width: 90px;
     height: 34px;
+
     padding: 0 14px;
-    border: 1px solid #bdbdbd;
+
+    border: 1px solid #bbb;
+
     background: #fff;
     color: #222;
-    font-size: 13px;
+
+    font-size: 12px;
+    font-weight: 600;
+
     cursor: pointer;
 }
 
 .wow-outline-btn:hover {
-    background: #f8f8f8;
+    background: #f7f7f7;
 }
 
-.wow-card {
-    border: 1px solid #bfbfbf;
-    background: #fff;
-    padding: 38px 24px 34px;
+/* =========================================================
+   와우 멤버십 메인 카드
+========================================================= */
+
+.wow-card,
+.wow-membership-card {
+    width: 100% !important;
+
+    min-height: 620px;
+
+    margin: 0 !important;
+    padding: 40px 30px !important;
+
+    border: 1px solid #bbb !important;
+
+    background: #fff !important;
 }
 
-.wow-card-header {
-    text-align: center;
+/* 상단 중앙 */
+
+.wow-card-header,
+.wow-membership-header {
+    text-align: center !important;
 }
 
-.wow-logo {
-    color: #0050d7;
-    font-size: 24px;
-    font-weight: 900;
-    margin-bottom: 4px;
+.wow-logo,
+.wow-logo-text {
+    margin-bottom: 6px !important;
+
+    color: #0756a5 !important;
+
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    font-style: italic !important;
 }
 
-.wow-name-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 18px;
+/* 와우 멤버십 + 회원 */
+
+.wow-name-row,
+.wow-membership-name {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 7px !important;
+
+    margin-bottom: 18px !important;
 }
 
-.wow-name-row strong {
-    font-size: 26px;
-    font-weight: 800;
+.wow-name-row strong,
+.wow-membership-name strong {
+    font-size: 27px !important;
+    font-weight: 800 !important;
 }
 
-.wow-badge {
-    color: #3f70ff;
-    font-size: 13px;
-    font-weight: 700;
+.wow-badge,
+.wow-membership-name span {
+    padding: 2px 5px;
+
+    background: #edf3ff;
+
+    color: #3675df;
+
+    font-size: 10px;
+    font-weight: bold;
 }
 
-.wow-next-payment {
-    margin: 0;
-    font-size: 17px;
+.wow-next-payment,
+.wow-membership-header p {
+    margin: 20px 0 0 !important;
+
     color: #222;
+
+    font-size: 15px !important;
 }
 
-.wow-divider {
-    margin: 28px 0 26px;
-    border-top: 1px solid #ddd;
+/* 구분선 */
+
+.wow-divider,
+.wow-membership-line {
+    width: 100%;
+
+    margin: 28px 0 !important;
+
+    border: 0;
+    border-top: 1px solid #ddd !important;
 }
+
+/* =========================================================
+   절약 금액
+========================================================= */
 
 .wow-saving-title {
     text-align: center;
-    font-size: 16px;
+
     color: #333;
+
+    font-size: 14px;
 }
 
 .wow-saving-total {
-    margin: 10px 0 24px;
+    margin: 10px 0 22px;
+
     text-align: center;
-    font-size: 20px;
+
+    font-size: 18px;
 }
 
 .wow-saving-total strong {
@@ -183,69 +467,102 @@ ul {
 }
 
 .wow-saving-box {
-    width: 420px;
-    margin: 0 auto;
-    padding: 18px 18px 16px;
-    background: #f4f8ff;
-    box-sizing: border-box;
+    width: 470px;
+    max-width: 100%;
+
+    margin: 0 auto !important;
+    padding: 20px 18px !important;
+
+    background: #f1f5ff !important;
 }
 
 .wow-saving-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
-    font-size: 15px;
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+
     color: #222;
+
+    font-size: 13px;
 }
 
 .wow-saving-row strong {
-    font-size: 15px;
-    font-weight: 700;
+    font-weight: bold;
 }
 
 .wow-saving-sub {
-    margin: -6px 0 6px;
-    color: #666;
-    font-size: 13px;
-    line-height: 1.6;
+    margin: -4px 0 7px;
+
+    padding-left: 6px;
+
+    color: #555;
+
+    font-size: 12px;
 }
 
-.wow-footnote {
-    margin: 26px 0 0;
+.wow-footnote,
+.wow-membership-note {
+    margin: 18px 0 0;
+
     text-align: center;
+
     color: #666;
-    font-size: 13px;
+
+    font-size: 12px;
 }
+
+/* =========================================================
+   와우 해지 모달
+========================================================= */
 
 .wow-cancel-overlay {
     position: fixed;
+
     inset: 0;
+
     display: none;
     align-items: center;
     justify-content: center;
+
     background: rgba(0, 0, 0, 0.55);
+
     z-index: 99999;
 }
 
 .wow-cancel-modal {
     position: relative;
+
     width: 420px;
+
     padding: 34px 28px 28px;
+
     border-radius: 16px;
+
     background: #fff;
+
     text-align: center;
-    box-sizing: border-box;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
 }
 
 .wow-cancel-close {
     position: absolute;
+
     top: 12px;
     right: 16px;
+
+    padding: 0;
+
     border: 0;
+
     background: transparent;
-    font-size: 28px;
+
     color: #888;
+
+    font-size: 28px;
+
     cursor: pointer;
 }
 
@@ -253,50 +570,80 @@ ul {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     width: 90px;
     height: 44px;
+
     margin-bottom: 16px;
+
     border-radius: 22px;
+
     background: linear-gradient(135deg, #6c3cff, #1769d2);
+
     color: #fff;
+
     font-size: 22px;
     font-weight: 900;
 }
 
 .wow-cancel-modal h3 {
     margin: 0 0 12px;
+
     font-size: 24px;
 }
 
 .wow-cancel-modal p {
     margin: 0 0 24px;
+
     color: #666;
+
     font-size: 14px;
     line-height: 1.6;
 }
 
 .wow-cancel-buttons {
     display: flex;
+
     gap: 10px;
 }
 
 .wow-cancel-buttons button {
     flex: 1;
+
     height: 46px;
+
     border-radius: 8px;
+
     font-size: 15px;
-    font-weight: 700;
+    font-weight: bold;
+
     cursor: pointer;
 }
 
 .wow-cancel-keep {
     border: 1px solid #1769d2;
+
     background: #1769d2;
+
     color: #fff;
 }
 
 .wow-cancel-submit {
     border: 1px solid #ccc;
+
     background: #fff;
+
     color: #444;
+}
+
+/* =========================================================
+   반응형
+========================================================= */
+
+@media (max-width: 1060px) {
+
+    .wow-page,
+    .mypage-container {
+        width: calc(100% - 24px) !important;
+    }
 }
