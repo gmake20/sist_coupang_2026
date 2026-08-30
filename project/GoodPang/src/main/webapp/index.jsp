@@ -3547,67 +3547,9 @@ document.addEventListener("DOMContentLoaded", function () {
         cardNumber4
     ];
     
-    const wowWelcomeModal =
-        document.getElementById("wowWelcomeModal");
-
-const wowWelcomeCloseBtn =
-        document.getElementById("wowWelcomeCloseBtn");
-
-const wowWelcomeConfirmBtn =
-        document.getElementById("wowWelcomeConfirmBtn");
-
-function closeWowWelcomeModal() {
-
-    if (!wowWelcomeModal) {
-        return;
-    }
-
-    wowWelcomeModal.classList.add("hide");
-
-    setTimeout(function() {
-        wowWelcomeModal.remove();
-    }, 250);
-}
-
-if (wowWelcomeCloseBtn) {
-    wowWelcomeCloseBtn.addEventListener(
-        "click",
-        closeWowWelcomeModal
-    );
-}
-
-if (wowWelcomeConfirmBtn) {
-    wowWelcomeConfirmBtn.addEventListener(
-        "click",
-        closeWowWelcomeModal
-    );
-}
-
-if (wowWelcomeModal) {
-
-    wowWelcomeModal.addEventListener(
-        "click",
-        function(event) {
-
-            if (event.target === wowWelcomeModal) {
-                closeWowWelcomeModal();
-            }
-        }
-    );
-
-    const url =
-            new URL(window.location.href);
-
-    url.searchParams.delete("wowJoined");
-
-    window.history.replaceState(
-        {},
-        "",
-        url.pathname + url.search
-    );
-}
     
-/*     const wowWelcomeBanner = document.getElementById("wowWelcomeBanner");
+    
+    const wowWelcomeBanner = document.getElementById("wowWelcomeBanner");
     const wowWelcomeClose = document.getElementById("wowWelcomeClose");
 
     if (wowWelcomeBanner) {
@@ -3624,7 +3566,7 @@ if (wowWelcomeModal) {
         }
 
         setTimeout(closeWowWelcomeBanner, 4000);
-    } */
+    }
   
     cardNumberInputs.forEach(function(input, index) {
         input.addEventListener("input", function() {
@@ -4084,6 +4026,50 @@ if (wowWelcomeModal) {
         </div>
     </div>
 </c:if>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const welcomeModal =
+        document.getElementById("wowWelcomeModal");
+
+    if (!welcomeModal) {
+        return;
+    }
+
+    const closeBtn =
+        document.getElementById("wowWelcomeCloseBtn");
+
+    const confirmBtn =
+        document.getElementById("wowWelcomeConfirmBtn");
+
+    function closeWelcomeModal() {
+        welcomeModal.style.display = "none";
+    }
+
+    closeBtn.addEventListener(
+        "click",
+        closeWelcomeModal
+    );
+
+    confirmBtn.addEventListener(
+        "click",
+        closeWelcomeModal
+    );
+
+    welcomeModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (event.target === welcomeModal) {
+                closeWelcomeModal();
+            }
+
+        }
+    );
+
+});
+</script>
 </body>
 
 </html>

@@ -595,3 +595,661 @@ button, input, select {
         margin: 0 12px;
     }
 }
+
+/* ================================
+   오른쪽 광고
+================================ */
+
+.right-ads {
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.right-ads .ad {
+    position: relative;
+    display: block;
+    min-height: 145px;
+    padding: 18px;
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.right-ads .ad:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.12);
+}
+
+.ad-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 13px;
+}
+
+.ad-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+}
+
+.ad-arrow {
+    font-size: 25px;
+    line-height: 1;
+}
+
+.right-ads .ad > strong {
+    position: relative;
+    z-index: 2;
+    display: block;
+    font-size: 17px;
+    line-height: 1.4;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+}
+
+.right-ads .ad > small {
+    position: relative;
+    z-index: 2;
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.ad-icon {
+    position: absolute;
+    right: 10px;
+    bottom: -10px;
+    font-size: 48px;
+    font-weight: 900;
+    opacity: 0.18;
+}
+
+
+/* 와우 */
+
+.ad-wow {
+    color: #ffffff;
+    background:
+        linear-gradient(135deg, #6d34d5 0%, #934bea 100%);
+}
+
+.ad-wow .ad-badge {
+    color: #7136cf;
+    background: #ffffff;
+}
+
+.ad-wow small {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+
+/* 로켓배송 */
+
+.ad-rocket {
+    color: #07396c;
+    background:
+        linear-gradient(135deg, #e5f5ff 0%, #b9e4ff 100%);
+}
+
+.ad-rocket .ad-badge {
+    color: #ffffff;
+    background: #1976d2;
+}
+
+.ad-rocket small {
+    color: #4b6b88;
+}
+
+
+/* 로켓프레시 */
+
+.ad-fresh {
+    color: #165c3c;
+    background:
+        linear-gradient(135deg, #ebfaef 0%, #c8f0d4 100%);
+}
+
+.ad-fresh .ad-badge {
+    color: #ffffff;
+    background: #28a665;
+}
+
+.ad-fresh small {
+    color: #557567;
+}
+
+
+/* 여행 */
+
+.ad-travel {
+    color: #17486a;
+    background:
+        linear-gradient(135deg, #e9f8ff 0%, #caedff 100%);
+}
+
+.ad-travel .ad-badge {
+    color: #ffffff;
+    background: #00a6d9;
+}
+
+.ad-travel small {
+    color: #53768a;
+}
+
+
+/* 판매자 */
+
+.ad-seller {
+    color: #494022;
+    background:
+        linear-gradient(135deg, #fff9dc 0%, #ffe8a4 100%);
+}
+
+.ad-seller .ad-badge {
+    color: #ffffff;
+    background: #d99700;
+}
+
+.ad-seller small {
+    color: #736847;
+}
+
+
+/* ================================
+   하단 광고
+================================ */
+
+.bottom-banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 105px;
+    margin-top: 28px;
+    padding: 20px 70px 20px 25px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-sizing: border-box;
+    color: #ffffff;
+    text-decoration: none;
+
+    background:
+        radial-gradient(
+            circle at 15% 50%,
+            rgba(255, 255, 255, 0.18),
+            transparent 25%
+        ),
+        linear-gradient(
+            120deg,
+            #6c2fd3 0%,
+            #8b46e8 48%,
+            #6232d3 100%
+        );
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.bottom-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(70, 33, 130, 0.2);
+}
+
+.bottom-banner-icon {
+    width: 65px;
+    height: 65px;
+    margin-right: 20px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.17);
+    flex-shrink: 0;
+}
+
+.bottom-banner-icon .rocket {
+    font-size: 34px;
+}
+
+.banner-copy {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.banner-label {
+    margin-bottom: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #e9dfff;
+}
+
+.banner-copy strong {
+    font-size: 20px;
+    line-height: 1.35;
+    font-weight: 800;
+    letter-spacing: -0.7px;
+}
+
+.banner-description {
+    margin-top: 5px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.banner-benefit {
+    min-width: 100px;
+    margin-left: 25px;
+    text-align: center;
+}
+
+.banner-benefit strong {
+    display: block;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.banner-benefit span {
+    display: block;
+    margin-top: 3px;
+    font-size: 13px;
+    color: #e9dfff;
+}
+
+.banner-arrow {
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    font-size: 35px;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* =====================================================
+   주문완료 페이지 레이아웃 보정
+===================================================== */
+
+.content-wrap {
+    width: 1200px;
+    max-width: calc(100% - 40px);
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+}
+
+.order-card {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* =====================================================
+   오른쪽 광고 깨짐 수정
+===================================================== */
+
+.right-ads {
+    flex: 0 0 200px !important;
+    width: 200px !important;
+    min-width: 200px !important;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    box-sizing: border-box;
+}
+
+.right-ads .ad {
+    position: relative;
+
+    display: block;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 145px;
+    min-height: 145px;
+
+    padding: 16px 17px;
+
+    border-radius: 11px;
+
+    box-sizing: border-box;
+    overflow: hidden;
+
+    text-decoration: none;
+}
+
+.right-ads .ad-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 11px;
+}
+
+.right-ads .ad-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 3px 7px;
+
+    border-radius: 4px;
+
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
+.right-ads .ad-arrow {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.right-ads .ad > strong {
+    position: relative;
+    z-index: 2;
+
+    display: block;
+
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.4;
+
+    letter-spacing: -0.5px;
+
+    word-break: keep-all;
+}
+
+.right-ads .ad > small {
+    position: relative;
+    z-index: 2;
+
+    display: block;
+
+    margin-top: 7px;
+
+    font-size: 12px;
+    line-height: 1.45;
+
+    word-break: keep-all;
+}
+
+.right-ads .ad-icon {
+    position: absolute;
+
+    right: 12px;
+    bottom: 4px;
+
+    font-size: 37px;
+    font-weight: 900;
+
+    opacity: 0.15;
+
+    pointer-events: none;
+}
+
+
+/* WOW */
+
+.ad-wow {
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d35db 0%,
+            #8846e9 100%
+        );
+}
+
+.ad-wow .ad-badge {
+    color: #7137d4;
+    background: #ffffff;
+}
+
+.ad-wow small {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+
+/* ROCKET */
+
+.ad-rocket {
+    color: #075087;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e3f5ff 0%,
+            #b9e3fb 100%
+        );
+}
+
+.ad-rocket .ad-badge {
+    color: #ffffff;
+    background: #1688df;
+}
+
+.ad-rocket small {
+    color: #53768e;
+}
+
+
+/* FRESH */
+
+.ad-fresh {
+    color: #17633f;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e7f9ed 0%,
+            #c8eed3 100%
+        );
+}
+
+.ad-fresh .ad-badge {
+    color: #ffffff;
+    background: #26a668;
+}
+
+.ad-fresh small {
+    color: #557867;
+}
+
+
+/* TRAVEL */
+
+.ad-travel {
+    color: #175376;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e8f8ff 0%,
+            #c9ebfb 100%
+        );
+}
+
+.ad-travel .ad-badge {
+    color: #ffffff;
+    background: #14a5d5;
+}
+
+.ad-travel small {
+    color: #587a8d;
+}
+
+
+/* SELLER */
+
+.ad-seller {
+    color: #51431c;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fff8d9 0%,
+            #ffe4a0 100%
+        );
+}
+
+.ad-seller .ad-badge {
+    color: #ffffff;
+    background: #dc9b08;
+}
+
+.ad-seller small {
+    color: #786d49;
+}
+
+/* =====================================================
+   본문 글씨 크기 조정
+===================================================== */
+
+.order-card {
+    font-size: 14px;
+}
+
+/* 주문완료 제목 */
+.title-row h1 {
+    font-size: 25px;
+    font-weight: 700;
+}
+
+/* 주문 단계 */
+.order-steps {
+    font-size: 13px;
+}
+
+/* 완료 메시지 */
+.complete-message {
+    font-size: 15px;
+}
+
+/* 상품배송 정보 */
+.delivery-section > h2 {
+    font-size: 21px;
+    font-weight: 600;
+}
+
+/* 도착 예정 */
+.delivery-summary strong {
+    font-size: 16px;
+}
+
+.delivery-summary small {
+    font-size: 12px;
+}
+
+/* 받는사람 / 결제정보 제목 */
+.receiver-info h3,
+.payment-info h3 {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+/* 좌우 정보 영역 */
+.receiver-info dl,
+.payment-info dl {
+    font-size: 13px;
+}
+
+/* 항목명 */
+.receiver-info dt,
+.payment-info dt {
+    font-size: 13px;
+}
+
+/* 실제 내용 */
+.receiver-info dd,
+.payment-info dd {
+    font-size: 13px;
+}
+
+/* 변경하기 */
+.receiver-info a {
+    font-size: 12px;
+}
+
+/* 총 결제금액 */
+.payment-total > span {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.payment-total strong {
+    font-size: 19px;
+}
+
+/* 버튼 */
+.button-row .btn {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ==========================
+   오른쪽 세로 광고
+========================== */
+
+.right-ads {
+    width: 90px;
+    min-width: 90px;
+    flex: 0 0 90px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    margin-top: 25px;
+}
+
+.side-ad {
+    display: block;
+
+    width: 90px;
+
+    border: 1px solid #ddd;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+
+    background: #fff;
+
+    text-decoration: none;
+}
+
+.side-ad img {
+    display: block;
+
+    width: 100%;
+    height: auto;
+
+    object-fit: cover;
+}
+
+.side-ad:hover {
+    border-color: #999;
+}
