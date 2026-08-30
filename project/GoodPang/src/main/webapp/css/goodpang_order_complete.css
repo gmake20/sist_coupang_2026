@@ -568,7 +568,7 @@
     flex: 0 0 92px;
     width: 92px;
     min-width: 92px;
-    margin-top: 8px;
+    margin-top: -6px;
 }
 
 .order-promotion-banner {
@@ -616,4 +616,75 @@
 .order-ad-link:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+}
+
+	/* =========================================
+   오른쪽 PNG 광고
+========================================= */
+
+.order-side-banner {
+    flex: 0 0 102px;
+
+    width: 102px;
+    min-width: 102px;
+
+    /* 주문완료 박스보다 살짝 아래 */
+    margin-top: -3px;
+}
+
+.order-promotion-banner {
+    width: 102px;
+
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    list-style: none;
+}
+
+.order-promotion-banner li {
+    width: 102px;
+    height: 150px;
+
+    margin: 0;
+    padding: 0;
+
+    line-height: 0;
+}
+
+.order-ad-link {
+    display: block;
+
+    width: 102px;
+    height: 150px;
+
+    overflow: hidden;
+
+    border-radius: 7px;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.order-ad-link img {
+    display: block;
+
+    width: 102px;
+    height: 150px;
+
+    /* 원본 비율과 거의 동일하기 때문에 안 찌그러짐 */
+    object-fit: contain;
+}
+
+.order-ad-link:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.15);
 }
