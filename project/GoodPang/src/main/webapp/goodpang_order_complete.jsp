@@ -135,16 +135,6 @@
 						href="${pageContext.request.contextPath}/">쇼핑 계속하기</a>
 				</div>
 
-				<!-- <a class="bottom-banner" href="#">
-                <div class="snacks">
-                    <span>붕어빵</span><span>붕어빵</span><span>붕어빵</span><span>붕어빵</span>
-                </div>
-                <div class="banner-copy">
-                    <strong>겉바속촉! 오뚜기 붕어빵</strong>
-                    <span>여기가 바로 붕세권!</span>
-                </div>
-                <div class="banner-arrow">〉</div>
-            </a> -->
 				<a class="bottom-banner"
 					href="${pageContext.request.contextPath}/wow/join">
 
@@ -167,38 +157,44 @@
 				</a>
 			</section>
 
-			<!-- <aside class="right-ads">
-				<a href="#" class="ad ad1"><strong>쿠팡 only</strong><span>✓</span><small>매일
-						찾는<br>생활 아이템
-				</small></a> <a href="#" class="ad ad2"><strong>~5만원<br>쿠폰 할인
-				</strong><span>›</span><small>여름맞이<br>특가혜택
-				</small></a> <a href="#" class="ad ad3"><strong>쿠팡이 직접<br>수입했어요!
-				</strong><span>›</span><small>베스트 상품</small></a> <a href="#" class="ad ad4"><strong>금주의<br>특가왕
-				</strong><span>🔔</span><small>오늘만 특가</small></a> <a href="#" class="ad ad5"><strong>쿠팡에서<br>판매시작하기
-				</strong><span>›</span><small>판매자 모집</small></a>
-			</aside> -->
-			<aside class="right-ads">
+			<aside class="order-side-banner">
+				<ul class="order-promotion-banner">
+					<li><a href="${pageContext.request.contextPath}/"
+						class="order-ad-link"> <img
+							src="${pageContext.request.contextPath}/images/ads/beauty.png"
+							alt="오늘의 뷰티 특가">
+					</a></li>
 
-				<a href="#" class="side-ad"> <img
-					src="${pageContext.request.contextPath}/images/ads/ad_beauty.jpg"
-					alt="뷰티 광고">
-				</a> <a href="#" class="side-ad"> <img
-					src="${pageContext.request.contextPath}/images/ads/ad_monster.jpg"
-					alt="생활용품 광고">
-				</a> <a href="#" class="side-ad"> <img
-					src="${pageContext.request.contextPath}/images/ads/ad_only.jpg"
-					alt="GoodPang Only">
-				</a> <a href="#" class="side-ad"> <img
-					src="${pageContext.request.contextPath}/images/ads/ad_seller.jpg"
-					alt="판매자 모집">
-				</a> <a href="#" class="side-ad"> <img
-					src="${pageContext.request.contextPath}/images/ads/ad_special.jpg"
-					alt="금주의 특가">
-				</a> <a href="#" class="side-ad"> <img
-					src="${pageContext.request.contextPath}/images/ads/ad_food.jpg"
-					alt="식품 광고">
-				</a>
+					<li><a href="${pageContext.request.contextPath}/"
+						class="order-ad-link"> <img
+							src="${pageContext.request.contextPath}/images/ads/fresh.png"
+							alt="신선식품 로켓프레시">
+					</a></li>
 
+					<li><a href="${pageContext.request.contextPath}/"
+						class="order-ad-link"> <img
+							src="${pageContext.request.contextPath}/images/ads/only.png"
+							alt="GoodPang 단독 상품">
+					</a></li>
+
+					<li><a href="${pageContext.request.contextPath}/"
+						class="order-ad-link"> <img
+							src="${pageContext.request.contextPath}/images/ads/tech.png"
+							alt="디지털 인기상품">
+					</a></li>
+
+					<li><a href="${pageContext.request.contextPath}/wow/join"
+						class="order-ad-link"> <img
+							src="${pageContext.request.contextPath}/images/ads/wow.png"
+							alt="와우회원 전용 혜택">
+					</a></li>
+
+					<li><a href="${pageContext.request.contextPath}/"
+						class="order-ad-link"> <img
+							src="${pageContext.request.contextPath}/images/ads/seller.png"
+							alt="GoodPang 판매자 모집">
+					</a></li>
+				</ul>
 			</aside>
 		</main>
 	</div>
