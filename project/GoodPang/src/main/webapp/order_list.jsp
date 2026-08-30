@@ -54,7 +54,7 @@
 				<li class="active"><a
 					href="${pageContext.request.contextPath}/order/order_list">주문목록/배송조회</a></li>
 				<a href="${pageContext.request.contextPath}/cancel_history.jsp">취소/반품/교환/환불
-					내역</a> <a href="#">와우 멤버십</a> <a href="#">구독 서비스 <span class="new">N</span></a>
+					내역</a> <a href="${pageContext.request.contextPath}/wow/membership">와우 멤버십</a> <a href="#">구독 서비스 <span class="new">N</span></a>
 				<a href="#">로켓프레시 프레시백 <span class="new">N</span></a> <a href="#">영수증
 					조회/출력</a>
 			</div>

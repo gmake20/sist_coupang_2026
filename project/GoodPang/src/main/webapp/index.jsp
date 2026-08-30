@@ -3547,7 +3547,67 @@ document.addEventListener("DOMContentLoaded", function () {
         cardNumber4
     ];
     
-    const wowWelcomeBanner = document.getElementById("wowWelcomeBanner");
+    const wowWelcomeModal =
+        document.getElementById("wowWelcomeModal");
+
+const wowWelcomeCloseBtn =
+        document.getElementById("wowWelcomeCloseBtn");
+
+const wowWelcomeConfirmBtn =
+        document.getElementById("wowWelcomeConfirmBtn");
+
+function closeWowWelcomeModal() {
+
+    if (!wowWelcomeModal) {
+        return;
+    }
+
+    wowWelcomeModal.classList.add("hide");
+
+    setTimeout(function() {
+        wowWelcomeModal.remove();
+    }, 250);
+}
+
+if (wowWelcomeCloseBtn) {
+    wowWelcomeCloseBtn.addEventListener(
+        "click",
+        closeWowWelcomeModal
+    );
+}
+
+if (wowWelcomeConfirmBtn) {
+    wowWelcomeConfirmBtn.addEventListener(
+        "click",
+        closeWowWelcomeModal
+    );
+}
+
+if (wowWelcomeModal) {
+
+    wowWelcomeModal.addEventListener(
+        "click",
+        function(event) {
+
+            if (event.target === wowWelcomeModal) {
+                closeWowWelcomeModal();
+            }
+        }
+    );
+
+    const url =
+            new URL(window.location.href);
+
+    url.searchParams.delete("wowJoined");
+
+    window.history.replaceState(
+        {},
+        "",
+        url.pathname + url.search
+    );
+}
+    
+/*     const wowWelcomeBanner = document.getElementById("wowWelcomeBanner");
     const wowWelcomeClose = document.getElementById("wowWelcomeClose");
 
     if (wowWelcomeBanner) {
@@ -3564,7 +3624,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         setTimeout(closeWowWelcomeBanner, 4000);
-    }
+    } */
   
     cardNumberInputs.forEach(function(input, index) {
         input.addEventListener("input", function() {
@@ -3948,7 +4008,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </script>
 
-<c:if test="${param.wowJoined eq 'Y'}">
+<%-- <c:if test="${param.wowJoined eq 'Y'}">
     <div id="wowWelcomeBanner" class="wow-welcome-banner">
         <div class="wow-welcome-content">
             <div class="wow-welcome-icon">WOW</div>
@@ -3959,6 +4019,68 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
 
             <button type="button" id="wowWelcomeClose" class="wow-welcome-close">&times;</button>
+        </div>
+    </div>
+</c:if> --%>
+
+<c:if test="${param.wowJoined eq 'Y'}">
+    <div id="wowWelcomeModal" class="wow-welcome-overlay">
+        <div class="wow-welcome-modal">
+
+            <button type="button"
+                    id="wowWelcomeCloseBtn"
+                    class="wow-welcome-close">
+                &times;
+            </button>
+
+            <div class="wow-welcome-crown">♛</div>
+
+            <div class="wow-welcome-logo">
+                WOW
+            </div>
+
+            <h2 class="wow-welcome-title">
+                와우 멤버십 가입을<br>
+                환영합니다!
+            </h2>
+
+            <p class="wow-welcome-description">
+                이제 굿팡의 특별한 와우 혜택을<br>
+                마음껏 이용하실 수 있습니다.
+            </p>
+
+            <div class="wow-welcome-benefits">
+                <div class="wow-welcome-benefit">
+                    <span>🚀</span>
+                    <strong>무료배송</strong>
+                </div>
+
+                <div class="wow-welcome-benefit">
+                    <span>📦</span>
+                    <strong>무료반품</strong>
+                </div>
+
+                <div class="wow-welcome-benefit">
+                    <span>🌿</span>
+                    <strong>로켓프레시</strong>
+                </div>
+            </div>
+
+            <div class="wow-welcome-price">
+                <span>와우 멤버십</span>
+                <strong>월 7,890원</strong>
+            </div>
+
+            <button type="button"
+                    id="wowWelcomeConfirmBtn"
+                    class="wow-welcome-confirm">
+                와우 혜택 시작하기
+            </button>
+
+            <p class="wow-welcome-small">
+                와우 회원이 되신 것을 진심으로 환영합니다.
+            </p>
+
         </div>
     </div>
 </c:if>
