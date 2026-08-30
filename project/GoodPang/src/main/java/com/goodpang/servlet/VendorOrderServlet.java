@@ -6,6 +6,7 @@ import java.util.List;
 import com.goodpang.dao.VendorOrderListDAO;
 import com.goodpang.dto.SellerDTO;
 import com.goodpang.dto.VendorOrderListDTO;
+import com.goodpang.dto.VendorOrderStatSummaryDTO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,8 +35,10 @@ public class VendorOrderServlet extends HttpServlet {
 		}
 
 		List<VendorOrderListDTO> orderList = orderListDAO.findBySellerNo(loginSeller.getSellerNo());
+		VendorOrderStatSummaryDTO orderStat = orderListDAO.countStats(loginSeller.getSellerNo());
 
 		request.setAttribute("orderList", orderList);
+		request.setAttribute("orderStat", orderStat);
 
 		request.getRequestDispatcher("/WEB-INF/views/vendor-order.jsp").forward(request, response);
 	}

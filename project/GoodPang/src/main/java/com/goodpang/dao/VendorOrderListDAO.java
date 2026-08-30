@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.goodpang.dto.VendorOrderListDTO;
+import com.goodpang.dto.VendorOrderStatSummaryDTO;
 import com.goodpang.util.ConnectionProvider;
 
 /*
@@ -63,6 +64,57 @@ public class VendorOrderListDAO {
         }
 
         return list;
+    }
+
+    /*
+     * 주문/배송 관리 화면 상단 통계 카드 + 우측 배송현황 도넛용 집계.
+     * ORDER_STATUS로 실제 존재하는 상태(결제완료/배송중/배송완료)만 센다 - 신규주문/결제대기/
+     * 상품준비중/취소반품교환에 대응하는 상태값은 아직 시스템에 없어서 집계 대상에서 제외.
+     * DELIVERY_END_DATE 기준으로 "오늘" 배송완료된 건수를 판단한다(AdminDeliveryDAO가
+     * 배송완료 처리할 때 그 컬럼에 SYSDATE를 넣음).
+     */
+    public VendorOrderStatSummaryDTO countStats(int sellerNo) {
+
+        VendorOrderStatSummaryDTO dto = new VendorOrderStatSummaryDTO();
+
+        String sql = """
+            SELECT
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '결제완료' THEN O.ORDER_NO END) AS WAITING_COUNT,
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '배송중' THEN O.ORDER_NO END) AS SHIPPING_COUNT,
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '배송완료' THEN O.ORDER_NO END) AS DELIVERED_COUNT,
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '배송완료'
+                                      AND D.DELIVERY_END_DATE IS NOT NULL
+                                      AND TRUNC(D.DELIVERY_END_DATE) = TRUNC(SYSDATE)
+                                 THEN O.ORDER_NO END) AS DELIVERED_TODAY_COUNT
+            FROM ORDERS O
+                JOIN ORDER_DETAIL OD ON OD.ORDER_NO = O.ORDER_NO
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                LEFT JOIN DELIVERY D ON D.ORDER_NO = O.ORDER_NO
+            WHERE P.SELLER_NO = ?
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setInt(1, sellerNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                if (rs.next()) {
+                    dto.setWaitingCount(rs.getInt("WAITING_COUNT"));
+                    dto.setShippingCount(rs.getInt("SHIPPING_COUNT"));
+                    dto.setDeliveredCount(rs.getInt("DELIVERED_COUNT"));
+                    dto.setDeliveredTodayCount(rs.getInt("DELIVERED_TODAY_COUNT"));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dto;
     }
 
     /*
