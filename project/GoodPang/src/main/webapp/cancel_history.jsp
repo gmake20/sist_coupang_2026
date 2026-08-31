@@ -54,8 +54,8 @@ a {
    ========================= */
 
 .page-wrap {
-    width: 1200px;
-    margin: 0 auto;
+    width: 1025px;
+    margin: 30px auto 80px auto;
     display: flex;
     min-height: 750px;
 }
@@ -66,7 +66,7 @@ a {
    ========================= */
 
 .side-menu {
-    width: 180px;
+    width: 135px;
     flex-shrink: 0;
     border: 1px solid #ddd;
     margin-top: 20px;
@@ -110,6 +110,147 @@ a {
 .side-section a.active {
     color: #2878c8;
     font-weight: bold;
+}
+
+
+/* =========================================
+   오른쪽 광고
+========================================= */
+/* =========================
+   오른쪽 광고 (화면에 고정, 스크롤 따라옴)
+========================= */
+.right-banner {
+    position: fixed;
+    top: 130px;
+    left: 50%;
+    margin-left: 610px;   /* mypage-container(1180px) 중앙 기준 오른쪽 여백 */
+    margin-left: 530px;
+    width: 92px;
+    z-index: 100;
+}
+.banner {
+    position: relative;
+
+    width: 92px;
+    height: 134px;
+
+    margin-bottom: 9px;
+
+    border-radius: 3px;
+
+    overflow: hidden;
+
+    padding: 14px 8px;
+
+    color: #fff;
+}
+
+.banner strong {
+    position: relative;
+    z-index: 2;
+
+    display: block;
+
+    font-size: 14px;
+    line-height: 1.25;
+}
+
+.banner span {
+    position: absolute;
+
+    left: 8px;
+    top: 49px;
+
+    z-index: 3;
+
+    width: 16px;
+    height: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.9);
+
+    color: #276fe5;
+
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.banner-product,
+.banner-character,
+.banner-bell,
+.banner-shop {
+    position: absolute;
+
+    right: 5px;
+    bottom: 2px;
+
+    font-size: 52px;
+}
+
+.banner-1 {
+    background: #fff;
+    border: 1px solid #ddd;
+    color: #2875db;
+}
+
+.banner-1 strong {
+    font-size: 17px;
+}
+
+.banner-2 {
+    background: #b9e4f5;
+    color: #222;
+}
+
+.banner-3 {
+    background: #f5a7c5;
+    color: #222;
+}
+
+.banner-3 em {
+    color: #ff0066;
+    font-style: normal;
+}
+
+.banner-4 {
+    background: #3339ef;
+}
+
+.banner-5 {
+    background: #ef4a3b;
+}
+
+.banner-bell {
+    font-size: 52px;
+}
+
+.banner-shop {
+    font-size: 48px;
+}
+
+.badge {
+    position: absolute;
+
+    right: 7px;
+    top: 54px;
+
+    width: 18px;
+    height: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #e60012;
+
+    border-radius: 50%;
+
+    font-size: 10px;
 }
 
 
@@ -355,6 +496,55 @@ a {
 }
 
 
+/* =========================================
+   오른쪽 미니 메뉴
+========================================= */
+
+.side-mini-menu {
+    border: 1px solid #ddd;
+}
+
+.side-mini-menu div {
+    height: 30px;
+
+    padding: 0 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #34405c;
+
+    color: #fff;
+
+    font-size: 10px;
+}
+
+.side-mini-menu div + div {
+    border-top: 1px solid #566078;
+}
+
+.side-mini-menu strong {
+    color: #39a5ff;
+    font-size: 11px;
+}
+
+
+/* 최근 상품 */
+
+.recent-product {
+    height: 78px;
+
+    margin-top: 0;
+
+    border: 1px solid #ddd;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 42px;
+}
 /* =========================
    FOOTER 자리
    ========================= */
@@ -399,9 +589,7 @@ footer {
 
             <h3>MY 쇼핑</h3>
 
-            <a href="${pageContext.request.contextPath}/order/order_list">
-                주문목록/배송조회
-            </a>
+            	<a href="${pageContext.request.contextPath}/order/order_list" >주문목록/배송조회</a>
 
             <a href="${pageContext.request.contextPath}/order/cancel_history"
                class="active">
@@ -469,9 +657,7 @@ footer {
 
         <div class="tab-menu">
 
-            <a href="${pageContext.request.contextPath}/order_list.jsp">
-                주문목록/배송조회
-            </a>
+           <a href="${pageContext.request.contextPath}/order/order_list" >주문목록/배송조회</a>
 
             <a href="${pageContext.request.contextPath}/cancel_history.jsp"
                class="active">
@@ -601,6 +787,68 @@ footer {
         </div>
 
     </main>
+    
+		<!-- =========================
+         오른쪽 광고 영역
+    ========================== -->
+		<aside class="right-banner">
+
+			<div class="banner banner-1">
+				<strong>쿠팡 only</strong> <span>›</span>
+				<div class="banner-product">📦</div>
+			</div>
+
+
+			<div class="banner banner-2">
+				<strong>~5만원<br>쿠폰 할인
+				</strong> <span>›</span>
+				<div class="banner-character">🏝️</div>
+			</div>
+
+
+			<div class="banner banner-3">
+				<strong>쿠팡이 직접<br> <em>수입</em>했어요!
+				</strong> <span>›</span>
+
+				<div class="banner-product">🧴</div>
+			</div>
+
+
+			<div class="banner banner-4">
+				<strong> 금주의<br> 특가왕
+				</strong> <span>›</span>
+
+				<div class="banner-bell">🔔</div>
+
+				<b class="badge">1</b>
+			</div>
+
+
+			<div class="banner banner-5">
+				<strong> 쿠팡에서<br> 판매 시작하기
+				</strong> <span>›</span>
+
+				<div class="banner-shop">🛍️</div>
+			</div>
+
+
+			<div class="side-mini-menu">
+
+				<div>
+					장바구니 <strong>2</strong>
+				</div>
+
+				<div>
+					최근본상품 <strong>15</strong>
+				</div>
+
+			</div>
+
+
+			<div class="recent-product">👟</div>
+
+		</aside>
+    
 
 </div>
 

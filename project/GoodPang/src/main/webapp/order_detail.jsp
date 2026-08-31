@@ -52,8 +52,8 @@
 			<div class="side-section">
 				<h3>MY 쇼핑</h3>
 
-				<a href="#" class="active">주문목록/배송조회</a> <a
-					href="cancel_history.jsp">취소/반품/교환/환불 내역</a> <a href="#">와우 멤버십</a>
+				<a href="${pageContext.request.contextPath}/order/order_list" class="active">주문목록/배송조회</a> <a
+					href="${pageContext.request.contextPath}/order/cancel_history">취소/반품/교환/환불 내역</a> <a href="#">와우 멤버십</a>
 				<a href="#">구독 서비스 <span class="new">N</span></a> <a href="#">로켓프레시
 					프레시백 <span class="new">N</span>
 				</a> <a href="#">영수증 조회/출력</a>
@@ -75,7 +75,7 @@
 			<div class="side-section">
 				<h3>MY 정보</h3>
 
-				<a href="#">개인정보확인/수정</a> <a href="#">결제수단·쿠페이 관리</a> <a href="#">배송지
+				<a href="${pageContext.request.contextPath}/member/modify">개인정보확인/수정</a> <a href="#">결제수단·쿠페이 관리</a> <a href="#">배송지
 					관리</a> <a href="#">패스키 관리</a> <a href="#">회원 탈퇴</a>
 			</div>
 
@@ -176,11 +176,10 @@
 					<div class="delivery-buttons">
 
 						<button type="button" class="delivery-btn primary"
-							id="deliveryBtn">배송 조회</button>
+							id="deliveryBtn" onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${item.orderNo}'">배송 조회</button>
 
 						<button type="button" class="delivery-btn" id="exchangeBtn" 
-             onclick="location.href='${pageContext.request.contextPath}
-             /order_cancel.jsp?orderNo=${item.orderNo}'">교환, 반품 신청</button>
+             onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${item.orderNo}'">교환, 반품 신청</button>
 
 						<button type="button" class="delivery-btn" id="reviewBtn">
 							리뷰 작성하기</button>
