@@ -7,8 +7,10 @@ import com.goodpang.util.ConnectionProvider;
 
 
 public class WowPaymentDAO {
+	
+	
 
-    public void insertPayment(
+    public int insertPayment(
             Connection conn,
             int wowMembershipNo,
             int memberNo,
@@ -76,7 +78,7 @@ public class WowPaymentDAO {
                     paymentType
             );
 
-            pstmt.executeUpdate();
+            return pstmt.executeUpdate();
         }
     }
     

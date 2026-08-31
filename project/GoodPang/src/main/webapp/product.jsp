@@ -1,13 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c"%>
-<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${p.productName}- ${p.subCategoryName} | 굿팡</title>
+<title>${p.productName}-${p.subCategoryName}|굿팡</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet"
@@ -22,6 +22,11 @@
 	href="${pageContext.request.contextPath}/css/main.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/product.css">
+<%-- <link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/wow_join_modal.css">
+ --%>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/product_wow_modal.css">
 <!-- 4. 상세페이지 전용 -->
 </head>
 
@@ -69,9 +74,12 @@
 					<li><a href="#">의류</a></li>
 					<li><a href="#">티셔츠</a></li>
 					 -->
-					<li><a href="${pageContext.request.contextPath}/category?categoryNo=${p.mainCategoryNo}">${p.mainCategoryName}</a></li>
-					<li><a href="${pageContext.request.contextPath}/category?categoryNo=${p.midCategoryNo}">${p.midCategoryName}</a></li>
-					<li><a href="${pageContext.request.contextPath}/category?categoryNo=${p.subCategoryNo}">${p.subCategoryName}</a></li>
+					<li><a
+						href="${pageContext.request.contextPath}/category?categoryNo=${p.mainCategoryNo}">${p.mainCategoryName}</a></li>
+					<li><a
+						href="${pageContext.request.contextPath}/category?categoryNo=${p.midCategoryNo}">${p.midCategoryName}</a></li>
+					<li><a
+						href="${pageContext.request.contextPath}/category?categoryNo=${p.subCategoryNo}">${p.subCategoryName}</a></li>
 
 				</ol>
 			</nav>
@@ -95,7 +103,8 @@
 					<ul class="product-image__thumbs">
 						<c:choose>
 							<c:when test="${not empty mainOption.images}">
-								<c:forEach items="${mainOption.images}" var="img" varStatus="loop">
+								<c:forEach items="${mainOption.images}" var="img"
+									varStatus="loop">
 									<li class="${loop.first ? 'is-on' : ''}"><a href="#"><img
 											src="${pageContext.request.contextPath}/${img.imageUrl}"
 											alt=""></a></li>
@@ -172,7 +181,9 @@
                            2026-08-27: 유니코드 별(★★★★☆) → 리뷰 카드와 같은 스프라이트(.star-rating)로 통일.
                  여기 별은 "이 리뷰 하나"가 아니라 "이 상품 전체 평균 평점"이라 avgRating(서버가 reviews 리스트로 계산해서 내려줌, ProductServlet)을 씀 -->
 						<div class="review-atf">
-		              <span class="star-rating" aria-label="평점 ${avgRating}점"><em style="width:${avgRating * 20}%"></em></span> <a href="#reviews" class="count">(${reviewCount})</a>
+							<span class="star-rating" aria-label="평점 ${avgRating}점"><em
+								style="width:${avgRating * 20}%"></em></span> <a href="#reviews"
+								class="count">(${reviewCount})</a>
 						</div>
 					</div>
 
@@ -183,15 +194,16 @@
 							     "추가금". 판매가/정상가 둘 다 ProductServlet 이 기본가+추가금으로 계산해둔 값을 씀.
 							     정상가가 없으면(NORMAL_PRICE 미입력) 할인 표시 자체를 숨김. 옵션 바꾸면 product.js 의
 							     setPrice() 가 이 태그들 글자·style 을 그대로 갈아끼움 -->
-							<span class="discount"${empty displayNormalPrice ? ' style="display:none"' : ''}>${discountRate}%</span>
+							<span class="discount"
+								${empty displayNormalPrice ? ' style="display:none"' : ''}>${discountRate}%</span>
 							<strong class="total-price" data-unit-price="${displayPrice}"
-								data-base-price="${p.productPrice}">${displayPrice}원</strong>
-							<span class="badge-rocket">로켓배송</span> <span
-								class="badge-tomorrow">내일도착</span>
+								data-base-price="${p.productPrice}">${displayPrice}원</strong> <span
+								class="badge-rocket">로켓배송</span> <span class="badge-tomorrow">내일도착</span>
 
 						</div>
 						<!-- 원가 취소선 (#768695 + line-through). 정상 추가금(NORMAL_PRICE) 입력 안 한 옵션이면 안 보임 -->
-						<div class="price-origin"${empty displayNormalPrice ? ' style="display:none"' : ''}>
+						<div class="price-origin"
+							${empty displayNormalPrice ? ' style="display:none"' : ''}>
 							<span class="origin-price">${displayNormalPrice}원</span>
 							<!-- 원본에 있는 ⓘ — 눌러도 아무 일 없는 안내 아이콘. 이미지 없이 글자로 그림 -->
 							<button type="button" class="price-info">
@@ -243,7 +255,8 @@
              값 목록을 뽑는 건 JSTL 보다 JS 가 훨씬 간단함 — 그래서 여기선 데이터만 넘기고
              실제 화면은 js/product.js 의 setupOptionSelect() 가 그림.
              options[0].option1Type 이 없으면(=옵션 자체가 없는 상품) 섹션 전체를 안 그림 -->
-					<c:if test="${not empty options && not empty options[0].option1Type}">
+					<c:if
+						test="${not empty options && not empty options[0].option1Type}">
 						<div class="fashion-option" id="fashionOption"></div>
 
 						<!-- 화면엔 안 보임 — js 가 읽어가는 원본 데이터 자리.
@@ -303,26 +316,17 @@
 						</div>
 
 						<!-- 장바구니 -->
-						<button type="button"
-						        class="prod-cart-btn"
-						        id="cartAddBtn">
-						    장바구니 담기
-						</button>
-						<div id="cartAddedPopup"
-						     class="cart-added-popup">
-						
-						    <button type="button"
-						            class="cart-popup-close"
-						            id="cartPopupClose">
-						        ×
-						    </button>
-						
-						    <p>상품이 장바구니에 담겼습니다.</p>
-						
-						    <a href="${pageContext.request.contextPath}/cart"
-						       class="cart-popup-link">
-						        장바구니 바로가기 &gt;
-						    </a>
+						<button type="button" class="prod-cart-btn" id="cartAddBtn">
+							장바구니 담기</button>
+						<div id="cartAddedPopup" class="cart-added-popup">
+
+							<button type="button" class="cart-popup-close"
+								id="cartPopupClose">×</button>
+
+							<p>상품이 장바구니에 담겼습니다.</p>
+
+							<a href="${pageContext.request.contextPath}/cart"
+								class="cart-popup-link"> 장바구니 바로가기 &gt; </a>
 						</div>
 
 						<!-- 바로구매 -->
@@ -334,14 +338,21 @@
 						</button>
 
 						<!-- 로켓와우 -->
-						<button type="submit" class="prod-wow-btn"
-							formaction="${pageContext.request.contextPath}/order/buy"
-							formmethod="post">
+						<c:choose>
+							<c:when test="${isWowMember}">
+								<button type="submit" class="prod-wow-btn"
+									formaction="${pageContext.request.contextPath}/order/buy"
+									formmethod="post">
+									로켓와우로 무료배송 <i class="arrow-right"></i>
+								</button>
 
-							로켓와우로 무료배송 <i class="arrow-right"></i>
-
-						</button>
-
+							</c:when>
+							<c:otherwise>
+								<button type="button" class="prod-wow-btn" id="wowJoinOpenBtn">
+									로켓와우로 무료배송 <i class="arrow-right"></i>
+								</button>
+							</c:otherwise>
+						</c:choose>
 						<!-- 품절 -->
 						<button type="button" class="prod-soldout-btn" disabled>
 							품절</button>
@@ -464,95 +475,96 @@
 							</span> <span class="ad-item__tag">무료배송</span> <span
 								class="ad-item__ship">모레(금) 도착 예정</span> <span
 								class="ad-item__rating"><em class="stars">★★★★☆</em>(682)</span>
+						</a></li>
 
 
-								<li class="ad-item"><a href="#"> <span
-										class="ad-item__thumb"><img
-											src="${pageContext.request.contextPath}/images/product-detail/ad-1.jpg"
-											alt=""></span> <span class="ad-item__name">베스티하루 로카티
-											ROKA 반팔 티셔츠</span> <span class="ad-item__price"> <span
-											class="was">할인 <del>23,900</del></span> <span class="now"><em
-												class="rate">58%</em> <strong>9,900</strong></span>
-									</span> <span class="ad-item__tag">무료반품</span> <span
-										class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
-										class="ad-item__rating"><em class="stars">★★★★☆</em>(63)</span>
-								</a></li>
-								<li class="ad-item"><a href="#"> <span
-										class="ad-item__thumb"><img
-											src="${pageContext.request.contextPath}/images/product-detail/ad-2.jpg"
-											alt=""></span> <span class="ad-item__name">3장 세트 ROKA
-											기능성 냉감 쿨링 남자 여자 반팔티 로카티</span> <span class="ad-item__price">
-											<span class="now"><strong>18,900</strong></span>
-									</span> <span class="ad-item__tag">무료배송</span> <span
-										class="ad-item__ship">${deliveryDate} 도착 예정</span> <span
-										class="ad-item__rating"><em class="stars">★★★★☆</em>(30)</span>
-								</a></li>
-								<li class="ad-item"><a href="#"> <span
-										class="ad-item__thumb"><img
-											src="${pageContext.request.contextPath}/images/product-detail/ad-3.jpg"
-											alt=""></span> <span class="ad-item__name">워크존 로카티
-											코리아아미 쿨링 반팔 티셔츠 남녀공용</span> <span class="ad-item__price"> <span
-											class="was">할인 <del>18,300</del></span> <span class="now"><em
-												class="rate">60%</em> <strong>7,290</strong></span>
-									</span> <span class="ad-item__tag">무료반품</span> <span
-										class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
-										class="ad-item__rating"><em class="stars">★★★★☆</em>(398)</span>
-								</a></li>
-								<li class="ad-item"><a href="#"> <span
-										class="ad-item__thumb"><img
-											src="${pageContext.request.contextPath}/images/product-detail/ad-4.jpg"
-											alt=""></span> <span class="ad-item__name">밀리랩 로카티 ROKA
-											반팔 티셔츠 2P</span> <span class="ad-item__price"> <span
-											class="was">할인 <del>25,800</del></span> <span class="now"><em
-												class="rate">36%</em> <strong>16,500</strong></span>
-									</span> <span class="ad-item__tag">무료반품</span> <span
-										class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
-										class="ad-item__rating"><em class="stars">★★★★☆</em>(6,543)</span>
-								</a></li>
-								<li class="ad-item"><a href="#"> <span
-										class="ad-item__thumb"><img
-											src="${pageContext.request.contextPath}/images/product-detail/ad-5.jpg"
-											alt=""></span> <span class="ad-item__name">5장 모던프로 스포츠
-											기능성 드라이 라운드 반팔 티셔츠</span> <span class="ad-item__price"> <span
-											class="was">할인 <del>120,000</del></span> <span class="now"><em
-												class="rate">87%</em> <strong>14,800</strong></span>
-									</span> <span class="ad-item__tag">무료반품</span> <span
-										class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
-										class="ad-item__rating"><em class="stars">★★★★☆</em>(357)</span>
-								</a></li>
-								<li class="ad-item"><a href="#"> <span
-										class="ad-item__thumb"><img
-											src="${pageContext.request.contextPath}/images/product-detail/ad-6.jpg"
-											alt=""></span> <span class="ad-item__name">NEOX 네옥스 쿨론
-											자카드 검정 라운드넥 반팔 티셔츠</span> <span class="ad-item__price"> <span
-											class="was">할인 <del>34,900</del></span> <span class="now"><em
-												class="rate">77%</em> <strong>7,910</strong></span>
-									</span> <span class="ad-item__tag">무료반품</span> <span
-										class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
-										class="ad-item__rating"><em class="stars">★★★★☆</em>(76)</span>
-								</a></li>
-								<li class="ad-item"><a href="#"> <span
-										class="ad-item__thumb"><img
-											src="${pageContext.request.contextPath}/images/product-detail/ad-7.jpg"
-											alt=""></span> <span class="ad-item__name">쿨링 ROKA 로카티
-											반팔 단체 티셔츠 반티 체육대회 유니폼</span> <span class="ad-item__price"> <span
-											class="was">할인 <del>20,000</del></span> <span class="now"><em
-												class="rate">56%</em> <strong>8,800</strong></span>
-									</span> <span class="ad-item__tag">무료반품</span> <span
-										class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
-										class="ad-item__rating"><em class="stars">★★★★☆</em>(6,384)</span>
-								</a></li>
-								<li class="ad-item"><a href="#"> <span
-										class="ad-item__thumb"><img
-											src="${pageContext.request.contextPath}/images/product-detail/ad-8.jpg"
-											alt=""></span> <span class="ad-item__name">아소트 냉감 통기성
-											메쉬 로카티 코리아 아미 반팔 티셔츠</span> <span class="ad-item__price"> <span
-											class="was">할인 <del>21,900</del></span> <span class="now"><em
-												class="rate">54%</em> <strong>9,920</strong></span>
-									</span> <span class="ad-item__tag">무료배송</span> <span
-										class="ad-item__ship">${deliveryDate} 도착 예정</span> <span
-										class="ad-item__rating"><em class="stars">★★★★☆</em>(682)</span>
-								</a></li>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-1.jpg"
+									alt=""></span> <span class="ad-item__name">베스티하루 로카티 ROKA
+									반팔 티셔츠</span> <span class="ad-item__price"> <span class="was">할인
+										<del>23,900</del>
+								</span> <span class="now"><em class="rate">58%</em> <strong>9,900</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(63)</span>
+						</a></li>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-2.jpg"
+									alt=""></span> <span class="ad-item__name">3장 세트 ROKA 기능성
+									냉감 쿨링 남자 여자 반팔티 로카티</span> <span class="ad-item__price"> <span
+									class="now"><strong>18,900</strong></span>
+							</span> <span class="ad-item__tag">무료배송</span> <span
+								class="ad-item__ship">${deliveryDate} 도착 예정</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(30)</span>
+						</a></li>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-3.jpg"
+									alt=""></span> <span class="ad-item__name">워크존 로카티 코리아아미
+									쿨링 반팔 티셔츠 남녀공용</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>18,300</del></span> <span class="now"><em
+										class="rate">60%</em> <strong>7,290</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(398)</span>
+						</a></li>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-4.jpg"
+									alt=""></span> <span class="ad-item__name">밀리랩 로카티 ROKA
+									반팔 티셔츠 2P</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>25,800</del></span> <span class="now"><em
+										class="rate">36%</em> <strong>16,500</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(6,543)</span>
+						</a></li>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-5.jpg"
+									alt=""></span> <span class="ad-item__name">5장 모던프로 스포츠
+									기능성 드라이 라운드 반팔 티셔츠</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>120,000</del></span> <span class="now"><em
+										class="rate">87%</em> <strong>14,800</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(357)</span>
+						</a></li>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-6.jpg"
+									alt=""></span> <span class="ad-item__name">NEOX 네옥스 쿨론
+									자카드 검정 라운드넥 반팔 티셔츠</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>34,900</del></span> <span class="now"><em
+										class="rate">77%</em> <strong>7,910</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(76)</span>
+						</a></li>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-7.jpg"
+									alt=""></span> <span class="ad-item__name">쿨링 ROKA 로카티 반팔
+									단체 티셔츠 반티 체육대회 유니폼</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>20,000</del></span> <span class="now"><em
+										class="rate">56%</em> <strong>8,800</strong></span>
+							</span> <span class="ad-item__tag">무료반품</span> <span
+								class="ad-item__ship">${deliveryDate} 도착 보장</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(6,384)</span>
+						</a></li>
+						<li class="ad-item"><a href="#"> <span
+								class="ad-item__thumb"><img
+									src="${pageContext.request.contextPath}/images/product-detail/ad-8.jpg"
+									alt=""></span> <span class="ad-item__name">아소트 냉감 통기성 메쉬
+									로카티 코리아 아미 반팔 티셔츠</span> <span class="ad-item__price"> <span
+									class="was">할인 <del>21,900</del></span> <span class="now"><em
+										class="rate">54%</em> <strong>9,920</strong></span>
+							</span> <span class="ad-item__tag">무료배송</span> <span
+								class="ad-item__ship">${deliveryDate} 도착 예정</span> <span
+								class="ad-item__rating"><em class="stars">★★★★☆</em>(682)</span>
+						</a></li>
 					</ul>
 					<button type="button" class="sdp-ads__next">
 						<span class="blind">다음 상품</span>
@@ -732,8 +744,7 @@
 					<c:when test="${not empty detailImages}">
 						<c:forEach items="${detailImages}" var="img">
 							<div class="detail-image">
-								<img
-									src="${pageContext.request.contextPath}/${img.imageUrl}"
+								<img src="${pageContext.request.contextPath}/${img.imageUrl}"
 									alt="">
 							</div>
 						</c:forEach>
@@ -779,7 +790,8 @@
                    (JSON-LD 의 ratingValue 4.2 / ratingCount 17 로 확인).
                    별 그림이 평점을, 숫자가 개수를 나타내는 구조 -->
 						<div class="review-score">
-							<span class="star-rating" aria-label="평점 ${avgRating}점"><em style="width:${avgRating * 20}%"></em></span> <strong>${reviewCount}</strong>
+							<span class="star-rating" aria-label="평점 ${avgRating}점"><em
+								style="width:${avgRating * 20}%"></em></span> <strong>${reviewCount}</strong>
 						</div>
 
 						<!-- 별점 분포 막대
@@ -908,40 +920,44 @@
                    **모자란 게 아니라 개수만 다른 것.** 카드 하나의 구조·크기는 원본과 같음.
                    DB 를 붙이면 &lt;c:forEach&gt; 가 리뷰 수만큼 찍어내므로 저절로 채워짐 —
                    지금 개수를 늘리려고 카드를 복붙할 필요 없음 (2026-08-21 확인) -->
-	<c:choose>
-	    <c:when test="${not empty reviews}">
-	        <c:forEach items="${reviews}" var="r">
-	        <article class="review-item" data-rating="${r.rating}" data-review-id="${r.reviewNo}">
-	            <div class="review-head">
-	                <span class="review-avatar"></span>
-	                <div class="review-writer">
-	                    <strong class="name">${r.maskedName}</strong>
-	                    <span class="seller">${r.storeName}</span>
-	                    <div class="meta">
-	                        <span class="star-rating" aria-label="별점 ${r.rating}점"><em style="width:${r.rating * 20}%"></em></span> <span class="date">${r.reviewDate}</span>
-	                    </div>
-	                </div>
-	            </div>
-	             <!-- 한줄요약(REVIEW.REVIEW_SUMMARY) — 2026-08-27 추가. 없는(NULL) 리뷰도 있어서
+						<c:choose>
+							<c:when test="${not empty reviews}">
+								<c:forEach items="${reviews}" var="r">
+									<article class="review-item" data-rating="${r.rating}"
+										data-review-id="${r.reviewNo}">
+										<div class="review-head">
+											<span class="review-avatar"></span>
+											<div class="review-writer">
+												<strong class="name">${r.maskedName}</strong> <span
+													class="seller">${r.storeName}</span>
+												<div class="meta">
+													<span class="star-rating" aria-label="별점 ${r.rating}점"><em
+														style="width:${r.rating * 20}%"></em></span> <span class="date">${r.reviewDate}</span>
+												</div>
+											</div>
+										</div>
+										<!-- 한줄요약(REVIEW.REVIEW_SUMMARY) — 2026-08-27 추가. 없는(NULL) 리뷰도 있어서
                    있을 때만 보여줌. .review-headline 은 예전에 더미 리뷰에 있다가 DB 연동하면서 한 번 빠졌던 자리(js/product.js 354행 주석 참고) —그 자리 그대로 씀 -->
-              <c:if test="${not empty r.reviewSummary}">
-              <p class="review-headline">${r.reviewSummary}</p>
-              </c:if>
-	            <c:if test="${not empty r.productName}">
-	            <p class="review-option">${r.productName}<c:if test="${not empty r.optionText}"> · ${r.optionText}</c:if></p>
-	            </c:if>
-	            <p class="review-text">${r.reviewContent}</p>
-	            <div class="review-foot">
-	                <button type="button" class="btn-helpful">도움이 돼요</button>
-	                <a href="#" class="btn-report">신고하기</a>
-	            </div>
-	        </article>
-	        </c:forEach>
-	    </c:when>
-	    <c:otherwise>
-	        <p class="review-empty">조건에 맞는 후기가 없어요</p>
-	    </c:otherwise>
-	</c:choose>
+										<c:if test="${not empty r.reviewSummary}">
+											<p class="review-headline">${r.reviewSummary}</p>
+										</c:if>
+										<c:if test="${not empty r.productName}">
+											<p class="review-option">${r.productName}<c:if
+													test="${not empty r.optionText}"> · ${r.optionText}</c:if>
+											</p>
+										</c:if>
+										<p class="review-text">${r.reviewContent}</p>
+										<div class="review-foot">
+											<button type="button" class="btn-helpful">도움이 돼요</button>
+											<a href="#" class="btn-report">신고하기</a>
+										</div>
+									</article>
+								</c:forEach>
+							</c:when>
+							<c:otherwise>
+								<p class="review-empty">조건에 맞는 후기가 없어요</p>
+							</c:otherwise>
+						</c:choose>
 						<!-- 페이지네이션 — 원본 실측(ref/product/vp_05_review2.jpeg): "‹ (1) 2 ›" 모양,
 						     지금 고른 페이지만 파란 원 테두리.
 						     번호 버튼은 JS(setupReviewTools)가 리뷰 개수를 보고 그때그때 새로 그림 —
@@ -949,22 +965,16 @@
 						     ▶JSP: 총 페이지 수 = 서버가 리뷰 개수(2,033) ÷ 페이지당 개수로 계산해서 내려줄 자리.
 						       지금은 더미 리뷰 5개를 3개씩 나눠 2페이지로 흉내냄 (js/product.js PAGE_SIZE). -->
 						<c:if test="${fn:length(reviews) > 3}">
-							    <nav class="review-pagination">
-							        <button type="button"
-							                class="page-prev"
-							                aria-label="이전 페이지"
-							                disabled>
-							            ‹
-							        </button>
-							        <span class="page-numbers"></span>
-							        <button type="button"
-							                class="page-next"
-							                aria-label="다음 페이지">
-							            ›
-							        </button>
-							    </nav>
-							</c:if>
-					<!-- //.review-list -->
+							<nav class="review-pagination">
+								<button type="button" class="page-prev" aria-label="이전 페이지"
+									disabled>‹</button>
+								<span class="page-numbers"></span>
+								<button type="button" class="page-next" aria-label="다음 페이지">
+									›</button>
+							</nav>
+						</c:if>
+						<!-- //.review-list -->
+					</div>
 				</div>
 			</section>
 
@@ -1129,24 +1139,24 @@
 									및 환불/교환에 대한 문의는 마이굿팡-고객센터 내 상담하기를 이용해주세요.</span>
 							</td>
 						</tr>
-						 <tr>
-					    <th>상호/대표자</th>
-					    <td>${p.storeName} / ${p.ceoName}</td>
-					    <th>사업장 소재지</th>
-					    <td>${p.businessAddress} ${p.businessDetailAddress}</td>
-					</tr>
-					<tr>
-					    <th>e-mail</th>
-					    <td>${p.email}</td>
-					    <th>연락처</th>
-					    <td>${p.phone}</td>
-					</tr>
-					<tr>
-					    <th>통신판매업 신고번호</th>
-					    <td>${p.mailOrderNo}</td>
-					    <th>사업자번호</th>
-					    <td>${p.businessNo}</td>
-					</tr>
+						<tr>
+							<th>상호/대표자</th>
+							<td>${p.storeName}/${p.ceoName}</td>
+							<th>사업장 소재지</th>
+							<td>${p.businessAddress}${p.businessDetailAddress}</td>
+						</tr>
+						<tr>
+							<th>e-mail</th>
+							<td>${p.email}</td>
+							<th>연락처</th>
+							<td>${p.phone}</td>
+						</tr>
+						<tr>
+							<th>통신판매업 신고번호</th>
+							<td>${p.mailOrderNo}</td>
+							<th>사업자번호</th>
+							<td>${p.businessNo}</td>
+						</tr>
 						<tr>
 							<th>구매안전 서비스</th>
 							<td colspan="3">02-006-00042 <a href="#" class="link">서비스
@@ -1270,11 +1280,673 @@
 		</div>
 	</div>
 
+	<!-- 상품상세 전용 와우 가입 모달 -->
+	<div id="productWowModal" class="product-wow-overlay">
+		<div class="product-wow-modal">
+
+			<button type="button" id="productWowCloseBtn"
+				class="product-wow-close">&times;</button>
+
+			<!-- STEP 1 -->
+			<div id="productWowStep1">
+
+				<div class="product-wow-header">
+					<div class="product-wow-logo">WOW</div>
+
+					<h2>
+						와우 멤버십으로<br> 이 상품을 무료배송 받으세요
+					</h2>
+
+					<p>지금 가입하면 바로 와우회원 혜택이 적용됩니다.</p>
+				</div>
+
+				<div class="product-wow-benefits">
+
+					<div class="product-wow-benefit">
+						<span class="product-wow-benefit-icon">🚀</span>
+
+						<div>
+							<strong>로켓배송 무료배송</strong>
+							<p>금액에 상관없이 무료배송 혜택</p>
+						</div>
+					</div>
+
+					<div class="product-wow-benefit">
+						<span class="product-wow-benefit-icon">📦</span>
+
+						<div>
+							<strong>무료반품</strong>
+							<p>와우회원 전용 무료반품 혜택</p>
+						</div>
+					</div>
+
+					<div class="product-wow-benefit">
+						<span class="product-wow-benefit-icon">💰</span>
+
+						<div>
+							<strong>와우 전용 혜택</strong>
+							<p>다양한 할인과 적립 혜택</p>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="product-wow-price">
+					<span>월 이용료</span> <strong> 7,890 <em>원</em>
+					</strong>
+				</div>
+
+				<div class="product-wow-actions">
+
+					<button type="button" id="productWowCancelBtn"
+						class="product-wow-btn-secondary">다음에 할게요</button>
+
+					<button type="button" id="productWowNextBtn"
+						class="product-wow-btn-primary">가입하고 무료배송 받기</button>
+
+				</div>
+
+			</div>
+
+			<!-- STEP 2 -->
+			<div id="productWowStep2" class="product-wow-step2"
+				style="display: none;">
+				<div class="product-wow-header product-wow-payment-header">
+					<div class="product-wow-logo">WOW</div>
+					<h2>결제수단을 선택해주세요</h2>
+					<p>매월 등록된 결제수단으로 7,890원이 자동 결제됩니다.</p>
+				</div>
+				<div class="product-wow-payment-price">
+					<span>오늘 결제금액</span> <strong>7,890원</strong>
+				</div>
+				<form action="${pageContext.request.contextPath}/wow/join"
+					method="post" id="productWowPaymentForm">
+
+					<input type="hidden" name="joinMode" value="modal"> <input
+						type="hidden" name="productNo" value="${p.productNo}"> <input
+						type="hidden" name="afterWowJoin" value="buy"> <input
+						type="hidden" name="productNo" value="${p.productNo}"> <input
+						type="hidden" name="optionId" id="productWowOptionId"> <input
+						type="hidden" name="quantity" id="productWowQuantity"> <input
+						type="hidden" name="color" id="productWowColor">
+
+					<!-- AJAX로 결제수단 들어오는 곳 -->
+					<div id="productWowPaymentMethodList"
+						class="product-wow-payment-list">결제수단을 불러오는 중입니다...</div>
+					<button type="button" id="productWowPaymentAddBtn"
+						class="product-wow-payment-add-btn">
+						<span>새 결제수단</span> <strong>+</strong>
+					</button>
+					<label class="product-wow-agree"> <input type="checkbox"
+						id="productWowAgree" required> <span> 와우 멤버십 월
+							7,890원 정기결제에 동의합니다. </span>
+					</label>
+					<div class="product-wow-actions">
+						<button type="button" id="productWowBackBtn"
+							class="product-wow-btn-secondary">이전</button>
+						<button type="submit" class="product-wow-btn-primary">
+							7,890원 결제하고 무료배송</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- 상품상세 와우 결제수단 추가 모달 -->
+	<div id="productWowPaymentAddModal" class="product-wow-add-overlay">
+
+		<div class="product-wow-add-modal">
+
+			<button type="button" id="productWowPaymentAddCloseBtn"
+				class="product-wow-add-close">&times;</button>
+
+			<h2 class="product-wow-add-title">새 결제수단 등록</h2>
+
+			<p class="product-wow-add-description">와우 멤버십 결제에 사용할 결제수단을
+				등록해주세요.</p>
+
+			<div class="product-wow-payment-tabs">
+
+				<button type="button" class="product-wow-payment-tab active"
+					data-type="BANK">계좌</button>
+
+				<button type="button" class="product-wow-payment-tab"
+					data-type="CARD">카드</button>
+
+			</div>
+
+			<form id="productWowPaymentAddForm">
+
+				<input type="hidden" id="productWowPaymentType" name="paymentType"
+					value="BANK">
+
+				<!-- 계좌 -->
+				<div id="productWowBankArea">
+
+					<div class="product-wow-form-row">
+
+						<label for="productWowBankCode"> 은행 </label> <select
+							id="productWowBankCode" name="bankCode">
+
+							<option value="">은행 선택</option>
+							<option value="SHINHAN">신한은행</option>
+							<option value="KB">KB국민은행</option>
+							<option value="WOORI">우리은행</option>
+							<option value="NH">NH농협은행</option>
+							<option value="HANA">하나은행</option>
+							<option value="KAKAO">카카오뱅크</option>
+							<option value="TOSS">토스뱅크</option>
+
+						</select>
+
+					</div>
+
+					<div class="product-wow-form-row">
+
+						<label for="productWowAccountNumber"> 계좌번호 </label> <input
+							type="text" id="productWowAccountNumber" maxlength="16"
+							inputmode="numeric" placeholder="'-' 없이 입력">
+
+					</div>
+
+					<div class="product-wow-form-row">
+
+						<label for="productWowAccountHolder"> 예금주 </label> <input
+							type="text" id="productWowAccountHolder" maxlength="30"
+							placeholder="예금주 이름">
+
+					</div>
+
+				</div>
+
+				<!-- 카드 -->
+				<div id="productWowCardArea" style="display: none;">
+
+					<div class="product-wow-form-row">
+
+						<label for="productWowCardCompany"> 카드사 </label> <select
+							id="productWowCardCompany">
+
+							<option value="">카드사 선택</option>
+							<option value="SHINHAN">신한카드</option>
+							<option value="KB">KB국민카드</option>
+							<option value="SAMSUNG">삼성카드</option>
+							<option value="HYUNDAI">현대카드</option>
+							<option value="LOTTE">롯데카드</option>
+							<option value="HANA">하나카드</option>
+
+						</select>
+
+					</div>
+
+					<div class="product-wow-form-row">
+
+						<label>카드번호</label>
+
+						<div class="product-wow-card-number">
+
+							<input type="text" id="productWowCard1" maxlength="4"
+								inputmode="numeric"> <span>-</span> <input type="text"
+								id="productWowCard2" maxlength="4" inputmode="numeric">
+
+							<span>-</span> <input type="text" id="productWowCard3"
+								maxlength="4" inputmode="numeric"> <span>-</span> <input
+								type="text" id="productWowCard4" maxlength="4"
+								inputmode="numeric">
+
+						</div>
+
+					</div>
+
+				</div>
+
+				<label class="product-wow-default-payment"> <input
+					type="checkbox" name="paymentDefault" value="Y"> 기본 결제수단으로
+					설정
+
+				</label>
+
+				<div class="product-wow-add-actions">
+
+					<button type="button" id="productWowPaymentAddCancelBtn"
+						class="product-wow-add-cancel">취소</button>
+
+					<button type="submit" class="product-wow-add-submit">등록하기
+					</button>
+
+				</div>
+
+			</form>
+
+		</div>
+
+	</div>
+
+	<script>
+    const contextPath = "${pageContext.request.contextPath}";
+</script>
+
 	<!-- JS는 </body> 바로 앞에! HTML을 다 읽은 뒤에 실행되게 하려고 -->
 	<script src="${pageContext.request.contextPath}/js/header.js"></script>
 	<script src="${pageContext.request.contextPath}/js/product.js"></script>
 
-</body>
+	<script>
+	document.addEventListener("DOMContentLoaded", function () {
 
+    const openBtn = document.getElementById("wowJoinOpenBtn");
+
+    const modal =
+        document.getElementById("productWowModal");
+
+    const closeBtn =
+        document.getElementById("productWowCloseBtn");
+
+    const cancelBtn =
+        document.getElementById("productWowCancelBtn");
+
+    const nextBtn =
+        document.getElementById("productWowNextBtn");
+
+    const backBtn =
+        document.getElementById("productWowBackBtn");
+
+    const step1 =
+        document.getElementById("productWowStep1");
+
+    const step2 =
+        document.getElementById("productWowStep2");
+
+    const paymentList =
+        document.getElementById("productWowPaymentMethodList");
+
+    const paymentForm =
+        document.getElementById("productWowPaymentForm");
+    
+    const paymentAddBtn =
+        document.getElementById("productWowPaymentAddBtn");
+
+    const paymentAddModal =
+        document.getElementById("productWowPaymentAddModal");
+
+    const paymentAddCloseBtn =
+        document.getElementById("productWowPaymentAddCloseBtn");
+
+    const paymentAddCancelBtn =
+        document.getElementById("productWowPaymentAddCancelBtn");
+
+    const paymentAddForm =
+        document.getElementById("productWowPaymentAddForm");
+
+    const paymentType =
+        document.getElementById("productWowPaymentType");
+
+    const paymentTabs =
+        document.querySelectorAll(".product-wow-payment-tab");
+
+    const bankArea =
+        document.getElementById("productWowBankArea");
+
+    const cardArea =
+        document.getElementById("productWowCardArea");
+    
+    paymentAddForm.addEventListener(
+    	    "submit",
+    	    async function (event) {
+
+    	        event.preventDefault();
+
+    	        const type = paymentType.value;
+
+    	        const params =
+    	            new URLSearchParams();
+
+    	        params.set(
+    	            "paymentType",
+    	            type
+    	        );
+
+    	        const defaultPayment =
+    	            paymentAddForm.querySelector(
+    	                '[name="paymentDefault"]'
+    	            );
+
+    	        params.set(
+    	            "paymentDefault",
+    	            defaultPayment &&
+    	            defaultPayment.checked
+    	                ? "Y"
+    	                : "N"
+    	        );
+
+    	        if (type === "BANK") {
+
+    	            const bankCode =
+    	                document.getElementById(
+    	                    "productWowBankCode"
+    	                );
+
+    	            const accountNumber =
+    	                document.getElementById(
+    	                    "productWowAccountNumber"
+    	                );
+
+    	            const accountHolder =
+    	                document.getElementById(
+    	                    "productWowAccountHolder"
+    	                );
+
+    	            if (!bankCode.value) {
+    	                alert("은행을 선택해주세요.");
+    	                return;
+    	            }
+
+    	            if (!accountNumber.value.trim()) {
+    	                alert("계좌번호를 입력해주세요.");
+    	                return;
+    	            }
+
+    	            if (!accountHolder.value.trim()) {
+    	                alert("예금주를 입력해주세요.");
+    	                return;
+    	            }
+
+    	            params.set(
+    	                "bankCode",
+    	                bankCode.value
+    	            );
+
+    	            params.set(
+    	                "accountNumber",
+    	                accountNumber.value.trim()
+    	            );
+
+    	            params.set(
+    	                "accountHolder",
+    	                accountHolder.value.trim()
+    	            );
+    	        }
+
+    	        if (type === "CARD") {
+
+    	            const cardCompany =
+    	                document.getElementById(
+    	                    "productWowCardCompany"
+    	                );
+
+    	            const card1 =
+    	                document.getElementById(
+    	                    "productWowCard1"
+    	                ).value.replace(/\D/g, "");
+
+    	            const card2 =
+    	                document.getElementById(
+    	                    "productWowCard2"
+    	                ).value.replace(/\D/g, "");
+
+    	            const card3 =
+    	                document.getElementById(
+    	                    "productWowCard3"
+    	                ).value.replace(/\D/g, "");
+
+    	            const card4 =
+    	                document.getElementById(
+    	                    "productWowCard4"
+    	                ).value.replace(/\D/g, "");
+
+    	            const cardNumber =
+    	                card1 + card2 + card3 + card4;
+
+    	            if (!cardCompany.value) {
+    	                alert("카드사를 선택해주세요.");
+    	                return;
+    	            }
+
+    	            if (cardNumber.length !== 16) {
+    	                alert("카드번호 16자리를 입력해주세요.");
+    	                return;
+    	            }
+
+    	            params.set(
+    	                "cardCompany",
+    	                cardCompany.value
+    	            );
+
+    	            params.set(
+    	                "cardNumber",
+    	                cardNumber
+    	            );
+    	        }
+
+    	        try {
+
+    	            const response =
+    	                await fetch(
+    	                    contextPath
+    	                    + "/wow/payment-method",
+    	                    {
+    	                        method: "POST",
+    	                        headers: {
+    	                            "Content-Type":
+    	                                "application/x-www-form-urlencoded; charset=UTF-8"
+    	                        },
+    	                        body: params.toString()
+    	                    }
+    	                );
+
+    	            if (response.status === 401) {
+    	                window.location.href =
+    	                    contextPath + "/login";
+    	                return;
+    	            }
+
+    	            if (!response.ok) {
+
+    	                const message =
+    	                    await response.text();
+
+    	                throw new Error(
+    	                    message ||
+    	                    "결제수단 등록에 실패했습니다."
+    	                );
+    	            }
+
+    	            // 결제수단 목록 다시 조회
+    	            await loadWowPaymentMethods();
+
+    	            // 추가 모달 닫기
+    	            closePaymentAddModal();
+
+    	            // 입력폼 초기화
+    	            paymentAddForm.reset();
+
+    	            paymentType.value = "BANK";
+
+    	            paymentTabs.forEach(function (tab) {
+    	                tab.classList.toggle(
+    	                    "active",
+    	                    tab.dataset.type === "BANK"
+    	                );
+    	            });
+
+    	            bankArea.style.display = "block";
+    	            cardArea.style.display = "none";
+
+    	        } catch (error) {
+
+    	            console.error(error);
+    	            alert(error.message);
+    	        }
+    	    }
+    	);
+    
+    paymentTabs.forEach(function (tab) {
+
+        tab.addEventListener("click", function () {
+
+            paymentTabs.forEach(function (item) {
+                item.classList.remove("active");
+            });
+
+            tab.classList.add("active");
+
+            const type = tab.dataset.type;
+
+            paymentType.value = type;
+
+            if (type === "BANK") {
+                bankArea.style.display = "block";
+                cardArea.style.display = "none";
+            } else {
+                bankArea.style.display = "none";
+                cardArea.style.display = "block";
+            }
+        });
+    });
+    
+    paymentAddBtn.addEventListener("click", function () {
+        paymentAddModal.style.display = "flex";
+    });
+
+    function closePaymentAddModal() {
+        paymentAddModal.style.display = "none";
+    }
+
+    paymentAddCloseBtn.addEventListener(
+        "click",
+        closePaymentAddModal
+    );
+
+    paymentAddCancelBtn.addEventListener(
+        "click",
+        closePaymentAddModal
+    );
+
+    paymentAddModal.addEventListener("click", function (event) {
+        if (event.target === paymentAddModal) {
+            closePaymentAddModal();
+        }
+    });
+
+    if (!openBtn || !modal) {
+        return;
+    }
+
+    openBtn.addEventListener("click", function () {
+        modal.style.display = "flex";
+        step1.style.display = "block";
+        step2.style.display = "none";
+    });
+
+    nextBtn.addEventListener("click", async function () {
+
+        try {
+            await loadWowPaymentMethods();
+
+            step1.style.display = "none";
+            step2.style.display = "block";
+
+        } catch (error) {
+            console.error(error);
+
+            paymentList.innerHTML =
+                "결제수단을 불러오지 못했습니다.";
+        }
+    });
+
+    backBtn.addEventListener("click", function () {
+        step2.style.display = "none";
+        step1.style.display = "block";
+    });
+
+    function closeModal() {
+        modal.style.display = "none";
+        step1.style.display = "block";
+        step2.style.display = "none";
+    }
+
+    closeBtn.addEventListener("click", closeModal);
+    cancelBtn.addEventListener("click", closeModal);
+
+    modal.addEventListener("click", function (event) {
+
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    async function loadWowPaymentMethods() {
+
+        paymentList.innerHTML =
+            "결제수단을 불러오는 중입니다...";
+
+        const response = await fetch(
+            contextPath + "/wow/payment-method",
+            {
+                method: "GET"
+            }
+        );
+
+        if (response.status === 401) {
+            window.location.href =
+                contextPath + "/login";
+
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                "결제수단을 불러오지 못했습니다."
+            );
+        }
+
+        const html =
+            await response.text();
+
+        paymentList.innerHTML = html;
+    }
+
+    paymentForm.addEventListener("submit", function (event) {
+
+        const selectedPayment =
+            paymentForm.querySelector(
+                'input[name="paymentMethodNo"]:checked'
+            );
+
+        if (!selectedPayment) {
+            event.preventDefault();
+
+            alert("결제수단을 선택해주세요.");
+
+            return;
+        }
+
+        const optionId =
+            document.getElementById("selectedOptionId");
+
+        const quantity =
+            document.querySelector(".qty-input");
+
+        const color =
+            document.getElementById("selectedColor");
+
+        document.getElementById(
+            "productWowOptionId"
+        ).value =
+            optionId ? optionId.value : "";
+
+        document.getElementById(
+            "productWowQuantity"
+        ).value =
+            quantity ? quantity.value : "1";
+
+        document.getElementById(
+            "productWowColor"
+        ).value =
+            color ? color.value : "";
+    });
+});
+</script>
+
+</body>
 </html>
 
