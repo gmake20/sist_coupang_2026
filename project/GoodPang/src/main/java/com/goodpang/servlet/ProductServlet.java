@@ -38,9 +38,6 @@ public class ProductServlet extends HttpServlet {
 
         String productNoParam = request.getParameter("productNo");
 
-        System.out.println("[DEBUG ProductServlet] === 상품 상세 조회 시작 ===");
-        System.out.println("[DEBUG ProductServlet] 전달받은 productNoParam: " + productNoParam);
-
         try {
             if (productNoParam != null && !productNoParam.isEmpty()) {
 
@@ -50,7 +47,6 @@ public class ProductServlet extends HttpServlet {
                 ProductDTO product = dao.selectProduct(productNo);
 
                 if (product == null) {
-                    System.out.println("[DEBUG ProductServlet] 상품을 찾을 수 없음: productNo=" + productNo);
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "상품을 찾을 수 없습니다.");
                     return;
                 }
