@@ -219,9 +219,11 @@
 			</div>
 
 		</main>
+		<jsp:include page="/inc/right_banner.jsp" />
 
 	
 	</div>
+	
 
 	<jsp:include page="/inc/footer.jsp" />
 
@@ -244,4 +246,5 @@
 	</script>
 
 </body>
+
 </html>

@@ -324,33 +324,16 @@
 			</div>
 
 		</main>
+        
+        
+        <jsp:include page="/inc/right_banner.jsp" />
+        
+    
 
-		<!-- =========================
-             [3열] 우측 광고 배너 영역
-        ========================== -->
-		<aside class="right-banner">
-			<div class="banner banner-1">
-				<strong>쿠팡 only</strong>
-				<div class="banner-product">🧻</div>
-			</div>
-			<div class="banner banner-2">
-				<strong>추석연휴 숙소~64%</strong>
-				<div class="banner-character">🐰</div>
-			</div>
-			<div class="banner banner-3">
-				<strong>쿠팡이 직접 수입했어요!</strong>
-				<div class="banner-shop">🥤</div>
-			</div>
-			<div class="banner banner-4">
-				<strong>금주의 특가왕</strong>
-				<div class="banner-bell">🔔</div>
-				<div class="badge">1</div>
-			</div>
-		</aside>
 
 	</div>
 	<!-- //.mypage-container -->
-
+     
 	<jsp:include page="/inc/footer.jsp" />
 
 	<%-- <script src="${pageContext.request.contextPath}/js/order_list.js"></script> --%>
