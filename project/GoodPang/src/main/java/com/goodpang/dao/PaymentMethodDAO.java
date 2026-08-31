@@ -214,37 +214,67 @@ public class PaymentMethodDAO {
 			return pstmt.executeUpdate();
 		}
 	}
+	
+	public int insertBankAccount(PaymentMethodDTO dto) {
 
+	    String sql = """
+	        INSERT INTO PAYMENT_METHOD (
+	            PAYMENT_METHOD_NO,
+	            MEMBER_NO,
+	            PAYMENT_TYPE,
+	            BANK_CODE,
+	            ACCOUNT_LAST4,
+	            ACCOUNT_HOLDER,
+	            PAYMENT_DEFAULT,
+	            CREATED_AT
+	        )
+	        VALUES (
+	            SEQ_PAYMENT_METHOD_NO.NEXTVAL,
+	            ?, ?, ?, ?, ?, ?, SYSDATE
+	        )
+	        """;
 
-	/*
-	 * 주문할 때 해당 회원의 결제수단인지 검사
-	 */
-	public boolean existsPaymentMethod(
-			Connection conn,
-			int paymentMethodNo,
-			int memberNo)
-					throws Exception {
+	    try (
+	        Connection conn =
+	                ConnectionProvider.getConnection()
+	    ) {
 
-		String sql = """
-				SELECT 1
-				FROM PAYMENT_METHOD
-				WHERE PAYMENT_METHOD_NO = ?
-				  AND MEMBER_NO = ?
-				  AND PAYMENT_TYPE = 'BANK'
-				""";
+	        if (dto.isPaymentDefault()) {
+	            clearDefault(
+	                    conn,
+	                    dto.getMemberNo()
+	            );
+	        }
 
-		try (PreparedStatement pstmt =
-				conn.prepareStatement(sql)) {
+	        try (
+	            PreparedStatement pstmt =
+	                    conn.prepareStatement(sql)
+	        ) {
 
-			pstmt.setInt(1, paymentMethodNo);
-			pstmt.setInt(2, memberNo);
+	            pstmt.setInt(1, dto.getMemberNo());
+	            pstmt.setString(2, dto.getPaymentType());
+	            pstmt.setString(3, dto.getBankCode());
+	            pstmt.setString(4, dto.getAccountLast4());
+	            pstmt.setString(5, dto.getAccountHolder());
 
-			try (ResultSet rs =
-					pstmt.executeQuery()) {
+	            pstmt.setString(
+	                    6,
+	                    dto.isPaymentDefault()
+	                        ? "Y"
+	                        : "N"
+	            );
 
-				return rs.next();
-			}
-		}
+	            return pstmt.executeUpdate();
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+
+	        throw new RuntimeException(
+	                "결제수단 등록 중 오류가 발생했습니다.",
+	                e
+	        );
+	    }
 	}
 
 	public int insertCard(
@@ -415,6 +445,213 @@ public class PaymentMethodDAO {
 		}
 
 		return list;
+	}
+	
+	public List<PaymentMethodDTO> getPaymentMethods(int memberNo) {
+
+	    List<PaymentMethodDTO> list =
+	            new ArrayList<>();
+
+	    String sql = """
+	        SELECT
+	            PAYMENT_METHOD_NO,
+	            MEMBER_NO,
+	            PAYMENT_TYPE,
+	            BANK_CODE,
+
+	            CASE BANK_CODE
+	                WHEN 'SHINHAN' THEN '신한은행'
+	                WHEN 'KB' THEN 'KB국민은행'
+	                WHEN 'WOORI' THEN '우리은행'
+	                WHEN 'NH' THEN 'NH농협은행'
+	                WHEN 'HANA' THEN '하나은행'
+	                WHEN 'KAKAO' THEN '카카오뱅크'
+	                WHEN 'TOSS' THEN '토스뱅크'
+	                ELSE BANK_CODE
+	            END AS BANK_NAME,
+
+	            ACCOUNT_LAST4,
+	            ACCOUNT_HOLDER,
+	            CARD_COMPANY,
+	            CARD_LAST4,
+	            PAYMENT_DEFAULT
+
+	        FROM PAYMENT_METHOD
+
+	        WHERE MEMBER_NO = ?
+
+	        ORDER BY
+	            CASE
+	                WHEN PAYMENT_DEFAULT = 'Y'
+	                THEN 0
+	                ELSE 1
+	            END,
+	            PAYMENT_METHOD_NO DESC
+	        """;
+
+	    try (
+	        Connection conn =
+	                ConnectionProvider.getConnection();
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, memberNo);
+	        try (ResultSet rs =
+	                pstmt.executeQuery()) {
+
+	            while (rs.next()) {
+
+	                PaymentMethodDTO dto =
+	                        new PaymentMethodDTO();
+
+	                dto.setPaymentMethodNo(
+	                        rs.getInt("PAYMENT_METHOD_NO")
+	                );
+
+	                dto.setMemberNo(
+	                        rs.getInt("MEMBER_NO")
+	                );
+
+	                dto.setPaymentType(
+	                        rs.getString("PAYMENT_TYPE")
+	                );
+
+	                dto.setBankCode(
+	                        rs.getString("BANK_CODE")
+	                );
+
+	                dto.setBankName(
+	                        rs.getString("BANK_NAME")
+	                );
+
+	                dto.setAccountLast4(
+	                        rs.getString("ACCOUNT_LAST4")
+	                );
+
+	                dto.setAccountHolder(
+	                        rs.getString("ACCOUNT_HOLDER")
+	                );
+
+	                dto.setCardCompany(
+	                        rs.getString("CARD_COMPANY")
+	                );
+
+	                dto.setCardLast4(
+	                        rs.getString("CARD_LAST4")
+	                );
+	                dto.setPaymentDefault(
+	                        "Y".equals(
+	                                rs.getString(
+	                                        "PAYMENT_DEFAULT"
+	                                )
+	                        )
+	                );
+	                list.add(dto);
+	            }
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException(
+	                "결제수단 조회 중 오류가 발생했습니다.",
+	                e
+	        );
+	    }
+	    return list;
+	}
+	
+	public boolean existsPaymentMethod(
+	        int memberNo,
+	        int paymentMethodNo) {
+
+	    String sql = """
+	        SELECT 1
+	        FROM PAYMENT_METHOD
+	        WHERE MEMBER_NO = ?
+	          AND PAYMENT_METHOD_NO = ?
+	        """;
+
+	    try (
+	        Connection conn =
+	            ConnectionProvider.getConnection();
+
+	        PreparedStatement pstmt =
+	            conn.prepareStatement(sql);
+	    ) {
+
+	        pstmt.setInt(
+	                1,
+	                memberNo
+	        );
+
+	        pstmt.setInt(
+	                2,
+	                paymentMethodNo
+	        );
+
+	        try (ResultSet rs =
+	                pstmt.executeQuery()) {
+
+	            return rs.next();
+	        }
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        throw new RuntimeException(
+	                "결제수단 확인 중 오류가 발생했습니다.",
+	                e
+	        );
+	    }
+	}
+	
+	public int insertPaymentMethod(PaymentMethodDTO dto) {
+
+	    String sql = """
+	        INSERT INTO PAYMENT_METHOD (
+	            PAYMENT_METHOD_NO,
+	            MEMBER_NO,
+	            PAYMENT_TYPE,
+	            BANK_CODE,
+	            ACCOUNT_LAST4,
+	            ACCOUNT_HOLDER,
+	            CARD_COMPANY,
+	            CARD_LAST4,
+	            PAYMENT_DEFAULT
+	        )
+	        VALUES (
+	            SEQ_PAYMENT_METHOD_NO.NEXTVAL,
+	            ?, ?, ?, ?, ?, ?, ?, ?
+	        )
+	        """;
+
+	    try (Connection conn = ConnectionProvider.getConnection()) {
+
+	        if (dto.isPaymentDefault()) {
+	            clearDefault(conn, dto.getMemberNo());
+	        }
+
+	        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+	            pstmt.setInt(1, dto.getMemberNo());
+	            pstmt.setString(2, dto.getPaymentType());
+	            pstmt.setString(3, dto.getBankCode());
+	            pstmt.setString(4, dto.getAccountLast4());
+	            pstmt.setString(5, dto.getAccountHolder());
+	            pstmt.setString(6, dto.getCardCompany());
+	            pstmt.setString(7, dto.getCardLast4());
+	            pstmt.setString(8, dto.isPaymentDefault() ? "Y" : "N");
+
+	            return pstmt.executeUpdate();
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException(
+	                "결제수단 등록 중 오류가 발생했습니다.",
+	                e
+	        );
+	    }
 	}
 
 }

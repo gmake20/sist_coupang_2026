@@ -415,4 +415,52 @@ public class MemberDAO {
 	        return pstmt.executeUpdate();
 	    }
 	}
+	
+	public int updateToWow(int memberNo) {
+
+	    String sql = """
+	        UPDATE MEMBER
+	        SET RANK = 'WOW'
+	        WHERE MEMBER_NO = ?
+	          AND RANK != 'WOW'
+	        """;
+
+	    try (
+	        Connection conn = ConnectionProvider.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setInt(1, memberNo);
+
+	        return pstmt.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+
+	        throw new RuntimeException(
+	                "WOW 회원 변경 중 오류가 발생했습니다.",
+	                e
+	        );
+	    }
+	}
+	
+	public int cancelWow(int memberNo) {
+	    String sql = """
+	        UPDATE MEMBER
+	        SET RANK = 'USER'
+	        WHERE MEMBER_NO = ?
+	          AND RANK = 'WOW'
+	        """;
+
+	    try (
+	        Connection conn = ConnectionProvider.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, memberNo);
+	        return pstmt.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException("와우 멤버십 해지 중 오류가 발생했습니다.", e);
+	    }
+	}
 }
