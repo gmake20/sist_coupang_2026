@@ -1,8 +1,5 @@
 package com.goodpang.dao;
 
-import com.goodpang.dto.OrderItemDTO; //[cite: 1]
-import com.goodpang.util.ConnectionProvider;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,78 +9,171 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
+import com.goodpang.dto.OrderItemDTO;
+import com.goodpang.util.ConnectionProvider;
+import com.goodpang.util.DBConn;
+
 public class OrderListDAO {
-	
-	public OrderListDAO() {
-        // 기본 생성자를 명시적으로 선언 (내용 비워둠)
+
+    public OrderListDAO() {
     }
 
-	
-	/**
-	 * 특정 회원의 마이페이지 주문 내역 조회 (4개 테이블 조인)
-	 * @throws NamingException 
-	 */
-	public List<OrderItemDTO> selectMyPageOrders(int memberNo) throws NamingException {
-		List<OrderItemDTO> list = new ArrayList<>();
+    /**
+     * 특정 회원의 전체 마이페이지 주문 내역 조회 (기존)
+     */
+    public List<OrderItemDTO> selectMyPageOrders(int memberNo) throws NamingException {
+        List<OrderItemDTO> list = new ArrayList<>();
 
-		String sql = "SELECT "
-				+ "  o.order_no, o.member_no, o.order_date, o.order_status, o.total_price AS order_total_price, "
-				+ "  od.order_detail_no, od.order_qty, od.price AS item_price, "
-				+ "  p.product_no, p.product_name, p.product_price, "
-				+ "  po.OPTION_ID, po.OPTION1_TYPE, po.OPTION1_VALUE, po.OPTION2_TYPE, po.OPTION2_VALUE, po.PRICE AS option_price "
-				+ "FROM ORDERS o "
-				+ "JOIN ORDER_DETAIL od ON o.order_no = od.order_no "
-				+ "JOIN PRODUCT p ON od.product_no = p.product_no "
-				+ "LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID "
-				+ "WHERE o.member_no = ? "
-				+ "ORDER BY o.order_date DESC, od.order_detail_no ASC";
+        String sql = "SELECT "
+                + "  o.order_no, o.member_no, o.order_date, o.order_status, o.total_price AS order_total_price, "
+                + "  od.order_detail_no, od.order_qty, od.price AS item_price, "
+                + "  p.product_no, p.product_name, p.product_price, "
+                + "  po.OPTION_ID, po.OPTION1_TYPE, po.OPTION1_VALUE, po.OPTION2_TYPE, po.OPTION2_VALUE "
+                + "FROM ORDERS o "
+                + "JOIN ORDER_DETAIL od ON o.order_no = od.order_no "
+                + "JOIN PRODUCT p ON od.product_no = p.product_no "
+                + "LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID "
+                + "WHERE o.member_no = ? "
+                + "ORDER BY o.order_date DESC, od.order_detail_no ASC";
 
-		try (Connection conn = ConnectionProvider.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionProvider.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-			pstmt.setLong(1, memberNo);
+            pstmt.setInt(1, memberNo);
 
-			try (ResultSet rs = pstmt.executeQuery()) {
-				while (rs.next()) {
-					OrderItemDTO dto = new OrderItemDTO();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    OrderItemDTO dto = new OrderItemDTO();
+                    dto.setOrderNo(rs.getInt("order_no"));
+                    dto.setOrderDate(rs.getTimestamp("order_date"));
+                    dto.setOrderStatus(rs.getString("order_status"));
+                    dto.setTotalPrice(rs.getInt("order_total_price"));
+                    dto.setOrderDetailNo(rs.getLong("order_detail_no"));
+                    dto.setQuantity(rs.getInt("order_qty"));
+                    dto.setItemPrice(rs.getInt("item_price"));
+                    dto.setProductNo(rs.getLong("product_no"));
+                    dto.setProductName(rs.getString("product_name"));
+                    dto.setOption1Type(rs.getString("OPTION1_TYPE"));
+                    dto.setOption1Value(rs.getString("OPTION1_VALUE"));
+                    dto.setOption2Type(rs.getString("OPTION2_TYPE"));
+                    dto.setOption2Value(rs.getString("OPTION2_VALUE"));
 
-					// ORDERS
-					dto.setOrderNo(rs.getInt("order_no"));
+                    list.add(dto);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBConn.close();
+        }
 
-					// 2. Null 체크 후 LocalDate로 변환
-					dto.setOrderDate(rs.getTimestamp("order_date"));
-				
-					dto.setOrderStatus(rs.getString("order_status"));
+        return list;
+    }
 
-					dto.setTotalPrice(rs.getInt("order_total_price"));
+    /**
+     * 필터 조건(최근6개월 / 년도)에 따른 회원 총 주문 건수 조회
+     */
+    public int getOrderCount(int memberNo, String yearFilter) {
+        int count = 0;
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM ORDERS o WHERE o.member_no = ? ");
 
-					// ORDER_DETAIL
-					dto.setOrderDetailNo(rs.getLong("order_detail_no"));
-					dto.setQuantity(rs.getInt("order_qty"));
-					dto.setItemPrice(rs.getInt("item_price"));
+        if ("recent".equals(yearFilter) || yearFilter == null || yearFilter.isEmpty()) {
+            sql.append("AND o.order_date >= ADD_MONTHS(SYSDATE, -6) ");
+        } else {
+            sql.append("AND TO_CHAR(o.order_date, 'YYYY') = ? ");
+        }
 
+        try (Connection conn = ConnectionProvider.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
 
-					// PRODUCT
-					dto.setProductNo(rs.getLong("product_no"));
-					dto.setProductName(rs.getString("product_name"));
+            pstmt.setInt(1, memberNo);
+            if (!"recent".equals(yearFilter) && yearFilter != null && !yearFilter.isEmpty()) {
+                pstmt.setString(2, yearFilter);
+            }
 
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DBConn.close();
+        }
+        return count;
+    }
 
-					// PRODUCT_OPTION
+    /**
+     * 연도 필터링 및 페이징 목록 조회 (OrderItemDTO 반환)
+     */
+    public List<OrderItemDTO> getOrderListPaged(int memberNo, String yearFilter, int page, int pageSize) {
+        List<OrderItemDTO> list = new ArrayList<>();
+        int startRow = (page - 1) * pageSize + 1;
+        int endRow = page * pageSize;
 
-					dto.setOption1Type(rs.getString("OPTION1_TYPE"));
-					dto.setOption1Value(rs.getString("OPTION1_VALUE"));
-					dto.setOption2Type(rs.getString("OPTION2_TYPE"));
-					dto.setOption2Value(rs.getString("OPTION2_VALUE"));
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT * FROM ( ");
+        sql.append("  SELECT ROWNUM AS rnum, T.* FROM ( ");
+        sql.append("    SELECT o.order_no, o.order_date, o.order_status, o.total_price AS order_total_price, ");
+        sql.append("           od.order_detail_no, od.order_qty, od.price AS item_price, ");
+        sql.append("           p.product_no, p.product_name, ");
+        sql.append("           po.option1_type, po.option1_value, po.option2_type, po.option2_value ");
+        sql.append("    FROM ORDERS o ");
+        sql.append("    JOIN ORDER_DETAIL od ON o.order_no = od.order_no ");
+        sql.append("    JOIN PRODUCT p ON od.product_no = p.product_no ");
+        sql.append("    LEFT JOIN PRODUCT_OPTION po ON od.option_id = po.option_id ");
+        sql.append("    WHERE o.member_no = ? ");
 
+        if ("recent".equals(yearFilter) || yearFilter == null || yearFilter.isEmpty()) {
+            sql.append("    AND o.order_date >= ADD_MONTHS(SYSDATE, -6) ");
+        } else {
+            sql.append("    AND TO_CHAR(o.order_date, 'YYYY') = ? ");
+        }
 
+        sql.append("    ORDER BY o.order_date DESC, o.order_no DESC, od.order_detail_no ASC ");
+        sql.append("  ) T WHERE ROWNUM <= ? ");
+        sql.append(") WHERE rnum >= ?");
 
-					list.add(dto);
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+        try (Connection conn = ConnectionProvider.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
 
-		return list;
-	}
+            int paramIdx = 1;
+            pstmt.setInt(paramIdx++, memberNo);
+
+            if (!"recent".equals(yearFilter) && yearFilter != null && !yearFilter.isEmpty()) {
+                pstmt.setString(paramIdx++, yearFilter);
+            }
+
+            pstmt.setInt(paramIdx++, endRow);
+            pstmt.setInt(paramIdx++, startRow);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    OrderItemDTO dto = new OrderItemDTO();
+                    dto.setOrderNo(rs.getInt("order_no"));
+                    dto.setOrderDate(rs.getTimestamp("order_date"));
+                    dto.setOrderStatus(rs.getString("order_status"));
+                    dto.setTotalPrice(rs.getInt("order_total_price"));
+                    dto.setOrderDetailNo(rs.getLong("order_detail_no"));
+                    dto.setQuantity(rs.getInt("order_qty"));
+                    dto.setItemPrice(rs.getInt("item_price"));
+                    dto.setProductNo(rs.getLong("product_no"));
+                    dto.setProductName(rs.getString("product_name"));
+                    dto.setOption1Type(rs.getString("option1_type"));
+                    dto.setOption1Value(rs.getString("option1_value"));
+                    dto.setOption2Type(rs.getString("option2_type"));
+                    dto.setOption2Value(rs.getString("option2_value"));
+
+                    list.add(dto);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DBConn.close();
+        }
+        return list;
+    }
 }
