@@ -158,8 +158,17 @@
             <span class="kpi-label">오늘 방문자수</span>
             <span class="kpi-icon kpi-icon-orange"><svg class="icon"><use href="#ic-users" /></svg></span>
           </div>
-          <div class="kpi-value">2,453 <small>명</small></div>
-          <div class="kpi-compare">어제 대비 <strong class="up">▲ 8.1%</strong></div>
+          <div class="kpi-value"><fmt:formatNumber value="${dashboardStat.todayVisitorCount}" pattern="#,##0" /> <small>명</small></div>
+          <div class="kpi-compare">어제 대비
+            <c:choose>
+              <c:when test="${dashboardStat.visitorCountUp}">
+                <strong class="up">▲ ${dashboardStat.visitorCountChangePercent}%</strong>
+              </c:when>
+              <c:otherwise>
+                <strong class="down">▼ ${dashboardStat.visitorCountChangePercent}%</strong>
+              </c:otherwise>
+            </c:choose>
+          </div>
           <svg class="kpi-spark" viewBox="0 0 160 40" preserveAspectRatio="none">
             <polyline points="0,20 25,28 50,18 75,24 100,14 125,20 160,10" fill="none" stroke="#ff9f1c"
               stroke-width="2" />
@@ -171,8 +180,17 @@
             <span class="kpi-label">오늘 상품 노출수</span>
             <span class="kpi-icon kpi-icon-purple"><svg class="icon"><use href="#ic-eye" /></svg></span>
           </div>
-          <div class="kpi-value">12,845 <small>회</small></div>
-          <div class="kpi-compare">어제 대비 <strong class="up">▲ 11.3%</strong></div>
+          <div class="kpi-value"><fmt:formatNumber value="${dashboardStat.todayProductViewCount}" pattern="#,##0" /> <small>회</small></div>
+          <div class="kpi-compare">어제 대비
+            <c:choose>
+              <c:when test="${dashboardStat.productViewCountUp}">
+                <strong class="up">▲ ${dashboardStat.productViewCountChangePercent}%</strong>
+              </c:when>
+              <c:otherwise>
+                <strong class="down">▼ ${dashboardStat.productViewCountChangePercent}%</strong>
+              </c:otherwise>
+            </c:choose>
+          </div>
           <svg class="kpi-spark" viewBox="0 0 160 40" preserveAspectRatio="none">
             <polyline points="0,28 25,22 50,24 75,14 100,18 125,8 160,12" fill="none" stroke="#9b5de5"
               stroke-width="2" />
