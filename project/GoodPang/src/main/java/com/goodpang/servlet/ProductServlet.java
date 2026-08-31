@@ -10,6 +10,7 @@ import java.util.Locale;
 import com.goodpang.dao.ProductDAO;
 import com.goodpang.dao.ProductImageDAO;
 import com.goodpang.dao.ProductOptionDAO;
+import com.goodpang.dao.ProductViewLogDAO;
 import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dao.WowMembershipDAO;
 import com.goodpang.dto.MemberDTO;
@@ -24,22 +25,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-<<<<<<< HEAD
 import jakarta.servlet.http.HttpSession;
-=======
 
-import com.google.gson.Gson;
-
-import com.goodpang.dao.ProductDAO;
-import com.goodpang.dao.ProductImageDAO;
-import com.goodpang.dao.ProductOptionDAO;
-import com.goodpang.dao.ProductViewLogDAO;
-import com.goodpang.dao.ReviewDAO;
-import com.goodpang.dto.ProductDTO;
-import com.goodpang.dto.ProductImageDTO;
-import com.goodpang.dto.ProductOptionDTO;
-import com.goodpang.dto.ReviewDTO;
->>>>>>> 5ba6b04e9a3a1bea7460c30b322ae4e0b2707a3c
 
 
 @WebServlet("/product")
