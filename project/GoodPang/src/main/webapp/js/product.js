@@ -23,7 +23,11 @@
 
      단가는 .total-price 의 data-unit-price 에서 읽음 (예: "19900").
      화면 글자(예: "19,900원")를 다시 파싱하면 두 번째 클릭부터
-     "39,800원" 을 단가로 잘못 읽는 사고가 나서, 원래 값을 data 속성에 따로 저장해둠. */
+     "39,800원" 을 단가로 잘못 읽는 사고가 나서, 원래 값을 data 속성에 따로 저장해둠.
+
+     ★ 2026-08-30 확정 — PRODUCT_OPTION.PRICE/NORMAL_PRICE 는 PRODUCT_PRICE(기본가)에 더해지는 "추가금".
+       옵션을 바꾸면 setupOptionSelect() 가 아래 setPrice() 를 불러서 판매가/정상가/할인율을 다시 그림.
+       판매가 = basePrice + 옵션의 PRICE, 정상가 = basePrice + 옵션의 NORMAL_PRICE(없으면 할인 표시 안 함). */
 function setupQuantity() {
   const box = document.querySelector('.product-quantity');
   if (!box) return;                     // 이 페이지에 수량박스가 없으면 아무것도 안 함
@@ -32,7 +36,11 @@ function setupQuantity() {
   const minus = box.querySelector('.qty-minus');
   const plus  = box.querySelector('.qty-plus');
   const priceEl = document.querySelector('.total-price');
-  const unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
+  const discountEl = document.querySelector('.discount');
+  const originBox = document.querySelector('.price-origin');
+  const originPriceEl = originBox ? originBox.querySelector('.origin-price') : null;
+  const basePrice = priceEl ? Number(priceEl.dataset.basePrice) || 0 : 0;
+  let unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
 
   const MIN = 1;
   /* 옵션이 없는 상품(재고 정보가 안 내려오는 경우)을 위한 기본값.
@@ -69,11 +77,36 @@ function setupQuantity() {
   /* 옵션이 바뀔 때마다 setupOptionSelect() 가 이 함수를 불러줌.
      지금 담아둔 수량이 새 재고보다 많으면 재고만큼으로 줄임
      (예: 10개 담아뒀는데 재고 3개짜리 옵션으로 바꾸면 3으로) */
-  return function setStock(stock) {
+  function setStock(stock) {
     max = Math.max(stock, MIN);          // 재고 0 이어도 max 는 1 — 품절 처리는 updateFromSelects 가 따로 함
     const now = Number(input.value) || MIN;
     render(Math.min(now, max));
-  };
+  }
+
+  /* 옵션이 바뀔 때마다 setupOptionSelect() 가 그 옵션의 price/normalPrice 를 넘겨서 불러줌.
+     판매가 = basePrice + optionPrice, 정상가 = basePrice + optionNormalPrice —
+     ProductServlet 의 displayPrice/displayNormalPrice 계산과 똑같은 공식. */
+  function setPrice(optionPrice, optionNormalPrice) {
+    unitPrice = basePrice + (optionPrice || 0);
+
+    const normalPrice = (optionNormalPrice != null) ? basePrice + optionNormalPrice : null;
+    const hasDiscount = normalPrice != null && normalPrice > unitPrice;
+
+    if (discountEl) {
+      discountEl.style.display = hasDiscount ? '' : 'none';
+      if (hasDiscount) {
+        discountEl.textContent = Math.round((1 - unitPrice / normalPrice) * 100) + '%';
+      }
+    }
+    if (originBox) originBox.style.display = hasDiscount ? '' : 'none';
+    if (hasDiscount && originPriceEl) {
+      originPriceEl.textContent = normalPrice.toLocaleString('ko-KR') + '원';
+    }
+
+    render(Number(input.value) || MIN);   // 단가가 바뀌었으니 화면 가격도 다시 그림
+  }
+
+  return { setStock: setStock, setPrice: setPrice };
 }
 
 
@@ -163,8 +196,13 @@ function setupAdSlider() {
 
    ★ 칩 사진은 "그 값 하나"의 사진이 아니라 "조합 하나(OPTION_ID)"에 딸려있음 — 예를 들어
      색상 칩 하나에 보여줄 사진은 (지금 고른 사이즈 + 이 색상) 조합의 사진을 씀. 사이즈를 바꾸면
-     색상 칩 사진도 그 사이즈 기준으로 다시 그림(refreshChipThumbnails) */
-function setupOptionSelect(setStock) {
+     색상 칩 사진도 그 사이즈 기준으로 다시 그림(refreshChipThumbnails)
+
+   ★ 2026-08-31 — 이 JSON(combos)은 이제 "축·값 구조"와 칩 사진(고르기 전 미리보기)에만 씀.
+     실제로 화면에 반영되는 가격/재고/큰 이미지는 옵션을 고를 때마다 fetchOptionDetail() 이
+     /option 으로 ajax 요청해서 서버 값을 다시 받아옴 (로그인 회원등급별 할인 대비 — 상세 이유는
+     fetchOptionDetail() 위 주석 참고) */
+function setupOptionSelect(setStock, setPrice) {
   const dataEl = document.getElementById('productOptionsData');
   const box = document.getElementById('fashionOption');
   if (!dataEl || !box) return;
@@ -220,6 +258,8 @@ function setupOptionSelect(setStock) {
     });
   }
 
+  let optionFetchSeq = 0;   // 응답이 늦게 와서 이전 클릭 결과가 나중에 덮어쓰는 것 방지용 번호표
+
   function updateFromSelects() {
     controls.forEach(function (ctl) { if (ctl.chipList) refreshChipThumbnails(ctl); });
 
@@ -232,21 +272,47 @@ function setupOptionSelect(setStock) {
       colorInput.value = controls.map(function (ctl) { return ctl.getValue(); }).join(' / ');
     }
 
-    /* 재고/품절 — 옵션마다 재고가 다르므로 고를 때마다 다시 판단.
-       STATUS 가 'N'(판매중지)이거나 재고가 0이면 품절로 봄 */
-    const soldout = (picked.quantity <= 0) || (picked.status === 'N');
-    document.body.classList.toggle('is-soldout', soldout);
-    if (setStock) setStock(picked.quantity);
+    fetchOptionDetail(picked.optionId);
+  }
 
-    if (!picked.imageUrls.length || !thumbBox || !mainImg) return;
+  /* ★ 2026-08-31 추가 — 가격/재고/사진은 이제 combos(페이지 처음 받아둔 JSON)를 그대로 안 쓰고
+     서버(/option)에 다시 물어봄. combos 는 이제 "이 상품이 어떤 축(사이즈/색상)에 어떤 값을
+     가지는지" 구조를 그리는 데만 쓰고, 실제 값(누구한테 얼마로 보여줄지)은 서버가 매번 계산해서
+     내려줌 — 나중에 로그인 회원등급별 할인이 생겨도 이 함수는 안 고쳐도 됨(서버만 고치면 됨). */
+  function fetchOptionDetail(optionId) {
+    const seq = ++optionFetchSeq;
 
-    thumbBox.innerHTML = picked.imageUrls.map(function (url, i) {
-      return '<li class="' + (i === 0 ? 'is-on' : '') + '">'
-           +   '<a href="#"><img src="' + url + '" alt=""></a>'
-           + '</li>';
-    }).join('');
+    fetch(contextPath + '/option?optionId=' + optionId)
+      .then(function (res) {
+        if (!res.ok) throw new Error('옵션 정보를 불러오지 못했습니다: ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        if (seq !== optionFetchSeq) return;   // 그 사이에 다른 옵션을 또 눌렀으면 이 응답은 버림
 
-    mainImg.src = picked.imageUrls[0];
+        /* 재고/품절 — 옵션마다 재고가 다르므로 고를 때마다 다시 판단.
+           STATUS 가 'N'(판매중지)이거나 재고가 0이면 품절로 봄 */
+        const soldout = (data.quantity <= 0) || (data.status === 'N');
+        document.body.classList.toggle('is-soldout', soldout);
+        if (setStock) setStock(data.quantity);
+        if (setPrice) setPrice(data.price, data.normalPrice);
+
+        const imageUrls = (data.imageUrls || []).map(function (url) {
+          return contextPath + '/' + url;
+        });
+        if (!imageUrls.length || !thumbBox || !mainImg) return;
+
+        thumbBox.innerHTML = imageUrls.map(function (url, i) {
+          return '<li class="' + (i === 0 ? 'is-on' : '') + '">'
+               +   '<a href="#"><img src="' + url + '" alt=""></a>'
+               + '</li>';
+        }).join('');
+
+        mainImg.src = imageUrls[0];
+      })
+      .catch(function (err) {
+        console.error(err);
+      });
   }
 
   axes.forEach(function (axis, axisIndex) {
@@ -615,12 +681,12 @@ function setupDeliveryOption() {
      (그 옵션의 QUANTITY 가 0 이거나 STATUS 가 'N' 이면 품절). */
 
 
-/* setupQuantity() 가 "재고를 바꾸는 함수"를 돌려주고, 그걸 setupOptionSelect() 에 넘겨줌 —
-   옵션을 고를 때마다 그 옵션의 재고로 수량 최대값이 바뀌게 하려는 것 (2026-08-28) */
-const setStock = setupQuantity();
+/* setupQuantity() 가 "재고/가격을 바꾸는 함수" 두 개를 돌려주고, 그걸 setupOptionSelect() 에 넘겨줌 —
+   옵션을 고를 때마다 그 옵션의 재고·가격으로 화면이 바뀌게 하려는 것 */
+const quantityControls = setupQuantity() || {};
 setupThumbs();
 setupAdSlider();
-setupOptionSelect(setStock);
+setupOptionSelect(quantityControls.setStock, quantityControls.setPrice);
 setupReviewTools();
 setupDeliveryOption();
 /* ── 9. 리뷰 사진 갤러리 (2단 모달) ────────────────

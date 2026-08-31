@@ -30,7 +30,11 @@ public class ProductOptionDTO {
     private String option3Type;
     private String option3Value;
 
-    private int price;         // 기본가에 더해지는 옵션 추가금 (NVL 처리해서 0으로 들어옴)
+    /* 2026-08-30 확정 — PRODUCT.PRODUCT_PRICE(기본가)에 더해지는 "추가금".
+       CartDAO.getCartItems() 가 이미 이 전제로 짜여있어서(p.PRODUCT_PRICE + NVL(po.PRICE,0)) 통일함.
+       NVL 처리해서 0 으로 들어옴 — 0 이면 "이 옵션엔 추가금이 없다"는 뜻이라 그냥 기본가 그대로 씀. */
+    private int price;
+    private Integer normalPrice; // 할인 전 "정상 추가금" — 선택 입력이라 없으면 null(그럼 그 옵션은 할인 표시 안 함)
     private int quantity;
     private String status;
 

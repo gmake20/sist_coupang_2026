@@ -14,8 +14,11 @@
     margin: 18px auto 90px;
 
     display: grid;
-    grid-template-columns: 140px 880px;
-    column-gap: 0;
+
+    /* 140 + 20 + 860 = 1020 */
+    grid-template-columns: 140px 860px;
+    column-gap: 20px;
+
     align-items: start;
 
     color: #111;
@@ -122,7 +125,7 @@
    ========================================================= */
 
 .addressbook-page .content-area {
-    width: 880px;
+    width: 860px;
     min-width: 0;
 
     margin: 0;
@@ -182,7 +185,7 @@
    ========================================================= */
 
 .addressbook-page .address-panel {
-    width: 850px;
+    width: 830px;
 
     margin: 0 auto;
     padding: 0;
@@ -190,6 +193,7 @@
     border: 1px solid #d5d5d5;
     background: #fff;
 }
+
 
 .addressbook-page .panel-header {
     width: 100%;
@@ -345,7 +349,7 @@
    ========================================================= */
 
 .addressbook-page .add-address {
-    width: 850px;
+    width: 830px;
     height: 44px;
 
     margin: 9px auto 0;
@@ -355,14 +359,12 @@
     justify-content: center;
 
     border: 1px solid #ccc;
-
     background: #fff;
-    color: #1475e8;
 
+    color: #1475e8;
     font-size: 14px;
     font-weight: 700;
 }
-
 .addressbook-page .add-address:hover {
     background: #fafafa;
 }

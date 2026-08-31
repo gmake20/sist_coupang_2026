@@ -653,5 +653,77 @@ public class PaymentMethodDAO {
 	        );
 	    }
 	}
+	
+	public PaymentMethodDTO findPaymentMethod(
+	        int memberNo,
+	        int paymentMethodNo) {
+
+	    String sql = """
+	            SELECT PAYMENT_METHOD_NO,
+	                   MEMBER_NO,
+	                   PAYMENT_TYPE,
+	                   PAYMENT_DEFAULT
+	            FROM PAYMENT_METHOD
+	            WHERE PAYMENT_METHOD_NO = ?
+	              AND MEMBER_NO = ?
+	            """;
+
+	    try (
+	        Connection conn = ConnectionProvider.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, paymentMethodNo);
+	        pstmt.setInt(2, memberNo);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                PaymentMethodDTO dto = new PaymentMethodDTO();
+
+	                dto.setPaymentMethodNo(
+	                        rs.getInt("PAYMENT_METHOD_NO")
+	                );
+	                dto.setMemberNo(
+	                        rs.getInt("MEMBER_NO")
+	                );
+	                dto.setPaymentType(
+	                        rs.getString("PAYMENT_TYPE")
+	                );
+	                dto.setPaymentDefault(
+	                        "Y".equals(rs.getString("PAYMENT_DEFAULT"))
+	                );
+
+	                return dto;
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        throw new RuntimeException(
+	                "결제수단 조회 중 오류가 발생했습니다.",
+	                e
+	        );
+	    }
+
+	    return null;
+	}
+	
+	public int setDefault(
+	        Connection conn,
+	        int memberNo,
+	        int paymentMethodNo) throws Exception {
+
+	    String sql = """
+	            UPDATE PAYMENT_METHOD
+	               SET PAYMENT_DEFAULT = 'Y'
+	             WHERE PAYMENT_METHOD_NO = ?
+	               AND MEMBER_NO = ?
+	            """;
+
+	    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        pstmt.setInt(1, paymentMethodNo);
+	        pstmt.setInt(2, memberNo);
+
+	        return pstmt.executeUpdate();
+	    }
+	}
 
 }

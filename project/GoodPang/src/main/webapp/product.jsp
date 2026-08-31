@@ -59,19 +59,19 @@
              JS 는 필요 없음 — 요청마다 서버(JSP)가 이미 값을 들고 있어서 EL 로 바로 찍으면 됨.
              (카테고리 "메뉴판" 을 그리는 category/getinfo + header.js 와는 다른 데이터임 — 그건
              사이트 전체 카테고리 트리고, 여긴 "이 상품 하나"가 속한 카테고리 경로임)
-           href="#" 는 그대로 둠 — 카테고리별 상품목록 페이지가 아직 없어서. 나중에 생기면
-             href="category?categoryNo=..." 식으로 채울 것 -->
+           2026-08-31: /category 카테고리 목록 페이지가 생겨서 href="#" 를 실제 링크로 채움
+             (CategoryServlet, categoryNo 는 ProductDAO 가 새로 내려주는 mid/mainCategoryNo) -->
 			<nav class="breadcrumb">
 				<ol>
 					<li><a href="index.jsp">굿팡 홈</a></li>
-					<!--   
+					<!--
 					<li><a href="#">남성패션</a></li>
 					<li><a href="#">의류</a></li>
 					<li><a href="#">티셔츠</a></li>
 					 -->
-					<li><a href="#">${p.mainCategoryName}</a></li>
-					<li><a href="#">${p.midCategoryName}</a></li>
-					<li><a href="#">${p.subCategoryName}</a></li>
+					<li><a href="${pageContext.request.contextPath}/category?categoryNo=${p.mainCategoryNo}">${p.mainCategoryName}</a></li>
+					<li><a href="${pageContext.request.contextPath}/category?categoryNo=${p.midCategoryNo}">${p.midCategoryName}</a></li>
+					<li><a href="${pageContext.request.contextPath}/category?categoryNo=${p.subCategoryNo}">${p.subCategoryName}</a></li>
 
 				</ol>
 			</nav>
@@ -179,17 +179,20 @@
 					<!-- ② 가격 -->
 					<div class="price-container">
 						<div class="price-now">
-							<!-- <span class="discount">15%</span> <strong class="total-price" data-unit-price="19900">19,900원</strong> -->
-							<span class="discount">15%</span> <strong class="total-price"
-								data-unit-price="${p.productPrice}">${p.productPrice}원</strong>
+							<!-- 2026-08-30 확정 — PRODUCT_OPTION.PRICE/NORMAL_PRICE 는 PRODUCT_PRICE(기본가)에 더해지는
+							     "추가금". 판매가/정상가 둘 다 ProductServlet 이 기본가+추가금으로 계산해둔 값을 씀.
+							     정상가가 없으면(NORMAL_PRICE 미입력) 할인 표시 자체를 숨김. 옵션 바꾸면 product.js 의
+							     setPrice() 가 이 태그들 글자·style 을 그대로 갈아끼움 -->
+							<span class="discount"${empty displayNormalPrice ? ' style="display:none"' : ''}>${discountRate}%</span>
+							<strong class="total-price" data-unit-price="${displayPrice}"
+								data-base-price="${p.productPrice}">${displayPrice}원</strong>
 							<span class="badge-rocket">로켓배송</span> <span
 								class="badge-tomorrow">내일도착</span>
 
 						</div>
-						<!-- 원가 취소선 (#768695 + line-through) -->
-						<div class="price-origin">
-						<!-- 여기가 product_price -->
-							<span class="origin-price">${p.productPrice}원</span>
+						<!-- 원가 취소선 (#768695 + line-through). 정상 추가금(NORMAL_PRICE) 입력 안 한 옵션이면 안 보임 -->
+						<div class="price-origin"${empty displayNormalPrice ? ' style="display:none"' : ''}>
+							<span class="origin-price">${displayNormalPrice}원</span>
 							<!-- 원본에 있는 ⓘ — 눌러도 아무 일 없는 안내 아이콘. 이미지 없이 글자로 그림 -->
 							<button type="button" class="price-info">
 								<span class="blind">가격 안내</span>
