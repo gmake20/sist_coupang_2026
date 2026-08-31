@@ -47,7 +47,7 @@
 
         <div class="field">
           <input class="input" id="email" name="email" type="email" placeholder="아이디(이메일)를 입력해주세요"
-            autocomplete="username" value="aaa@gmail.com">
+            autocomplete="username" value="modernwear@naver.com">
         </div>
 
         <div class="field">
