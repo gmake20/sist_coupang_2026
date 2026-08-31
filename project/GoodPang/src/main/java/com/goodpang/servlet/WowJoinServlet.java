@@ -1,4 +1,4 @@
-package com.goodpang.servlet;
+/*package com.goodpang.servlet;
 
 import java.io.IOException;
 import java.util.List;
@@ -63,7 +63,7 @@ public class WowJoinServlet extends HttpServlet {
                 "/WEB-INF/views/wow_payment_methods.jsp"
         ).forward(request, response);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -124,9 +124,9 @@ public class WowJoinServlet extends HttpServlet {
             throw new ServletException("결제에 실패했습니다.");
         }
 
-        /*
-         * 결제 성공 후 WOW 전환
-         */
+
+ * 결제 성공 후 WOW 전환
+
         int result = memberDAO.updateToWow(memberNo);
 
         if (result != 1) {
@@ -145,4 +145,112 @@ public class WowJoinServlet extends HttpServlet {
                 + "/?wowJoined=Y"
         );
     }
+}*/
+
+package com.goodpang.servlet;
+
+import java.io.IOException;
+import java.util.List;
+
+import com.goodpang.dao.MemberDAO;
+import com.goodpang.dao.PaymentMethodDAO;
+import com.goodpang.dto.MemberDTO;
+import com.goodpang.dto.PaymentMethodDTO;
+import com.goodpang.util.LoginUtil;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/wow/join")
+public class WowJoinServlet extends HttpServlet {
+
+	private static final long serialVersionUID = 1L;
+
+	private final MemberDAO memberDAO = new MemberDAO();
+	private final PaymentMethodDAO paymentMethodDAO = new PaymentMethodDAO();
+
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		MemberDTO loginMember = LoginUtil.requireLogin(request, response);
+
+		if (loginMember == null) {
+			return;
+		}
+
+		if ("WOW".equalsIgnoreCase(loginMember.getRank())) {
+			response.sendRedirect(request.getContextPath() + "/wow/membership");
+			return;
+		}
+
+		List<PaymentMethodDTO> paymentMethods = paymentMethodDAO.getPaymentMethods(loginMember.getMemberNo());
+
+		request.setAttribute("paymentMethods", paymentMethods);
+		request.getRequestDispatcher("/WEB-INF/views/wow_join.jsp").forward(request, response);
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		request.setCharacterEncoding("UTF-8");
+
+		MemberDTO loginMember = LoginUtil.requireLogin(request, response);
+
+		if (loginMember == null) {
+			return;
+		}
+
+		if ("WOW".equalsIgnoreCase(loginMember.getRank())) {
+			response.sendRedirect(request.getContextPath() + "/wow/membership");
+			return;
+		}
+
+		int memberNo = loginMember.getMemberNo();
+		String paymentMethodNoParam = request.getParameter("paymentMethodNo");
+
+		if (paymentMethodNoParam == null || paymentMethodNoParam.isBlank()) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "결제수단을 선택해주세요.");
+			return;
+		}
+
+		int paymentMethodNo;
+
+		try {
+			paymentMethodNo = Integer.parseInt(paymentMethodNoParam);
+		} catch (NumberFormatException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 결제수단입니다.");
+			return;
+		}
+
+		boolean valid = paymentMethodDAO.existsPaymentMethod(memberNo, paymentMethodNo);
+
+		if (!valid) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "사용할 수 없는 결제수단입니다.");
+			return;
+		}
+
+		boolean paymentSuccess = true;
+
+		if (!paymentSuccess) {
+			throw new ServletException("결제에 실패했습니다.");
+		}
+
+		int result = memberDAO.updateToWow(memberNo);
+
+		if (result != 1) {
+			throw new ServletException("와우 멤버십 가입 처리에 실패했습니다.");
+		}
+
+		loginMember.setRank("WOW");
+		request.getSession().setAttribute("loginMember", loginMember);
+
+		response.sendRedirect(
+		        request.getContextPath() + "/wow/welcome"
+		);
+	}
 }

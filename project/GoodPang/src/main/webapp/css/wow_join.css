@@ -1,0 +1,291 @@
+@charset "UTF-8";
+
+body {
+    margin: 0;
+    background: #f6f7f8;
+    color: #111;
+    font-family: Arial, "Noto Sans KR", sans-serif;
+}
+
+.wow-join-page {
+    width: 100%;
+    padding: 50px 0 80px;
+}
+
+.wow-join-container {
+    width: 760px;
+    margin: 0 auto;
+    padding: 50px 60px;
+    background: #fff;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+.wow-join-header {
+    padding-bottom: 40px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.wow-join-logo {
+    margin-bottom: 16px;
+    color: #00a8ff;
+    font-size: 45px;
+    font-weight: 900;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wow-join-header h1 {
+    margin: 0 0 12px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.wow-join-header p {
+    margin: 0;
+    color: #666;
+    font-size: 16px;
+}
+
+.wow-benefit-section {
+    padding: 40px 0;
+}
+
+.wow-benefit-section h2,
+.wow-payment-section h2,
+.wow-price-section h2 {
+    margin: 0 0 24px;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.wow-benefit-list {
+    border-top: 1px solid #ddd;
+}
+
+.wow-benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 22px 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.wow-benefit-icon {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+    width: 52px;
+    height: 52px;
+    background: #f0f8ff;
+    border-radius: 50%;
+    font-size: 23px;
+}
+
+.wow-benefit-text {
+    flex: 1;
+}
+
+.wow-benefit-text strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.wow-benefit-text p {
+    margin: 0;
+    color: #777;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.wow-payment-section {
+    padding: 35px 0;
+    border-top: 8px solid #f6f7f8;
+}
+
+.wow-payment-method-list {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.wow-payment-method {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.wow-payment-method:last-child {
+    border-bottom: 0;
+}
+
+.wow-payment-method:hover {
+    background: #fafafa;
+}
+
+.wow-payment-method input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: #0073e9;
+}
+
+.wow-payment-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.wow-payment-info strong {
+    font-size: 16px;
+}
+
+.wow-payment-info span {
+    color: #666;
+    font-size: 14px;
+}
+
+.wow-default-badge {
+    padding: 4px 8px;
+    background: #eaf4ff;
+    color: #0073e9 !important;
+    border-radius: 3px;
+    font-size: 12px !important;
+}
+
+.wow-no-payment {
+    padding: 35px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.wow-no-payment p {
+    margin: 0 0 18px;
+    color: #666;
+    font-size: 15px;
+}
+
+.wow-no-payment button {
+    height: 42px;
+    padding: 0 20px;
+    background: #fff;
+    border: 1px solid #0073e9;
+    color: #0073e9;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.wow-price-section {
+    padding: 30px 0;
+}
+
+.wow-price-box {
+    padding: 24px;
+    border: 1px solid #ddd;
+}
+
+.wow-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wow-price-row span {
+    font-size: 16px;
+}
+
+.wow-price-row strong {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.wow-price-box p {
+    margin: 12px 0 0;
+    color: #888;
+    font-size: 13px;
+}
+
+.wow-agree-section {
+    padding: 25px 0;
+    border-top: 1px solid #eee;
+}
+
+.wow-agree {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.wow-agree input[type="checkbox"] {
+    width: 19px;
+    height: 19px;
+    margin: 0;
+    accent-color: #0073e9;
+}
+
+.wow-agree-notice {
+    margin: 10px 0 0 29px;
+    color: #888;
+    font-size: 13px;
+}
+
+.wow-submit-btn {
+    width: 100%;
+    height: 58px;
+    border: 0;
+    border-radius: 4px;
+    background: #0073e9;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.wow-submit-btn:hover {
+    background: #0068d5;
+}
+
+.wow-submit-btn:disabled {
+    background: #ccc;
+    cursor: default;
+}
+
+.wow-back-btn {
+    width: 100%;
+    height: 54px;
+    margin-top: 12px;
+    background: #fff;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    color: #555;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.wow-back-btn:hover {
+    background: #fafafa;
+}
+
+@media (max-width: 800px) {
+    .wow-join-page {
+        padding: 0;
+    }
+
+    .wow-join-container {
+        width: 100%;
+        padding: 35px 25px;
+        border: 0;
+    }
+}

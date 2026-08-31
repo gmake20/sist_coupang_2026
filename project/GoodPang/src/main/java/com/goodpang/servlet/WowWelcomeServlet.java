@@ -1,0 +1,37 @@
+package com.goodpang.servlet;
+
+import java.io.IOException;
+
+import com.goodpang.dto.MemberDTO;
+import com.goodpang.util.LoginUtil;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/wow/welcome")
+public class WowWelcomeServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        MemberDTO loginMember = LoginUtil.requireLogin(request, response);
+
+        if (loginMember == null) {
+            return;
+        }
+
+        if (!"WOW".equalsIgnoreCase(loginMember.getRank())) {
+            response.sendRedirect(request.getContextPath() + "/wow/join");
+            return;
+        }
+
+        request.getRequestDispatcher("/WEB-INF/views/wow_welcome.jsp")
+               .forward(request, response);
+    }
+}
