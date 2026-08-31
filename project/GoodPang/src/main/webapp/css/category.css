@@ -48,6 +48,13 @@
 	flex: none;
 }
 
+.category-filter .filter-title {
+	font-size: 16px;
+	font-weight: 700;
+	color: #111111;
+	margin-bottom: 16px;
+}
+
 .category-filter .filter-group {
 	padding-bottom: 20px;
 	margin-bottom: 20px;
@@ -55,8 +62,9 @@
 }
 
 .category-filter h3 {
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: 700;
+	color: #000000;
 	margin-bottom: 10px;
 }
 
@@ -133,6 +141,7 @@
 .sort-bar {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	height: 26px;
 	margin-bottom: 16px;
 }
@@ -153,6 +162,11 @@
 .sort-bar li.Sort_selected a {
 	color: var(--link-blue);
 	font-weight: 700;
+}
+
+.sort-bar .list-size {
+	font-size: 13px;
+	color: #555555;
 }
 
 .empty-message {
@@ -205,29 +219,31 @@
 	color: var(--link-blue);
 }
 
+/* 원본 실측(2026-08-31, browser_evaluate): 할인정보 줄과 최종가 줄이 한 줄이 아니라 줄바꿈됨
+   (할인정보 span 들은 display:inline, 최종가 strong 만 display:block이라 자동으로 다음 줄로 감) */
 .product-card .product-price {
-	display: flex;
-	align-items: baseline;
-	gap: 4px;
 	margin-bottom: 4px;
 }
 
 .product-card .discount-rate {
-	font-size: 16px;
-	font-weight: 700;
-	color: var(--coupang-red);
+	font-size: 12px;
+	font-weight: 400;
+	color: #111111;
+	margin-right: 4px;
 }
 
 .product-card .normal-price {
-	font-size: 13px;
-	color: var(--text-gray);
+	font-size: 12px;
+	color: #888888;
 	text-decoration: line-through;
 }
 
 .product-card .sale-price {
+	display: block;
 	font-size: 16px;
 	font-weight: 700;
 	color: #CB1400;
+	margin-top: 2px;
 }
 
 .product-card .product-rating {

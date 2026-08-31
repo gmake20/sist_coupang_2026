@@ -531,6 +531,58 @@
   background: #dfe3e8;
 }
 
+/* ── 와우회원 배지 (2026-08-31 추가) ──────────────
+   로그인해서 실제 쿠팡 와우회원 화면을 Playwright 로 열어 실측한 값 그대로 옮김.
+   로고 이미지는 로켓/내일도착 배지(.badge-rocket/.badge-tomorrow)와 같은 방식으로
+   이미지 없이 CSS 로 그림 — webapp/images/gnb/wow.png 는 GNB 용이라 모양이 다름(원형 %+WOW) */
+.product-page .wow-benefit-badge {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  margin-top: 16px;
+}
+
+/* 실측 40x16 짜리 파란 로고를 텍스트 배지로 대체 */
+.product-page .wow-benefit-badge-logo {
+  flex: none;
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+  color: #fff;
+  background: var(--coupang-blue);
+}
+
+/* "고객님은 와우회원으로" — 실측 14px, "와우회원"만 700/파랑(rgb(78,131,212)) */
+.product-page .wow-benefit-badge-title {
+  margin-left: 4px;
+  font-size: 14px;
+  color: #111;
+}
+
+.product-page .wow-benefit-badge-title strong {
+  font-weight: 700;
+  color: rgb(78, 131, 212);
+}
+
+/* 초록 박스(실측 rgb(0,140,0) / border-radius 2px) — 줄바꿈해서 항상 다음 줄에 오게 */
+.product-page .wow-benefit-badge-items {
+  display: flex;
+  flex-basis: 100%;
+  margin-top: 4px;
+  padding: 0 4px;
+  border-radius: 2px;
+  background: rgb(0, 140, 0);
+}
+
+.product-page .wow-benefit-badge-items li {
+  padding: 4px 3px;
+  font-size: 12px;
+  color: #fff;
+}
+
 
 /* ── 3-3. 배송 ─────────────────────────────
    실측: margin 16px 0 10px, 글자 12px/18px */
@@ -2457,7 +2509,8 @@
 }
 
 .is-soldout .product-page .delivery-date,
-.is-soldout .product-page .radio-group {
+.is-soldout .product-page .radio-group,
+.is-soldout .product-page .wow-benefit-badge {
   display: none;
 }
 

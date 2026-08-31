@@ -53,6 +53,8 @@
 			     ================================================== --%>
 			<aside class="category-filter">
 
+				<h2 class="filter-title">필터</h2>
+
 				<%-- 카테고리 필터 — 실제로 동작함(클릭하면 그 카테고리로 이동) --%>
 				<section class="filter-group">
 					<h3>카테고리</h3>
@@ -68,6 +70,20 @@
 					</ul>
 				</section>
 
+				<%-- 여기부터 실제 DB에 속성 컬럼이 없어서 화면만 있고 동작은 안 하는 필터들
+				     (2026-08-30 확정 — 원본과 구성은 맞추되, 데이터가 없는 걸 있는 척 만들지 않음).
+				     원본 실측(2026-08-31, STRUCTURE.md) 순서 그대로: 카테고리→브랜드→상품상태→색상→핏→...→별점→가격 --%>
+				<c:forEach var="entry" items="${beforeColorGroups}">
+					<section class="filter-group is-inert">
+						<h3>${entry.key}</h3>
+						<ul>
+							<c:forEach var="item" items="${entry.value}">
+								<li><label><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
+							</c:forEach>
+						</ul>
+					</section>
+				</c:forEach>
+
 				<%-- 색상 — 하드코딩 아님, PRODUCT_OPTION 에 실제 등록된 값만 나옴(2026-08-30 확정).
 				     클릭 동작은 아직 없음 — 필터링 로직은 나중에 붙일 것 --%>
 				<c:if test="${not empty colorOptions}">
@@ -81,7 +97,18 @@
 					</section>
 				</c:if>
 
-				<%-- 평점 — 실제로 동작함 --%>
+				<c:forEach var="entry" items="${afterColorGroups}">
+					<section class="filter-group is-inert">
+						<h3>${entry.key}</h3>
+						<ul>
+							<c:forEach var="item" items="${entry.value}">
+								<li><label><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
+							</c:forEach>
+						</ul>
+					</section>
+				</c:forEach>
+
+				<%-- 평점 — 실제로 동작함. 원본은 맨 끝에서 두 번째 --%>
 				<section class="filter-group">
 					<h3>별점</h3>
 					<%-- JSP EL 은 리스트 리터럴이 없어서 5개를 그냥 하나씩 적음(0=전체) --%>
@@ -94,7 +121,7 @@
 					</ul>
 				</section>
 
-				<%-- 가격대 — 실제로 동작함. 쿠팡 원본 구간(9천 단위)을 그대로 씀 --%>
+				<%-- 가격대 — 실제로 동작함. 쿠팡 원본 구간(9천 단위)을 그대로 씀. 원본은 맨 끝 --%>
 				<section class="filter-group">
 					<h3>가격</h3>
 					<ul>
@@ -122,19 +149,6 @@
 					</form>
 				</section>
 
-				<%-- 실제 DB에 속성 컬럼이 없어서 화면만 있고 동작은 안 하는 필터들
-				     (2026-08-30 확정 — 원본과 구성은 맞추되, 데이터가 없는 걸 있는 척 만들지 않음) --%>
-				<c:forEach var="entry" items="${inertFilterGroups}">
-					<section class="filter-group is-inert">
-						<h3>${entry.key}</h3>
-						<ul>
-							<c:forEach var="item" items="${entry.value}">
-								<li><label><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
-							</c:forEach>
-						</ul>
-					</section>
-				</c:forEach>
-
 			</aside>
 
 			<%-- ==================================================
@@ -158,6 +172,8 @@
 							<a href="${baseUrl}&sort=SALE_COUNT&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">판매량순</a>
 						</li>
 					</ul>
+					<%-- 60개 고정(2026-08-30 확정) — 원본처럼 오른쪽에 표시만 함, 드롭다운 아님 --%>
+					<span class="list-size">60개씩 보기</span>
 				</div>
 
 				<c:choose>

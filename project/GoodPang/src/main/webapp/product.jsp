@@ -202,6 +202,23 @@
 						<!-- 품절일 때만 보이는 줄. 평소엔 CSS 가 감춤 (body 에 .is-soldout 이 붙어야 나옴)
 						     원본 실측: 14px / 700 / rgb(170,181,192) -->
 						<p class="soldout-text">품절</p>
+
+						<!-- 와우회원 전용 배지 — 2026-08-31 추가.
+						     sessionScope.wowMember 는 로그인할 때(LoginServlet) WOW_MEMBERSHIP 테이블 기준으로
+						     세팅되고, 가입/해지 직후(WowJoinServlet/WowCancelServlet)에도 갱신됨.
+						     로그인 자체를 안 했으면 세션에 이 값이 아예 없어서 EL 이 false 로 취급 — 로그인 여부를
+						     따로 검사할 필요 없음. 로그인해서 실제 쿠팡 와우회원 화면을 Playwright 로 열어
+						     확인한 구조/실측값 그대로 옮김(이미지는 로켓/내일도착 배지와 같은 방식으로 CSS 로 그림) -->
+						<c:if test="${sessionScope.wowMember}">
+							<div class="wow-benefit-badge">
+								<span class="wow-benefit-badge-logo">WOW</span>
+								<span class="wow-benefit-badge-title">고객님은 <strong>와우회원</strong>으로</span>
+								<ul class="wow-benefit-badge-items">
+									<li>무조건 무료배송</li>
+									<li>무료반품</li>
+								</ul>
+							</div>
+						</c:if>
 					</div>
 
 					<hr class="price-bottom-divider">
@@ -209,7 +226,16 @@
 					<!-- ③ 배송 정보 -->
 					<div class="delivery-container">
 						<p class="shipping-fee">
-							<em class="txt-bold">무료배송</em> (로켓배송 상품 19,800원 이상 구매 시)
+							<!-- 와우회원은 조건("19,800원 이상") 없이 항상 무료배송이라 문구도 다름 —
+							     원본에도 이 괄호 문구가 아예 없음 -->
+							<c:choose>
+								<c:when test="${sessionScope.wowMember}">
+									<em class="txt-bold">무료배송</em>
+								</c:when>
+								<c:otherwise>
+									<em class="txt-bold">무료배송</em> (로켓배송 상품 19,800원 이상 구매 시)
+								</c:otherwise>
+							</c:choose>
 						</p>
 						<p class="delivery-date">
 
@@ -218,24 +244,27 @@
 								20분 내 주문 시 / 서울·경기 기준)</span>
 						</p>
 
-						<!-- 배송 방법 선택 (2026-08-21 추가)
+						<!-- 배송 방법 선택 (2026-08-21 추가, 2026-08-31 와우회원 분기 추가)
 						     원본에 실제로 있는 라디오 버튼 2개. input[type=radio] 가 아니라
 						     span 을 CSS 로 동그랗게 그린 커스텀 라디오 (원본 클래스명 그대로 씀).
 						     ★ 둘째 항목(로켓와우)을 고르면 아래 [장바구니 담기][바로구매] 두 칸이
 						     [로켓와우로 무료배송 >] 한 칸으로 바뀜 — 원본을 Playwright 로 직접 클릭해서 확인함.
-						     ▶JSP: 지금은 앞쪽(로켓배송)이 기본 선택. 로그인/와우 여부에 따라 서버가
-						       기본값을 정하게 될 자리 -->
-						<ul class="radio-group">
-							<li class="radio-item is-on"><span class="radio"></span> <span
-								class="radio-text">로켓배송 상품 19,800원 이상 무료배송</span></li>
-							<li class="radio-item"><span class="radio"></span> <span
-								class="radio-text">무료배송 + 무료반품 <span class="separator">|</span>
-									로켓와우 신청시
-							</span>
-								<button type="button" class="radio-info">
-									<span class="blind">안내</span>
-								</button></li>
-						</ul>
+						     ▶ 와우회원은 이미 "무조건 무료배송"이라 이 선택 자체가 원본에 없음 —
+						       로그인해서 실제 와우회원 화면을 Playwright 로 열어 직접 확인함(라디오 0개, 위
+						       wow-benefit-badge 만 있음) -->
+						<c:if test="${not sessionScope.wowMember}">
+							<ul class="radio-group">
+								<li class="radio-item is-on"><span class="radio"></span> <span
+									class="radio-text">로켓배송 상품 19,800원 이상 무료배송</span></li>
+								<li class="radio-item"><span class="radio"></span> <span
+									class="radio-text">무료배송 + 무료반품 <span class="separator">|</span>
+										로켓와우 신청시
+								</span>
+									<button type="button" class="radio-info">
+										<span class="blind">안내</span>
+									</button></li>
+							</ul>
+						</c:if>
 					</div>
 
 					<!-- ④ 옵션 — "1번 축은 드롭박스, 그 다음 축은 사진 있으면 칩" (원본과 같은 모양)
