@@ -201,7 +201,6 @@
 							<span class="discount-label"${empty displayNormalPrice ? ' style="display:none"' : ''}>할인</span>
 							<span class="badge-rocket">로켓배송</span> <span
 								class="badge-tomorrow">내일도착</span>
-								
 						</div>
 						<!-- 원가 취소선 (#768695 + line-through). 정상 추가금(NORMAL_PRICE) 입력 안 한 옵션이면 안 보임 -->
 						<div class="price-origin"
