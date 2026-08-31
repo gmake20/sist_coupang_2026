@@ -196,7 +196,12 @@ function setupAdSlider() {
 
    ★ 칩 사진은 "그 값 하나"의 사진이 아니라 "조합 하나(OPTION_ID)"에 딸려있음 — 예를 들어
      색상 칩 하나에 보여줄 사진은 (지금 고른 사이즈 + 이 색상) 조합의 사진을 씀. 사이즈를 바꾸면
-     색상 칩 사진도 그 사이즈 기준으로 다시 그림(refreshChipThumbnails) */
+     색상 칩 사진도 그 사이즈 기준으로 다시 그림(refreshChipThumbnails)
+
+   ★ 2026-08-31 — 이 JSON(combos)은 이제 "축·값 구조"와 칩 사진(고르기 전 미리보기)에만 씀.
+     실제로 화면에 반영되는 가격/재고/큰 이미지는 옵션을 고를 때마다 fetchOptionDetail() 이
+     /option 으로 ajax 요청해서 서버 값을 다시 받아옴 (로그인 회원등급별 할인 대비 — 상세 이유는
+     fetchOptionDetail() 위 주석 참고) */
 function setupOptionSelect(setStock, setPrice) {
   const dataEl = document.getElementById('productOptionsData');
   const box = document.getElementById('fashionOption');
@@ -253,6 +258,8 @@ function setupOptionSelect(setStock, setPrice) {
     });
   }
 
+  let optionFetchSeq = 0;   // 응답이 늦게 와서 이전 클릭 결과가 나중에 덮어쓰는 것 방지용 번호표
+
   function updateFromSelects() {
     controls.forEach(function (ctl) { if (ctl.chipList) refreshChipThumbnails(ctl); });
 
@@ -265,22 +272,47 @@ function setupOptionSelect(setStock, setPrice) {
       colorInput.value = controls.map(function (ctl) { return ctl.getValue(); }).join(' / ');
     }
 
-    /* 재고/품절 — 옵션마다 재고가 다르므로 고를 때마다 다시 판단.
-       STATUS 가 'N'(판매중지)이거나 재고가 0이면 품절로 봄 */
-    const soldout = (picked.quantity <= 0) || (picked.status === 'N');
-    document.body.classList.toggle('is-soldout', soldout);
-    if (setStock) setStock(picked.quantity);
-    if (setPrice) setPrice(picked.price, picked.normalPrice);
+    fetchOptionDetail(picked.optionId);
+  }
 
-    if (!picked.imageUrls.length || !thumbBox || !mainImg) return;
+  /* ★ 2026-08-31 추가 — 가격/재고/사진은 이제 combos(페이지 처음 받아둔 JSON)를 그대로 안 쓰고
+     서버(/option)에 다시 물어봄. combos 는 이제 "이 상품이 어떤 축(사이즈/색상)에 어떤 값을
+     가지는지" 구조를 그리는 데만 쓰고, 실제 값(누구한테 얼마로 보여줄지)은 서버가 매번 계산해서
+     내려줌 — 나중에 로그인 회원등급별 할인이 생겨도 이 함수는 안 고쳐도 됨(서버만 고치면 됨). */
+  function fetchOptionDetail(optionId) {
+    const seq = ++optionFetchSeq;
 
-    thumbBox.innerHTML = picked.imageUrls.map(function (url, i) {
-      return '<li class="' + (i === 0 ? 'is-on' : '') + '">'
-           +   '<a href="#"><img src="' + url + '" alt=""></a>'
-           + '</li>';
-    }).join('');
+    fetch(contextPath + '/option?optionId=' + optionId)
+      .then(function (res) {
+        if (!res.ok) throw new Error('옵션 정보를 불러오지 못했습니다: ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        if (seq !== optionFetchSeq) return;   // 그 사이에 다른 옵션을 또 눌렀으면 이 응답은 버림
 
-    mainImg.src = picked.imageUrls[0];
+        /* 재고/품절 — 옵션마다 재고가 다르므로 고를 때마다 다시 판단.
+           STATUS 가 'N'(판매중지)이거나 재고가 0이면 품절로 봄 */
+        const soldout = (data.quantity <= 0) || (data.status === 'N');
+        document.body.classList.toggle('is-soldout', soldout);
+        if (setStock) setStock(data.quantity);
+        if (setPrice) setPrice(data.price, data.normalPrice);
+
+        const imageUrls = (data.imageUrls || []).map(function (url) {
+          return contextPath + '/' + url;
+        });
+        if (!imageUrls.length || !thumbBox || !mainImg) return;
+
+        thumbBox.innerHTML = imageUrls.map(function (url, i) {
+          return '<li class="' + (i === 0 ? 'is-on' : '') + '">'
+               +   '<a href="#"><img src="' + url + '" alt=""></a>'
+               + '</li>';
+        }).join('');
+
+        mainImg.src = imageUrls[0];
+      })
+      .catch(function (err) {
+        console.error(err);
+      });
   }
 
   axes.forEach(function (axis, axisIndex) {

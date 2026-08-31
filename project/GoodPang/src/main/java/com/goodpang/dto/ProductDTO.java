@@ -35,7 +35,9 @@ public class ProductDTO {
 
     private int subCategoryNo;
     private String subCategoryName;    // 빵부스러기 맨 끝 칸
+    private int midCategoryNo;         // 2026-08-31 추가 — 카테고리 목록 페이지(/category) 링크용
     private String midCategoryName;
+    private int mainCategoryNo;        // 2026-08-31 추가 — 카테고리 목록 페이지(/category) 링크용
     private String mainCategoryName;   // 빵부스러기 맨 앞 칸
 
     

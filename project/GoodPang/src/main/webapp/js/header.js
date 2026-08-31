@@ -48,7 +48,7 @@ function renderCategoryMenu(data) {
 
     // 하위 항목(중분류)이 있을 때만 ▶ 표시와 depth 패널을 붙임
     if (children.length === 0) {
-      return '<li><a href="#">' + iconHtml + escapeCategoryHtml(main.categoryName) + '</a></li>';
+		 return '<li><a href="/category?categoryNo=' + main.categoryNo + '">' + iconHtml + escapeCategoryHtml(main.categoryName) + '</a></li>';
     }
 
     return '<li><a href="#">' + iconHtml + escapeCategoryHtml(main.categoryName) + '<i class="si"></i></a>'
@@ -103,7 +103,7 @@ function renderMidPanel(midItems, subList) {
     }
 
     if (subItems.length === 0) {
-      return '<li><a href="#">' + escapeCategoryHtml(mid.categoryName) + '</a></li>';
+		 return '<li><a href="/category?categoryNo=' + mid.categoryNo + '">' + escapeCategoryHtml(mid.categoryName) + '</a></li>';
     }
 
     const isActive = mid.categoryNo === firstWithSub;
@@ -120,7 +120,7 @@ function renderMidPanel(midItems, subList) {
 
     const isActive = mid.categoryNo === firstWithSub;
     const subHtml = subItems.map(function (sub) {
-      return '<li><a href="#">' + escapeCategoryHtml(sub.categoryName) + '</a></li>';
+		 return '<li><a href="/category?categoryNo=' + sub.categoryNo + '">' + escapeCategoryHtml(sub.categoryName) + '</a></li>';
     }).join('');
 
     return '<div class="depth2' + (isActive ? ' active' : '') + '" data-mid="' + mid.categoryNo + '">'

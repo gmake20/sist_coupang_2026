@@ -59,19 +59,19 @@
              JS 는 필요 없음 — 요청마다 서버(JSP)가 이미 값을 들고 있어서 EL 로 바로 찍으면 됨.
              (카테고리 "메뉴판" 을 그리는 category/getinfo + header.js 와는 다른 데이터임 — 그건
              사이트 전체 카테고리 트리고, 여긴 "이 상품 하나"가 속한 카테고리 경로임)
-           href="#" 는 그대로 둠 — 카테고리별 상품목록 페이지가 아직 없어서. 나중에 생기면
-             href="category?categoryNo=..." 식으로 채울 것 -->
+           2026-08-31: /category 카테고리 목록 페이지가 생겨서 href="#" 를 실제 링크로 채움
+             (CategoryServlet, categoryNo 는 ProductDAO 가 새로 내려주는 mid/mainCategoryNo) -->
 			<nav class="breadcrumb">
 				<ol>
 					<li><a href="index.jsp">굿팡 홈</a></li>
-					<!--   
+					<!--
 					<li><a href="#">남성패션</a></li>
 					<li><a href="#">의류</a></li>
 					<li><a href="#">티셔츠</a></li>
 					 -->
-					<li><a href="#">${p.mainCategoryName}</a></li>
-					<li><a href="#">${p.midCategoryName}</a></li>
-					<li><a href="#">${p.subCategoryName}</a></li>
+					<li><a href="${pageContext.request.contextPath}/category?categoryNo=${p.mainCategoryNo}">${p.mainCategoryName}</a></li>
+					<li><a href="${pageContext.request.contextPath}/category?categoryNo=${p.midCategoryNo}">${p.midCategoryName}</a></li>
+					<li><a href="${pageContext.request.contextPath}/category?categoryNo=${p.subCategoryNo}">${p.subCategoryName}</a></li>
 
 				</ol>
 			</nav>
