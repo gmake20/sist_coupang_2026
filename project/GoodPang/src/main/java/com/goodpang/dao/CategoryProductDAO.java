@@ -211,9 +211,10 @@ public class CategoryProductDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    CategoryDTO main = new CategoryDTO(rs.getLong("MAIN_NO"), rs.getString("MAIN_NAME"), null, 1);
-                    CategoryDTO mid = new CategoryDTO(rs.getLong("MID_NO"), rs.getString("MID_NAME"), rs.getLong("MAIN_NO"), 2);
-                    CategoryDTO sub = new CategoryDTO(rs.getLong("SUB_NO"), rs.getString("SUB_NAME"), rs.getLong("MID_NO"), 3);
+                    long mainNo = rs.getLong("MAIN_NO");
+                    CategoryDTO main = new CategoryDTO(mainNo, rs.getString("MAIN_NAME"), null, 1, "./pds/category_" + mainNo + ".png");
+                    CategoryDTO mid = new CategoryDTO(rs.getLong("MID_NO"), rs.getString("MID_NAME"), mainNo, 2, null);
+                    CategoryDTO sub = new CategoryDTO(rs.getLong("SUB_NO"), rs.getString("SUB_NAME"), rs.getLong("MID_NO"), 3, null);
                     return new CategoryDTO[] { main, mid, sub };
                 }
             }
@@ -247,11 +248,14 @@ public class CategoryProductDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
+                    long categoryNoResult = rs.getLong("CATEGORY_NO");
+                    int categoryLevel = rs.getInt("CATEGORY_LEVEL");
                     list.add(new CategoryDTO(
-                        rs.getLong("CATEGORY_NO"),
+                        categoryNoResult,
                         rs.getString("CATEGORY_NAME"),
                         rs.getLong("PARENT_CATEGORY_NO"),
-                        rs.getInt("CATEGORY_LEVEL")
+                        categoryLevel,
+                        categoryLevel == 1 ? "./pds/category_" + categoryNoResult + ".png" : null
                     ));
                 }
             }

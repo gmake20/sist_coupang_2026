@@ -15,4 +15,5 @@ public class CategoryDTO {
     private String categoryName;
     private Long parentCategoryNo;
     private int categoryLevel;
+    private String imgUrl;
 }

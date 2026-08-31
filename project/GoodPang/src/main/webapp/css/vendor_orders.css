@@ -618,6 +618,7 @@ ul {
 .stat-icon-red { background: #fdeceb; color: #f4514a; }
 .stat-icon-purple { background: #f2eafd; color: #9b5de5; }
 .stat-icon-violet { background: #ece9fd; color: #6c5ce7; }
+.stat-icon-teal { background: #e1f7f5; color: #14b8a6; }
 
 .stat-value {
   margin-bottom: 6px;

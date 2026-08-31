@@ -25,7 +25,6 @@
   <% String menu = "orders"; %>
   <%@ include file="/WEB-INF/jspf/vendor/sidebar.jspf" %>
 
-
     <!-- 메인 -->
     <main class="main">
 
@@ -55,11 +54,10 @@
 
         <article class="stat-card">
           <div class="stat-top">
-            <span class="stat-label">신규 주문</span>
-            <span class="stat-icon stat-icon-purple"><svg class="icon"><use href="#ic-bag" /></svg></span>
+            <span class="stat-label">결제 완료</span>
+            <span class="stat-icon stat-icon-teal"><svg class="icon"><use href="#ic-receipt" /></svg></span>
           </div>
-          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
-          <p class="stat-compare" style="color:#bbb;">아직 대응하는 주문상태가 없습니다</p>
+          <div class="stat-value">${orderStat.waitingCount} <small>건</small></div>
         </article>
 
         <article class="stat-card">
