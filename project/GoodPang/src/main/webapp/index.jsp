@@ -3204,7 +3204,7 @@
 	<!-- 	<div id="wowModal" class="wow-modal-overlay">
  -->
 	<div id="wowModal" class="wow-modal-overlay"
-		<c:if test="${sessionScope.loginMember.rank eq 'WOW'}">
+		<c:if test="${sessionScope.wowMember}">
          style="display:none;"
      </c:if>>
 

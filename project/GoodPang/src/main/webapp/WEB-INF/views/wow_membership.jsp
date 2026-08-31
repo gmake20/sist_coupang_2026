@@ -69,7 +69,7 @@
         <c:choose>
 
             <%-- 와우 회원 --%>
-            <c:when test="${sessionScope.loginMember.rank eq 'WOW'}">
+            <c:when test="${sessionScope.wowMember}">
                 <div class="wow-title-row">
                     <h2>와우 멤버십 관리</h2>
 
@@ -220,7 +220,7 @@
     </main>
 </div>
 
-<c:if test="${sessionScope.loginMember.rank eq 'WOW'}">
+<c:if test="${sessionScope.wowMember}">
     <div id="wowCancelModal" class="wow-cancel-overlay">
         <div class="wow-cancel-modal">
             <button type="button" id="wowCancelCloseBtn" class="wow-cancel-close">&times;</button>

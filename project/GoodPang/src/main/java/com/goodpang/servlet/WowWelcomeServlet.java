@@ -10,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/wow/welcome")
 public class WowWelcomeServlet extends HttpServlet {
@@ -26,8 +27,15 @@ public class WowWelcomeServlet extends HttpServlet {
             return;
         }
 
-        if (!"WOW".equalsIgnoreCase(loginMember.getRank())) {
-            response.sendRedirect(request.getContextPath() + "/wow/join");
+        HttpSession session = request.getSession(false);
+
+        boolean wowMember = session != null
+                && Boolean.TRUE.equals(session.getAttribute("wowMember"));
+
+        if (!wowMember) {
+            response.sendRedirect(
+                    request.getContextPath() + "/wow/join"
+            );
             return;
         }
 
