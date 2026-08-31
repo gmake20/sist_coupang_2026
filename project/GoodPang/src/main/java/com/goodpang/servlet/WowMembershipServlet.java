@@ -2,7 +2,9 @@ package com.goodpang.servlet;
 
 import java.io.IOException;
 
+import com.goodpang.dao.WowMembershipDAO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.dto.WowMembershipDTO;
 import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
@@ -26,7 +28,11 @@ public class WowMembershipServlet extends HttpServlet {
             return;
         }
 
-        request.setAttribute("nextPaymentDate", "2026년 10월 19일");
+        WowMembershipDAO dao = new WowMembershipDAO();
+        
+        WowMembershipDTO membership = dao.getMembershipDetail(loginMember.getMemberNo());
+        request.setAttribute("membership", membership);
+        
         request.setAttribute("savingAmount", 17000);
         request.setAttribute("deliverySaving", 0);
         request.setAttribute("discountSaving", 14000);
@@ -34,7 +40,6 @@ public class WowMembershipServlet extends HttpServlet {
         request.setAttribute("cashSaving", 0);
         request.setAttribute("returnSaving", 0);
         request.setAttribute("globalSaving", 0);
-        request.setAttribute("joinDate", "2026.8.19");
 
         request.getRequestDispatcher("/WEB-INF/views/wow_membership.jsp").forward(request, response);
     }

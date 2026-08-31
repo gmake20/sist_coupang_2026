@@ -338,5 +338,116 @@ public class WowMembershipDAO {
         }
     }
     
-    
+    public WowMembershipDTO getMembershipDetail(int memberNo) {
+
+        String sql = """
+            SELECT
+                WM.WOW_MEMBERSHIP_NO,
+                WM.MEMBER_NO,
+                WM.STATUS,
+                WM.START_DATE,
+                WM.NEXT_PAYMENT_DATE,
+                WM.CANCEL_DATE,
+                WM.END_DATE,
+                WM.AUTO_PAYMENT_YN,
+                WM.PAYMENT_METHOD_NO,
+                PM.PAYMENT_TYPE,
+                PM.BANK_CODE,
+                PM.ACCOUNT_LAST4,
+                PM.ACCOUNT_HOLDER,
+                PM.CARD_COMPANY,
+                PM.CARD_LAST4
+            FROM WOW_MEMBERSHIP WM
+            LEFT JOIN PAYMENT_METHOD PM
+                   ON WM.PAYMENT_METHOD_NO = PM.PAYMENT_METHOD_NO
+            WHERE WM.MEMBER_NO = ?
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setInt(1, memberNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                if (!rs.next()) {
+                    return null;
+                }
+
+                WowMembershipDTO dto = new WowMembershipDTO();
+
+                dto.setWowMembershipNo(
+                        rs.getInt("WOW_MEMBERSHIP_NO")
+                );
+
+                dto.setMemberNo(
+                        rs.getInt("MEMBER_NO")
+                );
+
+                dto.setStatus(
+                        rs.getString("STATUS")
+                );
+
+                dto.setStartDate(
+                        rs.getDate("START_DATE")
+                );
+
+                dto.setNextPaymentDate(
+                        rs.getDate("NEXT_PAYMENT_DATE")
+                );
+
+                dto.setCancelDate(
+                        rs.getDate("CANCEL_DATE")
+                );
+
+                dto.setEndDate(
+                        rs.getDate("END_DATE")
+                );
+
+                dto.setAutoPaymentYn(
+                        rs.getString("AUTO_PAYMENT_YN")
+                );
+
+                int paymentMethodNo =
+                        rs.getInt("PAYMENT_METHOD_NO");
+
+                if (!rs.wasNull()) {
+                    dto.setPaymentMethodNo(paymentMethodNo);
+                }
+
+                dto.setPaymentType(
+                        rs.getString("PAYMENT_TYPE")
+                );
+
+                dto.setBankCode(
+                        rs.getString("BANK_CODE")
+                );
+
+                dto.setAccountLast4(
+                        rs.getString("ACCOUNT_LAST4")
+                );
+
+                dto.setAccountHolder(
+                        rs.getString("ACCOUNT_HOLDER")
+                );
+
+                dto.setCardCompany(
+                        rs.getString("CARD_COMPANY")
+                );
+
+                dto.setCardLast4(
+                        rs.getString("CARD_LAST4")
+                );
+
+                return dto;
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "와우 멤버십 상세 조회 중 오류",
+                    e
+            );
+        }
+    }
 }
