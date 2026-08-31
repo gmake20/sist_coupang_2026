@@ -63,4 +63,54 @@ public class ProductImageDAO {
 
         return list;
     }
+
+    /* 옵션 하나(OPTION_ID)의 사진만 조회 — /option ajax(ProductOptionServlet)에서 씀.
+       2026-08-31 추가. */
+    public List<ProductImageDTO> selectImagesByOptionId(int optionId) {
+
+        List<ProductImageDTO> list = new ArrayList<>();
+
+        String sql = """
+                SELECT
+                    IMAGE_NO,
+                    PRODUCT_NO,
+                    OPTION_ID,
+                    IMAGE_PURPOSE,
+                    IMAGE_ORDER,
+                    IMAGE_URL
+                FROM PRODUCT_IMAGE
+                WHERE OPTION_ID = ?
+                ORDER BY IMAGE_ORDER
+                """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+
+            pstmt.setInt(1, optionId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                while (rs.next()) {
+
+                    ProductImageDTO dto = new ProductImageDTO();
+
+                    dto.setImageNo(rs.getInt("IMAGE_NO"));
+                    dto.setProductNo(rs.getInt("PRODUCT_NO"));
+                    dto.setOptionId(optionId);
+                    dto.setImagePurpose(rs.getString("IMAGE_PURPOSE"));
+                    dto.setImageOrder(rs.getInt("IMAGE_ORDER"));
+                    dto.setImageUrl(rs.getString("IMAGE_URL"));
+
+                    list.add(dto);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }

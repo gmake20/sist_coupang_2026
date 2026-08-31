@@ -1,0 +1,285 @@
+/*
+ * 카테고리 목록 페이지(category_list.jsp) 전용 CSS.
+ * 전부 .category-page 안에서만 적용되게 스코프함 — 다른 페이지 클래스와 안 부딪히게(CLAUDE.md 8장 규칙).
+ */
+
+.category-page {
+	max-width: 1300px;
+	margin: 0 auto;
+	padding: 20px 0 60px;
+}
+
+.category-page .breadcrumb {
+	font-size: 12px;
+	color: var(--text-black);
+	margin-bottom: 16px;
+}
+
+.category-page .breadcrumb a {
+	color: var(--text-black);
+	text-decoration: none;
+}
+
+.category-page .breadcrumb a:hover {
+	text-decoration: underline;
+}
+
+.category-page .breadcrumb .sep {
+	margin: 0 6px;
+	color: var(--text-gray);
+}
+
+.category-page .breadcrumb .current {
+	color: var(--text-gray);
+}
+
+/* ---------- 2단 레이아웃 ---------- */
+
+.category-body {
+	display: flex;
+	gap: 20px;
+	align-items: flex-start;
+}
+
+/* ---------- 왼쪽 필터 사이드바 ---------- */
+
+.category-filter {
+	width: 200px;
+	flex: none;
+}
+
+.category-filter .filter-group {
+	padding-bottom: 20px;
+	margin-bottom: 20px;
+	border-bottom: 1px solid var(--line-gray);
+}
+
+.category-filter h3 {
+	font-size: 14px;
+	font-weight: 700;
+	margin-bottom: 10px;
+}
+
+.category-filter ul {
+	list-style: none;
+}
+
+.category-filter li {
+	margin-bottom: 8px;
+}
+
+.category-filter a,
+.category-filter label {
+	font-size: 13px;
+	color: #111111;
+	text-decoration: none;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* 선택된 상태 — 쿠팡 원본 실측: 글자색 #0073E9 + font-weight:700 로 통일(정렬/페이지네이션/카테고리 전부 동일 규칙) */
+.category-filter a.selected,
+.category-filter a:hover {
+	color: var(--link-blue);
+	font-weight: 700;
+}
+
+/* 체크박스형 필터(색상 등) 가짜 체크박스 자리 — 아직 스프라이트 이미지가 없어서 테두리 박스만 */
+.filter-function-bar-asset {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	border: 1px solid var(--line-gray);
+	flex: none;
+}
+
+/* 실제 DB에 속성 데이터가 없어서 화면만 있고 클릭해도 동작 안 하는 필터 그룹 */
+.category-filter .is-inert label {
+	color: var(--text-gray);
+	cursor: default;
+}
+
+.filter-price-direct {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin-top: 10px;
+}
+
+.filter-price-direct input[type="number"] {
+	width: 70px;
+	padding: 4px;
+	border: 1px solid var(--line-gray);
+	font-size: 12px;
+}
+
+.filter-price-direct button {
+	border: 1px solid var(--line-gray);
+	background: #fff;
+	padding: 4px 8px;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+/* ---------- 오른쪽 상품 목록 ---------- */
+
+.category-list {
+	width: 1080px;
+	flex: none;
+}
+
+.sort-bar {
+	display: flex;
+	align-items: center;
+	height: 26px;
+	margin-bottom: 16px;
+}
+
+.sort-bar ul {
+	display: flex;
+	list-style: none;
+	gap: 16px;
+}
+
+.sort-bar a {
+	font-size: 13px;
+	color: #555555;
+	font-weight: 400;
+	text-decoration: none;
+}
+
+.sort-bar li.Sort_selected a {
+	color: var(--link-blue);
+	font-weight: 700;
+}
+
+.empty-message {
+	padding: 60px 0;
+	text-align: center;
+	color: var(--text-gray);
+}
+
+/* 카드 270×439, 이미지 218×218, 4열 — 카드 폭 자체가 딱 270이라 gap 없이 4개면 1080 정확히 맞음 */
+.product-grid {
+	display: flex;
+	flex-wrap: wrap;
+	list-style: none;
+}
+
+.product-card {
+	width: 270px;
+	padding: 10px 0 20px;
+}
+
+.product-card a {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+}
+
+.product-card figure {
+	width: 218px;
+	height: 218px;
+	margin: 0 auto 10px;
+	background: var(--bg-gray);
+}
+
+.product-card figure img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.product-card .product-name {
+	font-size: 14px;
+	font-weight: 400;
+	color: #212B36;
+	line-height: 18.2px;
+	margin-bottom: 4px;
+}
+
+.product-card a:hover .product-name {
+	text-decoration: underline;
+	color: var(--link-blue);
+}
+
+.product-card .product-price {
+	display: flex;
+	align-items: baseline;
+	gap: 4px;
+	margin-bottom: 4px;
+}
+
+.product-card .discount-rate {
+	font-size: 16px;
+	font-weight: 700;
+	color: var(--coupang-red);
+}
+
+.product-card .normal-price {
+	font-size: 13px;
+	color: var(--text-gray);
+	text-decoration: line-through;
+}
+
+.product-card .sale-price {
+	font-size: 16px;
+	font-weight: 700;
+	color: #CB1400;
+}
+
+.product-card .product-rating {
+	font-size: 12px;
+	color: var(--text-gray);
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+/* product.css 의 .product-page .star-rating 과 완전히 같은 스프라이트 재사용(2026-08-27 원본 실측 그대로).
+   거기는 .product-page 스코프라 여기선 안 먹어서 .category-page 로 다시 씀 — 이미지 파일은 그대로 재사용 */
+.category-page .star-rating {
+	display: block;
+	width: 60px;
+	height: 12px;
+	background-image: url(../images/icons/star_rating_improve_design.png);
+	background-repeat: no-repeat;
+	background-size: 60px 24px;
+	background-position: 0 -12px;
+}
+
+.category-page .star-rating em {
+	display: block;
+	height: 12px;
+	background-image: url(../images/icons/star_rating_improve_design.png);
+	background-repeat: no-repeat;
+	background-size: 60px 24px;
+	background-position: 0 0;
+}
+
+/* ---------- 페이지네이션 ---------- */
+
+.pagination {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	height: 52px;
+}
+
+.pagination a {
+	font-size: 13px;
+	color: #555555;
+	font-weight: 700;
+	border: 0;
+	text-decoration: none;
+	padding: 4px 8px;
+}
+
+.pagination a.current {
+	color: var(--link-blue);
+	font-weight: 700;
+	border: 1px solid var(--link-blue);
+}
