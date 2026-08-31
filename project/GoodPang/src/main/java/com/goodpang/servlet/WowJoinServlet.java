@@ -187,10 +187,21 @@ public class WowJoinServlet extends HttpServlet {
 			return;
 		}
 
-		List<PaymentMethodDTO> paymentMethods = paymentMethodDAO.getPaymentMethods(loginMember.getMemberNo());
+		List<PaymentMethodDTO> paymentMethods =
+				paymentMethodDAO.getPaymentMethods(loginMember.getMemberNo());
 
 		request.setAttribute("paymentMethods", paymentMethods);
-		request.getRequestDispatcher("/WEB-INF/views/wow_join.jsp").forward(request, response);
+
+		String mode = request.getParameter("mode");
+
+		if ("modal".equals(mode)) {
+			request.getRequestDispatcher("/WEB-INF/views/wow_join_modal.jsp")
+			.forward(request, response);
+			return;
+		}
+
+		request.getRequestDispatcher("/WEB-INF/views/wow_join.jsp")
+		.forward(request, response);
 	}
 
 	@Override
@@ -249,8 +260,17 @@ public class WowJoinServlet extends HttpServlet {
 		loginMember.setRank("WOW");
 		request.getSession().setAttribute("loginMember", loginMember);
 
+		String joinMode = request.getParameter("joinMode");
+
+		if ("modal".equals(joinMode)) {
+			response.sendRedirect(
+					request.getContextPath() + "/?wowJoined=Y"
+					);
+			return;
+		}
+
 		response.sendRedirect(
-		        request.getContextPath() + "/wow/welcome"
-		);
+				request.getContextPath() + "/wow/welcome"
+				);
 	}
 }
