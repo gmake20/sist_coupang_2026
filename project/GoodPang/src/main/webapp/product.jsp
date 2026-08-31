@@ -338,15 +338,21 @@
 						</button>
 
 						<!-- 로켓와우 -->
-						<%-- <button type="submit" class="prod-wow-btn"
-							formaction="${pageContext.request.contextPath}/order/buy"
-							formmethod="post">
-							로켓와우로 무료배송 <i class="arrow-right"></i>
-						</button> --%>
-						<button type="button" class="prod-wow-btn" id="wowJoinOpenBtn">
-							로켓와우로 무료배송 <i class="arrow-right"></i>
-						</button>
+						<c:choose>
+							<c:when test="${isWowMember}">
+								<button type="submit" class="prod-wow-btn"
+									formaction="${pageContext.request.contextPath}/order/buy"
+									formmethod="post">
+									로켓와우로 무료배송 <i class="arrow-right"></i>
+								</button>
 
+							</c:when>
+							<c:otherwise>
+								<button type="button" class="prod-wow-btn" id="wowJoinOpenBtn">
+									로켓와우로 무료배송 <i class="arrow-right"></i>
+								</button>
+							</c:otherwise>
+						</c:choose>
 						<!-- 품절 -->
 						<button type="button" class="prod-soldout-btn" disabled>
 							품절</button>
@@ -1356,11 +1362,8 @@
 				<form action="${pageContext.request.contextPath}/wow/join"
 					method="post" id="productWowPaymentForm">
 
-					<input type="hidden" name="joinMode" value="modal">
-					  <input type="hidden" name="productNo" value="${p.productNo}"> 
-					
-					<input
-					
+					<input type="hidden" name="joinMode" value="modal"> <input
+						type="hidden" name="productNo" value="${p.productNo}"> <input
 						type="hidden" name="afterWowJoin" value="buy"> <input
 						type="hidden" name="productNo" value="${p.productNo}"> <input
 						type="hidden" name="optionId" id="productWowOptionId"> <input
