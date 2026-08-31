@@ -232,34 +232,34 @@
 
           <ul class="status-list">
             <li>
-              <span class="status-icon status-icon-purple"><svg class="icon"><use href="#ic-box" /></svg></span>
-              <span class="status-label">신규 주문</span>
-              <span class="status-value">35 <small>건</small></span>
+              <span class="status-icon status-icon-purple"><svg class="icon"><use href="#ic-receipt" /></svg></span>
+              <span class="status-label">결제 완료</span>
+              <span class="status-value"><fmt:formatNumber value="${orderStat.waitingCount}" pattern="#,##0" /> <small>건</small></span>
             </li>
             <li>
               <span class="status-icon status-icon-orange"><svg class="icon"><use href="#ic-clock" /></svg></span>
               <span class="status-label">결제 대기</span>
-              <span class="status-value">12 <small>건</small></span>
+              <span class="status-value" style="color:#bbb; font-size:13px; font-weight:400;">준비 중</span>
             </li>
             <li>
               <span class="status-icon status-icon-blue"><svg class="icon"><use href="#ic-clipboard-check" /></svg></span>
               <span class="status-label">상품 준비중</span>
-              <span class="status-value">74 <small>건</small></span>
+              <span class="status-value" style="color:#bbb; font-size:13px; font-weight:400;">준비 중</span>
             </li>
             <li>
               <span class="status-icon status-icon-teal"><svg class="icon"><use href="#ic-truck" /></svg></span>
               <span class="status-label">배송 중</span>
-              <span class="status-value">58 <small>건</small></span>
+              <span class="status-value"><fmt:formatNumber value="${orderStat.shippingCount}" pattern="#,##0" /> <small>건</small></span>
             </li>
             <li>
               <span class="status-icon status-icon-green"><svg class="icon"><use href="#ic-truck" /></svg></span>
               <span class="status-label">배송 완료</span>
-              <span class="status-value">320 <small>건</small></span>
+              <span class="status-value"><fmt:formatNumber value="${orderStat.deliveredCount}" pattern="#,##0" /> <small>건</small></span>
             </li>
             <li>
               <span class="status-icon status-icon-red"><svg class="icon"><use href="#ic-return" /></svg></span>
               <span class="status-label">취소/반품/교환</span>
-              <span class="status-value">8 <small>건</small></span>
+              <span class="status-value" style="color:#bbb; font-size:13px; font-weight:400;">준비 중</span>
             </li>
           </ul>
 
@@ -447,11 +447,14 @@
        매출 현황 차트 — 막대(매출액) + 선(주문수)
     ========================================================= */
 
+    // 최근 7일 실데이터 (VendorDashboardServlet -> VendorDashboardDAO.getDailySalesStat)
+    const dailyStat = ${dailySalesJson};
+
     const salesData = {
       daily: {
-        labels: ["5/13", "5/14", "5/15", "5/16", "5/17", "5/18", "5/19"],
-        sales: [2300000, 3700000, 2000000, 2300000, 2600000, 3600000, 3000000],
-        orders: [90, 150, 140, 145, 150, 200, 175]
+        labels: dailyStat.map(function (d) { return d.label; }),
+        sales: dailyStat.map(function (d) { return d.salesAmount; }),
+        orders: dailyStat.map(function (d) { return d.orderCount; })
       },
       weekly: {
         labels: ["1주", "2주", "3주", "4주", "5주"],
@@ -465,8 +468,23 @@
       }
     };
 
-    const salesMax = { daily: 5000000, weekly: 25000000, monthly: 80000000 };
-    const orderMax = { daily: 250, weekly: 1000, monthly: 3500 };
+    // 일간은 실데이터라 규모가 판매자마다 다르므로, 실제 최댓값에 여유를 두고 축 상한을 동적으로 잡는다
+    // (주간/월간은 아직 목업이라 기존처럼 고정값 사용)
+    function niceMax(values, step) {
+      const max = Math.max.apply(null, values.concat([0]));
+      return max > 0 ? Math.ceil(max * 1.2 / step) * step : step;
+    }
+
+    const salesMax = {
+      daily: niceMax(salesData.daily.sales, 100000),
+      weekly: 25000000,
+      monthly: 80000000
+    };
+    const orderMax = {
+      daily: niceMax(salesData.daily.orders, 10),
+      weekly: 1000,
+      monthly: 3500
+    };
 
     function formatAxis(value) {
       if (value >= 100000000) return (value / 100000000) + "억";
