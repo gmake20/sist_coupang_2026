@@ -46,9 +46,15 @@ public class VendorDashboardServlet extends HttpServlet {
 		VendorOrderStatSummaryDTO orderStat = orderListDAO.countStats(loginSeller.getSellerNo());
 		request.setAttribute("orderStat", orderStat);
 
-		// 매출 현황 차트(일간) - 최근 7일 실데이터. JS의 salesData.daily 자리를 이 JSON으로 채운다.
+		// 매출 현황 차트(일간/주간/월간) - 실데이터. JS의 salesData.daily/weekly/monthly 자리를 이 JSON으로 채운다.
 		List<VendorDailySalesDTO> dailySales = dao.getDailySalesStat(loginSeller.getSellerNo());
 		request.setAttribute("dailySalesJson", gson.toJson(dailySales));
+
+		List<VendorDailySalesDTO> weeklySales = dao.getWeeklySalesStat(loginSeller.getSellerNo());
+		request.setAttribute("weeklySalesJson", gson.toJson(weeklySales));
+
+		List<VendorDailySalesDTO> monthlySales = dao.getMonthlySalesStat(loginSeller.getSellerNo());
+		request.setAttribute("monthlySalesJson", gson.toJson(monthlySales));
 
 		request.getRequestDispatcher("/WEB-INF/views/vendor-dashboard.jsp").forward(request, response);
 	}

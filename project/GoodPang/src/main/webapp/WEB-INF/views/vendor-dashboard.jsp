@@ -304,128 +304,6 @@
 
       </section>
 
-
-      <!-- 하단 -->
-      <section class="bottom-row">
-
-        <article class="panel">
-
-          <div class="panel-head">
-            <h2>인기 상품 TOP 5</h2>
-            <a href="${pageContext.request.contextPath}/vendor/product" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
-          </div>
-
-          <table class="top-table">
-            <thead>
-              <tr>
-                <th>순위</th>
-                <th>상품명</th>
-                <th>판매수</th>
-                <th>매출액</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="rank">1</td>
-                <td class="product-name"><span class="thumb"></span>코멧 무선 청소기 V3</td>
-                <td>245</td>
-                <td>₩1,225,000</td>
-              </tr>
-              <tr>
-                <td class="rank">2</td>
-                <td class="product-name"><span class="thumb"></span>로켓프레시 베이직 생수 2L x 6</td>
-                <td>198</td>
-                <td>₩396,000</td>
-              </tr>
-              <tr>
-                <td class="rank">3</td>
-                <td class="product-name"><span class="thumb"></span>탐사 강아지 사료 3kg</td>
-                <td>156</td>
-                <td>₩468,000</td>
-              </tr>
-              <tr>
-                <td class="rank">4</td>
-                <td class="product-name"><span class="thumb"></span>홈플래닛 LED 스탠드</td>
-                <td>143</td>
-                <td>₩429,000</td>
-              </tr>
-              <tr>
-                <td class="rank">5</td>
-                <td class="product-name"><span class="thumb"></span>도브 바디워시 1L</td>
-                <td>127</td>
-                <td>₩317,500</td>
-              </tr>
-            </tbody>
-          </table>
-
-        </article>
-
-        <article class="panel">
-
-          <div class="panel-head">
-            <h2>매출 채널 비중</h2>
-            <a href="#" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
-          </div>
-
-          <div class="donut-wrap">
-
-            <div class="donut" id="channelDonut">
-              <div class="donut-center">
-                <strong>₩ 42,350,000</strong>
-                <span>(이번 달)</span>
-              </div>
-            </div>
-
-            <ul class="donut-legend">
-              <li><i class="dot dot-blue"></i>쿠팡 검색 <b>45%</b></li>
-              <li><i class="dot dot-teal"></i>추천/기획전 <b>25%</b></li>
-              <li><i class="dot dot-orange"></i>광고 <b>15%</b></li>
-              <li><i class="dot dot-mint"></i>즐겨찾기/찜 <b>10%</b></li>
-              <li><i class="dot dot-red"></i>기타 <b>5%</b></li>
-            </ul>
-
-          </div>
-
-        </article>
-
-        <article class="panel">
-
-          <div class="panel-head">
-            <h2>판매자 점수</h2>
-            <a href="#" class="more-link">자세히 보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
-          </div>
-
-          <div class="score-top">
-            <span class="score-face"><svg class="icon"><use href="#ic-smile" /></svg></span>
-            <div>
-              <strong class="score-grade">우수</strong>
-              <p>상위 20% 판매자입니다.<br>(최근 30일 기준)</p>
-            </div>
-          </div>
-
-          <div class="score-grid">
-            <div class="score-item">
-              <span class="score-num">4.8<small>/5</small></span>
-              <span class="score-name">배송 만족도</span>
-            </div>
-            <div class="score-item">
-              <span class="score-num">4.6<small>/5</small></span>
-              <span class="score-name">상품 만족도</span>
-            </div>
-            <div class="score-item">
-              <span class="score-num">4.7<small>/5</small></span>
-              <span class="score-name">고객 응대</span>
-            </div>
-            <div class="score-item">
-              <span class="score-num">5.0<small>/5</small></span>
-              <span class="score-name">정책 준수</span>
-            </div>
-          </div>
-
-        </article>
-
-      </section>
-
     </main>
 
   </div>
@@ -447,29 +325,27 @@
        매출 현황 차트 — 막대(매출액) + 선(주문수)
     ========================================================= */
 
-    // 최근 7일 실데이터 (VendorDashboardServlet -> VendorDashboardDAO.getDailySalesStat)
+    // 최근 7일/5주/5개월 실데이터 (VendorDashboardServlet -> VendorDashboardDAO.get*SalesStat)
     const dailyStat = ${dailySalesJson};
+    const weeklyStat = ${weeklySalesJson};
+    const monthlyStat = ${monthlySalesJson};
+
+    function toChartData(stat) {
+      return {
+        labels: stat.map(function (d) { return d.label; }),
+        sales: stat.map(function (d) { return d.salesAmount; }),
+        orders: stat.map(function (d) { return d.orderCount; })
+      };
+    }
 
     const salesData = {
-      daily: {
-        labels: dailyStat.map(function (d) { return d.label; }),
-        sales: dailyStat.map(function (d) { return d.salesAmount; }),
-        orders: dailyStat.map(function (d) { return d.orderCount; })
-      },
-      weekly: {
-        labels: ["1주", "2주", "3주", "4주", "5주"],
-        sales: [15200000, 18400000, 16800000, 21500000, 19600000],
-        orders: [620, 710, 680, 830, 760]
-      },
-      monthly: {
-        labels: ["1월", "2월", "3월", "4월", "5월"],
-        sales: [58000000, 61200000, 67400000, 72300000, 69800000],
-        orders: [2450, 2600, 2820, 3050, 2900]
-      }
+      daily: toChartData(dailyStat),
+      weekly: toChartData(weeklyStat),
+      monthly: toChartData(monthlyStat)
     };
 
-    // 일간은 실데이터라 규모가 판매자마다 다르므로, 실제 최댓값에 여유를 두고 축 상한을 동적으로 잡는다
-    // (주간/월간은 아직 목업이라 기존처럼 고정값 사용)
+    // 실데이터라 규모가 판매자마다 다르므로, 실제 최댓값에 여유를 두고 축 상한을 동적으로 잡는다
+    // (구간이 길수록 값이 커지니 step도 일간<주간<월간 순으로 크게)
     function niceMax(values, step) {
       const max = Math.max.apply(null, values.concat([0]));
       return max > 0 ? Math.ceil(max * 1.2 / step) * step : step;
@@ -477,13 +353,13 @@
 
     const salesMax = {
       daily: niceMax(salesData.daily.sales, 100000),
-      weekly: 25000000,
-      monthly: 80000000
+      weekly: niceMax(salesData.weekly.sales, 1000000),
+      monthly: niceMax(salesData.monthly.sales, 10000000)
     };
     const orderMax = {
       daily: niceMax(salesData.daily.orders, 10),
-      weekly: 1000,
-      monthly: 3500
+      weekly: niceMax(salesData.weekly.orders, 50),
+      monthly: niceMax(salesData.monthly.orders, 100)
     };
 
     function formatAxis(value) {
@@ -577,33 +453,6 @@
     });
 
     renderSalesChart("daily");
-
-
-    /* =========================================================
-       매출 채널 비중 — 도넛 차트 (conic-gradient)
-    ========================================================= */
-
-    const channelData = [
-      { pct: 45, color: "#4285f4" },
-      { pct: 25, color: "#17c9b0" },
-      { pct: 15, color: "#ff9f1c" },
-      { pct: 10, color: "#7bdcb5" },
-      { pct: 5, color: "#f4514a" }
-    ];
-
-    (function renderDonut() {
-      let stops = [];
-      let acc = 0;
-
-      channelData.forEach(function (item) {
-        const start = acc;
-        acc += item.pct;
-        stops.push(item.color + " " + start + "% " + acc + "%");
-      });
-
-      document.getElementById("channelDonut").style.background =
-        "conic-gradient(" + stops.join(", ") + ")";
-    })();
 
   </script>
 

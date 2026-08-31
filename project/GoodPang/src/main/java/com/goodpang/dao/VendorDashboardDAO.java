@@ -170,11 +170,124 @@ public class VendorDashboardDAO {
         return list;
     }
 
+    /*
+     * 매출 현황 차트(주간) - 최근 5주(이번 주 포함, 월요일 시작 ISO 주) 주별 매출액·주문수.
+     * 라벨은 각 주의 시작일(월요일)을 "M/d"로 표시. 나머지 로직은 일간과 동일한 날짜 스핀 + LEFT JOIN 방식.
+     */
+    public List<VendorDailySalesDTO> getWeeklySalesStat(int sellerNo) {
+
+        List<VendorDailySalesDTO> list = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                D.WEEK_START,
+                NVL(S.SALES_AMOUNT, 0) AS SALES_AMOUNT,
+                NVL(S.ORDER_COUNT, 0) AS ORDER_COUNT
+            FROM (
+                SELECT TRUNC(SYSDATE, 'IW') - (LEVEL - 1) * 7 AS WEEK_START
+                FROM DUAL
+                CONNECT BY LEVEL <= 5
+            ) D
+            LEFT JOIN (
+                SELECT
+                    TRUNC(O.ORDER_DATE, 'IW') AS WEEK_START,
+                    SUM(OD.PRICE * OD.ORDER_QTY) AS SALES_AMOUNT,
+                    COUNT(DISTINCT O.ORDER_NO) AS ORDER_COUNT
+                FROM ORDER_DETAIL OD
+                    JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+                    JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                WHERE P.SELLER_NO = ?
+                  AND O.ORDER_STATUS != '주문취소'
+                  AND O.ORDER_DATE >= TRUNC(SYSDATE, 'IW') - 28
+                GROUP BY TRUNC(O.ORDER_DATE, 'IW')
+            ) S ON S.WEEK_START = D.WEEK_START
+            ORDER BY D.WEEK_START
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setInt(1, sellerNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                while (rs.next()) {
+                    list.add(mapPeriodRow(rs, "WEEK_START", "M/d"));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    /*
+     * 매출 현황 차트(월간) - 최근 5개월(이번 달 포함) 월별 매출액·주문수.
+     */
+    public List<VendorDailySalesDTO> getMonthlySalesStat(int sellerNo) {
+
+        List<VendorDailySalesDTO> list = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                D.MONTH_START,
+                NVL(S.SALES_AMOUNT, 0) AS SALES_AMOUNT,
+                NVL(S.ORDER_COUNT, 0) AS ORDER_COUNT
+            FROM (
+                SELECT ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -(LEVEL - 1)) AS MONTH_START
+                FROM DUAL
+                CONNECT BY LEVEL <= 5
+            ) D
+            LEFT JOIN (
+                SELECT
+                    TRUNC(O.ORDER_DATE, 'MM') AS MONTH_START,
+                    SUM(OD.PRICE * OD.ORDER_QTY) AS SALES_AMOUNT,
+                    COUNT(DISTINCT O.ORDER_NO) AS ORDER_COUNT
+                FROM ORDER_DETAIL OD
+                    JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+                    JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                WHERE P.SELLER_NO = ?
+                  AND O.ORDER_STATUS != '주문취소'
+                  AND O.ORDER_DATE >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -4)
+                GROUP BY TRUNC(O.ORDER_DATE, 'MM')
+            ) S ON S.MONTH_START = D.MONTH_START
+            ORDER BY D.MONTH_START
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setInt(1, sellerNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                while (rs.next()) {
+                    list.add(mapPeriodRow(rs, "MONTH_START", "M월"));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
     private VendorDailySalesDTO mapDailyRow(ResultSet rs) throws java.sql.SQLException {
+        return mapPeriodRow(rs, "STAT_DATE", "M/d");
+    }
+
+    private VendorDailySalesDTO mapPeriodRow(ResultSet rs, String dateColumn, String labelPattern) throws java.sql.SQLException {
 
         VendorDailySalesDTO dto = new VendorDailySalesDTO();
 
-        dto.setLabel(rs.getDate("STAT_DATE").toLocalDate().format(DateTimeFormatter.ofPattern("M/d")));
+        dto.setLabel(rs.getDate(dateColumn).toLocalDate().format(DateTimeFormatter.ofPattern(labelPattern)));
         dto.setSalesAmount(rs.getLong("SALES_AMOUNT"));
         dto.setOrderCount(rs.getInt("ORDER_COUNT"));
 
