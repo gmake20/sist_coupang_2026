@@ -23,14 +23,15 @@ import com.goodpang.util.ConnectionProvider;
 public class CategoryInfo extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-    public CategoryInfo() {
-        super();
+	public CategoryInfo() {
+		super();
 
-    }
+	}
 
 	private static final Gson gson = new Gson();
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
 		String keyword = request.getParameter("keyword");
 
@@ -52,16 +53,17 @@ public class CategoryInfo extends HttpServlet {
 				CONNECT BY PRIOR category_no = parent_category_no
 				       AND LEVEL <= 3
 				ORDER SIBLINGS BY category_no
+
+
 				""";
 
 		List<CategoryDTO> categoryList = new ArrayList<>();
 		boolean hasError = false;
 
 		try (
-			Connection conn = ConnectionProvider.getConnection();
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			ResultSet rs = pstmt.executeQuery()
-		) {
+				Connection conn = ConnectionProvider.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+				ResultSet rs = pstmt.executeQuery()) {
 			while (rs.next()) {
 				long categoryNo = rs.getLong("category_no");
 				String categoryName = rs.getString("category_name");
@@ -70,11 +72,11 @@ public class CategoryInfo extends HttpServlet {
 				int categoryLevel = rs.getInt("category_level");
 
 				categoryList.add(new CategoryDTO(
-					categoryNo,
-					categoryName,
-					parentIsNull ? null : parentCategoryNo,
-					categoryLevel
-				));
+						categoryNo,
+						categoryName,
+						parentIsNull ? null : parentCategoryNo,
+						categoryLevel,
+						categoryLevel == 1 ? "/pds/category_" + categoryNo + ".png" : null));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -124,9 +126,8 @@ public class CategoryInfo extends HttpServlet {
 		boolean hasError = false;
 
 		try (
-			Connection conn = ConnectionProvider.getConnection();
-			PreparedStatement pstmt = conn.prepareStatement(sql)
-		) {
+				Connection conn = ConnectionProvider.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setString(1, keyword);
 
 			try (ResultSet rs = pstmt.executeQuery()) {
@@ -138,11 +139,11 @@ public class CategoryInfo extends HttpServlet {
 					int categoryLevel = rs.getInt("category_level");
 
 					resultList.add(new CategoryDTO(
-						categoryNo,
-						categoryName,
-						parentIsNull ? null : parentCategoryNo,
-						categoryLevel
-					));
+							categoryNo,
+							categoryName,
+							parentIsNull ? null : parentCategoryNo,
+							categoryLevel,
+							categoryLevel == 1 ? "./pds/category_" + categoryNo + ".png" : null));
 				}
 			}
 		} catch (Exception e) {
@@ -169,15 +170,15 @@ public class CategoryInfo extends HttpServlet {
 
 		for (CategoryDTO category : categoryList) {
 			groupedByLevel
-				.computeIfAbsent(category.getCategoryLevel(), level -> new ArrayList<>())
-				.add(category);
+					.computeIfAbsent(category.getCategoryLevel(), level -> new ArrayList<>())
+					.add(category);
 		}
 
 		return groupedByLevel;
 	}
 
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		doGet(request, response);
 	}
 

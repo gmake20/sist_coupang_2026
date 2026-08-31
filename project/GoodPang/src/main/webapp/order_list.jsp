@@ -53,8 +53,8 @@
 				<h3>MY 쇼핑</h3>
 				<li class="active"><a
 					href="${pageContext.request.contextPath}/order/order_list">주문목록/배송조회</a></li>
-				<a href="${pageContext.request.contextPath}/order/cancel_history">취소/반품/교환/환불
-					내역</a> <a href="#">와우 멤버십</a> <a href="#">구독 서비스 <span class="new">N</span></a>
+				<a href="${pageContext.request.contextPath}/cancel_history.jsp">취소/반품/교환/환불
+					내역</a> <a href="${pageContext.request.contextPath}/wow/membership">와우 멤버십</a> <a href="#">구독 서비스 <span class="new">N</span></a>
 				<a href="#">로켓프레시 프레시백 <span class="new">N</span></a> <a href="#">영수증
 					조회/출력</a>
 			</div>
@@ -66,7 +66,7 @@
 
 			<div class="side-section">
 				<h3>MY 활동</h3>
-				<a href="#">문의하기</a> <a href="#">문의내역 확인</a> <a href="#">리뷰관리</a> <a
+				<a href="#">문의하기</a> <a href="#">문의내역 확인</a> <a href="${pageContext.request.contextPath}/review/list">리뷰관리</a> <a
 					href="#">찜 리스트</a>
 			</div>
 
@@ -181,7 +181,7 @@
 											</div>
 											<div class="product-price"
 												style="font-size: 13px; color: #333; margin-bottom: 4px;">
-												<fmt:formatNumber value="${item.totalPrice}" pattern="#,###" />
+												<fmt:formatNumber value="${item.itemPrice * item.quantity}" pattern="#,###" />
 												원 <span>·</span> ${item.quantity}개
 											</div>
 											<c:if
@@ -324,33 +324,16 @@
 			</div>
 
 		</main>
+        
+        
+        <jsp:include page="/inc/right_banner.jsp" />
+        
+    
 
-		<!-- =========================
-             [3열] 우측 광고 배너 영역
-        ========================== -->
-		<aside class="right-banner">
-			<div class="banner banner-1">
-				<strong>쿠팡 only</strong>
-				<div class="banner-product">🧻</div>
-			</div>
-			<div class="banner banner-2">
-				<strong>추석연휴 숙소~64%</strong>
-				<div class="banner-character">🐰</div>
-			</div>
-			<div class="banner banner-3">
-				<strong>쿠팡이 직접 수입했어요!</strong>
-				<div class="banner-shop">🥤</div>
-			</div>
-			<div class="banner banner-4">
-				<strong>금주의 특가왕</strong>
-				<div class="banner-bell">🔔</div>
-				<div class="badge">1</div>
-			</div>
-		</aside>
 
 	</div>
 	<!-- //.mypage-container -->
-
+     
 	<jsp:include page="/inc/footer.jsp" />
 
 	<%-- <script src="${pageContext.request.contextPath}/js/order_list.js"></script> --%>

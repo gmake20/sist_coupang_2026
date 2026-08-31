@@ -126,92 +126,6 @@
 
 									</div>
 								</div>
-
-
-								<!-- 리뷰 내용 -->
-								<%-- <div class="review-body">
-
-									<div class="review-top">
-										<div class="review-stars">${review.ratingStars}</div>
-
-										<div class="review-date">
-											<fmt:formatDate value="${review.reviewDate}"
-												pattern="yyyy.MM.dd" />
-										</div>
-									</div>
-
-									<c:if test="${not empty review.reviewSummary}">
-										<div class="review-summary">${review.reviewSummary}</div>
-									</c:if>
-
-									<div class="review-content">
-										<c:out value="${review.reviewContent}" />
-									</div>
-									 --%>
-
-								<%-- <div class="mypang-review-body">
-									<div class="mypang-review-top">
-										<div class="mypang-review-stars">${review.ratingStars}</div>
-										<div class="mypang-review-date">
-											<fmt:formatDate value="${review.reviewDate}"
-												pattern="yyyy.MM.dd" />
-										</div>
-									</div>
-									<c:if test="${not empty review.reviewSummary}">
-										<div class="mypang-review-summary">
-											<c:out value="${review.reviewSummary}" />
-										</div>
-									</c:if>
-									<div class="mypang-review-content">
-										<c:out value="${review.reviewContent}" />
-									</div>
-									<c:if test="${not empty review.serviceRating}">
-										<div class="service-rating">
-											서비스 만족도 :
-											<c:choose>
-												<c:when test="${review.serviceRating == 2}">
-								                    👍 만족
-								                </c:when>
-
-												<c:otherwise>
-								                    👎 불만족
-								                </c:otherwise>
-											</c:choose>
-										</div>
-									</c:if>
-								</div>
-
-
-								<!-- 서비스 평가 -->
-								<c:if test="${not empty review.serviceRating}">
-									<div class="service-rating">
-										서비스 만족도 :
-										<c:choose>
-											<c:when test="${review.serviceRating == 2}">
-                                                👍 만족
-                                            </c:when>
-											<c:otherwise>
-                                                👎 불만족
-                                            </c:otherwise>
-										</c:choose>
-									</div>
-								</c:if>
-								<!-- 리뷰 관리 버튼 -->
-								<div class="review-actions">
-									<a
-										href="${pageContext.request.contextPath}/review/edit?reviewNo=${review.reviewNo}"
-										class="review-btn"> 수정 </a>
-									<form action="${pageContext.request.contextPath}/review/delete"
-										method="post" class="delete-form">
-
-										<input type="hidden" name="reviewNo"
-											value="${review.reviewNo}">
-
-										<button type="submit" class="review-btn delete-btn"
-											onclick="return confirm('리뷰를 삭제하시겠습니까?');">삭제</button>
-									</form>
-								</div>
-							</div> --%>
 								<div class="mypang-review-body">
 									<div class="mypang-review-top">
 										<div class="mypang-review-stars">${review.ratingStars}</div>
@@ -268,41 +182,7 @@
 
 		</main>
 
-		<!-- 오른쪽 광고 -->
-		<aside class="right-banner" aria-label="프로모션">
-
-			<div class="ad-box ad-only">
-				<div class="ad-title">
-					<strong>GoodPang</strong> <em>only</em>
-				</div>
-				<div class="ad-icon">🛍️</div>
-			</div>
-
-			<div class="ad-box ad-blue">
-				<strong> ~5만원<br> 쿠폰 할인
-				</strong>
-				<div class="ad-icon">🏖️</div>
-			</div>
-
-			<div class="ad-box ad-sky">
-				<strong> GoodPang<br> 이 직접<br> 수입했어요!
-				</strong>
-				<div class="ad-icon">🥤</div>
-			</div>
-
-			<div class="ad-box ad-purple">
-				<strong> 금주의<br> 특가왕
-				</strong>
-				<div class="ad-icon">🔔</div>
-			</div>
-
-			<div class="ad-box ad-red">
-				<strong> GoodPang<br> 에서<br> 판매 시작하기
-				</strong>
-				<div class="ad-icon">🏪</div>
-			</div>
-
-		</aside>
+		 <jsp:include page="/inc/right_banner.jsp" />
 	</div>
 
 	<jsp:include page="/inc/footer.jsp" />

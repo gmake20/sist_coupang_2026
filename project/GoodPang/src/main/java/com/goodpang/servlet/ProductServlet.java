@@ -7,22 +7,39 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.goodpang.dao.ProductDAO;
+import com.goodpang.dao.ProductImageDAO;
+import com.goodpang.dao.ProductOptionDAO;
+import com.goodpang.dao.ReviewDAO;
+import com.goodpang.dao.WowMembershipDAO;
+import com.goodpang.dto.MemberDTO;
+import com.goodpang.dto.ProductDTO;
+import com.goodpang.dto.ProductImageDTO;
+import com.goodpang.dto.ProductOptionDTO;
+import com.goodpang.dto.ReviewDTO;
+import com.google.gson.Gson;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+<<<<<<< HEAD
+import jakarta.servlet.http.HttpSession;
+=======
 
 import com.google.gson.Gson;
 
 import com.goodpang.dao.ProductDAO;
 import com.goodpang.dao.ProductImageDAO;
 import com.goodpang.dao.ProductOptionDAO;
+import com.goodpang.dao.ProductViewLogDAO;
 import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.ProductDTO;
 import com.goodpang.dto.ProductImageDTO;
 import com.goodpang.dto.ProductOptionDTO;
 import com.goodpang.dto.ReviewDTO;
+>>>>>>> 5ba6b04e9a3a1bea7460c30b322ae4e0b2707a3c
 
 
 @WebServlet("/product")
@@ -37,9 +54,36 @@ public class ProductServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String productNoParam = request.getParameter("productNo");
+        
+        WowMembershipDAO wowMembershipDAO =
+                new WowMembershipDAO();
 
-        System.out.println("[DEBUG ProductServlet] === 상품 상세 조회 시작 ===");
-        System.out.println("[DEBUG ProductServlet] 전달받은 productNoParam: " + productNoParam);
+        boolean isWowMember = false;
+
+        HttpSession session =
+                request.getSession(false);
+
+        if (session != null) {
+
+            MemberDTO loginMember =
+                    (MemberDTO) session.getAttribute(
+                            "loginMember"
+                    );
+
+            if (loginMember != null) {
+
+                isWowMember =
+                        wowMembershipDAO.isWowMember(
+                                loginMember.getMemberNo()
+                        );
+            }
+        }
+
+        request.setAttribute(
+                "isWowMember",
+                isWowMember
+        );
+        
 
         try {
             if (productNoParam != null && !productNoParam.isEmpty()) {
@@ -50,7 +94,6 @@ public class ProductServlet extends HttpServlet {
                 ProductDTO product = dao.selectProduct(productNo);
 
                 if (product == null) {
-                    System.out.println("[DEBUG ProductServlet] 상품을 찾을 수 없음: productNo=" + productNo);
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "상품을 찾을 수 없습니다.");
                     return;
                 }
@@ -61,17 +104,52 @@ public class ProductServlet extends HttpServlet {
                 String deliveryDate = "내일(" + dayOfWeek + ") " + tomorrow.getMonthValue() + "/" + tomorrow.getDayOfMonth();
                 request.setAttribute("deliveryDate", deliveryDate);
 
-                // 적립 혜택 — 가격의 5%
-                int rewardCash = product.getProductPrice() * 5 / 100;
-                request.setAttribute("rewardCash", rewardCash);
-
                 request.setAttribute("p", product);
+
+                // 판매자센터 대시보드의 "오늘 방문자수" / "오늘 상품 노출수" 집계용 조회 로그
+                Integer memberNo = (Integer) request.getSession().getAttribute("memberNo");
+                new ProductViewLogDAO().logView(productNo, memberNo, request.getSession().getId());
 
                 // 옵션 + 옵션별/상세설명 사진
                 //  옵션 하나(OPTION_ID)마다 대표/추가 사진이 딸려있고, OPTION_ID 가 null 인 사진은
                 //  상세설명용이라 따로 뺌)
                 ProductOptionDAO optionDAO = new ProductOptionDAO();
                 List<ProductOptionDTO> options = optionDAO.selectOptionsByProductNo(productNo);
+
+                /* 2026-08-30 확정 — PRODUCT_OPTION.PRICE/NORMAL_PRICE 는 PRODUCT.PRODUCT_PRICE(기본가)에
+                   더해지는 "추가금"(CartDAO.getCartItems() 와 같은 전제). 그래서:
+                     판매가 총액 = PRODUCT_PRICE + 옵션의 PRICE       (할인된 추가금)
+                     정상가 총액 = PRODUCT_PRICE + 옵션의 NORMAL_PRICE (할인 전 추가금, 선택 입력이라 없을 수 있음)
+                   정상가 총액이 판매가 총액보다 클 때만 "할인 중"으로 보고 취소선/할인율을 보여줌.
+                   지금은(2026-08-30) NORMAL_PRICE 를 채운 판매자가 없어서 할인 표시가 실제로는 안 뜨는데,
+                   판매자가 정상가를 입력하기 시작하면 코드 수정 없이 자동으로 뜨게 됨. */
+                int displayPrice = product.getProductPrice();
+                Integer displayNormalPrice = null;
+
+                if (!options.isEmpty()) {
+                    ProductOptionDTO firstOption = options.get(0);
+                    displayPrice = product.getProductPrice() + firstOption.getPrice();
+
+                    if (firstOption.getNormalPrice() != null) {
+                        int normalTotal = product.getProductPrice() + firstOption.getNormalPrice();
+                        if (normalTotal > displayPrice) {
+                            displayNormalPrice = normalTotal;
+                        }
+                    }
+                }
+
+                int discountRate = 0;
+                if (displayNormalPrice != null && displayNormalPrice > 0) {
+                    discountRate = (int) Math.round((1 - (double) displayPrice / displayNormalPrice) * 100);
+                }
+
+                request.setAttribute("displayPrice", displayPrice);
+                request.setAttribute("displayNormalPrice", displayNormalPrice);
+                request.setAttribute("discountRate", discountRate);
+
+                // 적립 혜택 — 가격의 5% (옵션 가격 기준으로 계산해야 해서 옵션 조회 뒤로 옮김)
+                int rewardCash = displayPrice * 5 / 100;
+                request.setAttribute("rewardCash", rewardCash);
 
                 ProductImageDAO imageDAO = new ProductImageDAO();
                 List<ProductImageDTO> images = imageDAO.selectImagesByProductNo(productNo);

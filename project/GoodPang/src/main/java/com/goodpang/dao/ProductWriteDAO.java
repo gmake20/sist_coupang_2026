@@ -82,7 +82,7 @@ public class ProductWriteDAO {
             ) VALUES (
                 ?, ?, ?,
                 ?, ?, ?, ?, ?,
-                'Y', NULL, NULL,
+                'Y', ?, 0,
                 ?, ?, ?, ?,
                 ?, ?, NULL,
                 ?, NULL, NULL, ?,
@@ -109,6 +109,8 @@ public class ProductWriteDAO {
             pstmt.setString(i++, dto.getNoBrandYn());
             pstmt.setString(i++, dto.getProductName());
             pstmt.setString(i++, dto.getInternalName());
+
+            pstmt.setInt(i++, dto.getProductPrice());
 
             pstmt.setString(i++, dto.getManufacturer());
             pstmt.setString(i++, dto.getCompositionType());

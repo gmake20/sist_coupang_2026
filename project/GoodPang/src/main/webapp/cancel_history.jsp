@@ -788,67 +788,7 @@ footer {
 
     </main>
     
-		<!-- =========================
-         오른쪽 광고 영역
-    ========================== -->
-		<aside class="right-banner">
-
-			<div class="banner banner-1">
-				<strong>쿠팡 only</strong> <span>›</span>
-				<div class="banner-product">📦</div>
-			</div>
-
-
-			<div class="banner banner-2">
-				<strong>~5만원<br>쿠폰 할인
-				</strong> <span>›</span>
-				<div class="banner-character">🏝️</div>
-			</div>
-
-
-			<div class="banner banner-3">
-				<strong>쿠팡이 직접<br> <em>수입</em>했어요!
-				</strong> <span>›</span>
-
-				<div class="banner-product">🧴</div>
-			</div>
-
-
-			<div class="banner banner-4">
-				<strong> 금주의<br> 특가왕
-				</strong> <span>›</span>
-
-				<div class="banner-bell">🔔</div>
-
-				<b class="badge">1</b>
-			</div>
-
-
-			<div class="banner banner-5">
-				<strong> 쿠팡에서<br> 판매 시작하기
-				</strong> <span>›</span>
-
-				<div class="banner-shop">🛍️</div>
-			</div>
-
-
-			<div class="side-mini-menu">
-
-				<div>
-					장바구니 <strong>2</strong>
-				</div>
-
-				<div>
-					최근본상품 <strong>15</strong>
-				</div>
-
-			</div>
-
-
-			<div class="recent-product">👟</div>
-
-		</aside>
-    
+	<jsp:include page="/inc/right_banner.jsp" />	
 
 </div>
 

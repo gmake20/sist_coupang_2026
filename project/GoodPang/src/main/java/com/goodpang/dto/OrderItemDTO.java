@@ -19,8 +19,9 @@ public class OrderItemDTO {
 	private String orderStatus; 
 	/* private LocalDate orderDate; */
 	private Timestamp orderDate;
-	private int totalPrice; 
-	private String productName; 
+	private int totalPrice;
+	private int itemPrice;
+	private String productName;
 	private int quantity;
 	private String option1Type;
 	private String option1Value;

@@ -18,250 +18,273 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/payment-method/add")
 public class PaymentMethodAddServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    private final PaymentMethodDAO paymentMethodDAO = new PaymentMethodDAO();
 
-	@Override
-	protected void doPost(
-			HttpServletRequest request,
-			HttpServletResponse response)
-			throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		request.setCharacterEncoding("UTF-8");
+        MemberDTO loginMember = LoginUtil.requireLogin(request, response);
 
-		MemberDTO member =
-				LoginUtil.requireLogin(request, response);
+        if (loginMember == null) {
+            return;
+        }
 
-		if (member == null) {
-			return;
-		}
+        String redirect = request.getParameter("redirect");
 
-		int memberNo = member.getMemberNo();
+        if (redirect != null && !redirect.isBlank()) {
+            request.getSession().setAttribute("paymentMethodRedirect", redirect);
+        }
 
-		String checkoutNo =
-				request.getParameter("checkoutNo");
+        request.getRequestDispatcher("/WEB-INF/views/payment_method_add.jsp")
+               .forward(request, response);
+    }
 
-		String paymentType =
-				request.getParameter("paymentType");
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		String bankCode =
-				request.getParameter("bankCode");
+        request.setCharacterEncoding("UTF-8");
 
-		String accountNumber =
-				request.getParameter("accountNumber");
+        MemberDTO member = LoginUtil.requireLogin(request, response);
 
-		String accountHolder =
-				request.getParameter("accountHolder");
+        if (member == null) {
+            return;
+        }
 
-		String cardCompany =
-				request.getParameter("cardCompany");
+        int memberNo = member.getMemberNo();
 
-		String cardNumber1 =
-				request.getParameter("cardNumber1");
+        String checkoutNoParam = request.getParameter("checkoutNo");
+        Integer checkoutNo = null;
 
-		String cardNumber2 =
-				request.getParameter("cardNumber2");
+        if (checkoutNoParam != null && !checkoutNoParam.isBlank()) {
+            try {
+                checkoutNo = Integer.parseInt(checkoutNoParam);
+            } catch (NumberFormatException e) {
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "잘못된 checkout 번호입니다."
+                );
+                return;
+            }
+        }
 
-		String cardNumber3 =
-				request.getParameter("cardNumber3");
+        String redirect = request.getParameter("redirect");
+        String paymentType = request.getParameter("paymentType");
+        String bankCode = request.getParameter("bankCode");
+        String accountNumber = request.getParameter("accountNumber");
+        String accountHolder = request.getParameter("accountHolder");
+        String cardCompany = request.getParameter("cardCompany");
+        String cardNumber1 = request.getParameter("cardNumber1");
+        String cardNumber2 = request.getParameter("cardNumber2");
+        String cardNumber3 = request.getParameter("cardNumber3");
+        String cardNumber4 = request.getParameter("cardNumber4");
+        String paymentDefaultParam = request.getParameter("paymentDefault");
 
-		String cardNumber4 =
-				request.getParameter("cardNumber4");
+        if (paymentType == null || paymentType.isBlank()) {
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "결제수단 종류가 없습니다."
+            );
+            return;
+        }
 
-		String paymentDefaultParam =
-				request.getParameter("paymentDefault");
+        boolean paymentDefault = "Y".equals(paymentDefaultParam);
 
-		if (checkoutNo == null
-				|| checkoutNo.isBlank()) {
+        PaymentMethodDTO dto = new PaymentMethodDTO();
+        dto.setMemberNo(memberNo);
+        dto.setPaymentType(paymentType);
+        dto.setPaymentDefault(paymentDefault);
 
-			response.sendError(
-					HttpServletResponse.SC_BAD_REQUEST,
-					"checkout 번호가 없습니다."
-			);
-			return;
-		}
+        if ("BANK".equals(paymentType)) {
 
-		if (paymentType == null
-				|| paymentType.isBlank()) {
+            if (bankCode == null || bankCode.isBlank()) {
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "은행을 선택해주세요."
+                );
+                return;
+            }
 
-			response.sendError(
-					HttpServletResponse.SC_BAD_REQUEST,
-					"결제수단 종류가 없습니다."
-			);
-			return;
-		}
+            if (accountNumber == null || accountNumber.isBlank()) {
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "계좌번호를 입력해주세요."
+                );
+                return;
+            }
 
-		boolean paymentDefault =
-				"Y".equals(paymentDefaultParam);
+            if (accountHolder == null || accountHolder.isBlank()) {
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "예금주를 입력해주세요."
+                );
+                return;
+            }
 
-		PaymentMethodDTO dto =
-				new PaymentMethodDTO();
+            accountNumber = accountNumber.replace("-", "").trim();
 
-		dto.setMemberNo(memberNo);
-		dto.setPaymentType(paymentType);
-		dto.setPaymentDefault(paymentDefault);
+            if (!accountNumber.matches("[0-9]{10,14}")) {
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "계좌번호는 숫자 10~14자리로 입력해주세요."
+                );
+                return;
+            }
 
-		if ("BANK".equals(paymentType)) {
+            accountHolder = accountHolder.trim();
 
-			if (bankCode == null
-					|| bankCode.isBlank()
-					|| accountNumber == null
-					|| accountNumber.isBlank()
-					|| accountHolder == null
-					|| accountHolder.isBlank()) {
+            if (accountHolder.length() > 10) {
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "예금주는 최대 10자리까지 입력할 수 있습니다."
+                );
+                return;
+            }
 
-				response.sendError(
-						HttpServletResponse.SC_BAD_REQUEST,
-						"계좌 정보를 입력해주세요."
-				);
-				return;
-			}
+            String accountLast4 =
+                    accountNumber.substring(accountNumber.length() - 4);
 
-			accountNumber =
-					accountNumber.replace("-", "");
+            dto.setBankCode(bankCode);
+            dto.setAccountLast4(accountLast4);
+            dto.setAccountHolder(accountHolder);
 
-			if (!accountNumber.matches("[0-9]+")) {
-				response.sendError(
-						HttpServletResponse.SC_BAD_REQUEST,
-						"계좌번호는 숫자만 입력해주세요."
-				);
-				return;
-			}
+        } else if ("CARD".equals(paymentType)) {
 
-			if (accountNumber.length() < 4) {
-				response.sendError(
-						HttpServletResponse.SC_BAD_REQUEST,
-						"계좌번호가 올바르지 않습니다."
-				);
-				return;
-			}
+            if (cardCompany == null || cardCompany.isBlank()) {
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "카드사를 선택해주세요."
+                );
+                return;
+            }
 
-			String accountLast4 =
-					accountNumber.substring(
-							accountNumber.length() - 4
-					);
+            if (!value(cardNumber1).matches("[0-9]{4}")
+                    || !value(cardNumber2).matches("[0-9]{4}")
+                    || !value(cardNumber3).matches("[0-9]{4}")
+                    || !value(cardNumber4).matches("[0-9]{4}")) {
 
-			dto.setBankCode(bankCode);
-			dto.setAccountLast4(accountLast4);
-			dto.setAccountHolder(accountHolder);
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "카드번호는 각 칸에 숫자 4자리씩 입력해주세요."
+                );
+                return;
+            }
 
-		} else if ("CARD".equals(paymentType)) {
+            String cardNumber =
+                    value(cardNumber1)
+                    + value(cardNumber2)
+                    + value(cardNumber3)
+                    + value(cardNumber4);
 
-			if (cardCompany == null
-					|| cardCompany.isBlank()) {
+            String cardLast4 = cardNumber.substring(12);
 
-				response.sendError(
-						HttpServletResponse.SC_BAD_REQUEST,
-						"카드사를 선택해주세요."
-				);
-				return;
-			}
+            dto.setCardCompany(cardCompany);
+            dto.setCardLast4(cardLast4);
 
-			String cardNumber =
-					value(cardNumber1)
-					+ value(cardNumber2)
-					+ value(cardNumber3)
-					+ value(cardNumber4);
+        } else {
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "지원하지 않는 결제수단입니다."
+            );
+            return;
+        }
 
-			if (!cardNumber.matches("[0-9]{16}")) {
-				response.sendError(
-						HttpServletResponse.SC_BAD_REQUEST,
-						"카드번호 16자리를 정확하게 입력해주세요."
-				);
-				return;
-			}
+        Connection conn = null;
 
-			String cardLast4 =
-					cardNumber.substring(12);
+        try {
+            conn = ConnectionProvider.getConnection();
+            conn.setAutoCommit(false);
 
-			dto.setCardCompany(cardCompany);
-			dto.setCardLast4(cardLast4);
+            if (paymentDefault) {
+                paymentMethodDAO.clearDefault(conn, memberNo, paymentType);
+            }
 
-		} else {
-			response.sendError(
-					HttpServletResponse.SC_BAD_REQUEST,
-					"지원하지 않는 결제수단입니다."
-			);
-			return;
-		}
+            int result;
 
-		Connection conn = null;
+            if ("BANK".equals(paymentType)) {
+                result = paymentMethodDAO.insertBankAccount(conn, dto);
+            } else {
+                result = paymentMethodDAO.insertCard(conn, dto);
+            }
 
-		try {
-			conn = ConnectionProvider.getConnection();
-			conn.setAutoCommit(false);
+            if (result <= 0) {
+                throw new Exception("결제수단 등록 실패");
+            }
 
-			PaymentMethodDAO dao =
-					new PaymentMethodDAO();
+            conn.commit();
 
-			if (paymentDefault) {
-				dao.clearDefault(
-						conn,
-						memberNo,
-						paymentType
-				);
-			}
+            if (redirect != null
+                    && !redirect.isBlank()
+                    && redirect.startsWith("/")) {
 
-			int result;
+                response.sendRedirect(
+                        request.getContextPath() + redirect
+                );
+                return;
+            }
 
-			if ("BANK".equals(paymentType)) {
-				result =
-						dao.insertBankAccount(
-								conn,
-								dto
-						);
-			} else {
-				result =
-						dao.insertCard(
-								conn,
-								dto
-						);
-			}
+            String sessionRedirect =
+                    (String) request.getSession()
+                            .getAttribute("paymentMethodRedirect");
 
-			if (result <= 0) {
-				throw new Exception(
-						"결제수단 등록 실패"
-				);
-			}
+            if (sessionRedirect != null
+                    && !sessionRedirect.isBlank()
+                    && sessionRedirect.startsWith("/")) {
 
-			conn.commit();
+                request.getSession()
+                       .removeAttribute("paymentMethodRedirect");
 
-			response.sendRedirect(
-					request.getContextPath()
-					+ "/order/payment?checkoutNo="
-					+ checkoutNo
-			);
+                response.sendRedirect(
+                        request.getContextPath() + sessionRedirect
+                );
+                return;
+            }
 
-		} catch (Exception e) {
+            if (checkoutNo != null) {
+                response.sendRedirect(
+                        request.getContextPath()
+                        + "/order/payment?checkoutNo="
+                        + checkoutNo
+                );
+                return;
+            }
 
-			if (conn != null) {
-				try {
-					conn.rollback();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/payment-method/list"
+            );
 
-			throw new ServletException(
-					"결제수단 등록 중 오류가 발생했습니다.",
-					e
-			);
+        } catch (Exception e) {
 
-		} finally {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
 
-			if (conn != null) {
-				try {
-					conn.setAutoCommit(true);
-					conn.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+            throw new ServletException(
+                    "결제수단 등록 중 오류가 발생했습니다.",
+                    e
+            );
 
-	private String value(String value) {
-		return value == null
-				? ""
-				: value.trim();
-	}
+        } finally {
+
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private String value(String value) {
+        return value == null ? "" : value.trim();
+    }
 }
