@@ -3499,9 +3499,7 @@
 const isLogin =
     ${not empty sessionScope.loginMember};
 
-const isWowMember =
-    ${not empty sessionScope.loginMember
-      and sessionScope.loginMember.rank eq 'WOW'};
+const isWowMember = ${sessionScope.wowMember};
 
 document.addEventListener("DOMContentLoaded", function () {
 

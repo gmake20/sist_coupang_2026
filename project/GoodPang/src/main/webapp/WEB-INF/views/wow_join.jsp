@@ -87,13 +87,15 @@
 					<h2>결제수단</h2>
 
 					<c:choose>
+						<%-- 등록된 결제수단이 있는 경우 --%>
 						<c:when test="${not empty paymentMethods}">
 							<div class="wow-payment-method-list">
 								<c:forEach var="payment" items="${paymentMethods}"
 									varStatus="status">
+
 									<label class="wow-payment-method"> <input type="radio"
 										name="paymentMethodNo" value="${payment.paymentMethodNo}"
-										<c:if test="${status.first}">checked</c:if>>
+										${status.first ? 'checked' : ''}>
 
 										<div class="wow-payment-info">
 											<c:choose>
@@ -121,16 +123,23 @@
 											</c:if>
 										</div>
 									</label>
+
 								</c:forEach>
 							</div>
+
+							<button type="button"
+								class="wow-payment-add-btn paymentAddOpenBtn">+ 다른 결제수단
+								등록하기</button>
 						</c:when>
 
+						<%-- 등록된 결제수단이 없는 경우 --%>
 						<c:otherwise>
 							<div class="wow-no-payment">
 								<p>등록된 결제수단이 없습니다.</p>
+
 								<button type="button"
-									onclick="location.href='${pageContext.request.contextPath}/payment-method/list'">
-									결제수단 등록하기</button>
+									class="wow-payment-add-btn paymentAddOpenBtn">결제수단
+									등록하기</button>
 							</div>
 						</c:otherwise>
 					</c:choose>
@@ -143,7 +152,6 @@
 						<div class="wow-price-row">
 							<span>와우 멤버십</span> <strong>월 7,890원</strong>
 						</div>
-
 						<p>매월 선택한 결제수단으로 자동 결제됩니다.</p>
 					</div>
 				</section>
@@ -162,47 +170,332 @@
 					disabled>와우 멤버십 가입하기</button>
 			</form>
 
-			<button type="button" class="wow-back-btn" onclick="history.back()">다음에
-				할게요</button>
+			<button type="button" class="wow-back-btn" onclick="history.back()">
+				다음에 할게요</button>
 
 		</div>
 	</div>
 
+
+	<%-- 결제수단 등록 모달 --%>
+	<div id="paymentAddModal" class="payment-add-overlay">
+		<div class="payment-add-modal">
+			<button type="button" id="paymentAddCloseBtn"
+				class="payment-add-close">&times;</button>
+
+			<div class="payment-add-header">
+				<h2>결제수단 등록</h2>
+				<p>와우 멤버십 결제에 사용할 결제수단을 등록해주세요.</p>
+			</div>
+
+			<form action="${pageContext.request.contextPath}/payment-method/add"
+				method="post" id="paymentAddForm">
+
+				<input type="hidden" name="redirect" value="/wow/join">
+
+				<div class="payment-type-list">
+					<label class="payment-type-item"> <input type="radio"
+						name="paymentType" value="BANK" checked> <span>계좌</span>
+					</label> <label class="payment-type-item"> <input type="radio"
+						name="paymentType" value="CARD"> <span>카드</span>
+					</label>
+				</div>
+
+				<%-- 계좌 --%>
+				<div id="bankSection" class="payment-input-section">
+					<div class="payment-field">
+						<label for="bankCode">은행</label> <select id="bankCode"
+							name="bankCode">
+							<option value="">은행을 선택해주세요.</option>
+							<option value="SHINHAN">신한은행</option>
+							<option value="KB">KB국민은행</option>
+							<option value="WOORI">우리은행</option>
+							<option value="NH">NH농협은행</option>
+							<option value="HANA">하나은행</option>
+							<option value="KAKAO">카카오뱅크</option>
+							<option value="TOSS">토스뱅크</option>
+						</select>
+					</div>
+
+					<div class="payment-field">
+						<label for="accountNumber">계좌번호</label> <input type="text"
+							id="accountNumber" name="accountNumber"
+							placeholder="- 없이 숫자 10~14자리" inputmode="numeric" maxlength="14"
+							autocomplete="off">
+					</div>
+
+					<div class="payment-field">
+						<label for="accountHolder">예금주</label> <input type="text"
+							id="accountHolder" name="accountHolder" placeholder="예금주명 입력"
+							maxlength="10">
+					</div>
+				</div>
+
+				<%-- 카드 --%>
+				<div id="cardSection" class="payment-input-section"
+					style="display: none;">
+					<div class="payment-field">
+						<label for="cardCompany">카드사</label> <select id="cardCompany"
+							name="cardCompany">
+							<option value="">카드사를 선택해주세요.</option>
+							<option value="SHINHAN">신한카드</option>
+							<option value="KB">KB국민카드</option>
+							<option value="SAMSUNG">삼성카드</option>
+							<option value="HYUNDAI">현대카드</option>
+							<option value="LOTTE">롯데카드</option>
+							<option value="HANA">하나카드</option>
+							<option value="WOORI">우리카드</option>
+						</select>
+					</div>
+
+					<div class="payment-field">
+						<label>카드번호</label>
+
+						<div class="card-number-group">
+							<input type="text" id="cardNumber1" name="cardNumber1"
+								class="card-number-part" inputmode="numeric" maxlength="4"
+								autocomplete="off"> <span class="card-number-dash">-</span>
+
+							<input type="text" id="cardNumber2" name="cardNumber2"
+								class="card-number-part" inputmode="numeric" maxlength="4"
+								autocomplete="off"> <span class="card-number-dash">-</span>
+
+							<input type="password" id="cardNumber3" name="cardNumber3"
+								class="card-number-part" inputmode="numeric" maxlength="4"
+								autocomplete="off"> <span class="card-number-dash">-</span>
+
+							<input type="password" id="cardNumber4" name="cardNumber4"
+								class="card-number-part" inputmode="numeric" maxlength="4"
+								autocomplete="off">
+						</div>
+
+						<p class="payment-field-help">카드번호 16자리를 입력해주세요.</p>
+					</div>
+				</div>
+
+				<label class="payment-default-label"> <input type="checkbox"
+					name="paymentDefault" value="Y"> <span>기본 결제수단으로 설정</span>
+				</label>
+
+				<div class="payment-add-buttons">
+					<button type="button" id="paymentAddCancelBtn"
+						class="payment-cancel-btn">취소</button>
+					<button type="submit" class="payment-submit-btn">등록하기</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+
 	<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const agree = document.getElementById("wowAgree");
-    const submitBtn = document.getElementById("wowSubmitBtn");
-    const paymentMethods = document.querySelectorAll('input[name="paymentMethodNo"]');
+		document
+				.addEventListener(
+						"DOMContentLoaded",
+						function() {
 
-    function checkForm() {
-        const selectedPayment = document.querySelector('input[name="paymentMethodNo"]:checked');
-        submitBtn.disabled = !(agree.checked && selectedPayment);
-    }
+							/* 와우 가입 */
+							const agree = document.getElementById("wowAgree");
+							const submitBtn = document
+									.getElementById("wowSubmitBtn");
+							const wowJoinForm = document
+									.getElementById("wowJoinForm");
+							const paymentMethods = document
+									.querySelectorAll('input[name="paymentMethodNo"]');
 
-    agree.addEventListener("change", checkForm);
+							function checkWowForm() {
+								const selectedPayment = document
+										.querySelector('input[name="paymentMethodNo"]:checked');
+								submitBtn.disabled = !(agree.checked && selectedPayment);
+							}
 
-    paymentMethods.forEach(function(payment) {
-        payment.addEventListener("change", checkForm);
-    });
+							agree.addEventListener("change", checkWowForm);
 
-    document.getElementById("wowJoinForm").addEventListener("submit", function(event) {
-        const selectedPayment = document.querySelector('input[name="paymentMethodNo"]:checked');
+							paymentMethods.forEach(function(payment) {
+								payment
+										.addEventListener("change",
+												checkWowForm);
+							});
 
-        if (!selectedPayment) {
-            event.preventDefault();
-            alert("결제수단을 선택해주세요.");
-            return;
-        }
+							wowJoinForm
+									.addEventListener(
+											"submit",
+											function(event) {
+												const selectedPayment = document
+														.querySelector('input[name="paymentMethodNo"]:checked');
 
-        if (!agree.checked) {
-            event.preventDefault();
-            alert("와우 멤버십 이용 조건에 동의해주세요.");
-        }
-    });
+												if (!selectedPayment) {
+													event.preventDefault();
+													alert("결제수단을 선택해주세요.");
+													return;
+												}
 
-    checkForm();
-});
-</script>
+												if (!agree.checked) {
+													event.preventDefault();
+													alert("와우 멤버십 이용 조건에 동의해주세요.");
+													return;
+												}
+											});
+
+							/* 결제수단 등록 모달 */
+							const openBtns = document
+									.querySelectorAll(".paymentAddOpenBtn");
+							const modal = document
+									.getElementById("paymentAddModal");
+							const closeBtn = document
+									.getElementById("paymentAddCloseBtn");
+							const cancelBtn = document
+									.getElementById("paymentAddCancelBtn");
+							const paymentAddForm = document
+									.getElementById("paymentAddForm");
+							const paymentTypes = document
+									.querySelectorAll('#paymentAddForm input[name="paymentType"]');
+							const bankSection = document
+									.getElementById("bankSection");
+							const cardSection = document
+									.getElementById("cardSection");
+							const cardNumberParts = document
+									.querySelectorAll(".card-number-part");
+
+							cardNumberParts
+									.forEach(function(input, index) {
+										input
+												.addEventListener(
+														"input",
+														function() {
+															this.value = this.value
+																	.replace(
+																			/[^0-9]/g,
+																			"")
+																	.slice(0, 4);
+
+															if (this.value.length === 4
+																	&& index < cardNumberParts.length - 1) {
+																cardNumberParts[index + 1]
+																		.focus();
+															}
+														});
+
+										input
+												.addEventListener(
+														"keydown",
+														function(event) {
+															if (event.key === "Backspace"
+																	&& this.value.length === 0
+																	&& index > 0) {
+																cardNumberParts[index - 1]
+																		.focus();
+															}
+														});
+									});
+
+							function openPaymentModal() {
+								modal.style.display = "flex";
+								document.body.style.overflow = "hidden";
+							}
+
+							function closePaymentModal() {
+								modal.style.display = "none";
+								document.body.style.overflow = "";
+							}
+
+							function changePaymentType() {
+								const selected = document
+										.querySelector('#paymentAddForm input[name="paymentType"]:checked');
+
+								if (!selected) {
+									return;
+								}
+
+								if (selected.value === "BANK") {
+									bankSection.style.display = "block";
+									cardSection.style.display = "none";
+								} else {
+									bankSection.style.display = "none";
+									cardSection.style.display = "block";
+								}
+							}
+
+							openBtns
+									.forEach(function(btn) {
+										btn.addEventListener("click",
+												openPaymentModal);
+									});
+
+							closeBtn.addEventListener("click",
+									closePaymentModal);
+							cancelBtn.addEventListener("click",
+									closePaymentModal);
+
+							modal.addEventListener("click", function(event) {
+								if (event.target === modal) {
+									closePaymentModal();
+								}
+							});
+
+							paymentTypes.forEach(function(type) {
+								type.addEventListener("change",
+										changePaymentType);
+							});
+
+							paymentAddForm
+									.addEventListener(
+											"submit",
+											function(event) {
+												const paymentType = document
+														.querySelector('#paymentAddForm input[name="paymentType"]:checked').value;
+
+												if (paymentType === "BANK") {
+													const bankCode = document
+															.getElementById("bankCode").value;
+													const accountNumber = document
+															.getElementById("accountNumber").value
+															.trim();
+													const accountHolder = document
+															.getElementById("accountHolder").value
+															.trim();
+
+													if (!bankCode) {
+														event.preventDefault();
+														alert("은행을 선택해주세요.");
+														return;
+													}
+
+													if (!accountNumber) {
+														event.preventDefault();
+														alert("계좌번호를 입력해주세요.");
+														return;
+													}
+
+													if (!accountHolder) {
+														event.preventDefault();
+														alert("예금주를 입력해주세요.");
+														return;
+													}
+												} else {
+													const cardCompany = document
+															.getElementById("cardCompany").value;
+													const cardNumber = document
+															.getElementById("cardNumber").value
+															.trim();
+
+													if (!cardCompany) {
+														event.preventDefault();
+														alert("카드사를 선택해주세요.");
+														return;
+													}
+
+													if (!cardNumber) {
+														event.preventDefault();
+														alert("카드번호를 입력해주세요.");
+														return;
+													}
+												}
+											});
+
+							changePaymentType();
+							checkWowForm();
+						});
+	</script>
 
 </body>
 </html>
