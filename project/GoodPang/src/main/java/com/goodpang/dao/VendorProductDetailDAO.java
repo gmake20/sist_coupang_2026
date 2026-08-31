@@ -42,7 +42,7 @@ public class VendorProductDetailDAO {
                 C1.CATEGORY_NAME AS MAIN_CATEGORY_NAME,
                 C2.CATEGORY_NAME AS MID_CATEGORY_NAME,
                 C3.CATEGORY_NAME AS SUB_CATEGORY_NAME,
-                P.SALE_METHOD, P.BRAND_NAME, P.NO_BRAND_YN, P.PRODUCT_NAME, P.INTERNAL_NAME,
+                P.SALE_METHOD, P.BRAND_NAME, P.NO_BRAND_YN, P.PRODUCT_NAME, P.INTERNAL_NAME, P.PRODUCT_PRICE,
                 P.MANUFACTURER, P.COMPOSITION_TYPE, P.CERTIFICATION_TYPE, P.PARALLEL_IMPORT_YN,
                 P.MINOR_PURCHASE_YN, P.MAX_PURCHASE_YN, P.MAX_PURCHASE_QTY,
                 P.SALE_PERIOD_YN, P.SALE_START_DATE, P.SALE_END_DATE, P.VAT_TYPE,
@@ -210,6 +210,7 @@ public class VendorProductDetailDAO {
         dto.setNoBrandYn(rs.getString("NO_BRAND_YN"));
         dto.setProductName(rs.getString("PRODUCT_NAME"));
         dto.setInternalName(rs.getString("INTERNAL_NAME"));
+        dto.setProductPrice(rs.getInt("PRODUCT_PRICE"));
 
         dto.setManufacturer(rs.getString("MANUFACTURER"));
         dto.setCompositionType(rs.getString("COMPOSITION_TYPE"));

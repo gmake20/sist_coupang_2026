@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.goodpang.dao.SellerDAO;
 import com.goodpang.dto.SellerDTO;
+import com.goodpang.util.UploadPaths;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -150,7 +151,7 @@ public class VendorBusinessInfoServlet extends HttpServlet {
 
 		String savedName = UUID.randomUUID() + ext;
 
-		String uploadDir = getServletContext().getRealPath("/upload/" + sellerNo);
+		String uploadDir = UploadPaths.resolveBaseDir(getServletContext()) + "/" + sellerNo;
 		File uploadDirFile = new File(uploadDir);
 
 		if (!uploadDirFile.exists()) {

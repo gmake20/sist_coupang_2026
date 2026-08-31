@@ -181,7 +181,7 @@
 											</div>
 											<div class="product-price"
 												style="font-size: 13px; color: #333; margin-bottom: 4px;">
-												<fmt:formatNumber value="${item.totalPrice}" pattern="#,###" />
+												<fmt:formatNumber value="${item.itemPrice * item.quantity}" pattern="#,###" />
 												원 <span>·</span> ${item.quantity}개
 											</div>
 											<c:if
@@ -208,7 +208,7 @@
 									<div class="delivery-buttons"
 										style="display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
 										<button type="button" class="delivery-btn btn-action primary"
-											onclick="location.href='${pageContext.request.contextPath}/order/tracking?orderNo=${item.orderNo}'"
+											onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${item.orderNo}'"
 											style="flex: 1; padding: 8px; border: 1px solid #0073e9; color: #0073e9; background: #fff; border-radius: 4px; cursor: pointer;">
 											배송 조회</button>
 										<button type="button" class="delivery-btn btn-action"

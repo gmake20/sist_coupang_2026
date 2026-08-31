@@ -89,8 +89,10 @@
             <span class="stat-label">판매 중</span>
             <span class="stat-icon stat-icon-green"><svg class="icon"><use href="#ic-bag" /></svg></span>
           </div>
-          <div class="stat-value">942 <small>개</small></div>
-          <span class="stat-rate rate-green">75.6%</span>
+          <div class="stat-value">${saleCount} <small>개</small></div>
+          <span class="stat-rate rate-green">
+            <fmt:formatNumber value="${fn:length(productList) > 0 ? (saleCount * 100.0 / fn:length(productList)) : 0}" pattern="0.0" />%
+          </span>
         </article>
 
         <article class="stat-card">
@@ -98,8 +100,10 @@
             <span class="stat-label">품절</span>
             <span class="stat-icon stat-icon-orange"><svg class="icon"><use href="#ic-ban" /></svg></span>
           </div>
-          <div class="stat-value">82 <small>개</small></div>
-          <span class="stat-rate rate-orange">6.6%</span>
+          <div class="stat-value">${soldOutCount} <small>개</small></div>
+          <span class="stat-rate rate-orange">
+            <fmt:formatNumber value="${fn:length(productList) > 0 ? (soldOutCount * 100.0 / fn:length(productList)) : 0}" pattern="0.0" />%
+          </span>
         </article>
 
         <article class="stat-card">
@@ -107,8 +111,10 @@
             <span class="stat-label">판매 중지</span>
             <span class="stat-icon stat-icon-red"><svg class="icon"><use href="#ic-pause-circle" /></svg></span>
           </div>
-          <div class="stat-value">68 <small>개</small></div>
-          <span class="stat-rate rate-red">5.5%</span>
+          <div class="stat-value">${stoppedCount} <small>개</small></div>
+          <span class="stat-rate rate-red">
+            <fmt:formatNumber value="${fn:length(productList) > 0 ? (stoppedCount * 100.0 / fn:length(productList)) : 0}" pattern="0.0" />%
+          </span>
         </article>
 
         <article class="stat-card">
@@ -116,8 +122,10 @@
             <span class="stat-label">승인 대기</span>
             <span class="stat-icon stat-icon-blue"><svg class="icon"><use href="#ic-clock" /></svg></span>
           </div>
-          <div class="stat-value">156 <small>개</small></div>
-          <span class="stat-rate rate-blue">12.3%</span>
+          <div class="stat-value">${pendingCount} <small>개</small></div>
+          <span class="stat-rate rate-blue">
+            <fmt:formatNumber value="${fn:length(productList) > 0 ? (pendingCount * 100.0 / fn:length(productList)) : 0}" pattern="0.0" />%
+          </span>
         </article>
 
       </section>
