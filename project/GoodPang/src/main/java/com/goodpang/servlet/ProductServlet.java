@@ -28,7 +28,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 
-
 @WebServlet("/product")
 public class ProductServlet extends HttpServlet {
 
