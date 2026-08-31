@@ -203,38 +203,7 @@
 			</main>
 
 			<!-- 오른쪽 배너 -->
-			<aside class="right-banner" aria-label="프로모션">
-
-				<div class="ad-box ad-only">
-					<strong>GoodPang</strong> <em>only</em>
-					<div class="ad-icon">🛍️</div>
-				</div>
-
-				<div class="ad-box ad-blue">
-					<strong> ~5만원<br> 쿠폰 할인
-					</strong>
-					<div class="ad-icon">🏖️</div>
-				</div>
-
-				<div class="ad-box ad-sky">
-					<strong> GoodPang<br> 이 직접<br> 수입했어요!
-					</strong>
-					<div class="ad-icon">🥤</div>
-				</div>
-
-				<div class="ad-box ad-purple">
-					<strong> 금주의<br> 특가왕
-					</strong>
-					<div class="ad-icon">🔔</div>
-				</div>
-
-				<div class="ad-box ad-red">
-					<strong> GoodPang<br> 에서<br> 판매 시작하기
-					</strong>
-					<div class="ad-icon">🏪</div>
-				</div>
-
-			</aside>
+			<jsp:include page="/inc/right_banner.jsp" />
 		</div>
 	</div>
 

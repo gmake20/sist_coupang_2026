@@ -250,7 +250,25 @@
 
 <c:if test="${param.canceled eq 'Y'}">
     <script>
-        alert("와우 멤버십이 해지되었습니다.");
+        alert("와우 멤버십 해지 신청이 완료되었습니다.");
+    </script>
+</c:if>
+
+<c:if test="${param.alreadyCanceled eq 'Y'}">
+    <script>
+        alert("이미 해지 신청된 와우 멤버십입니다.");
+    </script>
+</c:if>
+
+<c:if test="${param.alreadyExpired eq 'Y'}">
+    <script>
+        alert("이미 종료된 와우 멤버십입니다.");
+    </script>
+</c:if>
+
+<c:if test="${param.notMember eq 'Y'}">
+    <script>
+        alert("가입된 와우 멤버십이 없습니다.");
     </script>
 </c:if>
 
