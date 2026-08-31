@@ -3204,7 +3204,7 @@
 	<!-- 	<div id="wowModal" class="wow-modal-overlay">
  -->
 	<div id="wowModal" class="wow-modal-overlay"
-		<c:if test="${sessionScope.loginMember.rank eq 'WOW'}">
+		<c:if test="${sessionScope.wowMember}">
          style="display:none;"
      </c:if>>
 
@@ -3381,7 +3381,10 @@
 				</div>
 
 				<form action="${pageContext.request.contextPath}/wow/join"
-					method="post" id="wowPaymentForm">
+				      method="post"
+				      id="wowPaymentForm">
+				
+				    <input type="hidden" name="joinMode" value="modal">
 					<!-- 기존 결제수단 목록 -->
 					<div id="wowPaymentMethodList" class="wow-payment-method-list">
 						결제수단을 불러오는 중입니다...</div>
@@ -3496,9 +3499,7 @@
 const isLogin =
     ${not empty sessionScope.loginMember};
 
-const isWowMember =
-    ${not empty sessionScope.loginMember
-      and sessionScope.loginMember.rank eq 'WOW'};
+const isWowMember = ${sessionScope.wowMember};
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -3722,54 +3723,18 @@ document.addEventListener("DOMContentLoaded", function () {
     /*
      * STEP 1 → 결제
      */
-    joinNextBtn.addEventListener("click", async function () {
+     joinNextBtn.addEventListener("click", async function() {
+    	    try {
+    	        await loadWowPaymentMethods();
 
-        paymentMethodList.innerHTML =
-            "결제수단을 불러오는 중입니다...";
-
-        try {
-            const response = await fetch(
-                "${pageContext.request.contextPath}/wow/join",
-                {
-                    method: "GET"
-                }
-            );
-
-            if (response.status === 401) {
-                window.location.href =
-                    "${pageContext.request.contextPath}/login";
-                return;
-            }
-
-            if (response.status === 409) {
-                alert("이미 와우 회원입니다.");
-                window.location.href =
-                    "${pageContext.request.contextPath}/";
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error(
-                    "결제수단 조회 실패"
-                );
-            }
-
-            const html =
-                await response.text();
-
-            paymentMethodList.innerHTML = html;
-
-            joinStep1.style.display = "none";
-            joinStep2.style.display = "block";
-
-        } catch (error) {
-            console.error(error);
-
-            paymentMethodList.innerHTML =
-                "결제수단을 불러오지 못했습니다.";
-        }
-    });
-
+    	        joinStep1.style.display = "none";
+    	        joinStep2.style.display = "block";
+    	    } catch (error) {
+    	        console.error(error);
+    	        paymentMethodList.innerHTML = "결제수단을 불러오지 못했습니다.";
+    	    }
+    	});
+    
 
     /*
      * 결제 → 이전
