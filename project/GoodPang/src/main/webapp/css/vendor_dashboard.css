@@ -587,6 +587,11 @@ ul {
   font-weight: 700;
 }
 
+.kpi-compare .down {
+  color: #c0392b;
+  font-weight: 700;
+}
+
 .kpi-spark {
   display: block;
   width: 100%;

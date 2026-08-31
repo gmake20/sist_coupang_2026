@@ -66,7 +66,7 @@
 
 			<div class="side-section">
 				<h3>MY 활동</h3>
-				<a href="#">문의하기</a> <a href="#">문의내역 확인</a> <a href="#">리뷰관리</a> <a
+				<a href="#">문의하기</a> <a href="#">문의내역 확인</a> <a href="${pageContext.request.contextPath}/review/list">리뷰관리</a> <a
 					href="#">찜 리스트</a>
 			</div>
 

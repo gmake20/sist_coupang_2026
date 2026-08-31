@@ -2,7 +2,9 @@ package com.goodpang.servlet;
 
 import java.io.IOException;
 
+import com.goodpang.dao.VendorDashboardDAO;
 import com.goodpang.dto.SellerDTO;
+import com.goodpang.dto.VendorDashboardStatDTO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,6 +29,10 @@ public class VendorDashboardServlet extends HttpServlet {
 			response.sendRedirect(request.getContextPath() + "/vendor/login");
 			return;
 		}
+
+		VendorDashboardDAO dao = new VendorDashboardDAO();
+		VendorDashboardStatDTO dashboardStat = dao.getTodayStat(loginSeller.getSellerNo());
+		request.setAttribute("dashboardStat", dashboardStat);
 
 		request.getRequestDispatcher("/WEB-INF/views/vendor-dashboard.jsp").forward(request, response);
 	}
