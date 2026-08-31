@@ -30,7 +30,9 @@ public class ProductDAO {
 			        S.BUSINESS_NO,
 			        P.SUB_CATEGORY_NO,
 			        SC.CATEGORY_NAME    AS SUB_CATEGORY_NAME,
+			        MC.CATEGORY_NO      AS MID_CATEGORY_NO,
 			        MC.CATEGORY_NAME    AS MID_CATEGORY_NAME,
+			        MAINC.CATEGORY_NO   AS MAIN_CATEGORY_NO,
 			        MAINC.CATEGORY_NAME AS MAIN_CATEGORY_NAME
 			        FROM PRODUCT P
 			        JOIN SELLER S
@@ -75,7 +77,9 @@ public class ProductDAO {
 
                     dto.setSubCategoryNo(rs.getInt("SUB_CATEGORY_NO"));
                     dto.setSubCategoryName(rs.getString("SUB_CATEGORY_NAME"));
+                    dto.setMidCategoryNo(rs.getInt("MID_CATEGORY_NO"));
                     dto.setMidCategoryName(rs.getString("MID_CATEGORY_NAME"));
+                    dto.setMainCategoryNo(rs.getInt("MAIN_CATEGORY_NO"));
                     dto.setMainCategoryName(rs.getString("MAIN_CATEGORY_NAME"));
                     
                     return dto;

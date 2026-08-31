@@ -61,10 +61,6 @@ public class ProductServlet extends HttpServlet {
                 String deliveryDate = "내일(" + dayOfWeek + ") " + tomorrow.getMonthValue() + "/" + tomorrow.getDayOfMonth();
                 request.setAttribute("deliveryDate", deliveryDate);
 
-                // 적립 혜택 — 가격의 5%
-                int rewardCash = product.getProductPrice() * 5 / 100;
-                request.setAttribute("rewardCash", rewardCash);
-
                 request.setAttribute("p", product);
 
                 // 옵션 + 옵션별/상세설명 사진
@@ -72,6 +68,41 @@ public class ProductServlet extends HttpServlet {
                 //  상세설명용이라 따로 뺌)
                 ProductOptionDAO optionDAO = new ProductOptionDAO();
                 List<ProductOptionDTO> options = optionDAO.selectOptionsByProductNo(productNo);
+
+                /* 2026-08-30 확정 — PRODUCT_OPTION.PRICE/NORMAL_PRICE 는 PRODUCT.PRODUCT_PRICE(기본가)에
+                   더해지는 "추가금"(CartDAO.getCartItems() 와 같은 전제). 그래서:
+                     판매가 총액 = PRODUCT_PRICE + 옵션의 PRICE       (할인된 추가금)
+                     정상가 총액 = PRODUCT_PRICE + 옵션의 NORMAL_PRICE (할인 전 추가금, 선택 입력이라 없을 수 있음)
+                   정상가 총액이 판매가 총액보다 클 때만 "할인 중"으로 보고 취소선/할인율을 보여줌.
+                   지금은(2026-08-30) NORMAL_PRICE 를 채운 판매자가 없어서 할인 표시가 실제로는 안 뜨는데,
+                   판매자가 정상가를 입력하기 시작하면 코드 수정 없이 자동으로 뜨게 됨. */
+                int displayPrice = product.getProductPrice();
+                Integer displayNormalPrice = null;
+
+                if (!options.isEmpty()) {
+                    ProductOptionDTO firstOption = options.get(0);
+                    displayPrice = product.getProductPrice() + firstOption.getPrice();
+
+                    if (firstOption.getNormalPrice() != null) {
+                        int normalTotal = product.getProductPrice() + firstOption.getNormalPrice();
+                        if (normalTotal > displayPrice) {
+                            displayNormalPrice = normalTotal;
+                        }
+                    }
+                }
+
+                int discountRate = 0;
+                if (displayNormalPrice != null && displayNormalPrice > 0) {
+                    discountRate = (int) Math.round((1 - (double) displayPrice / displayNormalPrice) * 100);
+                }
+
+                request.setAttribute("displayPrice", displayPrice);
+                request.setAttribute("displayNormalPrice", displayNormalPrice);
+                request.setAttribute("discountRate", discountRate);
+
+                // 적립 혜택 — 가격의 5% (옵션 가격 기준으로 계산해야 해서 옵션 조회 뒤로 옮김)
+                int rewardCash = displayPrice * 5 / 100;
+                request.setAttribute("rewardCash", rewardCash);
 
                 ProductImageDAO imageDAO = new ProductImageDAO();
                 List<ProductImageDTO> images = imageDAO.selectImagesByProductNo(productNo);

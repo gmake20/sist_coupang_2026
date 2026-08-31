@@ -60,6 +60,7 @@ public class OrderListDAO {
 					// ORDER_DETAIL
 					dto.setOrderDetailNo(rs.getLong("order_detail_no"));
 					dto.setQuantity(rs.getInt("order_qty"));
+					dto.setItemPrice(rs.getInt("item_price"));
 
 
 					// PRODUCT

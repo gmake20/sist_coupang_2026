@@ -58,8 +58,8 @@
             <span class="stat-label">신규 주문</span>
             <span class="stat-icon stat-icon-purple"><svg class="icon"><use href="#ic-bag" /></svg></span>
           </div>
-          <div class="stat-value">35 <small>건</small></div>
-          <p class="stat-compare">어제 대비 <strong class="up">▲ 16 (84%)</strong></p>
+          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
+          <p class="stat-compare" style="color:#bbb;">아직 대응하는 주문상태가 없습니다</p>
         </article>
 
         <article class="stat-card">
@@ -67,8 +67,8 @@
             <span class="stat-label">결제 대기</span>
             <span class="stat-icon stat-icon-orange"><svg class="icon"><use href="#ic-card" /></svg></span>
           </div>
-          <div class="stat-value">12 <small>건</small></div>
-          <p class="stat-compare">어제 대비 <strong class="up">▲ 5 (71%)</strong></p>
+          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
+          <p class="stat-compare" style="color:#bbb;">아직 대응하는 주문상태가 없습니다</p>
         </article>
 
         <article class="stat-card">
@@ -76,8 +76,8 @@
             <span class="stat-label">상품 준비중</span>
             <span class="stat-icon stat-icon-violet"><svg class="icon"><use href="#ic-box" /></svg></span>
           </div>
-          <div class="stat-value">74 <small>건</small></div>
-          <p class="stat-compare">어제 대비 <strong class="up">▲ 12 (19%)</strong></p>
+          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
+          <p class="stat-compare" style="color:#bbb;">아직 대응하는 주문상태가 없습니다</p>
         </article>
 
         <article class="stat-card">
@@ -85,8 +85,7 @@
             <span class="stat-label">배송 중</span>
             <span class="stat-icon stat-icon-green"><svg class="icon"><use href="#ic-truck" /></svg></span>
           </div>
-          <div class="stat-value">58 <small>건</small></div>
-          <p class="stat-compare">어제 대비 <strong class="up">▲ 9 (18%)</strong></p>
+          <div class="stat-value">${orderStat.shippingCount} <small>건</small></div>
         </article>
 
         <article class="stat-card">
@@ -94,8 +93,7 @@
             <span class="stat-label">배송 완료 (오늘)</span>
             <span class="stat-icon stat-icon-blue"><svg class="icon"><use href="#ic-check-circle" /></svg></span>
           </div>
-          <div class="stat-value">320 <small>건</small></div>
-          <p class="stat-compare">어제 대비 <strong class="up">▲ 28 (10%)</strong></p>
+          <div class="stat-value">${orderStat.deliveredTodayCount} <small>건</small></div>
         </article>
 
         <article class="stat-card">
@@ -103,8 +101,8 @@
             <span class="stat-label">취소/반품/교환</span>
             <span class="stat-icon stat-icon-red"><svg class="icon"><use href="#ic-return" /></svg></span>
           </div>
-          <div class="stat-value">8 <small>건</small></div>
-          <p class="stat-compare">어제 대비 <strong class="down">▼ 3 (27%)</strong></p>
+          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
+          <p class="stat-compare" style="color:#bbb;">아직 취소/반품/교환 기능이 없습니다</p>
         </article>
 
       </section>
@@ -248,7 +246,7 @@
                           </div>
                         </td>
                         <td class="col-price">
-                          <p class="price"><fmt:formatNumber value="${order.price}" pattern="#,##0" />원</p>
+                          <p class="price"><fmt:formatNumber value="${order.price * order.orderQty}" pattern="#,##0" />원</p>
                         </td>
                         <td class="col-status"><span class="status-badge">${order.orderStatus}</span></td>
                         <td class="col-date">
@@ -256,10 +254,17 @@
                           <span class="time"><fmt:formatDate value="${order.orderDate}" pattern="HH:mm:ss" /></span>
                         </td>
                         <td class="col-manage">
-                          <button class="btn btn-outline btn-sm" type="button">상세보기</button>
-                          <button class="btn btn-outline btn-sm btn-more" type="button">
-                            작업 <svg class="icon"><use href="#ic-chevron-down" /></svg>
-                          </button>
+                          <a class="btn btn-outline btn-sm"
+                             href="${pageContext.request.contextPath}/vendor/order/detail?orderNo=${order.orderNo}">상세보기</a>
+                          <c:if test="${order.orderStatus == '결제완료'}">
+                            <form method="post" action="${pageContext.request.contextPath}/vendor/order/ship"
+                                  style="display:inline-flex; gap:4px; align-items:center; margin-top:4px;"
+                                  onsubmit="if (!this.invoiceNo.value.trim()) { alert('송장번호를 입력해주세요.'); return false; } return confirm('입력한 송장번호로 배송중 처리하시겠습니까?');">
+                              <input type="hidden" name="orderNo" value="${order.orderNo}">
+                              <input class="input input-sm" type="text" name="invoiceNo" placeholder="송장번호" style="width:110px;">
+                              <button class="btn btn-primary btn-sm" type="submit">배송중으로 변경</button>
+                            </form>
+                          </c:if>
                         </td>
                       </tr>
                     </c:forEach>
@@ -293,19 +298,30 @@
           <section class="panel">
 
             <div class="panel-head">
-              <h2>배송 현황 <span class="head-sub">(오늘 기준)</span></h2>
+              <h2>배송 현황 <span class="head-sub">(현재 기준)</span></h2>
               <a href="#" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
             </div>
 
             <div class="donut-wrap">
 
-              <div class="donut" id="statusDonut"></div>
+              <c:choose>
+                <c:when test="${orderStat.totalCount > 0}">
+                  <div class="donut" id="statusDonut"
+                       style="background: conic-gradient(
+                         #4285f4 0% ${orderStat.deliveredPercent}%,
+                         #17c964 ${orderStat.deliveredPercent}% ${orderStat.deliveredPercent + orderStat.shippingPercent}%,
+                         #ff9f1c ${orderStat.deliveredPercent + orderStat.shippingPercent}% 100%
+                       );"></div>
+                </c:when>
+                <c:otherwise>
+                  <div class="donut" id="statusDonut" style="background:#eee;"></div>
+                </c:otherwise>
+              </c:choose>
 
               <ul class="donut-legend">
-                <li><i class="dot dot-blue"></i>배송 완료 <b>320건 (68%)</b></li>
-                <li><i class="dot dot-green"></i>배송 중 <b>58건 (12%)</b></li>
-                <li><i class="dot dot-orange"></i>출고 대기 <b>74건 (16%)</b></li>
-                <li><i class="dot dot-gray"></i>기타 <b>12건 (4%)</b></li>
+                <li><i class="dot dot-blue"></i>배송 완료 <b>${orderStat.deliveredCount}건 (${orderStat.deliveredPercent}%)</b></li>
+                <li><i class="dot dot-green"></i>배송 중 <b>${orderStat.shippingCount}건 (${orderStat.shippingPercent}%)</b></li>
+                <li><i class="dot dot-orange"></i>출고 대기 <b>${orderStat.waitingCount}건 (${orderStat.waitingPercent}%)</b></li>
               </ul>
 
             </div>
@@ -413,22 +429,6 @@
       );
     });
 
-
-    /* =========================================================
-       배송 현황 도넛 차트
-    ========================================================= */
-
-    (function renderDonut() {
-      const stops = [
-        "#4285f4 0% 68%",
-        "#17c964 68% 80%",
-        "#ff9f1c 80% 96%",
-        "#c9ccd3 96% 100%"
-      ];
-
-      document.getElementById("statusDonut").style.background =
-        "conic-gradient(" + stops.join(", ") + ")";
-    })();
 
   </script>
 

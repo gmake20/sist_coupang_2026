@@ -181,7 +181,7 @@
 											</div>
 											<div class="product-price"
 												style="font-size: 13px; color: #333; margin-bottom: 4px;">
-												<fmt:formatNumber value="${item.totalPrice}" pattern="#,###" />
+												<fmt:formatNumber value="${item.itemPrice * item.quantity}" pattern="#,###" />
 												원 <span>·</span> ${item.quantity}개
 											</div>
 											<c:if

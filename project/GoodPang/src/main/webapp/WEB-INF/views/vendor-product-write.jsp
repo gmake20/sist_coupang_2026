@@ -118,6 +118,14 @@
             </div>
             <div class="block-body">
 
+              <div class="field-row">
+                <label class="field-label">기본 상품가격(원) <span class="required-dot">•</span></label>
+                <div class="field-control">
+                  <input class="input" id="basePriceInput" type="number" min="0" placeholder="예: 5000">
+                  <p class="field-hint">옵션별 판매가는 이 기본 상품가격에 더해지는 가감액입니다. (예: 기본가 5,000원 + 옵션가 -1,000원 = 최종가 4,000원)</p>
+                </div>
+              </div>
+
               <div class="tab-group" id="optionModeTabs">
                 <button class="tab-btn active" type="button" data-mode="on">설정함</button>
                 <button class="tab-btn" type="button" data-mode="off">설정 안 함</button>
@@ -147,7 +155,7 @@
                         <th class="col-check"><input type="checkbox" id="optionCheckAll"></th>
                         <th>옵션명</th>
                         <th>정상가(원)</th>
-                        <th>판매가(원) <span class="required-dot">•</span></th>
+                        <th>판매가(원) <span class="required-dot">•</span> <span class="help-q" title="기본 상품가격에 더해지는 가감액입니다. 0원이면 기본가와 동일, 음수도 입력 가능합니다.">?</span></th>
                         <th>판매자 자동가격조정 <span class="help-q" title="경쟁 판매자들과 비교해서 내 상품 가격을 자동으로 낮춰(또는 조정해) '아이템위너'(대표 판매자로 노출되는 자리)를 계속 유지하게 해주는 기능">?</span></th>
                         <th>재고수량 <span class="required-dot">•</span></th>
                         <th>판매자상품코드</th>
@@ -801,6 +809,7 @@
 
       const brandInput = document.getElementById("brandInput");
       const noBrandCheck = document.getElementById("noBrandCheck");
+      const basePriceInput = document.getElementById("basePriceInput");
 
       noBrandCheck.addEventListener("change", function () {
         brandInput.disabled = noBrandCheck.checked;
@@ -1541,6 +1550,11 @@
           return false;
         }
 
+        if (!basePriceInput.value.trim() || Number(basePriceInput.value) <= 0) {
+          alert("기본 상품가격을 입력해주세요.");
+          return false;
+        }
+
         if (optionGroups.some((group) => group.values.length > 0 && !group.name.trim())) {
           alert("옵션명을 입력해주세요.");
           return false;
@@ -1551,9 +1565,15 @@
           return false;
         }
 
+        const basePrice = Number(basePriceInput.value);
+
         for (const row of rows) {
-          if (!row.salePrice || Number(row.salePrice) <= 0) {
-            alert("모든 옵션의 판매가를 입력해주세요.");
+          if (row.salePrice === "" || isNaN(Number(row.salePrice))) {
+            alert("모든 옵션의 판매가(기본가에 대한 가감액)를 입력해주세요.");
+            return false;
+          }
+          if (basePrice + Number(row.salePrice) <= 0) {
+            alert("기본가와 옵션 판매가를 더한 최종가가 0원 이하인 옵션이 있습니다. 옵션 판매가를 확인해주세요.");
             return false;
           }
           if (row.quantity === "" || Number(row.quantity) < 0) {
@@ -1577,6 +1597,7 @@
         formData.append("displayName", displayNameInput.value.trim());
         formData.append("internalName", document.getElementById("internalNameInput").value.trim());
         formData.append("categoryNo", selectedCategoryNo);
+        formData.append("productPrice", basePriceInput.value.trim());
 
         formData.append("manufacturer", document.getElementById("manufacturerInput").value.trim());
         formData.append("compositionType", document.querySelector('input[name="productComposition"]:checked').value);
