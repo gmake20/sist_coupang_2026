@@ -1,5 +1,6 @@
 /*
  * 카테고리 목록 페이지(category_list.jsp) 전용 CSS.
+ * 값 출처: ref/category/원본_실측값.json (실제 coupang.com 을 Playwright MCP 로 1440px/1536px 두 폭에서 측정).
  * 전부 .category-page 안에서만 적용되게 스코프함 — 다른 페이지 클래스와 안 부딪히게(CLAUDE.md 8장 규칙).
  */
 
@@ -94,13 +95,55 @@
 	font-weight: 700;
 }
 
-/* 체크박스형 필터(색상 등) 가짜 체크박스 자리 — 아직 스프라이트 이미지가 없어서 테두리 박스만 */
+/* 체크박스형 필터(색상/브랜드 등) — 원본은 스프라이트 이미지인데 그 도메인이 승인 안 돼서
+   CSS로 직접 그린 체크박스로 대체(2026-08-31). label 에 selected 클래스가 붙으면 체크된 모양 */
 .filter-function-bar-asset {
 	display: inline-block;
 	width: 14px;
 	height: 14px;
-	border: 1px solid var(--line-gray);
+	border: 1px solid #C4C4C4;
+	border-radius: 2px;
 	flex: none;
+	position: relative;
+}
+
+label.selected .filter-function-bar-asset,
+.filter-function-bar-asset.checked {
+	background: var(--link-blue);
+	border-color: var(--link-blue);
+}
+
+label.selected .filter-function-bar-asset::after,
+.filter-function-bar-asset.checked::after {
+	content: "";
+	position: absolute;
+	left: 3px;
+	top: 0px;
+	width: 4px;
+	height: 8px;
+	border: solid #fff;
+	border-width: 0 2px 2px 0;
+	transform: rotate(45deg);
+}
+
+/* "필터" 제목 바로 아래, 소제목 없이 오는 배송/무료배송 체크박스 줄 */
+.filter-top-row {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	list-style: none;
+	padding-bottom: 20px;
+	margin-bottom: 20px;
+	border-bottom: 1px solid var(--line-gray);
+}
+
+.filter-top-row label {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	color: #111111;
+	cursor: pointer;
 }
 
 /* 실제 DB에 속성 데이터가 없어서 화면만 있고 클릭해도 동작 안 하는 필터 그룹 */
@@ -246,12 +289,30 @@
 	margin-top: 2px;
 }
 
+/* 배송정보 — 원본 실측(2026-08-31): 도착보장 문구는 초록, 무료배송 문구는 회색, 둘 다 14px */
+.product-card .delivery-info {
+	margin-bottom: 4px;
+}
+
+.product-card .delivery-date {
+	display: block;
+	font-size: 14px;
+	color: #008C00;
+}
+
+.product-card .delivery-free {
+	display: block;
+	font-size: 14px;
+	color: #454F5B;
+}
+
 .product-card .product-rating {
 	font-size: 12px;
 	color: var(--text-gray);
 	display: flex;
 	align-items: center;
 	gap: 4px;
+	margin-bottom: 4px;
 }
 
 /* product.css 의 .product-page .star-rating 과 완전히 같은 스프라이트 재사용(2026-08-27 원본 실측 그대로).
@@ -286,12 +347,16 @@
 }
 
 .pagination a {
-	font-size: 13px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 29px;
+	height: 29px;
+	font-size: 12px;
 	color: #555555;
 	font-weight: 700;
 	border: 0;
 	text-decoration: none;
-	padding: 4px 8px;
 }
 
 .pagination a.current {

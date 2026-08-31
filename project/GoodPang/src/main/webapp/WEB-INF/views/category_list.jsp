@@ -55,6 +55,14 @@
 
 				<h2 class="filter-title">필터</h2>
 
+				<%-- 원본은 "필터" 제목 바로 아래, 소제목 없이 로켓/무료배송 체크박스가 옴.
+				     실제 로켓 배지 이미지는 승인 안 된 도메인이라 못 받아와서 글자만(2026-08-31) --%>
+				<ul class="filter-top-row">
+					<c:forEach var="item" items="${topFilterItems}">
+						<li><label><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
+					</c:forEach>
+				</ul>
+
 				<%-- 카테고리 필터 — 실제로 동작함(클릭하면 그 카테고리로 이동) --%>
 				<section class="filter-group">
 					<h3>카테고리</h3>
@@ -198,12 +206,18 @@
 											</c:if>
 											<strong class="sale-price"><fmt:formatNumber value="${item.salePrice}" pattern="#,###"/>원</strong>
 										</p>
+										<%-- 배송정보 — 실제 DB에 배송 컬럼이 아직 연동 안 돼서 고정 문구(product.jsp 광고캐러셀과 같은 방식, 4장 4번 참고) --%>
+										<p class="delivery-info">
+											<span class="delivery-date">내일 도착 보장</span>
+											<span class="delivery-free">무료배송 · 무료반품</span>
+										</p>
 										<c:if test="${item.reviewCount > 0}">
 											<p class="product-rating">
 												<span class="star-rating" aria-label="평점 ${item.avgRating}점"><em style="width:${item.avgRating * 20}%"></em></span>
 												(${item.reviewCount})
 											</p>
 										</c:if>
+										<%-- 적립 — 2026-08-31 보류. 실제 적립 정책 없이 임의 계산(판매가 1%)으로 넣었다가 사용자가 "안 할 수도 있음"이라 뺌 --%>
 									</a>
 								</li>
 							</c:forEach>

@@ -73,6 +73,9 @@ public class CategoryServlet extends HttpServlet {
          * 색상(실제 동작)이 inert 그룹들 사이에 끼어있음. 별점/가격도 원본은 맨 끝이라 JSP에서 순서 맞춰 넣음. */
         request.setAttribute("beforeColorGroups", buildBeforeColorGroups());
         request.setAttribute("afterColorGroups", buildAfterColorGroups());
+        // "필터" 제목 바로 아래, 소제목(h3) 없이 나오는 체크박스 줄 — 2026-08-31 실측(1440px 스크린샷)한
+        // 실제 라벨 그대로("로켓럭셔리만 보기" 등은 처음에 잘못 짐작한 것, 이걸로 교체). 로켓 배지 이미지는 없어서 글자만
+        request.setAttribute("topFilterItems", new String[] { "로켓", "R.LUX만 보기", "로켓와우만 보기", "로켓직구만 보기", "C.에비뉴", "무료배송" });
 
         request.getRequestDispatcher("/WEB-INF/views/category_list.jsp").forward(request, response);
     }
