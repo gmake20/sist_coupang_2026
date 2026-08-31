@@ -33,13 +33,25 @@
 
     .menu-card h2 { margin: 0 0 6px; font-size: 15px; color: #111; }
     .menu-card p { margin: 0; font-size: 12px; color: #888; }
+
+    .top-bar { display: flex; align-items: center; justify-content: space-between; max-width: 900px; margin-bottom: 24px; }
+    .top-bar h1 { margin: 0; }
+    .top-bar .admin-name { font-size: 13px; color: #555; }
+    .top-bar .logout-link { margin-left: 12px; color: #888; text-decoration: none; }
+    .top-bar .logout-link:hover { text-decoration: underline; }
   </style>
 
 </head>
 
 <body>
 
-  <h1>관리자 대시보드</h1>
+  <div class="top-bar">
+    <h1>관리자 대시보드</h1>
+    <div>
+      <span class="admin-name">${sessionScope.adminName}님</span>
+      <a class="logout-link" href="${pageContext.request.contextPath}/admin/logout">로그아웃</a>
+    </div>
+  </div>
 
   <div class="menu-grid">
 
