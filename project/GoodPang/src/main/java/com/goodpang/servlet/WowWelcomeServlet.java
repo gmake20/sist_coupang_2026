@@ -21,25 +21,40 @@ public class WowWelcomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        MemberDTO loginMember = LoginUtil.requireLogin(request, response);
+        MemberDTO loginMember =
+                LoginUtil.requireLogin(request, response);
 
         if (loginMember == null) {
             return;
         }
 
-        HttpSession session = request.getSession(false);
+        HttpSession session =
+                request.getSession(false);
 
-        boolean wowMember = session != null
-                && Boolean.TRUE.equals(session.getAttribute("wowMember"));
+        boolean wowMember =
+                session != null
+                && Boolean.TRUE.equals(
+                        session.getAttribute("wowMember")
+                );
 
         if (!wowMember) {
             response.sendRedirect(
-                    request.getContextPath() + "/wow/join"
+                    request.getContextPath()
+                    + "/wow/join"
             );
             return;
         }
 
-        request.getRequestDispatcher("/WEB-INF/views/wow_welcome.jsp")
-               .forward(request, response);
+        String productNo =
+                request.getParameter("productNo");
+
+        request.setAttribute(
+                "returnProductNo",
+                productNo
+        );
+
+        request.getRequestDispatcher(
+                "/WEB-INF/views/wow_welcome.jsp"
+        ).forward(request, response);
     }
 }

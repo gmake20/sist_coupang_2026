@@ -41,11 +41,12 @@ public class WowJoinServlet extends HttpServlet {
 
         int memberNo = loginMember.getMemberNo();
 
-        // MEMBER.RANK가 아니라 WOW_MEMBERSHIP 기준으로 확인
         boolean wowMember = wowMembershipDAO.isWowMember(memberNo);
 
         if (wowMember) {
-            response.sendRedirect(request.getContextPath() + "/wow/membership");
+            response.sendRedirect(
+                    request.getContextPath() + "/wow/membership"
+            );
             return;
         }
 
@@ -57,13 +58,15 @@ public class WowJoinServlet extends HttpServlet {
         String mode = request.getParameter("mode");
 
         if ("modal".equals(mode)) {
-            request.getRequestDispatcher("/WEB-INF/views/wow_join_modal.jsp")
-                   .forward(request, response);
+            request.getRequestDispatcher(
+                    "/WEB-INF/views/wow_join_modal.jsp"
+            ).forward(request, response);
             return;
         }
 
-        request.getRequestDispatcher("/WEB-INF/views/wow_join.jsp")
-               .forward(request, response);
+        request.getRequestDispatcher(
+                "/WEB-INF/views/wow_join.jsp"
+        ).forward(request, response);
     }
 
     @Override
@@ -79,16 +82,34 @@ public class WowJoinServlet extends HttpServlet {
         }
 
         int memberNo = loginMember.getMemberNo();
+        
+        String productNo =
+                request.getParameter("productNo");
 
-        // POST에서도 와우 회원 여부 다시 확인
+        String joinMode = request.getParameter("joinMode");
+        String afterWowJoin = request.getParameter("afterWowJoin");
+
         if (wowMembershipDAO.isWowMember(memberNo)) {
-            response.sendRedirect(request.getContextPath() + "/wow/membership");
+
+            if ("buy".equals(afterWowJoin)) {
+                request.getRequestDispatcher(
+                        "/order/buy"
+                ).forward(request, response);
+                return;
+            }
+
+            response.sendRedirect(
+                    request.getContextPath() + "/wow/membership"
+            );
             return;
         }
 
-        String paymentMethodNoParam = request.getParameter("paymentMethodNo");
+        String paymentMethodNoParam =
+                request.getParameter("paymentMethodNo");
 
-        if (paymentMethodNoParam == null || paymentMethodNoParam.isBlank()) {
+        if (paymentMethodNoParam == null
+                || paymentMethodNoParam.isBlank()) {
+
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
                     "결제수단을 선택해주세요."
@@ -99,7 +120,8 @@ public class WowJoinServlet extends HttpServlet {
         int paymentMethodNo;
 
         try {
-            paymentMethodNo = Integer.parseInt(paymentMethodNoParam);
+            paymentMethodNo =
+                    Integer.parseInt(paymentMethodNoParam);
         } catch (NumberFormatException e) {
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
@@ -109,7 +131,10 @@ public class WowJoinServlet extends HttpServlet {
         }
 
         boolean valid =
-                paymentMethodDAO.existsPaymentMethod(memberNo, paymentMethodNo);
+                paymentMethodDAO.existsPaymentMethod(
+                        memberNo,
+                        paymentMethodNo
+                );
 
         if (!valid) {
             response.sendError(
@@ -122,7 +147,9 @@ public class WowJoinServlet extends HttpServlet {
         boolean paymentSuccess = true;
 
         if (!paymentSuccess) {
-            throw new ServletException("와우 멤버십 결제에 실패했습니다.");
+            throw new ServletException(
+                    "와우 멤버십 결제에 실패했습니다."
+            );
         }
 
         Connection conn = null;
@@ -137,7 +164,6 @@ public class WowJoinServlet extends HttpServlet {
             int wowMembershipNo;
 
             if (membership == null) {
-                // 최초 가입
                 wowMembershipNo =
                         wowMembershipDAO.getNextMembershipNo(conn);
 
@@ -148,7 +174,6 @@ public class WowJoinServlet extends HttpServlet {
                         paymentMethodNo
                 );
             } else {
-                // 기존 멤버십 재가입
                 wowMembershipNo =
                         membership.getWowMembershipNo();
 
@@ -160,27 +185,36 @@ public class WowJoinServlet extends HttpServlet {
                         );
 
                 if (updateResult != 1) {
-                    throw new Exception("와우 멤버십 재가입 처리 실패");
+                    throw new Exception(
+                            "와우 멤버십 재가입 처리 실패"
+                    );
                 }
             }
 
-            // 결제 내역 저장
-            wowPaymentDAO.insertPayment(
-                    conn,
-                    wowMembershipNo,
-                    memberNo,
-                    paymentMethodNo,
-                    WOW_PRICE,
-                    "JOIN",
-                    "SUCCESS"
-            );
+            int paymentResult =
+                    wowPaymentDAO.insertPayment(
+                            conn,
+                            wowMembershipNo,
+                            memberNo,
+                            paymentMethodNo,
+                            WOW_PRICE,
+                            "JOIN",
+                            "SUCCESS"
+                    );
+
+            if (paymentResult != 1) {
+                throw new Exception(
+                        "와우 멤버십 결제내역 저장 실패"
+                );
+            }
 
             conn.commit();
 
-            // MEMBER.RANK는 변경하지 않고 세션 상태만 변경
-            request.getSession().setAttribute("wowMember", true);
+            request.getSession()
+                   .setAttribute("wowMember", true);
 
         } catch (Exception e) {
+
             if (conn != null) {
                 try {
                     conn.rollback();
@@ -194,6 +228,7 @@ public class WowJoinServlet extends HttpServlet {
             );
 
         } finally {
+
             if (conn != null) {
                 try {
                     conn.setAutoCommit(true);
@@ -203,17 +238,27 @@ public class WowJoinServlet extends HttpServlet {
             }
         }
 
-        String joinMode = request.getParameter("joinMode");
+		/*
+		 * if ("modal".equals(joinMode) && "buy".equals(afterWowJoin)) {
+		 * 
+		 * request.getRequestDispatcher( "/order/buy" ).forward(request, response);
+		 * return; }
+		 */
+        if (productNo != null
+                && !productNo.isBlank()) {
 
-        if ("modal".equals(joinMode)) {
             response.sendRedirect(
-                    request.getContextPath() + "/?wowJoined=Y"
+                    request.getContextPath()
+                    + "/wow/welcome?productNo="
+                    + productNo
             );
+
             return;
         }
 
         response.sendRedirect(
-                request.getContextPath() + "/wow/welcome"
+                request.getContextPath()
+                + "/wow/welcome"
         );
     }
 }

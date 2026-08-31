@@ -7,22 +7,39 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.goodpang.dao.ProductDAO;
+import com.goodpang.dao.ProductImageDAO;
+import com.goodpang.dao.ProductOptionDAO;
+import com.goodpang.dao.ReviewDAO;
+import com.goodpang.dao.WowMembershipDAO;
+import com.goodpang.dto.MemberDTO;
+import com.goodpang.dto.ProductDTO;
+import com.goodpang.dto.ProductImageDTO;
+import com.goodpang.dto.ProductOptionDTO;
+import com.goodpang.dto.ReviewDTO;
+import com.google.gson.Gson;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+<<<<<<< HEAD
+import jakarta.servlet.http.HttpSession;
+=======
 
 import com.google.gson.Gson;
 
 import com.goodpang.dao.ProductDAO;
 import com.goodpang.dao.ProductImageDAO;
 import com.goodpang.dao.ProductOptionDAO;
+import com.goodpang.dao.ProductViewLogDAO;
 import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.ProductDTO;
 import com.goodpang.dto.ProductImageDTO;
 import com.goodpang.dto.ProductOptionDTO;
 import com.goodpang.dto.ReviewDTO;
+>>>>>>> 5ba6b04e9a3a1bea7460c30b322ae4e0b2707a3c
 
 
 @WebServlet("/product")
@@ -37,9 +54,36 @@ public class ProductServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String productNoParam = request.getParameter("productNo");
+        
+        WowMembershipDAO wowMembershipDAO =
+                new WowMembershipDAO();
 
-        System.out.println("[DEBUG ProductServlet] === 상품 상세 조회 시작 ===");
-        System.out.println("[DEBUG ProductServlet] 전달받은 productNoParam: " + productNoParam);
+        boolean isWowMember = false;
+
+        HttpSession session =
+                request.getSession(false);
+
+        if (session != null) {
+
+            MemberDTO loginMember =
+                    (MemberDTO) session.getAttribute(
+                            "loginMember"
+                    );
+
+            if (loginMember != null) {
+
+                isWowMember =
+                        wowMembershipDAO.isWowMember(
+                                loginMember.getMemberNo()
+                        );
+            }
+        }
+
+        request.setAttribute(
+                "isWowMember",
+                isWowMember
+        );
+        
 
         try {
             if (productNoParam != null && !productNoParam.isEmpty()) {
@@ -50,7 +94,6 @@ public class ProductServlet extends HttpServlet {
                 ProductDTO product = dao.selectProduct(productNo);
 
                 if (product == null) {
-                    System.out.println("[DEBUG ProductServlet] 상품을 찾을 수 없음: productNo=" + productNo);
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "상품을 찾을 수 없습니다.");
                     return;
                 }
@@ -62,6 +105,10 @@ public class ProductServlet extends HttpServlet {
                 request.setAttribute("deliveryDate", deliveryDate);
 
                 request.setAttribute("p", product);
+
+                // 판매자센터 대시보드의 "오늘 방문자수" / "오늘 상품 노출수" 집계용 조회 로그
+                Integer memberNo = (Integer) request.getSession().getAttribute("memberNo");
+                new ProductViewLogDAO().logView(productNo, memberNo, request.getSession().getId());
 
                 // 옵션 + 옵션별/상세설명 사진
                 //  옵션 하나(OPTION_ID)마다 대표/추가 사진이 딸려있고, OPTION_ID 가 null 인 사진은
