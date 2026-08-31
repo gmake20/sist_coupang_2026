@@ -3499,7 +3499,8 @@
 const isLogin =
     ${not empty sessionScope.loginMember};
 
-const isWowMember = ${sessionScope.wowMember};
+/* const isWowMember = ${sessionScope.wowMember}; */
+const isWowMember = ${sessionScope.wowMember == true};
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -3703,15 +3704,46 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.style.display = "none";
     }
 
-    closeBtn.addEventListener(
-        "click",
-        closeWowModal
-    );
+    function closeWowModal() {
+        if (!modal) {
+            return;
+        }
 
-    laterBtn.addEventListener(
-        "click",
-        closeWowModal
-    );
+        if (todayCheck && todayCheck.checked) {
+            localStorage.setItem(
+                "wowModalHideDate",
+                getToday()
+            );
+        }
+
+        modal.style.display = "none";
+        document.body.style.overflow = "";
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener(
+            "click",
+            closeWowModal
+        );
+    }
+
+    if (laterBtn) {
+        laterBtn.addEventListener(
+            "click",
+            closeWowModal
+        );
+    }
+
+    if (modal) {
+        modal.addEventListener(
+            "click",
+            function(event) {
+                if (event.target === modal) {
+                    closeWowModal();
+                }
+            }
+        );
+    }
 
     modal.addEventListener("click", function (event) {
         if (event.target === modal) {
