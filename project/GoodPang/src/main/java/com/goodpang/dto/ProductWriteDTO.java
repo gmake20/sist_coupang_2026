@@ -23,6 +23,7 @@ public class ProductWriteDTO {
     private String productName;
     private String internalName;
     private int productPrice;
+    private String optionYn = "Y";
 
     private String manufacturer;
     private String compositionType;

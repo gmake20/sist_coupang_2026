@@ -7,26 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import com.goodpang.dao.ProductDAO;
-import com.goodpang.dao.ProductImageDAO;
-import com.goodpang.dao.ProductOptionDAO;
-import com.goodpang.dao.ProductViewLogDAO;
-import com.goodpang.dao.ReviewDAO;
-import com.goodpang.dao.WowMembershipDAO;
-import com.goodpang.dto.MemberDTO;
-import com.goodpang.dto.ProductDTO;
-import com.goodpang.dto.ProductImageDTO;
-import com.goodpang.dto.ProductOptionDTO;
-import com.goodpang.dto.ReviewDTO;
-import com.goodpang.dao.ProductViewLogDAO;
-import com.google.gson.Gson;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
+
+import com.goodpang.dao.ProductDAO;
+import com.goodpang.dao.ProductImageDAO;
+import com.goodpang.dao.ProductOptionDAO;
+import com.goodpang.dao.ReviewDAO;
+import com.goodpang.dto.ProductDTO;
+import com.goodpang.dto.ProductImageDTO;
+import com.goodpang.dto.ProductOptionDTO;
+import com.goodpang.dto.ReviewDTO;
 
 
 @WebServlet("/product")
@@ -41,36 +37,9 @@ public class ProductServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String productNoParam = request.getParameter("productNo");
-        
-        WowMembershipDAO wowMembershipDAO =
-                new WowMembershipDAO();
 
-        boolean isWowMember = false;
-
-        HttpSession session =
-                request.getSession(false);
-
-        if (session != null) {
-
-            MemberDTO loginMember =
-                    (MemberDTO) session.getAttribute(
-                            "loginMember"
-                    );
-
-            if (loginMember != null) {
-
-                isWowMember =
-                        wowMembershipDAO.isWowMember(
-                                loginMember.getMemberNo()
-                        );
-            }
-        }
-
-        request.setAttribute(
-                "isWowMember",
-                isWowMember
-        );
-        
+        System.out.println("[DEBUG ProductServlet] === 상품 상세 조회 시작 ===");
+        System.out.println("[DEBUG ProductServlet] 전달받은 productNoParam: " + productNoParam);
 
         try {
             if (productNoParam != null && !productNoParam.isEmpty()) {
@@ -81,6 +50,7 @@ public class ProductServlet extends HttpServlet {
                 ProductDTO product = dao.selectProduct(productNo);
 
                 if (product == null) {
+                    System.out.println("[DEBUG ProductServlet] 상품을 찾을 수 없음: productNo=" + productNo);
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "상품을 찾을 수 없습니다.");
                     return;
                 }
@@ -93,15 +63,40 @@ public class ProductServlet extends HttpServlet {
 
                 request.setAttribute("p", product);
 
-                // 판매자센터 대시보드의 "오늘 방문자수" / "오늘 상품 노출수" 집계용 조회 로그
-                Integer memberNo = (Integer) request.getSession().getAttribute("memberNo");
-                new ProductViewLogDAO().logView(productNo, memberNo, request.getSession().getId());
-
                 // 옵션 + 옵션별/상세설명 사진
                 //  옵션 하나(OPTION_ID)마다 대표/추가 사진이 딸려있고, OPTION_ID 가 null 인 사진은
                 //  상세설명용이라 따로 뺌)
                 ProductOptionDAO optionDAO = new ProductOptionDAO();
                 List<ProductOptionDTO> options = optionDAO.selectOptionsByProductNo(productNo);
+
+                /* 2026-09-01 추가 — 옵션을 바꾸고 새로고침해도 그 옵션이 그대로 선택돼 있게.
+                   실제 쿠팡을 Playwright 로 확인해보니, 옵션을 바꾸면 주소(itemId/vendorItemId)가
+                   그 자리에서 바뀌고(js/product.js updateFromSelects 의 history.replaceState),
+                   그 주소로 새로고침하면 서버가 그 값을 보고 그 옵션으로 다시 그려줌 — 같은 방식을 씀.
+                   URL 의 optionId 가 없거나, 있어도 이 상품 옵션 목록에 없으면(다른 상품 값을 끼워넣거나
+                   조작한 경우) 조용히 무시하고 예전처럼 첫 옵션으로 감 — DB 를 한 번 더 안 물어보고
+                   이미 불러온 options 안에서만 찾음(그래야 "이 상품 소속"인지도 같이 검증됨) */
+                ProductOptionDTO selectedOption = null;
+                String optionIdParam = request.getParameter("optionId");
+                if (optionIdParam != null) {
+                    try {
+                        int wantedOptionId = Integer.parseInt(optionIdParam);
+                        for (ProductOptionDTO option : options) {
+                            if (option.getOptionId() == wantedOptionId) {
+                                selectedOption = option;
+                                break;
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        // optionId 가 숫자가 아니면 무시 — 아래에서 첫 옵션으로 fallback
+                    }
+                }
+                if (selectedOption == null && !options.isEmpty()) {
+                    selectedOption = options.get(0);
+                }
+                // product.jsp 는 예전에 <c:set var="mainOption" value="${options[0]}"/> 로 직접
+                // 골랐는데, 그러면 여기서 고른 값을 페이지 스코프가 도로 덮어써버려서 이 변수로 넘김
+                request.setAttribute("mainOption", selectedOption);
 
                 /* 2026-08-30 확정 — PRODUCT_OPTION.PRICE/NORMAL_PRICE 는 PRODUCT.PRODUCT_PRICE(기본가)에
                    더해지는 "추가금"(CartDAO.getCartItems() 와 같은 전제). 그래서:
@@ -113,12 +108,11 @@ public class ProductServlet extends HttpServlet {
                 int displayPrice = product.getProductPrice();
                 Integer displayNormalPrice = null;
 
-                if (!options.isEmpty()) {
-                    ProductOptionDTO firstOption = options.get(0);
-                    displayPrice = product.getProductPrice() + firstOption.getPrice();
+                if (selectedOption != null) {
+                    displayPrice = product.getProductPrice() + selectedOption.getPrice();
 
-                    if (firstOption.getNormalPrice() != null) {
-                        int normalTotal = product.getProductPrice() + firstOption.getNormalPrice();
+                    if (selectedOption.getNormalPrice() != null) {
+                        int normalTotal = product.getProductPrice() + selectedOption.getNormalPrice();
                         if (normalTotal > displayPrice) {
                             displayNormalPrice = normalTotal;
                         }

@@ -42,6 +42,11 @@ function setupQuantity() {
   const originPriceEl = originBox ? originBox.querySelector('.origin-price') : null;
   const basePrice = priceEl ? Number(priceEl.dataset.basePrice) || 0 : 0;
   let unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
+  // 2026-09-01 추가 — 정상가(취소선)의 "1개당" 값. 할인 중이 아니면 null(취소선 자체를 안 보여줌).
+  // render() 가 이 값 × 수량으로 취소선도 같이 다시 그림 — 예전엔 이 변수가 없어서 수량을 바꿔도
+  // 취소선 금액이 1개 값 그대로 안 바뀌던 버그가 있었음 (사용자가 "수량 버튼 누르면 정상가는 금액이
+  // 안 바뀐다"고 지적함)
+  let normalUnitPrice = null;
 
   const MIN = 1;
   /* 옵션이 없는 상품(재고 정보가 안 내려오는 경우)을 위한 기본값.
@@ -60,6 +65,11 @@ function setupQuantity() {
        0원으로 다시 그리면 "품절인데 원가는 남아있는" 원본 화면과 달라짐 */
     if (priceEl && !document.body.classList.contains('is-soldout')) {
       priceEl.textContent = (unitPrice * n).toLocaleString('ko-KR') + '원';
+    }
+    // 취소선(정상가)도 판매가와 똑같이 수량만큼 곱해서 다시 그림 (할인 중일 때만 — normalUnitPrice
+    // 가 null 이면 애초에 취소선 자체가 안 보이는 상태라 건드릴 필요 없음)
+    if (originPriceEl && normalUnitPrice != null) {
+      originPriceEl.textContent = (normalUnitPrice * n).toLocaleString('ko-KR') + '원';
     }
   }
 
@@ -101,9 +111,10 @@ function setupQuantity() {
     }
     if (discountLabelEl) discountLabelEl.style.display = hasDiscount ? '' : 'none';
     if (originBox) originBox.style.display = hasDiscount ? '' : 'none';
-    if (hasDiscount && originPriceEl) {
-      originPriceEl.textContent = normalPrice.toLocaleString('ko-KR') + '원';
-    }
+    // originPriceEl 의 글자는 여기서 직접 안 쓰고 normalUnitPrice 만 갱신함 —
+    // 실제 텍스트(× 수량)는 바로 아래 render() 가 그림 (수량 곱하는 로직을 두 군데 두면
+    // 하나만 고치고 하나는 깜빡하는 사고가 나서 한 곳으로 모음)
+    normalUnitPrice = hasDiscount ? normalPrice : null;
 
     render(Number(input.value) || MIN);   // 단가가 바뀌었으니 화면 가격도 다시 그림
   }
@@ -141,6 +152,88 @@ function setupThumbs() {
     const picked = li.querySelector('img');
     if (main && picked) main.src = picked.src;
   });
+}
+
+
+/* ── 2.5 대표 이미지 확대(마우스 오버 돋보기) ─────────────
+   (2, 3 사이에 끼워넣은 기능이라 번호를 2.5 로 붙임 — 아래 5.5/6.3/6.5 와 같은 방식,
+   전체를 다시 번호 매기면 다른 곳 참조 주석까지 다 밀려서 여기서도 그 관례를 따름)
+   2026-09-01 추가. 로그인해서 실제 쿠팡을 Playwright 로 대표 이미지에 마우스를 직접 올려서
+   실측함(뷰포트 1280 / 1536 / 1920 세 군데). 확인한 것:
+     · 뷰포트 1280px 미만이면 이 기능 자체가 원본 DOM 에 없음(숨기는 게 아니라 아예 안 만듦) —
+       본문이 좁아지면 오른쪽에 확대사진 놓을 자리가 없어져서인 듯. 우리도 같은 폭 기준으로 막음
+     · 렌즈(마우스 따라다니는 반투명 박스) 222×218px / 확대판(오른쪽에 뜨는 확대 사진) 476×466px —
+       뷰포트가 바뀌어서 대표 이미지 자체 크기(439px↔556px)가 달라져도 이 둘은 그대로임(고정 픽셀,
+       이미지 폭에 비례하는 게 아니었음)
+     · 확대판은 이미지 바로 오른쪽에 간격 없이(0px) 붙고, 위쪽 끝이 이미지와 나란함
+     · 배경 확대율은 마우스 위치와 상관없이 항상 250% 고정
+     · 확대판에 쓰는 사진은 화면에 보이는 썸네일용(492x492 등 축소본)이 아니라 별도의
+       고해상도 원본 — 우리는 그런 별도 파일이 없어서 지금 큰 이미지에 쓰는 파일을 그대로 씀
+       (원본 사진 자체가 작으면 확대했을 때 흐려질 수 있음 — 나중에 사진 커지면 자동으로 좋아짐)
+
+   ★ 렌즈는 이미지 박스 테두리를 못 벗어나게 clamp — 마우스가 이미지 밖으로 나가도 렌즈는
+     가장자리에 붙어서 멈춤 (원본도 이렇게 동작하는 걸 실측 확인) */
+function setupImageZoom() {
+  const box = document.querySelector('.product-image__main');
+  if (!box) return;
+
+  const LENS_W = 222, LENS_H = 218;
+  const ZOOM = 2.5;   // = 250% (실측값, 렌즈/확대판 크기 비율로 계산한 값이 아니라 원본에 박혀있던 고정 배율)
+
+  let lens = null, overlayImg = null;
+
+  function build() {
+    lens = document.createElement('div');
+    lens.className = 'magnifier-lens';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'magnify-overlay';
+    overlayImg = document.createElement('div');
+    overlayImg.className = 'magnify-overlay__img';
+    overlay.appendChild(overlayImg);
+
+    box.appendChild(lens);
+    box.appendChild(overlay);
+  }
+
+  function remove() {
+    box.querySelectorAll('.magnifier-lens, .magnify-overlay').forEach(function (el) { el.remove(); });
+    lens = null;
+    overlayImg = null;
+  }
+
+  function move(e) {
+    if (!lens) return;
+    const rect = box.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // 렌즈 중심이 이미지 박스를 못 벗어나게 막음
+    x = Math.max(LENS_W / 2, Math.min(rect.width  - LENS_W / 2, x));
+    y = Math.max(LENS_H / 2, Math.min(rect.height - LENS_H / 2, y));
+
+    const lensLeft = x - LENS_W / 2;
+    const lensTop  = y - LENS_H / 2;
+    lens.style.left = lensLeft + 'px';
+    lens.style.top  = lensTop + 'px';
+
+    // 렌즈가 가리키는 지점을 확대판에서 보여줌 — 배경이 250%로 커져있으니
+    // 좌표에도 같은 배율을 곱해야 렌즈 위치랑 확대판 안 위치가 맞물림
+    if (overlayImg) {
+      overlayImg.style.backgroundPosition = (-lensLeft * ZOOM) + 'px ' + (-lensTop * ZOOM) + 'px';
+    }
+  }
+
+  box.addEventListener('mouseenter', function (e) {
+    if (window.innerWidth < 1280) return;   // 원본도 이 폭 밑에서는 기능 자체가 없음
+    const img = box.querySelector('img');
+    if (!img || !img.src) return;
+    build();
+    overlayImg.style.backgroundImage = 'url(' + img.src + ')';
+    move(e);
+  });
+  box.addEventListener('mousemove', move);
+  box.addEventListener('mouseleave', remove);
 }
 
 
@@ -232,6 +325,16 @@ function setupOptionSelect(setStock, setPrice) {
   // 이 상품에 사진이 하나라도 딸린 조합이 있는지 — 2번째 이후 축을 칩으로 할지 드롭박스로 할지 판단 기준
   const anyImages = combos.some(function (c) { return c.imageUrls.length; });
 
+  /* 2026-09-01 추가 — 새로고침해도 옵션 선택 유지.
+     주소(?optionId=)에 담겨온 조합을 찾아서, 아래에서 드롭박스/칩을 그릴 때 "처음부터 이 값"으로
+     선택해둠. ProductServlet 도 같은 optionId 를 보고 mainOption(대표사진·가격)을 이미 그 옵션
+     기준으로 렌더해놨으니, 여기서 화면(드롭박스·칩)만 맞춰주면 서버가 그린 것과 어긋나지 않음.
+     주소에 optionId 가 없거나 이 상품 조합에 없는 값이면 그냥 null → 아래에서 예전처럼 첫 값 씀 */
+  const urlOptionId = new URLSearchParams(location.search).get('optionId');
+  const initialCombo = urlOptionId
+    ? combos.find(function (c) { return String(c.optionId) === urlOptionId; })
+    : null;
+
   const optionIdInput = document.getElementById('selectedOptionId');
   const colorInput    = document.getElementById('selectedColor');
   const thumbBox      = document.querySelector('.product-image__thumbs');
@@ -272,6 +375,19 @@ function setupOptionSelect(setStock, setPrice) {
     if (colorInput) {
       // 원래 "색상"만 담던 자리인데, 지금은 고른 값들을 다 이어붙여서 담음 (예: "M / Black")
       colorInput.value = controls.map(function (ctl) { return ctl.getValue(); }).join(' / ');
+    }
+
+    /* 2026-09-01 추가 — 지금 고른 옵션을 주소창에 실어둠(?optionId=).
+       실제 쿠팡도 옵션을 바꾸면 페이지 이동 없이 주소(itemId/vendorItemId)만 바뀌는 걸
+       Playwright 로 확인함. pushState 가 아니라 replaceState 를 쓰는 이유: 옵션 하나 누를 때마다
+       "뒤로가기" 기록이 쌓이면 안 되고(다른 사이즈 5번 눌렀는데 뒤로가기 5번 눌러야 이 상품
+       페이지를 벗어나는 건 이상함), 주소는 "지금 상태"만 보여주면 되기 때문.
+       이 함수는 페이지 처음 열릴 때도 한 번 불려서(맨 아래 updateFromSelects() 참고), 그때도
+       주소에 optionId 가 없었다면 여기서 채워짐 — 원본도 처음부터 itemId 가 주소에 있는 것과 같음 */
+    if (window.history && window.history.replaceState) {
+      const params = new URLSearchParams(location.search);
+      params.set('optionId', picked.optionId);
+      history.replaceState(null, '', location.pathname + '?' + params.toString());
     }
 
     fetchOptionDetail(picked.optionId);
@@ -329,19 +445,22 @@ function setupOptionSelect(setStock, setPrice) {
 
     const useChips = axisIndex > 0 && anyImages;   // 1번 축은 무조건 드롭박스
 
+    // 이 축에서 "처음부터 선택돼 있어야 할 값" — URL 에 실려온 조합이 있으면 그 값, 없으면 예전처럼 첫 값
+    const initialValue = (initialCombo && initialCombo[axis.key]) || values[0];
+
     if (useChips) {
       const label = document.createElement('div');
-      label.innerHTML = axis.type + ': <span class="option-value">' + values[0] + '</span>';
+      label.innerHTML = axis.type + ': <span class="option-value">' + initialValue + '</span>';
       label.className = 'option-label';
       section.appendChild(label);
 
       const ul = document.createElement('ul');
       ul.className = 'option-chips';
 
-      values.forEach(function (v, i) {
+      values.forEach(function (v) {
         const li = document.createElement('li');
         li.dataset.value = v;
-        if (i === 0) li.classList.add('is-on');
+        if (v === initialValue) li.classList.add('is-on');
         li.innerHTML = '<a href="#"><img src="" alt="' + v + '"></a>';
         li.addEventListener('click', function (e) {
           e.preventDefault();
@@ -381,6 +500,7 @@ function setupOptionSelect(setStock, setPrice) {
         const opt = document.createElement('option');
         opt.value = v;
         opt.textContent = v;
+        if (v === initialValue) opt.selected = true;
         select.appendChild(opt);
       });
       select.addEventListener('change', updateFromSelects);
@@ -687,6 +807,7 @@ function setupDeliveryOption() {
    옵션을 고를 때마다 그 옵션의 재고·가격으로 화면이 바뀌게 하려는 것 */
 const quantityControls = setupQuantity() || {};
 setupThumbs();
+setupImageZoom();
 setupAdSlider();
 setupOptionSelect(quantityControls.setStock, quantityControls.setPrice);
 setupReviewTools();

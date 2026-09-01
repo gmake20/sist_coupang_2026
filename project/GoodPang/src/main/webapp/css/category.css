@@ -31,7 +31,7 @@
 }
 
 .category-page .breadcrumb .current {
-	color: var(--text-gray);
+	color: #000000;
 }
 
 /* ---------- 2단 레이아웃 ---------- */
@@ -108,12 +108,14 @@
 }
 
 label.selected .filter-function-bar-asset,
+.category-filter a.selected .filter-function-bar-asset,
 .filter-function-bar-asset.checked {
 	background: var(--link-blue);
 	border-color: var(--link-blue);
 }
 
 label.selected .filter-function-bar-asset::after,
+.category-filter a.selected .filter-function-bar-asset::after,
 .filter-function-bar-asset.checked::after {
 	content: "";
 	position: absolute;
@@ -289,21 +291,11 @@ label.selected .filter-function-bar-asset::after,
 	margin-top: 2px;
 }
 
-/* 배송정보 — 원본 실측(2026-08-31): 도착보장 문구는 초록, 무료배송 문구는 회색, 둘 다 14px */
-.product-card .delivery-info {
+/* 적립 — 실제 적립 정책 없어서 판매가 1%로 임의 계산(2026-09-01 재추가) */
+.product-card .cash-reward {
+	font-size: 12px;
+	color: var(--text-gray);
 	margin-bottom: 4px;
-}
-
-.product-card .delivery-date {
-	display: block;
-	font-size: 14px;
-	color: #008C00;
-}
-
-.product-card .delivery-free {
-	display: block;
-	font-size: 14px;
-	color: #454F5B;
 }
 
 .product-card .product-rating {
