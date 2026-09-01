@@ -10,6 +10,7 @@ import java.util.Locale;
 import com.goodpang.dao.ProductDAO;
 import com.goodpang.dao.ProductImageDAO;
 import com.goodpang.dao.ProductOptionDAO;
+import com.goodpang.dao.ProductViewLogDAO;
 import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dao.WowMembershipDAO;
 import com.goodpang.dto.MemberDTO;
@@ -26,8 +27,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
-
 
 
 @WebServlet("/product")
