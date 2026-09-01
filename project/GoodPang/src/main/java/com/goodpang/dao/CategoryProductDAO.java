@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.goodpang.dto.CategoryDTO;
@@ -12,7 +13,6 @@ import com.goodpang.util.ConnectionProvider;
 
 /*
  * 카테고리 목록 페이지(/category?categoryNo=...) 조회 전용 DAO.
- * 실제 라이브 coupang.com 을 Playwright MCP 로 확인해서 설계함 — 근거는 ref/category/STRUCTURE.md.
  */
 public class CategoryProductDAO {
 
@@ -21,8 +21,9 @@ public class CategoryProductDAO {
         LATEST, PRICE_ASC, PRICE_DESC, SALE_COUNT
     }
 
-    // 상품 목록 하나의 SELECT 본문 + FROM/JOIN 은 count 조회와 겹쳐서 재사용
-    private static final String BASE_FROM = """
+    // 상품 목록 하나의 SELECT 본문 + FROM/JOIN 은 count 조회와 겹쳐서 재사용.
+    // 색상 조건은 다중선택(2026-09-02)이라 자리표시자 개수가 매번 달라져서 상수에서 뺐음 — buildColorCondition() 참고
+    private static final String BASE_FROM_HEAD = """
             FROM PRODUCT P
             LEFT JOIN (
                 SELECT PRODUCT_NO, PRICE, NORMAL_PRICE
@@ -57,16 +58,40 @@ public class CategoryProductDAO {
             WHERE P.SUB_CATEGORY_NO = ?
               AND (P.PRODUCT_PRICE + NVL(OPT.PRICE, 0)) BETWEEN ? AND ?
               AND NVL(RV.AVG_RATING, 0) >= ?
-              AND (? IS NULL OR EXISTS (
-                    SELECT 1 FROM PRODUCT_OPTION PO2
-                    WHERE PO2.PRODUCT_NO = P.PRODUCT_NO
-                      AND (PO2.OPTION1_VALUE = ? OR PO2.OPTION2_VALUE = ? OR PO2.OPTION3_VALUE = ?)
-                  ))
             """;
 
-    // 목록 (60개씩 고정, page 는 1부터). color 는 null 이면 필터 안 함
+    /*
+     * 색상 다중선택 조건 (2026-09-02 추가) — 같은 색상 그룹 안에서는 OR("Black 또는 White 가진 상품"),
+     * 다른 필터 그룹(가격/평점 등)과는 AND. IN() 자리표시자는 선택한 색상 개수만큼 동적으로 만들지만
+     * 값은 여전히 PreparedStatement 로만 바인딩하니 SQL 인젝션 위험은 없음(사용자 입력이 SQL 문자열에 직접 안 들어감).
+     */
+    private String buildColorCondition(int colorCount) {
+        if (colorCount == 0) return "";
+        String placeholders = String.join(",", Collections.nCopies(colorCount, "?"));
+        return "  AND EXISTS (\n"
+             + "        SELECT 1 FROM PRODUCT_OPTION PO2\n"
+             + "        WHERE PO2.PRODUCT_NO = P.PRODUCT_NO\n"
+             + "          AND (PO2.OPTION1_VALUE IN (" + placeholders + ")\n"
+             + "            OR PO2.OPTION2_VALUE IN (" + placeholders + ")\n"
+             + "            OR PO2.OPTION3_VALUE IN (" + placeholders + "))\n"
+             + "      )\n";
+    }
+
+    // 색상 조건의 IN() 자리표시자(OPTION1~3 세 번 반복)에 값 바인딩. colors 가 비어있으면 아무것도 안 함
+    private int bindColors(PreparedStatement pstmt, int startIndex, List<String> colors) throws java.sql.SQLException {
+        int i = startIndex;
+        if (colors == null || colors.isEmpty()) return i;
+        for (int rep = 0; rep < 3; rep++) {          // OPTION1_VALUE, OPTION2_VALUE, OPTION3_VALUE 순서
+            for (String color : colors) {
+                pstmt.setString(i++, color);
+            }
+        }
+        return i;
+    }
+
+    // 목록 (60개씩 고정, page 는 1부터). colors 가 비어있으면 색상 필터 안 함
     public List<CategoryProductDTO> findByCategory(
-            int categoryNo, Sort sort, int minPrice, int maxPrice, int minRating, String color,
+            int categoryNo, Sort sort, int minPrice, int maxPrice, int minRating, List<String> colors,
             int page, int pageSize) {
 
         List<CategoryProductDTO> list = new ArrayList<>();
@@ -83,7 +108,8 @@ public class CategoryProductDAO {
                     NVL(RV.REVIEW_COUNT, 0) AS REVIEW_COUNT,
                     NVL(SC.SALE_COUNT, 0) AS SALE_COUNT
                 """
-                + BASE_FROM
+                + BASE_FROM_HEAD
+                + buildColorCondition(colors == null ? 0 : colors.size())
                 + "ORDER BY " + orderByClause(sort) + "\n"
                 + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY\n";
 
@@ -97,10 +123,7 @@ public class CategoryProductDAO {
             pstmt.setInt(i++, minPrice);
             pstmt.setInt(i++, maxPrice);
             pstmt.setInt(i++, minRating);
-            pstmt.setString(i++, color);
-            pstmt.setString(i++, color);
-            pstmt.setString(i++, color);
-            pstmt.setString(i++, color);
+            i = bindColors(pstmt, i, colors);
             pstmt.setInt(i++, (page - 1) * pageSize);
             pstmt.setInt(i++, pageSize);
 
@@ -118,23 +141,21 @@ public class CategoryProductDAO {
     }
 
     // 페이지네이션용 총 개수 — 필터 조건은 findByCategory 와 반드시 같아야 함
-    public int countByCategory(int categoryNo, int minPrice, int maxPrice, int minRating, String color) {
+    public int countByCategory(int categoryNo, int minPrice, int maxPrice, int minRating, List<String> colors) {
 
-        String sql = "SELECT COUNT(*) " + BASE_FROM;
+        String sql = "SELECT COUNT(*) " + BASE_FROM_HEAD + buildColorCondition(colors == null ? 0 : colors.size());
 
         try (
             Connection conn = ConnectionProvider.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
 
-            pstmt.setInt(1, categoryNo);
-            pstmt.setInt(2, minPrice);
-            pstmt.setInt(3, maxPrice);
-            pstmt.setInt(4, minRating);
-            pstmt.setString(5, color);
-            pstmt.setString(6, color);
-            pstmt.setString(7, color);
-            pstmt.setString(8, color);
+            int i = 1;
+            pstmt.setInt(i++, categoryNo);
+            pstmt.setInt(i++, minPrice);
+            pstmt.setInt(i++, maxPrice);
+            pstmt.setInt(i++, minRating);
+            bindColors(pstmt, i, colors);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -311,7 +332,7 @@ public class CategoryProductDAO {
         dto.setReviewCount(rs.getInt("REVIEW_COUNT"));
         dto.setSaleCount(rs.getInt("SALE_COUNT"));
 
-        // 적립 — 실제 적립 정책 테이블이 없어서 판매가 1%로 임의 계산(2026-09-01 사용자 요청)
+        // 적립 — 실제 적립 정책 테이블이 없어서 판매가 1%로 임의 계산
         dto.setCashReward((int) Math.floor(dto.getSalePrice() * 0.01));
 
         return dto;
