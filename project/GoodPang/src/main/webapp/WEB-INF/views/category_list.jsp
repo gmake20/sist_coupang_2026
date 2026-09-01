@@ -19,6 +19,22 @@
 </head>
 
 <body class="page-category">
+
+	<%-- 상단 띠배너 — index.html 21~27번 줄과 완전히 동일한 마크업 재사용(2026-09-01).
+	     header.jsp 안에는 이 배너가 없고, index.html 이 header include 앞에 직접 넣어둔 걸 그대로 가져옴.
+	     CSS(.coupang-top-banner, .top-banner-placeholder)와 배너 이미지(top-1.jpg/top-2.jpg)는
+	     common.css/main.css 에 이미 있는 걸 그대로 씀 — 새로 만든 것 없음 --%>
+	<div class="coupang-top-banner">
+		<div class="banner-middle">
+			<a href="#"> <span class="top-banner-placeholder"
+				style="background: #b5f3fe; color: #0b3d5c"> 오늘 밤 12시까지 주문해도
+					로켓배송은 내일 도착! <i class="arrow"></i>
+			</span></a> <a href="#"> <span class="top-banner-placeholder"
+				style="background: #80daff; color: #0b2d45"> 김원훈의 모발관리템 <i
+					class="arrow"></i></span></a>
+		</div>
+	</div>
+
 	<jsp:include page="/inc/header.jsp" />
 
 	<%-- 정렬/페이지/평점/가격 링크에 항상 같이 실어야 하는 값들. 새 링크 만들 때마다 이어붙임.
@@ -35,11 +51,11 @@
 	<c:set var="hasActiveFilter"
 		value="${not empty selectedColors || rating > 0 || minPrice > 0 || not empty maxPrice}" />
 
-	<main class="category-page">
-
-		<%-- ==================================================
-		     브레드크럼
-		     ================================================== --%>
+	<%-- ==================================================
+	     브레드크럼 — 원본 재실측(2026-09-01): 화면 끝까지 이어지는 회색 띠(#F9FAFB,
+	     border-bottom #DFE3E8) 안에 있음. .category-page(max-width:1300px) 밖에 따로 둬야
+	     배경만 풀폭으로 퍼지고 글자는 그 안에서 1300px 폭으로 맞춰짐 --%>
+	<div class="breadcrumb-bar">
 		<nav class="breadcrumb" aria-label="브레드크럼">
 			<a href="${pageContext.request.contextPath}/">굿팡 홈</a>
 			<c:forEach var="crumb" items="${breadcrumb}">
@@ -50,6 +66,9 @@
 					class="${crumb.categoryLevel == 3 ? 'current' : ''}">${crumb.categoryName}</a>
 			</c:forEach>
 		</nav>
+	</div>
+
+	<main class="category-page">
 
 		<div class="category-body">
 
