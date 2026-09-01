@@ -30,7 +30,7 @@ public class VendorProductOptionDAO {
                 JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
             WHERE P.SELLER_NO = ?
               AND (? IS NULL OR P.PRODUCT_NO = ?)
-            ORDER BY P.PRODUCT_NO, PO.OPTION_ID
+            ORDER BY P.CREATED_DATE DESC, P.PRODUCT_NO DESC, PO.OPTION_ID
             """;
 
         try (
@@ -68,11 +68,11 @@ public class VendorProductOptionDAO {
         List<VendorProductOptionDTO> list = new ArrayList<>();
 
         String sql = """
-            SELECT DISTINCT P.PRODUCT_NO, P.PRODUCT_NAME
+            SELECT DISTINCT P.PRODUCT_NO, P.PRODUCT_NAME, P.CREATED_DATE
             FROM PRODUCT_OPTION PO
                 JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
             WHERE P.SELLER_NO = ?
-            ORDER BY P.PRODUCT_NO
+            ORDER BY P.CREATED_DATE DESC, P.PRODUCT_NO DESC
             """;
 
         try (
