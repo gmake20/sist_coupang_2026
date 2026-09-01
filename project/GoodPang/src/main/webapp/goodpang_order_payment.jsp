@@ -16,9 +16,6 @@
 </head>
 
 <body>
-
-	<div class="top-header"></div>
-
 	<div class="container">
 
 		<h1 class="logo">
