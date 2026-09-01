@@ -23,44 +23,10 @@
 
 	<div class="mypang-layout">
 
-		<!-- 왼쪽 MY쿠팡 -->
-		<aside class="mypang-sidebar">
-			<div class="mypang-logo">MY쿠팡</div>
-
-			<div class="mypang-menu-group">
-				<h3>MY 쇼핑</h3>
-				<a href="${pageContext.request.contextPath}/mypage/orders">주문목록/배송조회</a>
-				<a href="#">취소/반품/교환/환불내역</a> <a href="#">로켓와우 멤버십 관리</a> <a
-					href="#">영수증 조회/출력</a>
-			</div>
-
-			<div class="mypang-menu-group">
-				<h3>MY 혜택</h3>
-				<a href="#">할인쿠폰</a> <a href="#">쿠팡캐시</a>
-			</div>
-
-			<div class="mypang-menu-group">
-				<h3>MY 활동</h3>
-				<a href="#">문의하기</a> <a href="#">문의내역 확인</a> <a
-					href="${pageContext.request.contextPath}/review/list"
-					class="active">리뷰관리</a> <a href="#">찜 리스트</a>
-			</div>
-
-			<div class="mypang-menu-group">
-				<h3>MY 정보</h3>
-				<a href="${pageContext.request.contextPath}/member/modify">개인정보확인/수정</a>
-				<a href="#">결제수단·쿠페이 관리</a> <a
-					href="${pageContext.request.contextPath}/address/list">배송지 관리</a> <a
-					href="#">회원 탈퇴</a>
-			</div>
-
-			<div class="mypang-help">
-				<div>📋 쿠팡문의</div>
-				<div>📢 고객의 소리</div>
-				<div>📦 취소/반품안내</div>
-			</div>
-		</aside>
-
+			<!-- 리뷰관리 메뉴 파란색 활성화 -->
+	<jsp:include page="/inc/left_banner.jsp">
+	    <jsp:param name="activeMenu" value="review" />
+	</jsp:include>
 		<!-- 중앙 리뷰관리 -->
 		<main class="review-page">
 			<h1 class="review-title">리뷰관리</h1>

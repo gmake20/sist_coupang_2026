@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.NamingException;
-
 import com.goodpang.dao.OrderCancelDAO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.OrderDetailDTO;
@@ -30,19 +28,39 @@ public class CancelHistoryServlet extends HttpServlet {
         if (loginMember == null) {
             return;
         }
-        
-        int memberNo =
-                loginMember.getMemberNo();
-        
+
+        int memberNo = loginMember.getMemberNo();
+
         System.out.println("[DEBUG CancelHistoryServlet] === 취소/반품 내역 조회 시작 ===");
         System.out.println("[DEBUG CancelHistoryServlet] 로그인 memberNo: " + memberNo);
 
-        // 2. 파라미터 및 데이터 초기화 (NullPointerException 및 미초기화 에러 방지)
+        // 2. 현재 페이지 파라미터 수신 (기본값: 1)
+        int curPage = 1;
+        String pageParam = request.getParameter("page");
+        if (pageParam != null && !pageParam.trim().isEmpty()) {
+            try {
+                curPage = Integer.parseInt(pageParam.trim());
+            } catch (NumberFormatException e) {
+                curPage = 1;
+            }
+        }
+
+        // 3. 페이지당 5개 설정
+        int pageSize = 5;
+
         List<OrderDetailDTO> cancelList = new ArrayList<>();
+        int totalPages = 1;
 
         try {
             OrderCancelDAO dao = new OrderCancelDAO();
-            cancelList = dao.getCancelHistoryList(memberNo);
+
+            // 총 취소건수 및 전체 페이지 수 계산
+            int totalCount = dao.getCancelHistoryCount(memberNo);
+            totalPages = (int) Math.ceil((double) totalCount / pageSize);
+            if (totalPages == 0) totalPages = 1;
+
+            // 페이지당 5개씩 페이징 처리된 목록 조회
+            cancelList = dao.getCancelHistoryPaged(memberNo, curPage, pageSize);
 
             int resultCount = (cancelList != null) ? cancelList.size() : 0;
             System.out.println("[DEBUG CancelHistoryServlet] DB 취소 내역 조회 완료건: " + resultCount);
@@ -52,10 +70,12 @@ public class CancelHistoryServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        // 3. JSP 바인딩
+        // 4. JSP 영역 데이터 바인딩
         request.setAttribute("cancelList", cancelList);
+        request.setAttribute("curPage", curPage);
+        request.setAttribute("totalPages", totalPages);
 
-        // 4. cancel_history.jsp 포워딩
+        // 5. cancel_history.jsp 포워딩
         request.getRequestDispatcher("/cancel_history.jsp").forward(request, response);
     }
 

@@ -19,52 +19,10 @@
 	<jsp:include page="/inc/header.jsp" />
 
 	<div class="wow-page">
-		<aside class="wow-sidebar">
-			<div class="wow-sidebar-top">MY쿠팡</div>
-
-			<div class="wow-menu-group">
-				<h3>MY 쇼핑</h3>
-				<ul>
-					<li><a
-						href="${pageContext.request.contextPath}/order/order_list">주문목록/배송조회</a></li>
-					<li><a href="#">취소/반품/교환/환불내역</a></li>
-					<li><a
-						href="${pageContext.request.contextPath}/wow/membership"
-						class="active">와우 멤버십</a></li>
-					<li><a href="#">구독 서비스</a></li>
-					<li><a href="#">로켓프레시 프레시백</a></li>
-					<li><a href="#">영수증 조회/출력</a></li>
-				</ul>
-			</div>
-
-			<div class="wow-menu-group">
-				<h3>MY 혜택</h3>
-				<ul>
-					<li><a href="#">쿠폰 · 이용권</a></li>
-					<li><a href="#">쿠팡캐시/기프트카드</a></li>
-				</ul>
-			</div>
-
-			<div class="wow-menu-group">
-				<h3>MY 활동</h3>
-				<ul>
-					<li><a href="#">문의하기</a></li>
-					<li><a href="#">문의내역 확인</a></li>
-					<li><a href="#">리뷰관리</a></li>
-					<li><a href="#">찜 리스트</a></li>
-				</ul>
-			</div>
-
-			<div class="wow-menu-group">
-				<h3>MY 정보</h3>
-				<ul>
-					<li><a href="#">개인정보확인/수정</a></li>
-					<li><a href="#">결제수단·쿠페이 관리</a></li>
-					<li><a href="#">배송지 관리</a></li>
-					<li><a href="#">회원 탈퇴</a></li>
-				</ul>
-			</div>
-		</aside>
+				<!-- 개인정보확인/수정 메뉴 파란색 활성화 -->
+		<jsp:include page="/inc/left_banner.jsp">
+		    <jsp:param name="activeMenu" value="wow" />
+		</jsp:include>
 
 		<main class="wow-content">
 			<div class="wow-summary-bar">
