@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.List;
 
 import com.goodpang.dao.OrderListDAO;
+import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.OrderItemDTO;
+import com.goodpang.dto.ReviewAvailableDTO;
 import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
@@ -52,6 +54,13 @@ public class OrderListServlet extends HttpServlet {
         if (totalPages == 0) totalPages = 1;
 
         List<OrderItemDTO> orderList = dao.getOrderListPaged(memberNo, yearFilter, curPage, pageSize);
+        
+        ReviewDAO reviewDAO = new ReviewDAO();
+
+        List<ReviewAvailableDTO> reviewList =
+        		reviewDAO.getReviewStatus(memberNo);
+
+        request.setAttribute("reviewList", reviewList);
 
         // 3. JSP 데이터 바인딩
         request.setAttribute("orderList", orderList);

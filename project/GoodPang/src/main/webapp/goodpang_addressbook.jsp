@@ -23,36 +23,9 @@
 
 	<main class="addressbook-page">
 
-		<aside class="left-menu">
-			<div class="mypang-title">MY굿팡</div>
-
-			<div class="menu-section">
-				<h3>MY 쇼핑</h3>
-				<a href="#">주문목록/배송조회</a> <a href="#">취소/반품/교환/환불내역</a> <a href="#">와우
-					멤버십</a> <a href="#">구독 서비스 <em>N</em></a> <a href="#">로켓프레시 프레시백 <em>N</em></a>
-				<a href="#">영수증 조회/출력</a>
-			</div>
-
-			<div class="menu-section">
-				<h3>MY 혜택</h3>
-				<a href="#">쿠폰 · 이용권</a> <a href="#">굿팡캐시/기프트카드</a>
-			</div>
-
-			<div class="menu-section">
-				<h3>MY 활동</h3>
-				<a href="#">문의하기</a> <a href="#">문의내역 확인</a> <a href="#">리뷰관리</a> <a
-					href="#">찜 리스트</a>
-			</div>
-
-			<div class="menu-section">
-				<h3>MY 정보</h3>
-				<a href="#">개인정보확인/수정</a> <a href="#">결제수단·굿페이 관리</a> <a
-					class="active"
-					href="${pageContext.request.contextPath}/address/list"> 배송지 관리
-				</a> <a href="#">회원 탈퇴</a>
-			</div>
-		</aside>
-
+			<jsp:include page="/inc/left_banner.jsp">
+	    <jsp:param name="activeMenu" value="address" />
+	      </jsp:include>
 		<section class="content-area">
 
 			<div class="benefit-bar">

@@ -49,11 +49,58 @@
 	flex: none;
 }
 
+.category-filter .filter-title-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16px;
+}
+
 .category-filter .filter-title {
 	font-size: 16px;
 	font-weight: 700;
 	color: #111111;
-	margin-bottom: 16px;
+}
+
+/* 필터 하나라도 선택돼 있을 때만 뜸(JSP 에서 조건부 렌더) — 원본 실측: 빨간 글씨 */
+.category-filter .filter-clear-all {
+	font-size: 12px;
+	color: #CB1400;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.category-filter .filter-clear-all:hover {
+	text-decoration: underline;
+}
+
+/* 체크박스형 필터 공통 — 진짜 <input type="checkbox"> 를 눈에는 안 보이게 숨기고
+   .filter-function-bar-asset(CSS로 그린 네모)를 대신 보여줌. 클릭은 label 전체가 받아서 그대로 토글됨.
+   색상(name="color", 서버로 감)이든 브랜드/핏 등 장식용(name 없음, 서버로 안 감)이든 규칙은 동일 —
+   "체크박스가 있으면 눌렀을 때 체크 표시는 난다"를 이 셀렉터 하나로 통일함(2026-09-01) */
+.category-filter label input[type="checkbox"] {
+	position: absolute;
+	width: 0;
+	height: 0;
+	opacity: 0;
+	margin: 0;
+}
+
+.category-filter label input[type="checkbox"]:checked + .filter-function-bar-asset {
+	background: var(--link-blue);
+	border-color: var(--link-blue);
+}
+
+.category-filter label input[type="checkbox"]:checked + .filter-function-bar-asset::after {
+	content: "";
+	position: absolute;
+	left: 3px;
+	top: 0px;
+	width: 4px;
+	height: 8px;
+	border: solid #fff;
+	border-width: 0 2px 2px 0;
+	transform: rotate(45deg);
 }
 
 .category-filter .filter-group {
@@ -148,11 +195,9 @@ label.selected .filter-function-bar-asset::after,
 	cursor: pointer;
 }
 
-/* 실제 DB에 속성 데이터가 없어서 화면만 있고 클릭해도 동작 안 하는 필터 그룹 */
-.category-filter .is-inert label {
-	color: var(--text-gray);
-	cursor: default;
-}
+/* .is-inert = 실제 DB에 속성 컬럼이 없어서 "필터링 자체"는 동작 안 하는 그룹이라는 표시(클래스명은 유지).
+   2026-09-01: 예전엔 여기서 글자를 회색으로 죽여놨는데, 이제 체크박스는 진짜로 눌러지고 "선택한 필터"에도
+   잡히게 바꿨더니 회색이 안 맞게 됨(버그 리포트 4번) — 다른 필터랑 똑같이 검은 글자로 통일 */
 
 .filter-price-direct {
 	display: flex;
@@ -212,6 +257,51 @@ label.selected .filter-function-bar-asset::after,
 .sort-bar .list-size {
 	font-size: 13px;
 	color: #555555;
+}
+
+/* 선택한 필터 칩 줄 — 정렬줄 바로 아래, 상품목록 위(2026-09-01 원본 재확인 위치 그대로) */
+.filter-selected-bar {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.filter-selected-label {
+	font-size: 13px;
+	color: #555555;
+}
+
+.filter-selected-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	list-style: none;
+}
+
+.filter-selected-chips a {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 10px;
+	border: 1px solid var(--line-gray);
+	border-radius: 15px;
+	font-size: 12px;
+	color: #111111;
+	text-decoration: none;
+}
+
+.filter-selected-chips .remove {
+	color: #888888;
+}
+
+.filter-selected-chips a:hover {
+	border-color: var(--link-blue);
+}
+
+.filter-selected-chips a:hover .remove {
+	color: var(--link-blue);
 }
 
 .empty-message {

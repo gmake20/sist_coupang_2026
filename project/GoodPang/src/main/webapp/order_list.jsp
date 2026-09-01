@@ -42,56 +42,10 @@
     ========================== -->
 	<div class="mypage-container">
 
-		<!-- =========================
-             [1열] 왼쪽 MY쿠팡 메뉴
-        ========================== -->
-		<aside class="mycoupang-side">
-
-			<div class="side-title">MY쿠팡</div>
-
-			<div class="side-section">
-				<h3>MY 쇼핑</h3>
-				<li class="active"><a
-					href="${pageContext.request.contextPath}/order/order_list">주문목록/배송조회</a></li>
-				<a href="${pageContext.request.contextPath}/order/cancel_history">취소/반품/교환/환불
-					내역</a> <a href="${pageContext.request.contextPath}/wow/membership">와우
-					멤버십</a> <a href="#">구독 서비스 <span class="new">N</span></a> <a href="#">로켓프레시
-					프레시백 <span class="new">N</span>
-				</a> <a href="#">영수증 조회/출력</a>
-			</div>
-
-			<div class="side-section">
-				<h3>MY 혜택</h3>
-				<a href="#">쿠폰 · 이용권</a> <a href="#">쿠팡캐시/기프트카드</a>
-			</div>
-
-			<div class="side-section">
-				<h3>MY 활동</h3>
-				<a href="#">문의하기</a> <a href="#">문의내역 확인</a> <a
-					href="${pageContext.request.contextPath}/review/list">리뷰관리</a> <a
-					href="#">찜 리스트</a>
-			</div>
-
-			<div class="side-section">
-				<h3>MY 정보</h3>
-				<a href="${pageContext.request.contextPath}/member/modify">개인정보확인/수정</a>
-				<a href="#">결제수단·쿠페이 관리</a> <a
-					href="${pageContext.request.contextPath}/address/list">배송지 관리</a> <a
-					href="#">패스키 관리</a> <a href="#">회원 탈퇴</a>
-			</div>
-
-			<!-- 고객센터 메뉴 -->
-			<div class="side-help">
-				<a href="#"> <span class="help-icon">📝</span> <span>쿠팡문의</span>
-				</a> <a href="#"> <span class="help-icon">📢</span> <span>고객의
-						소리<br> <small>제안·칭찬·불편신고</small>
-				</span>
-				</a> <a href="#"> <span class="help-icon">📦</span> <span>취소/반품
-						안내</span>
-				</a>
-			</div>
-
-		</aside>
+			<!-- 주문목록 메뉴 파란색 활성화 -->
+		<jsp:include page="/inc/left_banner.jsp">
+		    <jsp:param name="activeMenu" value="order_list" />
+		</jsp:include>
 
 		<!-- =========================
              [2열] 중앙 메인 본문

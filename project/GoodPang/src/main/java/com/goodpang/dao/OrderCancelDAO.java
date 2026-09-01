@@ -15,6 +15,130 @@ import com.goodpang.util.DBConn;
 
 public class OrderCancelDAO {
 	
+	// =========================================================
+	// [추가 1] 회원의 취소/반품 내역 전체 개수 조회
+	// =========================================================
+	public int getCancelHistoryCount(int memberNo) {
+	    int count = 0;
+	    String sql = """
+	        SELECT COUNT(*)
+	        FROM ORDERS o
+	        JOIN ORDER_DETAIL od ON o.order_no = od.order_no
+	        JOIN PRODUCT_RETURN pr ON od.order_detail_no = pr.order_detail_no
+	        WHERE o.member_no = ?
+	        """;
+
+	    try (Connection conn = ConnectionProvider.getConnection();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+	        pstmt.setInt(1, memberNo);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                count = rs.getInt(1);
+	            }
+	        }
+	    } catch (Exception e) {
+	        System.err.println("[ERROR OrderCancelDAO] 취소 내역 카운트 조회 실패");
+	        e.printStackTrace();
+	    } finally {
+	        DBConn.close();
+	    }
+	    return count;
+	}
+
+	// =========================================================
+	// [추가 2] 회원의 취소/반품 내역 페이지당 5개씩 페이징 조회
+	// =========================================================
+	public List<OrderDetailDTO> getCancelHistoryPaged(int memberNo, int page, int pageSize) {
+	    List<OrderDetailDTO> list = new ArrayList<>();
+	    int startRow = (page - 1) * pageSize + 1;
+	    int endRow = page * pageSize;
+
+	    String sql = """
+	        SELECT * FROM (
+	            SELECT ROWNUM AS rnum, T.* FROM (
+	                SELECT 
+	                    o.order_no,
+	                    o.order_date,
+	                    o.order_status,
+	                    o.delivery_fee,
+	                    od.order_detail_no,
+	                    od.order_qty AS quantity,
+	                    od.price AS total_price,
+	                    p.product_no,
+	                    p.product_name,
+	                    po.option1_type, po.option1_value,
+	                    po.option2_type, po.option2_value,
+	                    pr.return_no,
+	                    pr.request_date,
+	                    pr.return_reason,
+	                    pr.refund_amount,
+	                    pr.expected_cancel_date
+	                FROM ORDERS o
+	                JOIN ORDER_DETAIL od ON o.order_no = od.order_no
+	                JOIN PRODUCT p ON od.product_no = p.product_no
+	                LEFT JOIN PRODUCT_OPTION po ON od.option_id = po.option_id
+	                JOIN PRODUCT_RETURN pr ON od.order_detail_no = pr.order_detail_no
+	                WHERE o.member_no = ?
+	                ORDER BY pr.request_date DESC
+	            ) T WHERE ROWNUM <= ?
+	        ) WHERE rnum >= ?
+	        """;
+
+	    try (Connection conn = ConnectionProvider.getConnection();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+	        pstmt.setInt(1, memberNo);
+	        pstmt.setInt(2, endRow);
+	        pstmt.setInt(3, startRow);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            while (rs.next()) {
+	                OrderDetailDTO dto = new OrderDetailDTO();
+
+	                // 주문 기본 정보
+	                dto.setOrderNo(rs.getInt("order_no"));
+	                dto.setOrderDate(rs.getTimestamp("order_date"));
+	                dto.setOrderStatus(rs.getString("order_status"));
+	                dto.setDeliveryFee(rs.getInt("delivery_fee"));
+
+	                // 주문 상세 및 상품 정보
+	                dto.setOrderDetailNo(rs.getLong("order_detail_no"));
+	                dto.setQuantity(rs.getInt("quantity"));
+	                dto.setTotalPrice(rs.getInt("total_price"));
+	                dto.setProductNo(rs.getLong("product_no"));
+	                dto.setProductName(rs.getString("product_name"));
+
+	                // 옵션 정보
+	                dto.setOption1Type(rs.getString("option1_type"));
+	                dto.setOption1Value(rs.getString("option1_value"));
+	                dto.setOption2Type(rs.getString("option2_type"));
+	                dto.setOption2Value(rs.getString("option2_value"));
+
+	                // 취소/반품(PRODUCT_RETURN) 상세 정보
+	                dto.setReturnNo(rs.getLong("return_no"));
+	                dto.setRequestDate(rs.getTimestamp("request_date"));
+	                dto.setReturnReason(rs.getString("return_reason"));
+	                dto.setRefundAmount(rs.getInt("refund_amount"));
+	                dto.setExpectedCancelDate(rs.getTimestamp("expected_cancel_date"));
+
+	                list.add(dto);
+	            }
+	        }
+	    } catch (Exception e) {
+	        System.err.println("[ERROR OrderCancelDAO] 취소 내역 페이징 조회 실패");
+	        e.printStackTrace();
+	    } finally {
+	        DBConn.close();
+	    }
+
+	    return list;
+	}
+	
+	
+	
+	
 
 	    // [기존 cancelOrder 메서드는 그대로 유지]
 
