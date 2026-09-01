@@ -52,6 +52,7 @@
       "buyerName": "홍*동",
       "buyerPhone": "010-0000-****",
       "productName": "반팔 티셔츠",
+      "productImageUrl": "./pds/short_1.jpg",
       "storeName": "베이직루트",
       "itemCount": 2
     }

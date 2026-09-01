@@ -23,13 +23,14 @@ public class AdminDeliveryDAO {
                 D.DELIVERY_NO, D.ORDER_NO, D.DELIVERY_SERVICE_CODE, D.INVOICE_NO,
                 D.DELIVERY_STATUS, D.DELIVERY_START_DATE,
                 M.MEMBER_NAME, M.PHONE,
-                PN.PRODUCT_NAME, PN.STORE_NAME, PN.ITEM_COUNT
+                PN.PRODUCT_NAME, PN.STORE_NAME, PN.ITEM_COUNT, IMG.IMAGE_URL AS PRODUCT_IMAGE_URL
             FROM DELIVERY D
                 JOIN ORDERS O ON D.ORDER_NO = O.ORDER_NO
                 JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO
                 JOIN (
                     SELECT
                         OD.ORDER_NO,
+                        MIN(OD.PRODUCT_NO) KEEP (DENSE_RANK FIRST ORDER BY OD.ORDER_DETAIL_NO) AS PRODUCT_NO,
                         MIN(P.PRODUCT_NAME) KEEP (DENSE_RANK FIRST ORDER BY OD.ORDER_DETAIL_NO) AS PRODUCT_NAME,
                         MIN(S.STORE_NAME) KEEP (DENSE_RANK FIRST ORDER BY OD.ORDER_DETAIL_NO) AS STORE_NAME,
                         COUNT(*) AS ITEM_COUNT
@@ -38,6 +39,12 @@ public class AdminDeliveryDAO {
                         JOIN SELLER S ON P.SELLER_NO = S.SELLER_NO
                     GROUP BY OD.ORDER_NO
                 ) PN ON PN.ORDER_NO = D.ORDER_NO
+                LEFT JOIN (
+                    SELECT PRODUCT_NO, IMAGE_URL,
+                           ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID, IMAGE_ORDER) AS RN
+                    FROM PRODUCT_IMAGE
+                    WHERE IMAGE_PURPOSE = '대표'
+                ) IMG ON IMG.PRODUCT_NO = PN.PRODUCT_NO AND IMG.RN = 1
             WHERE D.DELIVERY_STATUS = '배송중'
             ORDER BY D.DELIVERY_START_DATE DESC
             """;
@@ -152,6 +159,7 @@ public class AdminDeliveryDAO {
         dto.setBuyerPhone(rs.getString("PHONE"));
 
         dto.setProductName(rs.getString("PRODUCT_NAME"));
+        dto.setProductImageUrl(rs.getString("PRODUCT_IMAGE_URL"));
         dto.setStoreName(rs.getString("STORE_NAME"));
         dto.setItemCount(rs.getInt("ITEM_COUNT"));
 

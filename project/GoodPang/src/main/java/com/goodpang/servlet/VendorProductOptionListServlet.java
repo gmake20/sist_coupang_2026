@@ -72,6 +72,7 @@ public class VendorProductOptionListServlet extends HttpServlet {
 				VendorProductOptionGroupDTO g = new VendorProductOptionGroupDTO();
 				g.setProductNo(option.getProductNo());
 				g.setProductName(option.getProductName());
+				g.setThumbnailUrl(option.getThumbnailUrl());
 				g.setOptions(new ArrayList<>());
 				return g;
 			});

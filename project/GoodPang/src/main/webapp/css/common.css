@@ -1238,7 +1238,7 @@ a.del-button:hover {
 
 .category-layer .menu > li:hover .depth {
   display: block;
-  width: 591px;
+  width: 767px;   /* 중분류(157) + 소분류(110) + 프로모 이미지 실제 폭(500) */
   height: 100%;
   overflow: hidden;
 }
@@ -1301,14 +1301,14 @@ a.del-button:hover {
 }
 
 .category-layer .depth2 li {
-  width: 157px;
+  width: 110px;   /* 옆에 프로모 이미지가 붙으므로 중분류(157px)보다 좁게 잡아 빈 여백을 줄임 */
   height: 28px;
   overflow: hidden;
 }
 
 .category-layer .depth2 li a {
   position: relative;
-  width: 137px;
+  width: 90px;
   height: 28px;
   padding: 9px 0 0 20px;
   font-size: 12px;
@@ -1328,6 +1328,34 @@ a.del-button:hover {
 }
 
 .category-layer .depth li.is-active > a > .si {
+  display: block;
+}
+
+/* ---------------------------------------------------------
+   1-4-c. 대분류 프로모션 이미지 (.depth-promo)
+
+   대분류(main)의 imgUrl(/pds/category_N.png)은 문구/버튼까지 다 그려진
+   배너 이미지(실제 500x413)라서, 축소하지 않고 원본 크기 그대로
+   중분류(157px)+소분류(110px, 옆에 이미지가 붙어서 좁게 잡음) 다음 자리에 띄움.
+   어떤 중분류에 마우스를 올렸는지와 상관없이 대분류당 항상 같은 이미지 하나만 보임.
+   --------------------------------------------------------- */
+.category-layer .depth-promo {
+  position: absolute;
+  top: 0;
+  left: 267px;
+  width: 500px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff;
+}
+
+.category-layer .depth-promo img {
+  width: 500px;
+  height: 413px;
+  max-width: none;
   display: block;
 }
 

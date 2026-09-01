@@ -52,7 +52,7 @@ function renderCategoryMenu(data) {
     }
 
     return '<li><a href="#">' + iconHtml + escapeCategoryHtml(main.categoryName) + '<i class="si"></i></a>'
-      + renderMidPanel(children, subList)
+      + renderMidPanel(children, subList, main.imgUrl)
       + '</li>';
   }).join('');
 }
@@ -89,8 +89,8 @@ function getCategoryIconHtml(categoryName) {
   return '<span class="cat-icon"><svg viewBox="0 0 24 24">' + iconPath + '</svg></span>';
 }
 
-/** 중분류 목록(depth)과 그 오른쪽에 겹쳐지는 소분류 패널들(depth2)을 함께 만듦 */
-function renderMidPanel(midItems, subList) {
+/** 중분류 목록(depth)과 그 오른쪽에 겹쳐지는 소분류 패널들(depth2), 그리고 대분류 프로모 이미지를 함께 만듦 */
+function renderMidPanel(midItems, subList, mainImgUrl) {
   let firstWithSub = null;   // 패널이 열리자마자 기본으로 보여줄 소분류 (첫 번째 것)
 
   const midHtml = midItems.map(function (mid) {
@@ -128,7 +128,11 @@ function renderMidPanel(midItems, subList) {
       + '</div>';
   }).join('');
 
-  return '<div class="depth"><ul>' + midHtml + '</ul>' + depth2Html + '</div>';
+  const promoHtml = mainImgUrl
+    ? '<div class="depth-promo"><img src="' + escapeCategoryHtml(mainImgUrl) + '" alt=""></div>'
+    : '';
+
+  return '<div class="depth"><ul>' + midHtml + '</ul>' + promoHtml + depth2Html + '</div>';
 }
 
 /* 중분류 위에 마우스를 올리면 그 항목의 소분류(depth2)만 보이게 전환
