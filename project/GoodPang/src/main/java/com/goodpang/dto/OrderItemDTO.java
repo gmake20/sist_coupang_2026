@@ -29,6 +29,7 @@ public class OrderItemDTO {
 	private String option2Value;
 	private Long orderDetailNo;
     private Long productNo;
+    private int deliveryFee;       // 배송비
 
 
 }

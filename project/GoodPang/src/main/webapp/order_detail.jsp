@@ -248,7 +248,7 @@
 					<div class="payment-price">
 						<div class="price-row">
 							<span>총 상품가격</span> <strong> <fmt:formatNumber
-									value="${orderInfo.totalPrice}" pattern="#,###" /> 원
+									value="${orderInfo.finalTotalPrice}" pattern="#,###" /> 원
 							</strong>
 						</div>
 						<div class="price-row">
@@ -275,7 +275,7 @@
 
 					<div>
 						<span>총 결제금액</span> <strong> <fmt:formatNumber
-								value="${orderInfo.totalPrice + orderInfo.deliveryFee}"
+								value="${orderInfo.finalTotalPrice + orderInfo.deliveryFee}"
 								pattern="#,###" /> 원
 						</strong>
 					</div>
