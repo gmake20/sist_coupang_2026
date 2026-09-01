@@ -98,8 +98,8 @@
 
 						<!-- 계좌이체 -->
 						<label class="pay-radio-row account-row"> <input
-							type="radio" name="paymentMethod" value="BANK_TRANSFER" form="paymentForm"
-							checked> <span class="pay-title">계좌이체</span>
+							type="radio" name="paymentMethod" value="BANK_TRANSFER"
+							form="paymentForm" checked> <span class="pay-title">계좌이체</span>
 						</label>
 
 						<!-- 등록된 계좌 -->
@@ -395,19 +395,16 @@
 
 						<div class="address-card-buttons">
 
-							<button type="button"
-							        class="address-edit-btn"
-							        data-address-no="${addr.addressNo}"
-							        data-receiver-name="${fn:escapeXml(addr.receiverName)}"
-							        data-zipcode="${fn:escapeXml(addr.zipcode)}"
-							        data-address="${fn:escapeXml(addr.address)}"
-							        data-detail-address="${fn:escapeXml(addr.detailAddress)}"
-							        data-tel="${fn:escapeXml(addr.tel)}"
-							        data-request-msg="${fn:escapeXml(addr.requestMsg)}"
-							        data-default="${addr.addressDefault}"
-							        onclick="openEditAddressModal(this)">
-							    수정
-							</button>
+							<button type="button" class="address-edit-btn"
+								data-address-no="${addr.addressNo}"
+								data-receiver-name="${fn:escapeXml(addr.receiverName)}"
+								data-zipcode="${fn:escapeXml(addr.zipcode)}"
+								data-address="${fn:escapeXml(addr.address)}"
+								data-detail-address="${fn:escapeXml(addr.detailAddress)}"
+								data-tel="${fn:escapeXml(addr.tel)}"
+								data-request-msg="${fn:escapeXml(addr.requestMsg)}"
+								data-default="${addr.addressDefault}"
+								onclick="openEditAddressModal(this)">수정</button>
 
 							<button type="button" class="address-select-btn"
 								data-address-no="${addr.addressNo}"
@@ -449,21 +446,15 @@
 			</div>
 
 			<form id="addAddressForm"
-				    action="${pageContext.request.contextPath}/address/add"
-				    method="post">
-				    
-				    <input type="hidden"
-				           name="addressNo"
-				           id="editAddressNo">
+				action="${pageContext.request.contextPath}/address/add"
+				method="post">
 
-				    <!-- 결제 페이지에서 배송지 추가했다는 정보 -->
-				    <input type="hidden"
-				           name="checkoutNo"
-				           value="${checkoutNo}">
-				
-				    <input type="hidden"
-				           name="from"
-				           value="payment">
+				<input type="hidden" name="addressNo" id="editAddressNo">
+
+				<!-- 결제 페이지에서 배송지 추가했다는 정보 -->
+				<input type="hidden" name="checkoutNo" value="${checkoutNo}">
+
+				<input type="hidden" name="from" value="payment">
 
 				<div class="address-add-body">
 
@@ -475,17 +466,12 @@
 					</div>
 
 					<div class="add-address-row postcode-row">
-					    <div class="add-address-icon">◉</div>
-					
-					    <button type="button"
-					            class="postcode-search-btn"
-					            onclick="findPostcode()">
-					        우편번호 찾기
-					    </button>
-					
-					    <input type="hidden"
-					           name="zipcode"
-					           id="newZipcode">
+						<div class="add-address-icon">◉</div>
+
+						<button type="button" class="postcode-search-btn"
+							onclick="findPostcode()">우편번호 찾기</button>
+
+						<input type="hidden" name="zipcode" id="newZipcode">
 					</div>
 
 					<div class="add-address-row address-input-row">
@@ -502,39 +488,41 @@
 							placeholder="상세주소">
 					</div>
 
+
+					<!-- 휴대폰 번호 -->
 					<div class="add-address-row phone-row">
 						<div class="add-address-icon">▣</div>
 
-						<input type="text" name="tel" id="newTel" placeholder="휴대폰 번호">
-
-						<span class="phone-plus">＋</span>
-					</div>
-						<div class="add-address-row hidden"
-						     id="requestMsgDirectArea">
-						
-						    <div class="add-address-icon">✎</div>
-						
-						    <input type="text"
-						           id="newRequestMsg"
-						           name="requestMsg"
-						           placeholder="배송 요청사항을 입력해주세요."
-						           maxlength="100">
+						<div class="phone-inputs">
+							<input type="text" id="phone1" class="phone-input" maxlength="3"
+								inputmode="numeric" value="010"> <span
+								class="phone-hyphen">-</span> <input type="text" id="phone2"
+								class="phone-input" maxlength="4" inputmode="numeric"> <span
+								class="phone-hyphen">-</span> <input type="text" id="phone3"
+								class="phone-input" maxlength="4" inputmode="numeric">
 						</div>
-					<label class="default-address-check">
-						    <input type="checkbox"
-						           name="addressDefault"
-						           id="newAddressDefault"
-						           value="Y">
-						
-						    <span class="custom-check"></span>
-						    기본 배송지로 선택
-						</label>
-					<button type="submit"
-					        class="address-save-btn"
-					        id="addressSaveBtn">
-					    저장
-					</button>
 
+						<input type="hidden" name="tel" id="newTel">
+					</div>
+
+					<!-- 배송 요청사항 -->
+					<div class="add-address-row" id="requestMsgDirectArea">
+
+						<div class="add-address-icon">✎</div>
+
+						<input type="text" id="newRequestMsg" name="requestMsg"
+							placeholder="배송 요청사항을 입력해주세요." maxlength="100">
+					</div>
+
+					<!-- 기본 배송지 -->
+					<label class="default-address-check"> <input
+						type="checkbox" name="addressDefault" id="newAddressDefault"
+						value="Y"> <span class="custom-check"></span> 기본 배송지로 선택
+					</label>
+
+					<!-- 저장 -->
+					<button type="submit" class="address-save-btn" id="addressSaveBtn">
+						저장</button>
 				</div>
 			</form>
 
@@ -615,7 +603,7 @@
 
 						<select id="newCardCompany" name="cardCompany"
 							class="payment-add-select">
-							
+
 							<option value="">카드사를 선택해주세요</option>
 							<option value="BC">비씨카드</option>
 							<option value="SHINHAN">신한카드</option>
@@ -626,8 +614,8 @@
 							<option value="HANA">하나카드</option>
 							<option value="WOORI">우리카드</option>
 							<option value="NH">NH농협카드</option>
-							
-							</select>
+
+						</select>
 
 
 						<div class="payment-add-label">카드번호</div>
@@ -668,10 +656,62 @@
 			</div>
 		</div>
 	</div>
-	
-	<script src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+	<script
+		src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script>
 
+	const phone1 = document.getElementById("phone1");
+	const phone2 = document.getElementById("phone2");
+	const phone3 = document.getElementById("phone3");
+
+	function onlyNumber(input) {
+	    input.value = input.value.replace(/[^0-9]/g, "");
+	}
+
+	function syncPhoneNumber() {
+
+	    const p1 = phone1.value.trim();
+	    const p2 = phone2.value.trim();
+	    const p3 = phone3.value.trim();
+
+	    const tel = document.getElementById("newTel");
+
+	    if (p1 && p2 && p3) {
+	        tel.value = p1 + "-" + p2 + "-" + p3;
+	    } else {
+	        tel.value = "";
+	    }
+	}
+
+	phone1.addEventListener("input", function() {
+
+	    onlyNumber(this);
+
+	    if (this.value.length === 3) {
+	        phone2.focus();
+	    }
+
+	    syncPhoneNumber();
+	});
+
+	phone2.addEventListener("input", function() {
+
+	    onlyNumber(this);
+
+	    if (this.value.length === 4) {
+	        phone3.focus();
+	    }
+
+	    syncPhoneNumber();
+	});
+
+	phone3.addEventListener("input", function() {
+
+	    onlyNumber(this);
+
+	    syncPhoneNumber();
+	});
 	
 
 
@@ -962,10 +1002,11 @@ function openAddAddressModal() {
         "newDetailAddress"
     ).value = "";
 
-    document.getElementById(
-        "newTel"
-    ).value = "";
-
+    document.getElementById("phone1").value = "010";
+    document.getElementById("phone2").value = "";
+    document.getElementById("phone3").value = "";
+    document.getElementById("newTel").value = "";
+    
     const requestMsg =
         document.getElementById(
             "newRequestMsg"
@@ -1228,9 +1269,28 @@ function openEditAddressModal(button) {
         "newDetailAddress"
     ).value = button.dataset.detailAddress || "";
 
-    document.getElementById(
-        "newTel"
-    ).value = button.dataset.tel || "";
+    const tel = button.dataset.tel || "";
+    const telNumber = tel.replace(/[^0-9]/g, "");
+
+    if (telNumber.length === 11) {
+
+        document.getElementById("phone1").value =
+            telNumber.substring(0, 3);
+
+        document.getElementById("phone2").value =
+            telNumber.substring(3, 7);
+
+        document.getElementById("phone3").value =
+            telNumber.substring(7, 11);
+
+    } else {
+
+        document.getElementById("phone1").value = "010";
+        document.getElementById("phone2").value = "";
+        document.getElementById("phone3").value = "";
+    }
+
+    syncPhoneNumber();
 
     const requestMsg =
         document.getElementById("newRequestMsg");
@@ -1488,8 +1548,51 @@ document
 		if (event.target === this) {
 			closePaymentAddModal();
 		}
+		
 	});
+	
+const cardNumberInputs = [
+    document.getElementById("cardNumber1"),
+    document.getElementById("cardNumber2"),
+    document.getElementById("cardNumber3"),
+    document.getElementById("cardNumber4")
+];
 
+cardNumberInputs.forEach(function(input, index) {
+
+    input.addEventListener("input", function() {
+
+        // 숫자만 입력
+        this.value =
+            this.value.replace(/[^0-9]/g, "");
+
+        // 최대 4자리
+        if (this.value.length > 4) {
+            this.value = this.value.substring(0, 4);
+        }
+
+        // 4자리 입력 완료 → 다음 칸
+        if (
+            this.value.length === 4 &&
+            index < cardNumberInputs.length - 1
+        ) {
+            cardNumberInputs[index + 1].focus();
+        }
+    });
+
+    input.addEventListener("keydown", function(event) {
+
+        // 현재 칸이 비어있는데 Backspace
+        if (
+            event.key === "Backspace" &&
+            this.value.length === 0 &&
+            index > 0
+        ) {
+            cardNumberInputs[index - 1].focus();
+        }
+    });
+
+});	
 </script>
 
 </body>
