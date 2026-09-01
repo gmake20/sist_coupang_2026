@@ -1153,67 +1153,167 @@ public class ReviewDAO {
         return list;
     }
     
+	/*
+	 * public List<ReviewAvailableDTO> getReviewStatus(int memberNo) {
+	 * 
+	 * List<ReviewAvailableDTO> list = new ArrayList<>();
+	 * 
+	 * String sql = """ SELECT od.ORDER_DETAIL_NO, od.PRODUCT_NO, p.PRODUCT_NAME,
+	 * CASE WHEN EXISTS ( SELECT 1 FROM REVIEW r WHERE r.ORDER_DETAIL_NO =
+	 * od.ORDER_DETAIL_NO ) THEN 1 ELSE 0 END AS REVIEW_WRITTEN FROM ORDER_DETAIL od
+	 * JOIN ORDERS o ON o.ORDER_NO = od.ORDER_NO JOIN PRODUCT p ON p.PRODUCT_NO =
+	 * od.PRODUCT_NO WHERE o.MEMBER_NO = ? """;
+	 * 
+	 * try ( Connection conn = ConnectionProvider.getConnection(); PreparedStatement
+	 * pstmt = conn.prepareStatement(sql); ) {
+	 * 
+	 * pstmt.setInt(1, memberNo);
+	 * 
+	 * try (ResultSet rs = pstmt.executeQuery()) {
+	 * 
+	 * while (rs.next()) {
+	 * 
+	 * ReviewAvailableDTO dto = new ReviewAvailableDTO();
+	 * 
+	 * dto.setOrderDetailNo( rs.getInt("ORDER_DETAIL_NO"));
+	 * 
+	 * dto.setProductNo( rs.getInt("PRODUCT_NO"));
+	 * 
+	 * dto.setProductName( rs.getString("PRODUCT_NAME"));
+	 * 
+	 * dto.setReviewWritten( rs.getInt("REVIEW_WRITTEN") == 1);
+	 * 
+	 * list.add(dto); } }
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); }
+	 * 
+	 * return list; }
+	 */
+    
     public List<ReviewAvailableDTO> getReviewStatus(int memberNo) {
 
-        List<ReviewAvailableDTO> list = new ArrayList<>();
+    	List<ReviewAvailableDTO> list = new ArrayList<>();
 
-        String sql = """
-            SELECT
-                od.ORDER_DETAIL_NO,
-                od.PRODUCT_NO,
-                p.PRODUCT_NAME,
-                CASE
-                    WHEN EXISTS (
-                        SELECT 1
-                        FROM REVIEW r
-                        WHERE r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO
-                    )
-                    THEN 1
-                    ELSE 0
-                END AS REVIEW_WRITTEN
-            FROM ORDER_DETAIL od
-            JOIN ORDERS o
-                ON o.ORDER_NO = od.ORDER_NO
-            JOIN PRODUCT p
-                ON p.PRODUCT_NO = od.PRODUCT_NO
-            WHERE o.MEMBER_NO = ?
-            """;
+    	String sql = """
+    			SELECT
+    				od.ORDER_DETAIL_NO,
+    				od.PRODUCT_NO,
+    				p.PRODUCT_NAME,
+    				po.OPTION1_TYPE,
+    				po.OPTION1_VALUE,
+    				po.OPTION2_TYPE,
+    				po.OPTION2_VALUE,
+    				CASE
+    					WHEN EXISTS (
+    						SELECT 1
+    						FROM REVIEW r
+    						WHERE r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO
+    					)
+    					THEN 1
+    					ELSE 0
+    				END AS REVIEW_WRITTEN
+    			FROM ORDER_DETAIL od
+    			JOIN ORDERS o
+    				ON o.ORDER_NO = od.ORDER_NO
+    			JOIN PRODUCT p
+    				ON p.PRODUCT_NO = od.PRODUCT_NO
+    			LEFT JOIN PRODUCT_OPTION po
+    				ON od.OPTION_ID = po.OPTION_ID
+    			WHERE o.MEMBER_NO = ?
+    			ORDER BY o.ORDER_DATE DESC,
+    					 od.ORDER_DETAIL_NO DESC
+    			""";
 
-        try (
-            Connection conn = ConnectionProvider.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-        ) {
+    	try (
+    		Connection conn = ConnectionProvider.getConnection();
+    		PreparedStatement pstmt = conn.prepareStatement(sql)
+    	) {
+    		pstmt.setInt(1, memberNo);
 
-            pstmt.setInt(1, memberNo);
+    		try (ResultSet rs = pstmt.executeQuery()) {
 
-            try (ResultSet rs = pstmt.executeQuery()) {
+    			while (rs.next()) {
 
-                while (rs.next()) {
+    				ReviewAvailableDTO dto = new ReviewAvailableDTO();
 
-                    ReviewAvailableDTO dto =
-                            new ReviewAvailableDTO();
+    				dto.setOrderDetailNo(
+    						rs.getInt("ORDER_DETAIL_NO")
+    				);
 
-                    dto.setOrderDetailNo(
-                            rs.getInt("ORDER_DETAIL_NO"));
+    				dto.setProductNo(
+    						rs.getInt("PRODUCT_NO")
+    				);
 
-                    dto.setProductNo(
-                            rs.getInt("PRODUCT_NO"));
+    				dto.setProductName(
+    						rs.getString("PRODUCT_NAME")
+    				);
 
-                    dto.setProductName(
-                            rs.getString("PRODUCT_NAME"));
+    				dto.setReviewWritten(
+    						rs.getInt("REVIEW_WRITTEN") == 1
+    				);
 
-                    dto.setReviewWritten(
-                            rs.getInt("REVIEW_WRITTEN") == 1);
+    				String option1Type =
+    						rs.getString("OPTION1_TYPE");
 
-                    list.add(dto);
-                }
-            }
+    				String option1Value =
+    						rs.getString("OPTION1_VALUE");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    				String option2Type =
+    						rs.getString("OPTION2_TYPE");
 
-        return list;
+    				String option2Value =
+    						rs.getString("OPTION2_VALUE");
+
+    				StringBuilder option =
+    						new StringBuilder();
+
+    				if (option1Value != null
+    						&& !option1Value.isBlank()) {
+
+    					if (option1Type != null
+    							&& !option1Type.isBlank()) {
+
+    						option.append(option1Type)
+    							  .append(" ");
+    					}
+
+    					option.append(option1Value);
+    				}
+
+    				if (option2Value != null
+    						&& !option2Value.isBlank()) {
+
+    					if (option.length() > 0) {
+    						option.append(" / ");
+    					}
+
+    					if (option2Type != null
+    							&& !option2Type.isBlank()) {
+
+    						option.append(option2Type)
+    							  .append(" ");
+    					}
+
+    					option.append(option2Value);
+    				}
+
+    				dto.setOptionText(
+    						option.toString()
+    				);
+
+    				list.add(dto);
+    			}
+    		}
+
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		throw new RuntimeException(
+    				"리뷰 상태 조회 중 오류가 발생했습니다.",
+    				e
+    		);
+    	}
+
+    	return list;
     }
     
     public int insertReview(
