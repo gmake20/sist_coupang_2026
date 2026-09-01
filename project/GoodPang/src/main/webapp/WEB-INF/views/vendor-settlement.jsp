@@ -95,6 +95,7 @@
                 <th class="col-price">정산금액</th>
                 <th class="col-date">정산예정일</th>
                 <th class="col-status">상태</th>
+                <th class="col-manage">관리</th>
               </tr>
             </thead>
             <tbody>
@@ -103,7 +104,7 @@
 
                 <c:when test="${empty settlementList}">
                   <tr>
-                    <td colspan="7" class="empty" style="text-align: center; padding: 60px 0; color: #999;">
+                    <td colspan="8" class="empty" style="text-align: center; padding: 60px 0; color: #999;">
                       정산 내역이 없습니다.
                     </td>
                   </tr>
@@ -127,6 +128,10 @@
                             <span class="status-badge status-waiting">정산예정</span>
                           </c:otherwise>
                         </c:choose>
+                      </td>
+                      <td class="col-manage">
+                        <a class="btn btn-outline btn-sm"
+                           href="${pageContext.request.contextPath}/vendor/settlement/detail?periodStart=${settlement.periodStart}">상세보기</a>
                       </td>
                     </tr>
                   </c:forEach>
