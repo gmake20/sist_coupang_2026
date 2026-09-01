@@ -490,73 +490,43 @@
 
 
 					<!-- 휴대폰 번호 -->
-<div class="add-address-row phone-row">
-    <div class="add-address-icon">▣</div>
+					<div class="add-address-row phone-row">
+						<div class="add-address-icon">▣</div>
 
-    <div class="phone-inputs">
-        <input type="text"
-               id="phone1"
-               class="phone-input"
-               maxlength="3"
-               inputmode="numeric"
-               value="010">
+						<div class="phone-inputs">
+							<input type="text" id="phone1" class="phone-input" maxlength="3"
+								inputmode="numeric" value="010"> <span
+								class="phone-hyphen">-</span> <input type="text" id="phone2"
+								class="phone-input" maxlength="4" inputmode="numeric"> <span
+								class="phone-hyphen">-</span> <input type="text" id="phone3"
+								class="phone-input" maxlength="4" inputmode="numeric">
+						</div>
 
-        <span class="phone-hyphen">-</span>
+						<input type="hidden" name="tel" id="newTel">
+					</div>
 
-        <input type="text"
-               id="phone2"
-               class="phone-input"
-               maxlength="4"
-               inputmode="numeric">
+					<!-- 배송 요청사항 -->
+					<div class="add-address-row" id="requestMsgDirectArea">
 
-        <span class="phone-hyphen">-</span>
+						<div class="add-address-icon">✎</div>
 
-        <input type="text"
-               id="phone3"
-               class="phone-input"
-               maxlength="4"
-               inputmode="numeric">
-    </div>
+						<input type="text" id="newRequestMsg" name="requestMsg"
+							placeholder="배송 요청사항을 입력해주세요." maxlength="100">
+					</div>
 
-    <input type="hidden"
-           name="tel"
-           id="newTel">
-</div>
+					<!-- 기본 배송지 -->
+					<label class="default-address-check"> <input
+						type="checkbox" name="addressDefault" id="newAddressDefault"
+						value="Y"> <span class="custom-check"></span> 기본 배송지로 선택
+					</label>
 
-<!-- 배송 요청사항 -->
-<div class="add-address-row"
-     id="requestMsgDirectArea">
+					<!-- 저장 -->
+					<button type="submit" class="address-save-btn" id="addressSaveBtn">
+						저장</button>
+				</div>
+			</form>
 
-    <div class="add-address-icon">✎</div>
-
-    <input type="text"
-           id="newRequestMsg"
-           name="requestMsg"
-           placeholder="배송 요청사항을 입력해주세요."
-           maxlength="100">
-</div>
-
-<!-- 기본 배송지 -->
-<label class="default-address-check">
-    <input type="checkbox"
-           name="addressDefault"
-           id="newAddressDefault"
-           value="Y">
-
-    <span class="custom-check"></span>
-    기본 배송지로 선택
-</label>
-
-<!-- 저장 -->
-<button type="submit"
-        class="address-save-btn"
-        id="addressSaveBtn">
-    저장
-</button>
 		</div>
-		</form>
-
-	</div>
 	</div>
 	<!-- 결제수단 추가 모달 -->
 	<div id="paymentAddModalOverlay" class="payment-add-modal-overlay">
