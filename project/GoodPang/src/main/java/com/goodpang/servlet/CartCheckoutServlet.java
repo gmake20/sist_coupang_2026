@@ -111,7 +111,7 @@ public class CartCheckoutServlet extends HttpServlet {
 				return;
 			}
 
-			checkoutDAO.updateCheckoutAmount(
+			checkoutDAO.updateCheckoutAmountv2(
 					checkoutNo
 					);
 

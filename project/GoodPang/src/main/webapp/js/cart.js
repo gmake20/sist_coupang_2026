@@ -129,10 +129,15 @@ selectedCount++;
 
 });
 
-const deliveryFee =
+/*const deliveryFee =
 (totalPrice >= 19800 || totalPrice === 0)
 ? 0
-: 3000;
+: 3000;*/
+
+const deliveryFee =
+    (isWowMember || totalPrice >= 19800 || totalPrice === 0)
+    ? 0
+    : 3000;
 
 const grandTotal =
 totalPrice + deliveryFee;
