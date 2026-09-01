@@ -7,23 +7,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import com.google.gson.Gson;
-
 import com.goodpang.dao.ProductDAO;
 import com.goodpang.dao.ProductImageDAO;
 import com.goodpang.dao.ProductOptionDAO;
 import com.goodpang.dao.ProductViewLogDAO;
 import com.goodpang.dao.ReviewDAO;
+import com.goodpang.dao.WowMembershipDAO;
+import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.ProductDTO;
 import com.goodpang.dto.ProductImageDTO;
 import com.goodpang.dto.ProductOptionDTO;
 import com.goodpang.dto.ReviewDTO;
+import com.goodpang.dao.ProductViewLogDAO;
+import com.google.gson.Gson;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 
 @WebServlet("/product")
@@ -38,9 +41,36 @@ public class ProductServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String productNoParam = request.getParameter("productNo");
+        
+        WowMembershipDAO wowMembershipDAO =
+                new WowMembershipDAO();
 
-        System.out.println("[DEBUG ProductServlet] === 상품 상세 조회 시작 ===");
-        System.out.println("[DEBUG ProductServlet] 전달받은 productNoParam: " + productNoParam);
+        boolean isWowMember = false;
+
+        HttpSession session =
+                request.getSession(false);
+
+        if (session != null) {
+
+            MemberDTO loginMember =
+                    (MemberDTO) session.getAttribute(
+                            "loginMember"
+                    );
+
+            if (loginMember != null) {
+
+                isWowMember =
+                        wowMembershipDAO.isWowMember(
+                                loginMember.getMemberNo()
+                        );
+            }
+        }
+
+        request.setAttribute(
+                "isWowMember",
+                isWowMember
+        );
+        
 
         try {
             if (productNoParam != null && !productNoParam.isEmpty()) {
@@ -51,7 +81,6 @@ public class ProductServlet extends HttpServlet {
                 ProductDTO product = dao.selectProduct(productNo);
 
                 if (product == null) {
-                    System.out.println("[DEBUG ProductServlet] 상품을 찾을 수 없음: productNo=" + productNo);
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "상품을 찾을 수 없습니다.");
                     return;
                 }

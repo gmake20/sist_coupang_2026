@@ -569,7 +569,7 @@ button {
 }
 
 .payment-price {
-    width: 305px;
+    width: 350px;
 
     padding: 10px 15px;
 
@@ -589,7 +589,7 @@ button {
 }
 
 .price-row strong {
-    font-size: 12px;
+    font-size: 14px;
 }
 
 
@@ -600,7 +600,7 @@ button {
     justify-content: space-between;
     align-items: center;
 
-    padding: 0 15px 0 420px;
+    padding: 0 15px 0 380px;
 
     background: #fafafa;
 }
