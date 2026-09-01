@@ -16,11 +16,6 @@ import com.goodpang.dao.CategoryProductDAO.Sort;
 import com.goodpang.dto.CategoryDTO;
 import com.goodpang.dto.CategoryProductDTO;
 
-/*
- * 카테고리 목록 페이지 (/category?categoryNo=10301 처럼 CATEGORY.CATEGORY_NO 로 진입).
- * 실제 라이브 coupang.com 구조/인터랙션을 Playwright MCP 로 확인해서 설계함 — ref/category/STRUCTURE.md 참고.
- * 보기개수는 60개 고정(2026-08-30 확정), 정렬은 쿠팡랭킹순 제외 4개만 지원.
- */
 @WebServlet("/category")
 public class CategoryServlet extends HttpServlet {
 
@@ -42,11 +37,15 @@ public class CategoryServlet extends HttpServlet {
         // 평점 필터 — 원본처럼 "N점 이상"(0 = 전체)
         int minRating = Math.max(0, Math.min(5, parseIntOrDefault(request.getParameter("rating"), 0)));
 
+        // 색상 필터 — 하나만 선택(원본도 실측상 클릭 시 전체 페이지 재요청, 다중선택 UI 아님). 안 고르면 null
+        String color = request.getParameter("color");
+        if (color != null && color.isBlank()) color = null;
+
         CategoryProductDAO dao = new CategoryProductDAO();
 
         List<CategoryProductDTO> products =
-                dao.findByCategory(categoryNo, sort, minPrice, maxPrice, minRating, page, PAGE_SIZE);
-        int totalCount = dao.countByCategory(categoryNo, minPrice, maxPrice, minRating);
+                dao.findByCategory(categoryNo, sort, minPrice, maxPrice, minRating, color, page, PAGE_SIZE);
+        int totalCount = dao.countByCategory(categoryNo, minPrice, maxPrice, minRating, color);
         int totalPages = (int) Math.ceil(totalCount / (double) PAGE_SIZE);
 
         CategoryDTO[] breadcrumb = dao.findBreadcrumb(categoryNo);
@@ -61,6 +60,7 @@ public class CategoryServlet extends HttpServlet {
         request.setAttribute("minPrice", minPrice);
         request.setAttribute("maxPrice", maxPrice == Integer.MAX_VALUE ? "" : maxPrice);
         request.setAttribute("rating", minRating);
+        request.setAttribute("selectedColor", color);
 
         request.setAttribute("categoryNo", categoryNo);
         request.setAttribute("breadcrumb", breadcrumb);          // [대분류, 중분류, 소분류]

@@ -90,7 +90,10 @@
 			<div class="prod-atf">
 
 				<!-- ── 왼쪽: 상품 이미지 ────────────────────────── -->
-				<c:set var="mainOption" value="${options[0]}" />
+				<!-- 2026-09-01: 여기 있던 <c:set var="mainOption" value="${options[0]}"/> 를 지움 —
+				     그대로 두면 ProductServlet 이 옵션 선택 유지를 위해 골라둔 mainOption(request 속성)을
+				     이 c:set 이 페이지 스코프로 다시 덮어써서 "항상 첫 옵션"으로 돌아가버림.
+				     이제 mainOption 은 ProductServlet 이 request 에 담아준 것을 그대로 씀 -->
 				<div class="product-image">
 
 					<!-- 썸네일 세로 목록 (원본 실측 70 x 70, 아래 여백 4px)
@@ -256,17 +259,14 @@
 					     사이에 선(border/hr) 자체가 없었음(둘 다 border:0, margin-top:16px 로만
 					     간격을 줌). 지어낸 선이었던 것 -->
 					<div class="delivery-container">
+						<!-- 2026-09-01: 와우회원이 아닐 때 여기 붙어 있던 "(로켓배송 상품 19,800원 이상
+						     구매 시)" 괄호를 지움 — 사용자가 "라디오 위에 이 한 줄이 중복"이라고 지적함.
+						     바로 아래 radio-group 첫 번째 항목이 "로켓배송 상품 19,800원 이상 무료배송"으로
+						     똑같은 조건을 이미 말하고 있어서, 여기서도 또 말하면 한 화면에 같은 문장이 두 번 나옴.
+						     와우회원 문구("무료배송"만, 괄호 없음)와도 이제 모양이 같아져서 c:choose 자체가
+						     필요 없어짐 -->
 						<p class="shipping-fee">
-							<!-- 와우회원은 조건("19,800원 이상") 없이 항상 무료배송이라 문구도 다름 —
-							     원본에도 이 괄호 문구가 아예 없음 -->
-							<c:choose>
-								<c:when test="${sessionScope.wowMember}">
-									<em class="txt-bold">무료배송</em>
-								</c:when>
-								<c:otherwise>
-									<em class="txt-bold">무료배송</em> (로켓배송 상품 19,800원 이상 구매 시)
-								</c:otherwise>
-							</c:choose>
+							<em class="txt-bold">무료배송</em>
 						</p>
 						<p class="delivery-date">
 
@@ -347,9 +347,11 @@
 
 						<!-- 실제 CART에 저장할 OPTION_ID
                  2026-08-28: 하드코딩(25) 대신 첫 번째 옵션 값으로 시작, #optionSelect 를 바꾸면
-                 js/product.js 가 이 값을 그 옵션의 OPTION_ID 로 갈아끼움 -->
+                 js/product.js 가 이 값을 그 옵션의 OPTION_ID 로 갈아끼움.
+                 2026-09-01: "첫 번째 옵션"이 아니라 mainOption(=URL 의 optionId 로 새로고침해도
+                 유지되는 선택 옵션, ProductServlet 이 골라서 request 에 담아줌)으로 바꿈 -->
 						<input type="hidden" name="optionId" id="selectedOptionId"
-							value="${not empty options ? options[0].optionId : ''}">
+							value="${not empty mainOption ? mainOption.optionId : ''}">
 
 						<!-- 화면 표시용 선택 옵션 -->
 						<!-- 상품번호 -->
@@ -357,7 +359,7 @@
 						<!-- 원래 "색상"만 담던 자리인데, 옵션이 색상이 아닐 수도 있어서
                  지금은 선택한 옵션 조합 전체 라벨(예: "블랙 / S")을 담음 -->
 						<input type="hidden" name="color" id="selectedColor"
-							value="${not empty options ? options[0].label : ''}">
+							value="${not empty mainOption ? mainOption.label : ''}">
 
 						<!-- 수량 -->
 						<div class="product-quantity">

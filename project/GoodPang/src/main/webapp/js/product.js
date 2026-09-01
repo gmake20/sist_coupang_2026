@@ -232,6 +232,16 @@ function setupOptionSelect(setStock, setPrice) {
   // 이 상품에 사진이 하나라도 딸린 조합이 있는지 — 2번째 이후 축을 칩으로 할지 드롭박스로 할지 판단 기준
   const anyImages = combos.some(function (c) { return c.imageUrls.length; });
 
+  /* 2026-09-01 추가 — 새로고침해도 옵션 선택 유지.
+     주소(?optionId=)에 담겨온 조합을 찾아서, 아래에서 드롭박스/칩을 그릴 때 "처음부터 이 값"으로
+     선택해둠. ProductServlet 도 같은 optionId 를 보고 mainOption(대표사진·가격)을 이미 그 옵션
+     기준으로 렌더해놨으니, 여기서 화면(드롭박스·칩)만 맞춰주면 서버가 그린 것과 어긋나지 않음.
+     주소에 optionId 가 없거나 이 상품 조합에 없는 값이면 그냥 null → 아래에서 예전처럼 첫 값 씀 */
+  const urlOptionId = new URLSearchParams(location.search).get('optionId');
+  const initialCombo = urlOptionId
+    ? combos.find(function (c) { return String(c.optionId) === urlOptionId; })
+    : null;
+
   const optionIdInput = document.getElementById('selectedOptionId');
   const colorInput    = document.getElementById('selectedColor');
   const thumbBox      = document.querySelector('.product-image__thumbs');
@@ -272,6 +282,19 @@ function setupOptionSelect(setStock, setPrice) {
     if (colorInput) {
       // 원래 "색상"만 담던 자리인데, 지금은 고른 값들을 다 이어붙여서 담음 (예: "M / Black")
       colorInput.value = controls.map(function (ctl) { return ctl.getValue(); }).join(' / ');
+    }
+
+    /* 2026-09-01 추가 — 지금 고른 옵션을 주소창에 실어둠(?optionId=).
+       실제 쿠팡도 옵션을 바꾸면 페이지 이동 없이 주소(itemId/vendorItemId)만 바뀌는 걸
+       Playwright 로 확인함. pushState 가 아니라 replaceState 를 쓰는 이유: 옵션 하나 누를 때마다
+       "뒤로가기" 기록이 쌓이면 안 되고(다른 사이즈 5번 눌렀는데 뒤로가기 5번 눌러야 이 상품
+       페이지를 벗어나는 건 이상함), 주소는 "지금 상태"만 보여주면 되기 때문.
+       이 함수는 페이지 처음 열릴 때도 한 번 불려서(맨 아래 updateFromSelects() 참고), 그때도
+       주소에 optionId 가 없었다면 여기서 채워짐 — 원본도 처음부터 itemId 가 주소에 있는 것과 같음 */
+    if (window.history && window.history.replaceState) {
+      const params = new URLSearchParams(location.search);
+      params.set('optionId', picked.optionId);
+      history.replaceState(null, '', location.pathname + '?' + params.toString());
     }
 
     fetchOptionDetail(picked.optionId);
@@ -329,19 +352,22 @@ function setupOptionSelect(setStock, setPrice) {
 
     const useChips = axisIndex > 0 && anyImages;   // 1번 축은 무조건 드롭박스
 
+    // 이 축에서 "처음부터 선택돼 있어야 할 값" — URL 에 실려온 조합이 있으면 그 값, 없으면 예전처럼 첫 값
+    const initialValue = (initialCombo && initialCombo[axis.key]) || values[0];
+
     if (useChips) {
       const label = document.createElement('div');
-      label.innerHTML = axis.type + ': <span class="option-value">' + values[0] + '</span>';
+      label.innerHTML = axis.type + ': <span class="option-value">' + initialValue + '</span>';
       label.className = 'option-label';
       section.appendChild(label);
 
       const ul = document.createElement('ul');
       ul.className = 'option-chips';
 
-      values.forEach(function (v, i) {
+      values.forEach(function (v) {
         const li = document.createElement('li');
         li.dataset.value = v;
-        if (i === 0) li.classList.add('is-on');
+        if (v === initialValue) li.classList.add('is-on');
         li.innerHTML = '<a href="#"><img src="" alt="' + v + '"></a>';
         li.addEventListener('click', function (e) {
           e.preventDefault();
@@ -381,6 +407,7 @@ function setupOptionSelect(setStock, setPrice) {
         const opt = document.createElement('option');
         opt.value = v;
         opt.textContent = v;
+        if (v === initialValue) opt.selected = true;
         select.appendChild(opt);
       });
       select.addEventListener('change', updateFromSelects);

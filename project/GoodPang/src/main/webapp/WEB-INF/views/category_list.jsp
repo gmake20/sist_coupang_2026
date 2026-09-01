@@ -21,9 +21,11 @@
 <body class="page-category">
 	<jsp:include page="/inc/header.jsp" />
 
-	<%-- 정렬/페이지/평점/가격 링크에 항상 같이 실어야 하는 값들. 새 링크 만들 때마다 이어붙임 --%>
+	<%-- 정렬/페이지/평점/가격/색상 링크에 항상 같이 실어야 하는 값들. 새 링크 만들 때마다 이어붙임.
+	     color 는 한글이라 <c:param> 으로 URL 인코딩까지 여기서 미리 해둠(직접 이어붙이면 깨짐) --%>
 	<c:url var="baseUrl" value="/category">
 		<c:param name="categoryNo" value="${categoryNo}" />
+		<c:param name="color" value="${selectedColor}" />
 	</c:url>
 
 	<main class="category-page">
@@ -93,13 +95,26 @@
 				</c:forEach>
 
 				<%-- 색상 — 하드코딩 아님, PRODUCT_OPTION 에 실제 등록된 값만 나옴(2026-08-30 확정).
-				     클릭 동작은 아직 없음 — 필터링 로직은 나중에 붙일 것 --%>
+				     2026-09-01: 실제로 필터링되도록 링크로 바꿈(다른 필터와 같은 방식 — 클릭하면 전체 재요청).
+				     이미 선택된 색을 다시 누르면 해제(color= 빈값)되게 토글 --%>
 				<c:if test="${not empty colorOptions}">
 					<section class="filter-group">
 						<h3>색상</h3>
 						<ul class="filter-chip-list">
 							<c:forEach var="color" items="${colorOptions}">
-								<li><label><i class="filter-function-bar-asset"></i><span>${color}</span></label></li>
+								<c:url var="colorUrl" value="/category">
+									<c:param name="categoryNo" value="${categoryNo}" />
+									<c:param name="sort" value="${sort}" />
+									<c:param name="minPrice" value="${minPrice}" />
+									<c:param name="maxPrice" value="${maxPrice}" />
+									<c:param name="rating" value="${rating}" />
+									<c:param name="color" value="${color eq selectedColor ? '' : color}" />
+								</c:url>
+								<li>
+									<a href="${colorUrl}" class="${color eq selectedColor ? 'selected' : ''}">
+										<i class="filter-function-bar-asset"></i><span>${color}</span>
+									</a>
+								</li>
 							</c:forEach>
 						</ul>
 					</section>
@@ -206,18 +221,14 @@
 											</c:if>
 											<strong class="sale-price"><fmt:formatNumber value="${item.salePrice}" pattern="#,###"/>원</strong>
 										</p>
-										<%-- 배송정보 — 실제 DB에 배송 컬럼이 아직 연동 안 돼서 고정 문구(product.jsp 광고캐러셀과 같은 방식, 4장 4번 참고) --%>
-										<p class="delivery-info">
-											<span class="delivery-date">내일 도착 보장</span>
-											<span class="delivery-free">무료배송 · 무료반품</span>
-										</p>
+										<%-- 적립 — 실제 적립 정책 테이블이 없어서 판매가 1%로 임의 계산(2026-09-01 사용자 요청으로 재추가) --%>
+										<p class="cash-reward">적립 <fmt:formatNumber value="${item.cashReward}" pattern="#,###"/>원</p>
 										<c:if test="${item.reviewCount > 0}">
 											<p class="product-rating">
 												<span class="star-rating" aria-label="평점 ${item.avgRating}점"><em style="width:${item.avgRating * 20}%"></em></span>
 												(${item.reviewCount})
 											</p>
 										</c:if>
-										<%-- 적립 — 2026-08-31 보류. 실제 적립 정책 없이 임의 계산(판매가 1%)으로 넣었다가 사용자가 "안 할 수도 있음"이라 뺌 --%>
 									</a>
 								</li>
 							</c:forEach>
