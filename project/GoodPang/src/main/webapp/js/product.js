@@ -42,6 +42,11 @@ function setupQuantity() {
   const originPriceEl = originBox ? originBox.querySelector('.origin-price') : null;
   const basePrice = priceEl ? Number(priceEl.dataset.basePrice) || 0 : 0;
   let unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
+  // 2026-09-01 추가 — 정상가(취소선)의 "1개당" 값. 할인 중이 아니면 null(취소선 자체를 안 보여줌).
+  // render() 가 이 값 × 수량으로 취소선도 같이 다시 그림 — 예전엔 이 변수가 없어서 수량을 바꿔도
+  // 취소선 금액이 1개 값 그대로 안 바뀌던 버그가 있었음 (사용자가 "수량 버튼 누르면 정상가는 금액이
+  // 안 바뀐다"고 지적함)
+  let normalUnitPrice = null;
 
   const MIN = 1;
   /* 옵션이 없는 상품(재고 정보가 안 내려오는 경우)을 위한 기본값.
@@ -60,6 +65,11 @@ function setupQuantity() {
        0원으로 다시 그리면 "품절인데 원가는 남아있는" 원본 화면과 달라짐 */
     if (priceEl && !document.body.classList.contains('is-soldout')) {
       priceEl.textContent = (unitPrice * n).toLocaleString('ko-KR') + '원';
+    }
+    // 취소선(정상가)도 판매가와 똑같이 수량만큼 곱해서 다시 그림 (할인 중일 때만 — normalUnitPrice
+    // 가 null 이면 애초에 취소선 자체가 안 보이는 상태라 건드릴 필요 없음)
+    if (originPriceEl && normalUnitPrice != null) {
+      originPriceEl.textContent = (normalUnitPrice * n).toLocaleString('ko-KR') + '원';
     }
   }
 
@@ -101,9 +111,10 @@ function setupQuantity() {
     }
     if (discountLabelEl) discountLabelEl.style.display = hasDiscount ? '' : 'none';
     if (originBox) originBox.style.display = hasDiscount ? '' : 'none';
-    if (hasDiscount && originPriceEl) {
-      originPriceEl.textContent = normalPrice.toLocaleString('ko-KR') + '원';
-    }
+    // originPriceEl 의 글자는 여기서 직접 안 쓰고 normalUnitPrice 만 갱신함 —
+    // 실제 텍스트(× 수량)는 바로 아래 render() 가 그림 (수량 곱하는 로직을 두 군데 두면
+    // 하나만 고치고 하나는 깜빡하는 사고가 나서 한 곳으로 모음)
+    normalUnitPrice = hasDiscount ? normalPrice : null;
 
     render(Number(input.value) || MIN);   // 단가가 바뀌었으니 화면 가격도 다시 그림
   }
@@ -141,6 +152,88 @@ function setupThumbs() {
     const picked = li.querySelector('img');
     if (main && picked) main.src = picked.src;
   });
+}
+
+
+/* ── 2.5 대표 이미지 확대(마우스 오버 돋보기) ─────────────
+   (2, 3 사이에 끼워넣은 기능이라 번호를 2.5 로 붙임 — 아래 5.5/6.3/6.5 와 같은 방식,
+   전체를 다시 번호 매기면 다른 곳 참조 주석까지 다 밀려서 여기서도 그 관례를 따름)
+   2026-09-01 추가. 로그인해서 실제 쿠팡을 Playwright 로 대표 이미지에 마우스를 직접 올려서
+   실측함(뷰포트 1280 / 1536 / 1920 세 군데). 확인한 것:
+     · 뷰포트 1280px 미만이면 이 기능 자체가 원본 DOM 에 없음(숨기는 게 아니라 아예 안 만듦) —
+       본문이 좁아지면 오른쪽에 확대사진 놓을 자리가 없어져서인 듯. 우리도 같은 폭 기준으로 막음
+     · 렌즈(마우스 따라다니는 반투명 박스) 222×218px / 확대판(오른쪽에 뜨는 확대 사진) 476×466px —
+       뷰포트가 바뀌어서 대표 이미지 자체 크기(439px↔556px)가 달라져도 이 둘은 그대로임(고정 픽셀,
+       이미지 폭에 비례하는 게 아니었음)
+     · 확대판은 이미지 바로 오른쪽에 간격 없이(0px) 붙고, 위쪽 끝이 이미지와 나란함
+     · 배경 확대율은 마우스 위치와 상관없이 항상 250% 고정
+     · 확대판에 쓰는 사진은 화면에 보이는 썸네일용(492x492 등 축소본)이 아니라 별도의
+       고해상도 원본 — 우리는 그런 별도 파일이 없어서 지금 큰 이미지에 쓰는 파일을 그대로 씀
+       (원본 사진 자체가 작으면 확대했을 때 흐려질 수 있음 — 나중에 사진 커지면 자동으로 좋아짐)
+
+   ★ 렌즈는 이미지 박스 테두리를 못 벗어나게 clamp — 마우스가 이미지 밖으로 나가도 렌즈는
+     가장자리에 붙어서 멈춤 (원본도 이렇게 동작하는 걸 실측 확인) */
+function setupImageZoom() {
+  const box = document.querySelector('.product-image__main');
+  if (!box) return;
+
+  const LENS_W = 222, LENS_H = 218;
+  const ZOOM = 2.5;   // = 250% (실측값, 렌즈/확대판 크기 비율로 계산한 값이 아니라 원본에 박혀있던 고정 배율)
+
+  let lens = null, overlayImg = null;
+
+  function build() {
+    lens = document.createElement('div');
+    lens.className = 'magnifier-lens';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'magnify-overlay';
+    overlayImg = document.createElement('div');
+    overlayImg.className = 'magnify-overlay__img';
+    overlay.appendChild(overlayImg);
+
+    box.appendChild(lens);
+    box.appendChild(overlay);
+  }
+
+  function remove() {
+    box.querySelectorAll('.magnifier-lens, .magnify-overlay').forEach(function (el) { el.remove(); });
+    lens = null;
+    overlayImg = null;
+  }
+
+  function move(e) {
+    if (!lens) return;
+    const rect = box.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // 렌즈 중심이 이미지 박스를 못 벗어나게 막음
+    x = Math.max(LENS_W / 2, Math.min(rect.width  - LENS_W / 2, x));
+    y = Math.max(LENS_H / 2, Math.min(rect.height - LENS_H / 2, y));
+
+    const lensLeft = x - LENS_W / 2;
+    const lensTop  = y - LENS_H / 2;
+    lens.style.left = lensLeft + 'px';
+    lens.style.top  = lensTop + 'px';
+
+    // 렌즈가 가리키는 지점을 확대판에서 보여줌 — 배경이 250%로 커져있으니
+    // 좌표에도 같은 배율을 곱해야 렌즈 위치랑 확대판 안 위치가 맞물림
+    if (overlayImg) {
+      overlayImg.style.backgroundPosition = (-lensLeft * ZOOM) + 'px ' + (-lensTop * ZOOM) + 'px';
+    }
+  }
+
+  box.addEventListener('mouseenter', function (e) {
+    if (window.innerWidth < 1280) return;   // 원본도 이 폭 밑에서는 기능 자체가 없음
+    const img = box.querySelector('img');
+    if (!img || !img.src) return;
+    build();
+    overlayImg.style.backgroundImage = 'url(' + img.src + ')';
+    move(e);
+  });
+  box.addEventListener('mousemove', move);
+  box.addEventListener('mouseleave', remove);
 }
 
 
@@ -714,6 +807,7 @@ function setupDeliveryOption() {
    옵션을 고를 때마다 그 옵션의 재고·가격으로 화면이 바뀌게 하려는 것 */
 const quantityControls = setupQuantity() || {};
 setupThumbs();
+setupImageZoom();
 setupAdSlider();
 setupOptionSelect(quantityControls.setStock, quantityControls.setPrice);
 setupReviewTools();

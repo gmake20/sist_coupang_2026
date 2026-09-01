@@ -37,14 +37,10 @@
 			<a href="${pageContext.request.contextPath}/">굿팡 홈</a>
 			<c:forEach var="crumb" items="${breadcrumb}">
 				<span class="sep">&gt;</span>
-				<c:choose>
-					<c:when test="${crumb.categoryLevel == 3}">
-						<span class="current">${crumb.categoryName}</span>
-					</c:when>
-					<c:otherwise>
-						<a href="${pageContext.request.contextPath}/category?categoryNo=${crumb.categoryNo}">${crumb.categoryName}</a>
-					</c:otherwise>
-				</c:choose>
+				<%-- 2026-09-02: 소분류(현재 페이지)도 클릭 가능하게 링크로 바꿈(사용자 요청) —
+				     "current" 클래스는 그대로 둬서 색상 등 스타일 구분은 유지 --%>
+				<a href="${pageContext.request.contextPath}/category?categoryNo=${crumb.categoryNo}"
+					class="${crumb.categoryLevel == 3 ? 'current' : ''}">${crumb.categoryName}</a>
 			</c:forEach>
 		</nav>
 
