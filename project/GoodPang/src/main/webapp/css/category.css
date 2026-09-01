@@ -74,6 +74,15 @@
 	text-decoration: underline;
 }
 
+/* 2026-09-03 버그 수정: 위 ".category-filter a" 규칙이 display:inline-flex 를 강제해서,
+   #filterClearAll 에 hidden 속성이 붙어도 항상 보이던 버그가 있었음(원본은 필터 0개 선택 시
+   전체해제 자체가 안 뜸 — coupang.com 실측 확인함). author CSS는 origin 우선순위상 브라우저
+   기본 스타일([hidden]{display:none})을 항상 이겨서, hidden 만으론 안 숨겨졌던 것.
+   그래서 hidden 상태일 때만 명시적으로 display:none 을 다시 걸어줌 */
+.category-filter .filter-clear-all[hidden] {
+	display: none;
+}
+
 /* 체크박스형 필터 공통 — 진짜 <input type="checkbox"> 를 눈에는 안 보이게 숨기고
    .filter-function-bar-asset(CSS로 그린 네모)를 대신 보여줌. 클릭은 label 전체가 받아서 그대로 토글됨.
    색상(name="color", 서버로 감)이든 브랜드/핏 등 장식용(name 없음, 서버로 안 감)이든 규칙은 동일 —
@@ -199,6 +208,19 @@ label.selected .filter-function-bar-asset::after,
    2026-09-01: 예전엔 여기서 글자를 회색으로 죽여놨는데, 이제 체크박스는 진짜로 눌러지고 "선택한 필터"에도
    잡히게 바꿨더니 회색이 안 맞게 됨(버그 리포트 4번) — 다른 필터랑 똑같이 검은 글자로 통일 */
 
+/* 더보기/접기 — 2026-09-03 추가. coupang.com 실측(Playwright): 체크박스 필터 그룹은 5개까지만
+   보이고 "+ 더보기" 클릭 시 "- 접기"로 바뀌며 나머지가 펼쳐짐. URL 안 바뀌는 순수 클라이언트 토글
+   (category.js 가 li.hidden 을 토글). 카테고리/평점/가격처럼 <a> 링크만 있는 목록은 원본도 안 접으므로
+   여기 대상 아님(category.js 에서 체크박스가 있는 ul만 골라서 처리) */
+.filter-fold-toggle {
+	margin-top: 4px;
+}
+
+.filter-fold-toggle a {
+	color: var(--link-blue);
+	font-size: 12px;
+}
+
 .filter-price-direct {
 	display: flex;
 	align-items: center;
@@ -266,6 +288,11 @@ label.selected .filter-function-bar-asset::after,
 	flex-wrap: wrap;
 	gap: 8px;
 	margin-bottom: 16px;
+}
+
+/* 위 .filter-clear-all[hidden] 과 같은 이유(author CSS가 UA 기본 [hidden] 을 이김) — 여기도 같이 고침 */
+.filter-selected-bar[hidden] {
+	display: none;
 }
 
 .filter-selected-label {

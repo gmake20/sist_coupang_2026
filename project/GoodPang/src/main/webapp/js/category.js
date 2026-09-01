@@ -66,3 +66,43 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (clearAllBtn) clearAllBtn.hidden = !show;
 	}
 });
+
+// 더보기/접기 — 2026-09-03 추가. 위 블록(선택한 필터 칩)과는 별개 기능이라 DOMContentLoaded 리스너를
+// 따로 둠 — selectedBar/chipList 가 없어서 위 블록이 일찍 return 해도 이건 항상 실행되게.
+//
+// coupang.com 을 Playwright 로 직접 열어서 확인한 실제 동작(원본은 URL 안 바뀌는 순수 클라이언트 토글):
+// 체크박스 필터 그룹(색상/소재/네크라인/패턴·프린트/제조년도 등)은 처음엔 5개까지만 보이고,
+// "+ 더보기" 를 누르면 나머지가 펼쳐지며 버튼 글자가 "- 접기"로 바뀜.
+// 카테고리/평점/가격처럼 <a> 링크만 있는 목록은 원본도 접지 않으므로, "체크박스가 들어있는 ul"만 골라서 처리함
+// (li 개수가 아니라 checkbox 유무로 판별 — 카테고리 ul은 12개나 되지만 원본이 안 접기 때문).
+document.addEventListener('DOMContentLoaded', function () {
+	var FOLD_LIMIT = 5;
+	var lists = document.querySelectorAll('.category-filter .filter-group ul');
+
+	lists.forEach(function (ul) {
+		if (!ul.querySelector('input[type="checkbox"]')) return;
+
+		var items = Array.prototype.slice.call(ul.children);
+		if (items.length <= FOLD_LIMIT) return;
+
+		var hiddenItems = items.slice(FOLD_LIMIT);
+		hiddenItems.forEach(function (li) { li.hidden = true; });
+
+		var toggleLi = document.createElement('li');
+		toggleLi.className = 'filter-fold-toggle';
+
+		var toggleBtn = document.createElement('a');
+		toggleBtn.href = '#';
+		toggleBtn.textContent = '+ 더보기';
+		toggleLi.appendChild(toggleBtn);
+		ul.appendChild(toggleLi);
+
+		var folded = true;
+		toggleBtn.addEventListener('click', function (e) {
+			e.preventDefault();
+			folded = !folded;
+			hiddenItems.forEach(function (li) { li.hidden = folded; });
+			toggleBtn.textContent = folded ? '+ 더보기' : '- 접기';
+		});
+	});
+});
