@@ -816,37 +816,78 @@ public class ReviewDAO {
         return count;
     }
     
+	/*
+	 * public int deleteReview( int reviewNo, int memberNo) {
+	 * 
+	 * String sql = """ DELETE FROM REVIEW WHERE REVIEW_NO = ? AND MEMBER_NO = ?
+	 * """;
+	 * 
+	 * int rowCount = 0;
+	 * 
+	 * try ( Connection conn = ConnectionProvider.getConnection();
+	 * 
+	 * PreparedStatement pstmt = conn.prepareStatement(sql) ) {
+	 * 
+	 * pstmt.setInt(1, reviewNo); pstmt.setInt(2, memberNo);
+	 * 
+	 * rowCount = pstmt.executeUpdate();
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); }
+	 * 
+	 * return rowCount; }
+	 */
+    
     public int deleteReview(
             int reviewNo,
-            int memberNo) {
+            int memberNo) throws Exception {
 
-        String sql = """
-            DELETE FROM REVIEW
-            WHERE REVIEW_NO = ?
-              AND MEMBER_NO = ?
-            """;
+        try (Connection conn =
+                ConnectionProvider.getConnection()) {
 
-        int rowCount = 0;
+            try {
 
-        try (
-            Connection conn =
-                ConnectionProvider.getConnection();
+                conn.setAutoCommit(false);
 
-            PreparedStatement pstmt =
-                conn.prepareStatement(sql)
-        ) {
+                String imageSql = """
+                    DELETE FROM REVIEW_IMAGE
+                    WHERE REVIEW_NO = ?
+                    """;
 
-            pstmt.setInt(1, reviewNo);
-            pstmt.setInt(2, memberNo);
+                try (PreparedStatement pstmt =
+                        conn.prepareStatement(imageSql)) {
 
-            rowCount =
-                pstmt.executeUpdate();
+                    pstmt.setInt(1, reviewNo);
+                    pstmt.executeUpdate();
+                }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+                String reviewSql = """
+                    DELETE FROM REVIEW
+                    WHERE REVIEW_NO = ?
+                      AND MEMBER_NO = ?
+                    """;
+
+                int rowCount;
+
+                try (PreparedStatement pstmt =
+                        conn.prepareStatement(reviewSql)) {
+
+                    pstmt.setInt(1, reviewNo);
+                    pstmt.setInt(2, memberNo);
+
+                    rowCount =
+                        pstmt.executeUpdate();
+                }
+
+                conn.commit();
+
+                return rowCount;
+
+            } catch (Exception e) {
+
+                conn.rollback();
+                throw e;
+            }
         }
-
-        return rowCount;
     }
     
     public ReviewDTO2 selectReviewByNo(
