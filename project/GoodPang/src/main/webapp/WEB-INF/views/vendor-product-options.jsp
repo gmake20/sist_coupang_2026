@@ -119,11 +119,20 @@
                     <tr class="${groupStatus.index % 2 == 1 ? 'option-group-alt' : ''}">
                       <c:if test="${optionStatus.first}">
                         <td class="col-product" rowspan="${fn:length(group.options)}">
-                          <p class="product-name">
-                            <a href="${pageContext.request.contextPath}/vendor/product/detail?productNo=${group.productNo}"
-                               style="color:inherit; text-decoration:none;">${group.productName}</a>
-                          </p>
-                          <p class="product-sku">상품번호 ${group.productNo}</p>
+                          <div class="product-cell">
+                            <span class="thumb">
+                              <c:if test="${not empty group.thumbnailUrl}">
+                                <img src="${pageContext.request.contextPath}/${group.thumbnailUrl}" alt="${group.productName}">
+                              </c:if>
+                            </span>
+                            <div class="product-text">
+                              <p class="product-name">
+                                <a href="${pageContext.request.contextPath}/vendor/product/detail?productNo=${group.productNo}"
+                                   style="color:inherit; text-decoration:none;">${group.productName}</a>
+                              </p>
+                              <p class="product-sku">상품번호 ${group.productNo}</p>
+                            </div>
+                          </div>
                         </td>
                       </c:if>
                       <td class="col-option">${option.optionLabel}</td>
