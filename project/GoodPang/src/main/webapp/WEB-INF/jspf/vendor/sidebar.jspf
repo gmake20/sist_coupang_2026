@@ -4,9 +4,10 @@
 
      쓰는 쪽(포함하는 JSP)이 include 하기 전에 아래 변수를 선언해둬야 함
        String menu = "dashboard";     // 대시보드
-       String menu = "products";      // 상품관리 > 상품 목록
-       String menu = "productWrite";  // 상품관리 > 상품 등록
-       String menu = "orders";        // 주문/배송관리 > 주문 목록
+       String menu = "products";        // 상품관리 > 상품 목록
+       String menu = "productWrite";    // 상품관리 > 상품 등록
+       String menu = "productOptions";  // 상품관리 > 상품 옵션 관리
+       String menu = "orders";          // 주문/배송관리 > 주문 목록
 
      ⚠ 이 파일에 <%@ page %> 지시어를 넣지 않음.
      정적 include(<%@ include %>)로만 쓰이는 조각이라, 인코딩은 이 파일을
@@ -31,15 +32,15 @@
         <span>대시보드</span>
       </a>
 
-      <button class="side-item side-group-toggle <%= ("products".equals(menu) || "productWrite".equals(menu)) ? "active open" : "" %>" type="button">
+      <button class="side-item side-group-toggle <%= ("products".equals(menu) || "productWrite".equals(menu) || "productOptions".equals(menu)) ? "active open" : "" %>" type="button">
         <svg class="icon"><use href="#ic-box" /></svg>
         <span>상품관리</span>
         <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
       </button>
-      <div class="side-submenu <%= ("products".equals(menu) || "productWrite".equals(menu)) ? "open" : "" %>">
+      <div class="side-submenu <%= ("products".equals(menu) || "productWrite".equals(menu) || "productOptions".equals(menu)) ? "open" : "" %>">
         <a href="/vendor/product" class="<%= "products".equals(menu) ? "active" : "" %>">상품 목록</a>
         <a href="/vendor/product/write" class="<%= "productWrite".equals(menu) ? "active" : "" %>">상품 등록</a>
-        <a href="#">상품 옵션 관리</a>
+        <a href="/vendor/product/options" class="<%= "productOptions".equals(menu) ? "active" : "" %>">상품 옵션 관리</a>
       </div>
 
       <button class="side-item side-group-toggle <%= "orders".equals(menu) ? "active open" : "" %>" type="button">
