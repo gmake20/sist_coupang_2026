@@ -27,6 +27,9 @@ public class OrderCancelServlet extends HttpServlet {
         if (loginMember == null) {
             return;
         }
+        
+     // ★ [핵심 해결 위치] 로그인한 사용자의 memberNo 변수 선언 및 추출
+        int memberNo = loginMember.getMemberNo();
 
         // 2. orderNo 파라미터 수신
         String orderNoParam = request.getParameter("orderNo");
@@ -38,7 +41,7 @@ public class OrderCancelServlet extends HttpServlet {
 
                 // 3. 기존 OrderDetailDAO의 6개 테이블 조인 메서드를 사용해 주문 데이터 가져오기
                 OrderDetailDAO dao = new OrderDetailDAO();
-                List<OrderDetailDTO> list = dao.getOrderDetailList(orderNo);
+                List<OrderDetailDTO> list = dao.getOrderDetailList(orderNo , memberNo);
 
                 if (list != null && !list.isEmpty()) {
                     cancelInfo = list.get(0); // 화면 출력에 필요한 단일 대표 객체 추출
