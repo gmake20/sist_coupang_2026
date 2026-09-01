@@ -65,6 +65,11 @@
       <p>입점 신청한 판매자 목록을 확인하고 승인/반려 처리합니다.</p>
     </a>
 
+    <a class="menu-card" href="${pageContext.request.contextPath}/admin/deliveries">
+      <h2>배송 관리</h2>
+      <p>배송중인 주문 목록을 확인하고 배송완료 처리합니다.</p>
+    </a>
+
   </div>
 
 </body>

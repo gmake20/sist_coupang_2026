@@ -7,14 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import com.google.gson.Gson;
-
 import com.goodpang.dao.ProductDAO;
 import com.goodpang.dao.ProductImageDAO;
 import com.goodpang.dao.ProductOptionDAO;
@@ -23,6 +15,14 @@ import com.goodpang.dto.ProductDTO;
 import com.goodpang.dto.ProductImageDTO;
 import com.goodpang.dto.ProductOptionDTO;
 import com.goodpang.dto.ReviewDTO;
+import com.goodpang.dto.ReviewDTO2;
+import com.google.gson.Gson;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 @WebServlet("/product")
@@ -165,6 +165,21 @@ public class ProductServlet extends HttpServlet {
                 List<ReviewDTO> reviews = reviewDAO.selectReviewsByProductNo(productNo);
                 request.setAttribute("reviews", reviews);
                 request.setAttribute("reviewCount", reviews.size());
+                
+				/*
+				 * List<ReviewDTO> reviews = reviewDAO.getReviews(productNo);
+				 */
+
+                for (ReviewDTO review : reviews) {
+                	List<String> imageUrls =
+                			reviewDAO.getReviewImages(
+                					review.getReviewNo()
+                			);
+
+                	review.setImageUrls(imageUrls);
+                }
+
+                request.setAttribute("reviews", reviews);
                 // 평균 평점 — 2026-08-27: 별점 UI를 두 자리 다 스프라이트 이미지로 바꾸면서 필요해짐
                 // (review-atf/review-score 는 "리뷰 개별 별점"이 아니라 "상품 전체 평균 별점"을 보여주는 자리라
                 //  이미 읽어온 reviews 리스트에서 바로 평균을 냄 — DB 를 한 번 더 조회할 필요 없음)

@@ -17,6 +17,8 @@ public class ReviewAvailableDTO {
     private String productImage;
     private Date orderDate;
     private Date deliveryDate;
+    
+    private String optionText;
 
     public boolean isReviewWritten() {
         return reviewWritten;
