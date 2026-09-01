@@ -598,7 +598,7 @@
 
 						<input type="text" id="newAccountNumber" name="accountNumber"
 							class="payment-add-input" placeholder="'-' 없이 계좌번호 입력"
-							inputmode="numeric" maxlength="20">
+							inputmode="numeric" maxlength="14">
 
 
 						<div class="payment-add-label">예금주</div>
