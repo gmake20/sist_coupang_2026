@@ -40,6 +40,13 @@ public class ReviewDeleteServlet extends HttpServlet {
 
         String reviewNoParam =
             request.getParameter("reviewNo");
+        
+
+        	System.out.println("reviewNoParam = " + reviewNoParam);
+        	System.out.println(
+        	    "login memberNo = "
+        	    + loginMember.getMemberNo()
+        	);
 
         if (reviewNoParam == null
                 || reviewNoParam.isBlank()) {
