@@ -7,7 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${p.productName}-${p.subCategoryName}|굿팡</title>
+<title>${p.productName}- ${p.subCategoryName} | 굿팡</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet"
@@ -184,8 +184,21 @@
 						</div>
 					</div>
 
-					<!-- ② 가격 -->
+					<!-- ② 가격
+					     2026-09-01: 순서가 다시 price-now(판매가) 위 / price-origin(원가) 아래로
+					     돌아가 있어서 원본과 반대였음(2026-08-31에 확인해서 뒤집었던 걸 머지하며 잃어버림).
+					     로그인해서 실제 쿠팡을 Playwright 로 다시 확인(원가 21,900원 위 → 판매가 9,890원
+					     아래, 클래스명도 원본이 그대로 original-price/final-price 였음) — 원가를 먼저 씀 -->
 					<div class="price-container">
+						<!-- 원가 취소선 (#768695 + line-through). 정상 추가금(NORMAL_PRICE) 입력 안 한 옵션이면 안 보임 -->
+						<div class="price-origin"
+							${empty displayNormalPrice ? ' style="display:none"' : ''}>
+							<span class="origin-price">${displayNormalPrice}원</span>
+							<!-- 원본에 있는 ⓘ — 눌러도 아무 일 없는 안내 아이콘. 이미지 없이 글자로 그림 -->
+							<button type="button" class="price-info">
+								<span class="blind">가격 안내</span>
+							</button>
+						</div>
 						<div class="price-now">
 							<!-- 2026-08-30 확정 — PRODUCT_OPTION.PRICE/NORMAL_PRICE 는 PRODUCT_PRICE(기본가)에 더해지는
 							     "추가금". 판매가/정상가 둘 다 ProductServlet 이 기본가+추가금으로 계산해둔 값을 씀.
@@ -201,15 +214,6 @@
 							<span class="discount-label"${empty displayNormalPrice ? ' style="display:none"' : ''}>할인</span>
 							<span class="badge-rocket">로켓배송</span> <span
 								class="badge-tomorrow">내일도착</span>
-						</div>
-						<!-- 원가 취소선 (#768695 + line-through). 정상 추가금(NORMAL_PRICE) 입력 안 한 옵션이면 안 보임 -->
-						<div class="price-origin"
-							${empty displayNormalPrice ? ' style="display:none"' : ''}>
-							<span class="origin-price">${displayNormalPrice}원</span>
-							<!-- 원본에 있는 ⓘ — 눌러도 아무 일 없는 안내 아이콘. 이미지 없이 글자로 그림 -->
-							<button type="button" class="price-info">
-								<span class="blind">가격 안내</span>
-							</button>
 						</div>
 
 						<!-- 품절일 때만 보이는 줄. 평소엔 CSS 가 감춤 (body 에 .is-soldout 이 붙어야 나옴)
@@ -294,6 +298,18 @@
 						</c:if>
 					</div>
 
+					<!-- 판매자 정보 — 사이즈 위. 2026-09-01: 머지하면서 통째로 빠져 있던 걸 되살림.
+					     로그인해서 실제 쿠팡을 Playwright 로 다시 확인(클래스명도 원본 그대로 seller-info) —
+					     "판매자 상품 보러가기"는 원본에선 판매자 스토어(shop.coupang.com) 링크인데,
+					     우리는 그런 페이지가 없어서 href="#" 로 자리만 잡음 -->
+					<div class="seller-info">
+						<div class="seller-info-row">
+							판매자: <a href="#" class="seller-info-link">${p.storeName}
+								<span class="seller-info-visit">판매자 상품 보러가기</span>
+							</a>
+						</div>
+					</div>
+
 					<!-- ④ 옵션 — "1번 축은 드롭박스, 그 다음 축은 사진 있으면 칩" (원본과 같은 모양)
              PRODUCT_OPTION 은 "조합 하나(사이즈+색상 등) = 행 하나"로 저장돼 있어서, 축마다 중복 없는
              값 목록을 뽑는 건 JSTL 보다 JS 가 훨씬 간단함 — 그래서 여기선 데이터만 넘기고
@@ -313,16 +329,15 @@
 							data-context-path="${pageContext.request.contextPath}">${optionsJson}</script>
 					</c:if>
 
-					<!-- ⑤ 적립 혜택 -->
+					<!-- ⑤ 적립 혜택
+					     2026-09-01: "혜택보기" 화살표와 "PC에서도 간편한 결제" 칩 줄이 다시 생겨 있어서
+					     지움. 로그인해서 실제 쿠팡을 Playwright 로 다시 확인 — 적립 줄 하나뿐, 오른쪽에
+					     아무 링크도 없고 그 아래 결제수단 줄 자체가 없음(둘 다 지어냈던 것) -->
 					<div class="conditional-benefits">
 						<div class="benefit-row">
 							<span class="benefit-label">적립</span> <span class="benefit-text">
 								<em>최대 ${rewardCash}원 </em> <u>굿팡캐시 적립</u> · 굿페이 머니 결제시
-							</span> <a href="#" class="benefit-more">혜택보기</a>
-						</div>
-						<div class="benefit-row pay-methods">
-							<strong>PC에서도 간편한 결제</strong> <span class="pay-chip">굿페이머니</span>
-							<span class="pay-chip">카드</span> <span class="pay-chip">계좌이체</span>
+							</span>
 						</div>
 					</div>
 
@@ -1185,9 +1200,9 @@
 						</tr>
 						<tr>
 							<th>상호/대표자</th>
-							<td>${p.storeName}/${p.ceoName}</td>
+							<td>${p.storeName} / ${p.ceoName}</td>
 							<th>사업장 소재지</th>
-							<td>${p.businessAddress}${p.businessDetailAddress}</td>
+							<td>${p.businessAddress} ${p.businessDetailAddress}</td>
 						</tr>
 						<tr>
 							<th>e-mail</th>
