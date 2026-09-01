@@ -12,6 +12,7 @@ import com.goodpang.dao.VendorDashboardDAO;
 import com.goodpang.dao.VendorOrderListDAO;
 import com.goodpang.dto.SellerDTO;
 import com.goodpang.dto.VendorDailySalesDTO;
+import com.goodpang.dto.VendorDailyTrafficDTO;
 import com.goodpang.dto.VendorDashboardStatDTO;
 import com.goodpang.dto.VendorOrderStatSummaryDTO;
 import com.google.gson.Gson;
@@ -46,13 +47,21 @@ public class VendorDashboardServlet extends HttpServlet {
 		LocalDate today = LocalDate.now();
 		LocalDate selectedDate = parseSelectedDate(request.getParameter("date"), today);
 
+		java.sql.Date targetSqlDate = java.sql.Date.valueOf(selectedDate);
+
 		VendorDashboardDAO dao = new VendorDashboardDAO();
-		VendorDashboardStatDTO dashboardStat = dao.getTodayStat(loginSeller.getSellerNo(), java.sql.Date.valueOf(selectedDate));
+		VendorDashboardStatDTO dashboardStat = dao.getTodayStat(loginSeller.getSellerNo(), targetSqlDate);
 		request.setAttribute("dashboardStat", dashboardStat);
 
 		request.setAttribute("selectedDate", selectedDate.toString());
 		request.setAttribute("selectedDateLabel", formatDateLabel(selectedDate));
 		request.setAttribute("dateOptions", buildDateOptions(today));
+
+		// KPI 카드 라벨 - 오늘을 보고 있으면 "오늘"/"어제", 과거 날짜를 보고 있으면 그 날짜/전날을 "M/d"로 표시
+		boolean isToday = selectedDate.equals(today);
+		LocalDate compareDate = selectedDate.minusDays(1);
+		request.setAttribute("todayLabel", isToday ? "오늘" : formatShortDate(selectedDate));
+		request.setAttribute("compareLabel", (isToday ? "어제" : formatShortDate(compareDate)) + " 대비");
 
 		// 주문/배송 현황 패널(배송중·배송완료) - vendor-order.jsp 상단 카드와 같은 집계를 재사용
 		VendorOrderListDAO orderListDAO = new VendorOrderListDAO();
@@ -60,14 +69,19 @@ public class VendorDashboardServlet extends HttpServlet {
 		request.setAttribute("orderStat", orderStat);
 
 		// 매출 현황 차트(일간/주간/월간) - 실데이터. JS의 salesData.daily/weekly/monthly 자리를 이 JSON으로 채운다.
-		List<VendorDailySalesDTO> dailySales = dao.getDailySalesStat(loginSeller.getSellerNo());
+		// 선택된 날짜가 속한 구간까지 포함해서 최근 7일/5주/5개월을 보여준다.
+		List<VendorDailySalesDTO> dailySales = dao.getDailySalesStat(loginSeller.getSellerNo(), targetSqlDate);
 		request.setAttribute("dailySalesJson", gson.toJson(dailySales));
 
-		List<VendorDailySalesDTO> weeklySales = dao.getWeeklySalesStat(loginSeller.getSellerNo());
+		List<VendorDailySalesDTO> weeklySales = dao.getWeeklySalesStat(loginSeller.getSellerNo(), targetSqlDate);
 		request.setAttribute("weeklySalesJson", gson.toJson(weeklySales));
 
-		List<VendorDailySalesDTO> monthlySales = dao.getMonthlySalesStat(loginSeller.getSellerNo());
+		List<VendorDailySalesDTO> monthlySales = dao.getMonthlySalesStat(loginSeller.getSellerNo(), targetSqlDate);
 		request.setAttribute("monthlySalesJson", gson.toJson(monthlySales));
+
+		// KPI 카드 스파크라인용 - 기준일 포함 최근 7일 방문자수/상품노출수 추이
+		List<VendorDailyTrafficDTO> dailyTraffic = dao.getDailyTrafficStat(loginSeller.getSellerNo(), targetSqlDate);
+		request.setAttribute("dailyTrafficJson", gson.toJson(dailyTraffic));
 
 		request.getRequestDispatcher("/WEB-INF/views/vendor-dashboard.jsp").forward(request, response);
 	}
@@ -108,6 +122,10 @@ public class VendorDashboardServlet extends HttpServlet {
 	private String formatDateLabel(LocalDate date) {
 		String dayName = DAY_NAMES[date.getDayOfWeek().getValue() % 7];
 		return String.format("%04d.%02d.%02d (%s)", date.getYear(), date.getMonthValue(), date.getDayOfMonth(), dayName);
+	}
+
+	private String formatShortDate(LocalDate date) {
+		return date.getMonthValue() + "/" + date.getDayOfMonth();
 	}
 
 }

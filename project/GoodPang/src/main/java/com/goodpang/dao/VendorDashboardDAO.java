@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.goodpang.dto.VendorDailySalesDTO;
+import com.goodpang.dto.VendorDailyTrafficDTO;
 import com.goodpang.dto.VendorDashboardStatDTO;
 import com.goodpang.util.ConnectionProvider;
 
@@ -120,11 +121,11 @@ public class VendorDashboardDAO {
     }
 
     /*
-     * 매출 현황 차트(일간) - 최근 7일(오늘 포함) 날짜별 매출액·주문수.
+     * 매출 현황 차트(일간) - 기준일 포함 최근 7일 날짜별 매출액·주문수.
      * 이 판매자 상품이 포함된 주문 기준, 주문취소 건 제외. 주문이 없는 날짜도 0으로 채워서
      * 항상 7일치가 빠짐없이 나오게 한다 (날짜 스핀 D를 만들어 실적 서브쿼리 S를 LEFT JOIN).
      */
-    public List<VendorDailySalesDTO> getDailySalesStat(int sellerNo) {
+    public List<VendorDailySalesDTO> getDailySalesStat(int sellerNo, Date targetDate) {
 
         List<VendorDailySalesDTO> list = new ArrayList<>();
 
@@ -134,7 +135,7 @@ public class VendorDashboardDAO {
                 NVL(S.SALES_AMOUNT, 0) AS SALES_AMOUNT,
                 NVL(S.ORDER_COUNT, 0) AS ORDER_COUNT
             FROM (
-                SELECT TRUNC(SYSDATE) - LEVEL + 1 AS STAT_DATE
+                SELECT ? - LEVEL + 1 AS STAT_DATE
                 FROM DUAL
                 CONNECT BY LEVEL <= 7
             ) D
@@ -148,7 +149,7 @@ public class VendorDashboardDAO {
                     JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
                 WHERE P.SELLER_NO = ?
                   AND O.ORDER_STATUS != '주문취소'
-                  AND TRUNC(O.ORDER_DATE) >= TRUNC(SYSDATE) - 6
+                  AND TRUNC(O.ORDER_DATE) >= ? - 6
                 GROUP BY TRUNC(O.ORDER_DATE)
             ) S ON S.ORDER_DAY = D.STAT_DATE
             ORDER BY D.STAT_DATE
@@ -159,7 +160,9 @@ public class VendorDashboardDAO {
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
 
-            pstmt.setInt(1, sellerNo);
+            pstmt.setDate(1, targetDate);
+            pstmt.setInt(2, sellerNo);
+            pstmt.setDate(3, targetDate);
 
             try (ResultSet rs = pstmt.executeQuery()) {
 
@@ -176,10 +179,69 @@ public class VendorDashboardDAO {
     }
 
     /*
-     * 매출 현황 차트(주간) - 최근 5주(이번 주 포함, 월요일 시작 ISO 주) 주별 매출액·주문수.
+     * KPI 카드 스파크라인용 - 기준일 포함 최근 7일 날짜별 방문자수·상품노출수.
+     * PRODUCT_VIEW_LOG 기준, 로직은 getDailySalesStat과 동일한 날짜 스핀 + LEFT JOIN 방식.
+     */
+    public List<VendorDailyTrafficDTO> getDailyTrafficStat(int sellerNo, Date targetDate) {
+
+        List<VendorDailyTrafficDTO> list = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                D.STAT_DATE,
+                NVL(S.VISITOR_COUNT, 0) AS VISITOR_COUNT,
+                NVL(S.VIEW_COUNT, 0) AS VIEW_COUNT
+            FROM (
+                SELECT ? - LEVEL + 1 AS STAT_DATE
+                FROM DUAL
+                CONNECT BY LEVEL <= 7
+            ) D
+            LEFT JOIN (
+                SELECT
+                    TRUNC(L.VIEW_DATE) AS VIEW_DAY,
+                    COUNT(DISTINCT L.SESSION_ID) AS VISITOR_COUNT,
+                    COUNT(*) AS VIEW_COUNT
+                FROM PRODUCT_VIEW_LOG L
+                    JOIN PRODUCT P ON L.PRODUCT_NO = P.PRODUCT_NO
+                WHERE P.SELLER_NO = ?
+                  AND TRUNC(L.VIEW_DATE) >= ? - 6
+                GROUP BY TRUNC(L.VIEW_DATE)
+            ) S ON S.VIEW_DAY = D.STAT_DATE
+            ORDER BY D.STAT_DATE
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setDate(1, targetDate);
+            pstmt.setInt(2, sellerNo);
+            pstmt.setDate(3, targetDate);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                while (rs.next()) {
+                    VendorDailyTrafficDTO dto = new VendorDailyTrafficDTO();
+                    dto.setLabel(rs.getDate("STAT_DATE").toLocalDate().format(DateTimeFormatter.ofPattern("M/d")));
+                    dto.setVisitorCount(rs.getInt("VISITOR_COUNT"));
+                    dto.setViewCount(rs.getInt("VIEW_COUNT"));
+                    list.add(dto);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    /*
+     * 매출 현황 차트(주간) - 기준일이 속한 주 포함 최근 5주(월요일 시작 ISO 주) 주별 매출액·주문수.
      * 라벨은 각 주의 시작일(월요일)을 "M/d"로 표시. 나머지 로직은 일간과 동일한 날짜 스핀 + LEFT JOIN 방식.
      */
-    public List<VendorDailySalesDTO> getWeeklySalesStat(int sellerNo) {
+    public List<VendorDailySalesDTO> getWeeklySalesStat(int sellerNo, Date targetDate) {
 
         List<VendorDailySalesDTO> list = new ArrayList<>();
 
@@ -189,7 +251,7 @@ public class VendorDashboardDAO {
                 NVL(S.SALES_AMOUNT, 0) AS SALES_AMOUNT,
                 NVL(S.ORDER_COUNT, 0) AS ORDER_COUNT
             FROM (
-                SELECT TRUNC(SYSDATE, 'IW') - (LEVEL - 1) * 7 AS WEEK_START
+                SELECT TRUNC(?, 'IW') - (LEVEL - 1) * 7 AS WEEK_START
                 FROM DUAL
                 CONNECT BY LEVEL <= 5
             ) D
@@ -203,7 +265,7 @@ public class VendorDashboardDAO {
                     JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
                 WHERE P.SELLER_NO = ?
                   AND O.ORDER_STATUS != '주문취소'
-                  AND O.ORDER_DATE >= TRUNC(SYSDATE, 'IW') - 28
+                  AND O.ORDER_DATE >= TRUNC(?, 'IW') - 28
                 GROUP BY TRUNC(O.ORDER_DATE, 'IW')
             ) S ON S.WEEK_START = D.WEEK_START
             ORDER BY D.WEEK_START
@@ -214,7 +276,9 @@ public class VendorDashboardDAO {
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
 
-            pstmt.setInt(1, sellerNo);
+            pstmt.setDate(1, targetDate);
+            pstmt.setInt(2, sellerNo);
+            pstmt.setDate(3, targetDate);
 
             try (ResultSet rs = pstmt.executeQuery()) {
 
@@ -231,9 +295,9 @@ public class VendorDashboardDAO {
     }
 
     /*
-     * 매출 현황 차트(월간) - 최근 5개월(이번 달 포함) 월별 매출액·주문수.
+     * 매출 현황 차트(월간) - 기준일이 속한 달 포함 최근 5개월 월별 매출액·주문수.
      */
-    public List<VendorDailySalesDTO> getMonthlySalesStat(int sellerNo) {
+    public List<VendorDailySalesDTO> getMonthlySalesStat(int sellerNo, Date targetDate) {
 
         List<VendorDailySalesDTO> list = new ArrayList<>();
 
@@ -243,7 +307,7 @@ public class VendorDashboardDAO {
                 NVL(S.SALES_AMOUNT, 0) AS SALES_AMOUNT,
                 NVL(S.ORDER_COUNT, 0) AS ORDER_COUNT
             FROM (
-                SELECT ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -(LEVEL - 1)) AS MONTH_START
+                SELECT ADD_MONTHS(TRUNC(?, 'MM'), -(LEVEL - 1)) AS MONTH_START
                 FROM DUAL
                 CONNECT BY LEVEL <= 5
             ) D
@@ -257,7 +321,7 @@ public class VendorDashboardDAO {
                     JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
                 WHERE P.SELLER_NO = ?
                   AND O.ORDER_STATUS != '주문취소'
-                  AND O.ORDER_DATE >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -4)
+                  AND O.ORDER_DATE >= ADD_MONTHS(TRUNC(?, 'MM'), -4)
                 GROUP BY TRUNC(O.ORDER_DATE, 'MM')
             ) S ON S.MONTH_START = D.MONTH_START
             ORDER BY D.MONTH_START
@@ -268,7 +332,9 @@ public class VendorDashboardDAO {
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
 
-            pstmt.setInt(1, sellerNo);
+            pstmt.setDate(1, targetDate);
+            pstmt.setInt(2, sellerNo);
+            pstmt.setDate(3, targetDate);
 
             try (ResultSet rs = pstmt.executeQuery()) {
 
