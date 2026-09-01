@@ -11,18 +11,47 @@ import com.goodpang.util.ConnectionProvider;
 import com.goodpang.util.DBConn;
 
 public class OrderDetailDAO {
+	
+	/**
+     * 와우 회원 여부 조회
+     */
+    public boolean isWowMember(int memberNo) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM WOW_MEMBERSHIP
+                WHERE MEMBER_NO = ?
+                  AND STATUS IN ('ACTIVE', 'CANCEL_PENDING')
+                """;
+
+        try (Connection conn = ConnectionProvider.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, memberNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("와우 회원 확인 중 오류가 발생했습니다.", e);
+        }
+        return false;
+    }
 
  
-    
-    
-    public List<OrderDetailDTO> getOrderDetailList(int orderNo) {
+    public List<OrderDetailDTO> getOrderDetailList(int orderNo , int memberNo ) {
 
         List<OrderDetailDTO> list = new ArrayList<>();
+        
+     // 와우 회원 여부 판별
+        boolean isWow = isWowMember(memberNo);
 
         String sql = """
                 SELECT
                     od.ORDER_DETAIL_NO,
                     od.ORDER_NO,
+                    od.price AS item_price,
                     o.MEMBER_NO,
                     o.ORDER_STATUS,
                     o.ORDER_DATE,
@@ -139,6 +168,8 @@ public class OrderDetailDAO {
                     dto.setTotalPrice(
                             rs.getInt("TOTAL_PRICE")
                     );
+                    
+                    dto.setItemPrice(rs.getInt("item_price"));
 
 
                     // 상품 정보
@@ -154,9 +185,9 @@ public class OrderDetailDAO {
                             rs.getInt("QUANTITY")
                     );
 
-                    dto.setDeliveryFee(
-                            rs.getInt("DELIVERY_FEE")
-                    );
+					/*
+					 * dto.setDeliveryFee( rs.getInt("DELIVERY_FEE") );
+					 */
 
 
                     // 결제 정보
@@ -210,15 +241,36 @@ public class OrderDetailDAO {
 
                     dto.setOption2Value(
                             rs.getString("OPTION2_VALUE")
+
                     );
                     
-                    finalTotalPrice += rs.getInt("TOTAL_PRICE");
-                    dto.setFinalTotalPrice(finalTotalPrice);
-                    if(finalTotalPrice >= 19800 ) {
-                   	 dto.setDeliveryFee(0);
-                   }
+                    int orderTotalPrice = rs.getInt("TOTAL_PRICE");
+                    // 3. 배송비 무료 조건 판별 (주문 전체 금액이 19,800원 이상 시 무료)
+                   // ★ 배송비 세팅 로직: 와우 회원이거나 주문총액이 19,800원 이상이면 0원 적용
+                    if (isWow || orderTotalPrice >= 19800) {
+                        dto.setDeliveryFee(0);
+                    } else {
+                        dto.setDeliveryFee(rs.getInt("DELIVERY_FEE"));
+                    }
+                     System.out.println( "배송비" + rs.getInt("DELIVERY_FEE"));
+                    
+					/*
+					 * int finalTotalPrice = 0; // 총 합계 변수 선언
+					 * 
+					 * for (OrderDetailDTO item : list) { // 상품 개별 단가(itemPrice)에 수량(quantity)을 곱한
+					 * 금액을 누적합! int itemSum = item.getItemPrice() * item.getQuantity();
+					 * finalTotalPrice += itemSum; }
+					 */
+                    // 결과: (A상품 단가 * 수량) + (B상품 단가 * 수량) ... 완벽 처리
+                     
+                   // finalTotalPrice +=  rs.getInt("TOTAL_PRICE")* rs.getInt("QUANTITY");
+                   // dto.setFinalTotalPrice(finalTotalPrice);
+                   
                    System.out.println("orderDetailDAO" + "finalTotalPrice:" + finalTotalPrice + "rs.getInt(\"TOTAL_PRICE\")" + rs.getInt("TOTAL_PRICE") );
-                   System.out.println("orderDetailDAO" + "DeliveryFee:" + dto.getDeliveryFee());
+                   System.out.println("orderDetailDAO" + "item_price:" + rs.getInt("item_price") + "rs.getInt(\"TOTAL_PRICE\")" + rs.getInt("TOTAL_PRICE") );
+                  
+                   
+                   //System.out.println("orderDetailDAO" + "DeliveryFee:" + dto.getDeliveryFee());
 
                     list.add(dto);
                 }
