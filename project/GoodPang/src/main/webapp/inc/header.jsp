@@ -956,7 +956,7 @@
 
 										src="${pageContext.request.contextPath}/images/gnb/coupang-play.png"
 
-										alt=""> <span> 쿠팡플레이 </span>
+										alt=""> <span> 굿팡플레이 </span>
 
 								</a></li>
 
@@ -1000,7 +1000,7 @@
 
 										src="${pageContext.request.contextPath}/images/gnb/biz.png"
 
-										alt=""> <span> 쿠팡비즈 </span>
+										alt=""> <span> 굿팡비즈 </span>
 
 								</a></li>
 
@@ -1114,7 +1114,7 @@
 
 										src="${pageContext.request.contextPath}/images/gnb/travel.png"
 
-										alt=""> <span> 쿠팡트래블 </span> <i class="in"> N <span
+										alt=""> <span> 굿팡트래블 </span> <i class="in"> N <span
 
 											class="blind"> 신규 </span>
 
