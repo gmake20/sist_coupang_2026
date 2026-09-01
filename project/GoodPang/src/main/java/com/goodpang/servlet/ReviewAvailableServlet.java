@@ -1,13 +1,6 @@
 package com.goodpang.servlet;
 
 import java.io.IOException;
-import java.util.List;
-
-import com.goodpang.dao.ReviewDAO;
-import com.goodpang.dto.MemberDTO;
-import com.goodpang.dto.ReviewAvailableDTO;
-import com.goodpang.dto.ReviewItemDTO;
-import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -24,40 +17,9 @@ public class ReviewAvailableServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		MemberDTO loginMember =
-				LoginUtil.requireLogin(request, response);
-
-		if (loginMember == null) {
-			return;
-		}
-
-		int memberNo = loginMember.getMemberNo();
-
-		ReviewDAO reviewDAO = new ReviewDAO();
-
-		List<ReviewAvailableDTO> reviewList =
-				reviewDAO.getReviewStatus(memberNo);
-
-		int availableCount = 0;
-		int writtenCount = 0;
-
-		for (ReviewAvailableDTO review : reviewList) {
-
-			if (review.isReviewWritten()) {
-				writtenCount++;
-			} else {
-				availableCount++;
-			}
-
-		}
-
-		request.setAttribute("reviewList", reviewList);
-		
-		request.setAttribute("availableCount", availableCount);
-		
-		request.setAttribute("writtenCount", writtenCount);
-
-		request.getRequestDispatcher("/review_available.jsp")
-		.forward(request, response);
+		response.sendRedirect(
+				request.getContextPath()
+				+ "/review/list?tab=available"
+		);
 	}
 }

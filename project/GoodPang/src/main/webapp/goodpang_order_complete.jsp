@@ -130,7 +130,7 @@
 
 				<div class="button-row">
 					<a class="btn btn-outline"
-						href="${pageContext.request.contextPath}/order/detail">주문 상세보기</a>
+						href="${pageContext.request.contextPath}/order/order_detail?orderNo=${orderNo}">주문 상세보기</a>
 					<a class="btn btn-primary"
 						href="${pageContext.request.contextPath}/">쇼핑 계속하기</a>
 				</div>

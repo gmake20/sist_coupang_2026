@@ -1,6 +1,8 @@
 package com.goodpang.servlet;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import com.goodpang.dao.VendorOrderListDAO;
@@ -34,13 +36,43 @@ public class VendorOrderServlet extends HttpServlet {
 			return;
 		}
 
-		List<VendorOrderListDTO> orderList = orderListDAO.findBySellerNo(loginSeller.getSellerNo());
+		String startDateParam = request.getParameter("startDate");
+		String endDateParam = request.getParameter("endDate");
+		String orderStatus = request.getParameter("orderStatus");
+		String deliveryStatus = request.getParameter("deliveryStatus");
+		String paymentStatus = request.getParameter("paymentStatus");
+
+		LocalDate startDate = parseDate(startDateParam);
+		LocalDate endDate = parseDate(endDateParam);
+
+		List<VendorOrderListDTO> orderList = orderListDAO.findBySellerNo(
+				loginSeller.getSellerNo(), startDate, endDate, orderStatus, deliveryStatus, paymentStatus);
 		VendorOrderStatSummaryDTO orderStat = orderListDAO.countStats(loginSeller.getSellerNo());
 
 		request.setAttribute("orderList", orderList);
 		request.setAttribute("orderStat", orderStat);
 
+		// 검색폼에 입력값을 그대로 남겨두기 위해 원본 파라미터를 그대로 되돌려준다
+		request.setAttribute("searchStartDate", startDateParam);
+		request.setAttribute("searchEndDate", endDateParam);
+		request.setAttribute("searchOrderStatus", orderStatus);
+		request.setAttribute("searchDeliveryStatus", deliveryStatus);
+		request.setAttribute("searchPaymentStatus", paymentStatus);
+
 		request.getRequestDispatcher("/WEB-INF/views/vendor-order.jsp").forward(request, response);
+	}
+
+	private LocalDate parseDate(String value) {
+
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+
+		try {
+			return LocalDate.parse(value);
+		} catch (DateTimeParseException e) {
+			return null;
+		}
 	}
 
 }

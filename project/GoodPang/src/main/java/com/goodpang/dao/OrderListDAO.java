@@ -115,39 +115,49 @@ public class OrderListDAO {
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT * FROM ( ");
-        sql.append("  SELECT ROWNUM AS rnum, T.* FROM ( ");
-        sql.append("    SELECT o.order_no, o.order_date, o.order_status, o.total_price AS order_total_price, ");
-        sql.append("           od.order_detail_no, od.order_qty, od.price AS item_price, ");
-        sql.append("           p.product_no, p.product_name, ");
-        sql.append("           po.option1_type, po.option1_value, po.option2_type, po.option2_value ");
-        sql.append("    FROM ORDERS o ");
-        sql.append("    JOIN ORDER_DETAIL od ON o.order_no = od.order_no ");
-        sql.append("    JOIN PRODUCT p ON od.product_no = p.product_no ");
-        sql.append("    LEFT JOIN PRODUCT_OPTION po ON od.option_id = po.option_id ");
-        sql.append("    WHERE o.member_no = ? ");
+        sql.append("  SELECT o.order_no, o.order_date, o.order_status, o.total_price AS order_total_price, o.delivery_fee, ");
+        sql.append("         od.order_detail_no, od.order_qty, od.price AS item_price, ");
+        sql.append("         p.product_no, p.product_name, ");
+        sql.append("         po.option1_type, po.option1_value, po.option2_type, po.option2_value ");
+        sql.append("  FROM ORDERS o ");
+        sql.append("  JOIN ORDER_DETAIL od ON o.order_no = od.order_no ");
+        sql.append("  JOIN PRODUCT p ON od.product_no = p.product_no ");
+        sql.append("  LEFT JOIN PRODUCT_OPTION po ON od.option_id = po.option_id ");
+        sql.append("  WHERE o.member_no = ? ");
+
+        // ★ 핵심: 상품(Row) 개수가 아니라 '주문번호 5건'을 먼저 추출하는 서브쿼리
+        sql.append("    AND o.order_no IN ( ");
+        sql.append("        SELECT order_no FROM ( ");
+        sql.append("            SELECT order_no, ROWNUM as rnum FROM ( ");
+        sql.append("                SELECT DISTINCT order_no, order_date FROM ORDERS ");
+        sql.append("                WHERE member_no = ? ");
 
         if ("recent".equals(yearFilter) || yearFilter == null || yearFilter.isEmpty()) {
-            sql.append("    AND o.order_date >= ADD_MONTHS(SYSDATE, -6) ");
+            sql.append("                AND order_date >= ADD_MONTHS(SYSDATE, -6) ");
         } else {
-            sql.append("    AND TO_CHAR(o.order_date, 'YYYY') = ? ");
+            sql.append("                AND TO_CHAR(order_date, 'YYYY') = ? ");
         }
 
-        sql.append("    ORDER BY o.order_date DESC, o.order_no DESC, od.order_detail_no ASC ");
-        sql.append("  ) T WHERE ROWNUM <= ? ");
-        sql.append(") WHERE rnum >= ?");
+        sql.append("                ORDER BY order_date DESC, order_no DESC ");
+        sql.append("            ) WHERE ROWNUM <= ? ");
+        sql.append("        ) WHERE rnum >= ? ");
+        sql.append("    ) ");
+
+        sql.append(") ORDER BY order_date DESC, order_no DESC, order_detail_no ASC");
 
         try (Connection conn = ConnectionProvider.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
 
             int paramIdx = 1;
-            pstmt.setInt(paramIdx++, memberNo);
+            pstmt.setInt(paramIdx++, memberNo); // 메인 WHERE o.member_no
+            pstmt.setInt(paramIdx++, memberNo); // 서브쿼리 WHERE member_no
 
             if (!"recent".equals(yearFilter) && yearFilter != null && !yearFilter.isEmpty()) {
-                pstmt.setString(paramIdx++, yearFilter);
+                pstmt.setString(paramIdx++, yearFilter); // 서브쿼리 연도 조건
             }
 
-            pstmt.setInt(paramIdx++, endRow);
-            pstmt.setInt(paramIdx++, startRow);
+            pstmt.setInt(paramIdx++, endRow);   // 서브쿼리 endRow
+            pstmt.setInt(paramIdx++, startRow); // 서브쿼리 startRow
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -156,6 +166,7 @@ public class OrderListDAO {
                     dto.setOrderDate(rs.getTimestamp("order_date"));
                     dto.setOrderStatus(rs.getString("order_status"));
                     dto.setTotalPrice(rs.getInt("order_total_price"));
+                    dto.setDeliveryFee(rs.getInt("delivery_fee"));
                     dto.setOrderDetailNo(rs.getLong("order_detail_no"));
                     dto.setQuantity(rs.getInt("order_qty"));
                     dto.setItemPrice(rs.getInt("item_price"));
@@ -168,7 +179,7 @@ public class OrderListDAO {
 
                     list.add(dto);
                 }
-            }
+            } 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

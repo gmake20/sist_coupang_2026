@@ -84,21 +84,22 @@
 
         <div>
           <h1 class="page-title">대시보드</h1>
-          <p class="page-desc">오늘의 판매 현황과 주요 지표를 한눈에 확인하세요.</p>
+          <p class="page-desc">${todayLabel}의 판매 현황과 주요 지표를 한눈에 확인하세요.</p>
         </div>
 
         <div class="date-picker" id="datePicker">
 
           <button class="date-picker-trigger" id="datePickerTrigger" type="button">
             <svg class="icon"><use href="#ic-calendar" /></svg>
-            <span>2025.05.19 (월)</span>
+            <span>${selectedDateLabel}</span>
             <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
           </button>
 
           <div class="date-picker-panel" id="datePickerPanel">
-            <a href="#">2025.05.19 (월)</a>
-            <a href="#">2025.05.18 (일)</a>
-            <a href="#">2025.05.17 (토)</a>
+            <c:forEach var="option" items="${dateOptions}">
+              <a href="${pageContext.request.contextPath}/vendor/dashboard?date=${option.date}"
+                 class="${option.date == selectedDate ? 'active' : ''}">${option.label}</a>
+            </c:forEach>
           </div>
 
         </div>
@@ -111,11 +112,11 @@
 
         <article class="kpi-card">
           <div class="kpi-top">
-            <span class="kpi-label">오늘 주문수</span>
+            <span class="kpi-label">${todayLabel} 주문수</span>
             <span class="kpi-icon kpi-icon-blue"><svg class="icon"><use href="#ic-cart" /></svg></span>
           </div>
           <div class="kpi-value"><fmt:formatNumber value="${dashboardStat.todayOrderCount}" pattern="#,##0" /> <small>건</small></div>
-          <div class="kpi-compare">어제 대비
+          <div class="kpi-compare">${compareLabel}
             <c:choose>
               <c:when test="${dashboardStat.orderCountUp}">
                 <strong class="up">▲ ${dashboardStat.orderCountChangePercent}%</strong>
@@ -125,19 +126,18 @@
               </c:otherwise>
             </c:choose>
           </div>
-          <svg class="kpi-spark" viewBox="0 0 160 40" preserveAspectRatio="none">
-            <polyline points="0,30 25,26 50,28 75,20 100,22 125,10 160,6" fill="none" stroke="#4285f4"
-              stroke-width="2" />
+          <svg class="kpi-spark" id="orderSpark" viewBox="0 0 160 40" preserveAspectRatio="none">
+            <polyline points="" fill="none" stroke="#4285f4" stroke-width="2" />
           </svg>
         </article>
 
         <article class="kpi-card">
           <div class="kpi-top">
-            <span class="kpi-label">오늘 매출</span>
+            <span class="kpi-label">${todayLabel} 매출</span>
             <span class="kpi-icon kpi-icon-green"><svg class="icon"><use href="#ic-receipt" /></svg></span>
           </div>
           <div class="kpi-value">₩ <fmt:formatNumber value="${dashboardStat.todaySales}" pattern="#,##0" /></div>
-          <div class="kpi-compare">어제 대비
+          <div class="kpi-compare">${compareLabel}
             <c:choose>
               <c:when test="${dashboardStat.salesUp}">
                 <strong class="up">▲ ${dashboardStat.salesChangePercent}%</strong>
@@ -147,19 +147,18 @@
               </c:otherwise>
             </c:choose>
           </div>
-          <svg class="kpi-spark" viewBox="0 0 160 40" preserveAspectRatio="none">
-            <polyline points="0,32 25,24 50,26 75,18 100,20 125,12 160,8" fill="none" stroke="#17c964"
-              stroke-width="2" />
+          <svg class="kpi-spark" id="salesSpark" viewBox="0 0 160 40" preserveAspectRatio="none">
+            <polyline points="" fill="none" stroke="#17c964" stroke-width="2" />
           </svg>
         </article>
 
         <article class="kpi-card">
           <div class="kpi-top">
-            <span class="kpi-label">오늘 방문자수</span>
+            <span class="kpi-label">${todayLabel} 방문자수</span>
             <span class="kpi-icon kpi-icon-orange"><svg class="icon"><use href="#ic-users" /></svg></span>
           </div>
           <div class="kpi-value"><fmt:formatNumber value="${dashboardStat.todayVisitorCount}" pattern="#,##0" /> <small>명</small></div>
-          <div class="kpi-compare">어제 대비
+          <div class="kpi-compare">${compareLabel}
             <c:choose>
               <c:when test="${dashboardStat.visitorCountUp}">
                 <strong class="up">▲ ${dashboardStat.visitorCountChangePercent}%</strong>
@@ -169,19 +168,18 @@
               </c:otherwise>
             </c:choose>
           </div>
-          <svg class="kpi-spark" viewBox="0 0 160 40" preserveAspectRatio="none">
-            <polyline points="0,20 25,28 50,18 75,24 100,14 125,20 160,10" fill="none" stroke="#ff9f1c"
-              stroke-width="2" />
+          <svg class="kpi-spark" id="visitorSpark" viewBox="0 0 160 40" preserveAspectRatio="none">
+            <polyline points="" fill="none" stroke="#ff9f1c" stroke-width="2" />
           </svg>
         </article>
 
         <article class="kpi-card">
           <div class="kpi-top">
-            <span class="kpi-label">오늘 상품 노출수</span>
+            <span class="kpi-label">${todayLabel} 상품 노출수</span>
             <span class="kpi-icon kpi-icon-purple"><svg class="icon"><use href="#ic-eye" /></svg></span>
           </div>
           <div class="kpi-value"><fmt:formatNumber value="${dashboardStat.todayProductViewCount}" pattern="#,##0" /> <small>회</small></div>
-          <div class="kpi-compare">어제 대비
+          <div class="kpi-compare">${compareLabel}
             <c:choose>
               <c:when test="${dashboardStat.productViewCountUp}">
                 <strong class="up">▲ ${dashboardStat.productViewCountChangePercent}%</strong>
@@ -191,9 +189,8 @@
               </c:otherwise>
             </c:choose>
           </div>
-          <svg class="kpi-spark" viewBox="0 0 160 40" preserveAspectRatio="none">
-            <polyline points="0,28 25,22 50,24 75,14 100,18 125,8 160,12" fill="none" stroke="#9b5de5"
-              stroke-width="2" />
+          <svg class="kpi-spark" id="viewSpark" viewBox="0 0 160 40" preserveAspectRatio="none">
+            <polyline points="" fill="none" stroke="#9b5de5" stroke-width="2" />
           </svg>
         </article>
 
@@ -329,6 +326,47 @@
     const dailyStat = ${dailySalesJson};
     const weeklyStat = ${weeklySalesJson};
     const monthlyStat = ${monthlySalesJson};
+    const dailyTraffic = ${dailyTrafficJson};
+
+
+    /* =========================================================
+       KPI 카드 스파크라인 — 최근 7일 추이 (일간 매출 현황 데이터 재사용 + 방문자수/노출수)
+    ========================================================= */
+
+    function renderSparkline(svgId, values) {
+      const svg = document.getElementById(svgId);
+      const polyline = svg.querySelector("polyline");
+
+      if (!values || values.length === 0) {
+        polyline.setAttribute("points", "");
+        return;
+      }
+
+      const width = 160;
+      const height = 40;
+      const padding = 4;
+
+      const max = Math.max.apply(null, values);
+      const min = Math.min.apply(null, values);
+      const range = max - min;
+
+      const step = values.length > 1 ? width / (values.length - 1) : 0;
+
+      const points = values.map(function (value, index) {
+        const x = step * index;
+        const y = range === 0
+          ? height / 2
+          : height - padding - ((value - min) / range) * (height - padding * 2);
+        return x + "," + y.toFixed(1);
+      });
+
+      polyline.setAttribute("points", points.join(" "));
+    }
+
+    renderSparkline("orderSpark", dailyStat.map(function (d) { return d.orderCount; }));
+    renderSparkline("salesSpark", dailyStat.map(function (d) { return d.salesAmount; }));
+    renderSparkline("visitorSpark", dailyTraffic.map(function (d) { return d.visitorCount; }));
+    renderSparkline("viewSpark", dailyTraffic.map(function (d) { return d.viewCount; }));
 
     function toChartData(stat) {
       return {

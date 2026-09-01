@@ -250,10 +250,10 @@
 														style="font-size: 13px; color: #333; margin-bottom: 4px;">
 														<c:choose>
 															<c:when test="${not empty item.totalPrice}">
-																<fmt:formatNumber value="${item.totalPrice}" pattern="#,###" />원
+																<fmt:formatNumber value="${item.itemPrice * item.quantity + item.deliveryFee}" pattern="#,###" />원
 															</c:when>
 															<c:otherwise>
-																<fmt:formatNumber value="${item.itemPrice * item.quantity}" pattern="#,###" />원
+																<fmt:formatNumber value="${item.itemPrice * item.quantity+ item.deliveryFee}" pattern="#,###" />원
 															</c:otherwise>
 														</c:choose>
 														<span>·</span> ${item.quantity}개

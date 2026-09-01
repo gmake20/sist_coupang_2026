@@ -18,46 +18,6 @@ import com.goodpang.util.ConnectionProvider;
 
 public class ReviewDAO {
 
-	/*
-	 * public List<ReviewDTO> selectReviewsByProductNo(int productNo) {
-	 * 
-	 * String sql = """ SELECT r.REVIEW_NO, r.RATING, r.REVIEW_CONTENT,
-	 * r.REVIEW_DATE, m.MEMBER_NAME, po.OPTION1_TYPE, po.OPTION1_VALUE,
-	 * po.OPTION2_TYPE, po.OPTION2_VALUE FROM REVIEW r JOIN ORDER_DETAIL od ON
-	 * r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO JOIN MEMBER m ON r.MEMBER_NO =
-	 * m.MEMBER_NO LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID WHERE
-	 * od.PRODUCT_NO = ? ORDER BY r.REVIEW_DATE DESC """;
-	 * 
-	 * List<ReviewDTO> list = new ArrayList<>(); SimpleDateFormat sdf = new
-	 * SimpleDateFormat("yyyy.MM.dd");
-	 * 
-	 * try ( Connection conn = ConnectionProvider.getConnection(); PreparedStatement
-	 * pstmt = conn.prepareStatement(sql); ) { pstmt.setInt(1, productNo);
-	 * 
-	 * try (ResultSet rs = pstmt.executeQuery()) { while (rs.next()) { ReviewDTO dto
-	 * = new ReviewDTO(); dto.setReviewNo(rs.getInt("REVIEW_NO"));
-	 * 
-	 * int rating = rs.getInt("RATING"); dto.setRating(rating); StringBuilder stars
-	 * = new StringBuilder(); for (int i = 0; i < rating; i++) stars.append("★");
-	 * for (int i = rating; i < 5; i++) stars.append("☆");
-	 * dto.setRatingStars(stars.toString());
-	 * 
-	 * dto.setReviewContent(rs.getString("REVIEW_CONTENT"));
-	 * dto.setReviewDate(sdf.format(rs.getDate("REVIEW_DATE")));
-	 * dto.setMaskedName(maskName(rs.getString("MEMBER_NAME")));
-	 * 
-	 * String o1v = rs.getString("OPTION1_VALUE"); String o2v =
-	 * rs.getString("OPTION2_VALUE"); StringBuilder option = new StringBuilder(); if
-	 * (o1v != null)
-	 * option.append(rs.getString("OPTION1_TYPE")).append(" ").append(o1v); if (o2v
-	 * != null) { if (option.length() > 0) option.append(" / ");
-	 * option.append(rs.getString("OPTION2_TYPE")).append(" ").append(o2v); }
-	 * dto.setOptionText(option.toString());
-	 * 
-	 * list.add(dto); } } } catch (Exception e) { e.printStackTrace(); }
-	 * 
-	 * return list; }
-	 */
 	public List<ReviewDTO2> selectReviewsByProductNo2(int productNo) {
 
 	    String sql = """
@@ -1193,66 +1153,367 @@ public class ReviewDAO {
         return list;
     }
     
+	/*
+	 * public List<ReviewAvailableDTO> getReviewStatus(int memberNo) {
+	 * 
+	 * List<ReviewAvailableDTO> list = new ArrayList<>();
+	 * 
+	 * String sql = """ SELECT od.ORDER_DETAIL_NO, od.PRODUCT_NO, p.PRODUCT_NAME,
+	 * CASE WHEN EXISTS ( SELECT 1 FROM REVIEW r WHERE r.ORDER_DETAIL_NO =
+	 * od.ORDER_DETAIL_NO ) THEN 1 ELSE 0 END AS REVIEW_WRITTEN FROM ORDER_DETAIL od
+	 * JOIN ORDERS o ON o.ORDER_NO = od.ORDER_NO JOIN PRODUCT p ON p.PRODUCT_NO =
+	 * od.PRODUCT_NO WHERE o.MEMBER_NO = ? """;
+	 * 
+	 * try ( Connection conn = ConnectionProvider.getConnection(); PreparedStatement
+	 * pstmt = conn.prepareStatement(sql); ) {
+	 * 
+	 * pstmt.setInt(1, memberNo);
+	 * 
+	 * try (ResultSet rs = pstmt.executeQuery()) {
+	 * 
+	 * while (rs.next()) {
+	 * 
+	 * ReviewAvailableDTO dto = new ReviewAvailableDTO();
+	 * 
+	 * dto.setOrderDetailNo( rs.getInt("ORDER_DETAIL_NO"));
+	 * 
+	 * dto.setProductNo( rs.getInt("PRODUCT_NO"));
+	 * 
+	 * dto.setProductName( rs.getString("PRODUCT_NAME"));
+	 * 
+	 * dto.setReviewWritten( rs.getInt("REVIEW_WRITTEN") == 1);
+	 * 
+	 * list.add(dto); } }
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); }
+	 * 
+	 * return list; }
+	 */
+    
     public List<ReviewAvailableDTO> getReviewStatus(int memberNo) {
 
-        List<ReviewAvailableDTO> list = new ArrayList<>();
+    	List<ReviewAvailableDTO> list = new ArrayList<>();
 
-        String sql = """
-            SELECT
-                od.ORDER_DETAIL_NO,
-                od.PRODUCT_NO,
-                p.PRODUCT_NAME,
-                CASE
-                    WHEN EXISTS (
-                        SELECT 1
-                        FROM REVIEW r
-                        WHERE r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO
-                    )
-                    THEN 1
-                    ELSE 0
-                END AS REVIEW_WRITTEN
-            FROM ORDER_DETAIL od
-            JOIN ORDERS o
-                ON o.ORDER_NO = od.ORDER_NO
-            JOIN PRODUCT p
-                ON p.PRODUCT_NO = od.PRODUCT_NO
-            WHERE o.MEMBER_NO = ?
-            """;
+    	String sql = """
+    			SELECT
+    				od.ORDER_DETAIL_NO,
+    				od.PRODUCT_NO,
+    				p.PRODUCT_NAME,
+    				po.OPTION1_TYPE,
+    				po.OPTION1_VALUE,
+    				po.OPTION2_TYPE,
+    				po.OPTION2_VALUE,
+    				CASE
+    					WHEN EXISTS (
+    						SELECT 1
+    						FROM REVIEW r
+    						WHERE r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO
+    					)
+    					THEN 1
+    					ELSE 0
+    				END AS REVIEW_WRITTEN
+    			FROM ORDER_DETAIL od
+    			JOIN ORDERS o
+    				ON o.ORDER_NO = od.ORDER_NO
+    			JOIN PRODUCT p
+    				ON p.PRODUCT_NO = od.PRODUCT_NO
+    			LEFT JOIN PRODUCT_OPTION po
+    				ON od.OPTION_ID = po.OPTION_ID
+    			WHERE o.MEMBER_NO = ?
+    			ORDER BY o.ORDER_DATE DESC,
+    					 od.ORDER_DETAIL_NO DESC
+    			""";
+
+    	try (
+    		Connection conn = ConnectionProvider.getConnection();
+    		PreparedStatement pstmt = conn.prepareStatement(sql)
+    	) {
+    		pstmt.setInt(1, memberNo);
+
+    		try (ResultSet rs = pstmt.executeQuery()) {
+
+    			while (rs.next()) {
+
+    				ReviewAvailableDTO dto = new ReviewAvailableDTO();
+
+    				dto.setOrderDetailNo(
+    						rs.getInt("ORDER_DETAIL_NO")
+    				);
+
+    				dto.setProductNo(
+    						rs.getInt("PRODUCT_NO")
+    				);
+
+    				dto.setProductName(
+    						rs.getString("PRODUCT_NAME")
+    				);
+
+    				dto.setReviewWritten(
+    						rs.getInt("REVIEW_WRITTEN") == 1
+    				);
+
+    				String option1Type =
+    						rs.getString("OPTION1_TYPE");
+
+    				String option1Value =
+    						rs.getString("OPTION1_VALUE");
+
+    				String option2Type =
+    						rs.getString("OPTION2_TYPE");
+
+    				String option2Value =
+    						rs.getString("OPTION2_VALUE");
+
+    				StringBuilder option =
+    						new StringBuilder();
+
+    				if (option1Value != null
+    						&& !option1Value.isBlank()) {
+
+    					if (option1Type != null
+    							&& !option1Type.isBlank()) {
+
+    						option.append(option1Type)
+    							  .append(" ");
+    					}
+
+    					option.append(option1Value);
+    				}
+
+    				if (option2Value != null
+    						&& !option2Value.isBlank()) {
+
+    					if (option.length() > 0) {
+    						option.append(" / ");
+    					}
+
+    					if (option2Type != null
+    							&& !option2Type.isBlank()) {
+
+    						option.append(option2Type)
+    							  .append(" ");
+    					}
+
+    					option.append(option2Value);
+    				}
+
+    				dto.setOptionText(
+    						option.toString()
+    				);
+
+    				list.add(dto);
+    			}
+    		}
+
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		throw new RuntimeException(
+    				"리뷰 상태 조회 중 오류가 발생했습니다.",
+    				e
+    		);
+    	}
+
+    	return list;
+    }
+    
+    public int insertReview(
+            Connection conn,
+            int memberNo,
+            int orderDetailNo,
+            int productNo,
+            Integer serviceRating,
+            int productRating,
+            String reviewContent,
+            String reviewSummary)
+            throws Exception {
+
+        int reviewNo = 0;
+
+        String seqSql =
+                "SELECT SEQ_REVIEW_NO.NEXTVAL FROM DUAL";
 
         try (
-            Connection conn = ConnectionProvider.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt =
+                    conn.prepareStatement(seqSql);
+
+            ResultSet rs =
+                    pstmt.executeQuery()
         ) {
 
-            pstmt.setInt(1, memberNo);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-
-                while (rs.next()) {
-
-                    ReviewAvailableDTO dto =
-                            new ReviewAvailableDTO();
-
-                    dto.setOrderDetailNo(
-                            rs.getInt("ORDER_DETAIL_NO"));
-
-                    dto.setProductNo(
-                            rs.getInt("PRODUCT_NO"));
-
-                    dto.setProductName(
-                            rs.getString("PRODUCT_NAME"));
-
-                    dto.setReviewWritten(
-                            rs.getInt("REVIEW_WRITTEN") == 1);
-
-                    list.add(dto);
-                }
+            if (rs.next()) {
+                reviewNo =
+                        rs.getInt(1);
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
-        return list;
+        String sql = """
+                INSERT INTO REVIEW (
+                    REVIEW_NO,
+                    MEMBER_NO,
+                    ORDER_DETAIL_NO,
+                    PRODUCT_NO,
+                    SERVICE_RATING,
+                    PRODUCT_RATING,
+                    REVIEW_CONTENT,
+                    REVIEW_SUMMARY,
+                    REVIEW_DATE
+                )
+                VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE
+                )
+                """;
+
+        try (PreparedStatement pstmt =
+                conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, reviewNo);
+            pstmt.setInt(2, memberNo);
+            pstmt.setInt(3, orderDetailNo);
+            pstmt.setInt(4, productNo);
+
+            if (serviceRating == null) {
+
+                pstmt.setNull(
+                        5,
+                        java.sql.Types.INTEGER
+                );
+
+            } else {
+
+                pstmt.setInt(
+                        5,
+                        serviceRating
+                );
+            }
+
+            pstmt.setInt(
+                    6,
+                    productRating
+            );
+
+            pstmt.setString(
+                    7,
+                    reviewContent
+            );
+
+            pstmt.setString(
+                    8,
+                    reviewSummary
+            );
+
+            pstmt.executeUpdate();
+        }
+
+        return reviewNo;
+    }
+    
+    public int insertReviewImage(
+            Connection conn,
+            int reviewNo,
+            String imageUrl,
+            int imageOrder)
+            throws Exception {
+
+        String sql = """
+                INSERT INTO REVIEW_IMAGE (
+                    REVIEW_IMAGE_NO,
+                    REVIEW_NO,
+                    IMAGE_URL,
+                    IMAGE_ORDER
+                )
+                VALUES (
+                    SEQ_REVIEW_IMAGE_NO.NEXTVAL,
+                    ?,
+                    ?,
+                    ?
+                )
+                """;
+
+        try (PreparedStatement pstmt =
+                conn.prepareStatement(sql)) {
+
+            pstmt.setInt(
+                    1,
+                    reviewNo
+            );
+
+            pstmt.setString(
+                    2,
+                    imageUrl
+            );
+
+            pstmt.setInt(
+                    3,
+                    imageOrder
+            );
+
+            return pstmt.executeUpdate();
+        }
+    }
+    
+    public int insertReviewImage(
+    		int reviewNo,
+    		String imageUrl,
+    		int imageOrder) {
+
+    	String sql = """
+    			INSERT INTO REVIEW_IMAGE (
+    				REVIEW_IMAGE_NO,
+    				REVIEW_NO,
+    				IMAGE_URL,
+    				IMAGE_ORDER
+    			)
+    			VALUES (
+    				SEQ_REVIEW_IMAGE_NO.NEXTVAL,
+    				?,
+    				?,
+    				?
+    			)
+    			""";
+
+    	try (
+    		Connection conn = ConnectionProvider.getConnection();
+    		PreparedStatement pstmt = conn.prepareStatement(sql)
+    	) {
+    		pstmt.setInt(1, reviewNo);
+    		pstmt.setString(2, imageUrl);
+    		pstmt.setInt(3, imageOrder);
+
+    		return pstmt.executeUpdate();
+
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		throw new RuntimeException("리뷰 이미지 등록 실패", e);
+    	}
+    }
+    public List<String> getReviewImages(int reviewNo) {
+
+    	List<String> list = new ArrayList<>();
+
+    	String sql = """
+    			SELECT IMAGE_URL
+    			FROM REVIEW_IMAGE
+    			WHERE REVIEW_NO = ?
+    			ORDER BY IMAGE_ORDER
+    			""";
+
+    	try (
+    		Connection conn = ConnectionProvider.getConnection();
+    		PreparedStatement pstmt = conn.prepareStatement(sql)
+    	) {
+    		pstmt.setInt(1, reviewNo);
+
+    		try (ResultSet rs = pstmt.executeQuery()) {
+    			while (rs.next()) {
+    				list.add(rs.getString("IMAGE_URL"));
+    			}
+    		}
+
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		throw new RuntimeException("리뷰 이미지 조회 실패", e);
+    	}
+
+    	return list;
     }
 }

@@ -1654,3 +1654,224 @@ body.modal-open {
 	display: flex;
 }
 
+/* =========================
+   휴대폰 번호
+========================= */
+
+.phone-row {
+    height: 46px;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    border: 1px solid #d5d5d5;
+    box-sizing: border-box;
+}
+
+/* 왼쪽 휴대폰 아이콘 */
+.phone-row .add-address-icon {
+    width: 44px;
+    min-width: 44px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #d5d5d5;
+    box-sizing: border-box;
+    color: #c8c8c8;
+    font-size: 16px;
+}
+
+/* 전화번호 3칸 전체 */
+.phone-inputs {
+    flex: 1;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 24px 1fr 24px 1fr;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* 각각의 번호 입력칸 */
+.phone-row .phone-input {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+    outline: none !important;
+
+    background: #fff;
+    box-shadow: none !important;
+
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    box-sizing: border-box;
+}
+
+/* 첫 번째 010도 동일한 크기 */
+.phone-row .phone-first {
+    width: 100% !important;
+}
+
+/* - 표시 */
+.phone-hyphen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100%;
+    color: #999;
+    font-size: 14px;
+    user-select: none;
+}
+
+/* 포커스되어도 개별 박스 테두리 안 생기게 */
+.phone-row .phone-input:focus {
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* 기존 + 버튼/아이콘 완전히 제거 */
+.phone-plus {
+    display: none !important;
+}
+
+.address-add-body {
+    padding: 25px 10px 0;
+}
+
+.add-address-row {
+    width: 100%;
+    height: 46px;
+    margin-bottom: 12px;
+    border: 1px solid #d5d5d5;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.add-address-row > input {
+    height: 100%;
+    border: 0;
+    outline: none;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+/* .address-save-btn {
+    width: calc(100% + 20px);
+    height: 51px;
+    margin-left: -10px;
+    border: 0;
+    background: #0878e8;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+} */
+/* =========================
+   배송 요청사항
+========================= */
+
+#requestMsgDirectArea {
+    width: 100%;
+    height: 46px;
+    padding: 0;
+    margin-bottom: 12px;
+
+    display: flex;
+    align-items: center;
+
+    border: 1px solid #d5d5d5;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+/* hidden 상태 유지 */
+#requestMsgDirectArea.hidden {
+    display: none;
+}
+
+/* 왼쪽 아이콘 영역 */
+#requestMsgDirectArea .add-address-icon {
+    width: 44px;
+    min-width: 44px;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-right: 1px solid #d5d5d5;
+    box-sizing: border-box;
+
+    color: #c8c8c8;
+    font-size: 15px;
+}
+
+/* 배송 요청사항 입력창 */
+#newRequestMsg {
+    flex: 1;
+    width: auto;
+    height: 100%;
+
+    padding: 0 13px;
+    margin: 0;
+
+    border: 0;
+    outline: none;
+    box-shadow: none;
+
+    font-size: 14px;
+    color: #333;
+    box-sizing: border-box;
+}
+
+#newRequestMsg::placeholder {
+    color: #aaa;
+}
+
+
+/* =========================
+   저장 버튼
+========================= */
+
+.address-save-btn {
+    display: block;
+
+    width: 120px;
+    height: 42px;
+
+    margin: 18px auto 0;
+
+    border: 0;
+    border-radius: 3px;
+
+    background: #0878e8;
+    color: #fff;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.address-save-btn:hover {
+    background: #0068c9;
+}
+
+.add-address-row .add-address-icon {
+    width: 44px;
+    min-width: 44px;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-right: 1px solid #d5d5d5;
+    box-sizing: border-box;
+}

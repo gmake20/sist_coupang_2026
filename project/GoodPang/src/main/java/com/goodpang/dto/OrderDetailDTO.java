@@ -33,6 +33,7 @@ public class OrderDetailDTO {
     private String detailAddress;
     private String memberName;
     private String phone;
+    private int itemPrice;
     
     // 주문번호 당 총 가격
     private int finalTotalPrice;

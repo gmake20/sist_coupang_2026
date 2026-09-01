@@ -239,6 +239,12 @@ ul {
   white-space: nowrap;
 }
 
+.date-picker-panel a.active {
+  background: #eef2ff;
+  color: #346aff;
+  font-weight: 600;
+}
+
 .user-menu-panel a:hover,
 .date-picker-panel a:hover {
   background: #f4f6fb;

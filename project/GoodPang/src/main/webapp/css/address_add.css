@@ -213,3 +213,22 @@
         flex-basis: 50px;
     }
 }
+
+.phone-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.phone-input {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+}
+
+.phone-hyphen {
+    flex-shrink: 0;
+    color: #888;
+    font-size: 15px;
+}
