@@ -8,6 +8,9 @@
        String menu = "productWrite";    // 상품관리 > 상품 등록
        String menu = "productOptions";  // 상품관리 > 상품 옵션 관리
        String menu = "orders";          // 주문/배송관리 > 주문 목록
+       String menu = "delivery";        // 주문/배송관리 > 배송 관리
+       String menu = "shipping";        // 주문/배송관리 > 출고/운송장 관리
+       String menu = "settlement";      // 정산관리 > 정산내역 리스트
 
      ⚠ 이 파일에 <%@ page %> 지시어를 넣지 않음.
      정적 include(<%@ include %>)로만 쓰이는 조각이라, 인코딩은 이 파일을
@@ -43,26 +46,25 @@
         <a href="/vendor/product/options" class="<%= "productOptions".equals(menu) ? "active" : "" %>">상품 옵션 관리</a>
       </div>
 
-      <button class="side-item side-group-toggle <%= "orders".equals(menu) ? "active open" : "" %>" type="button">
+      <button class="side-item side-group-toggle <%= ("orders".equals(menu) || "delivery".equals(menu) || "shipping".equals(menu)) ? "active open" : "" %>" type="button">
         <svg class="icon"><use href="#ic-truck" /></svg>
         <span>주문/배송관리</span>
         <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
       </button>
-      <div class="side-submenu <%= "orders".equals(menu) ? "open" : "" %>">
+      <div class="side-submenu <%= ("orders".equals(menu) || "delivery".equals(menu) || "shipping".equals(menu)) ? "open" : "" %>">
         <a href="/vendor/order" class="<%= "orders".equals(menu) ? "active" : "" %>">주문 목록</a>
-        <a href="#">배송 관리</a>
+        <a href="/vendor/delivery" class="<%= "delivery".equals(menu) ? "active" : "" %>">배송 관리</a>
         <a href="#">취소/반품/교환 관리</a>
-        <a href="#">출고/운송장 관리</a>
+        <a href="/vendor/shipping" class="<%= "shipping".equals(menu) ? "active" : "" %>">출고/운송장 관리</a>
       </div>
 
-      <button class="side-item side-group-toggle" type="button">
+      <button class="side-item side-group-toggle <%= "settlement".equals(menu) ? "active open" : "" %>" type="button">
         <svg class="icon"><use href="#ic-calculator" /></svg>
         <span>정산관리</span>
         <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
       </button>
-      <div class="side-submenu">
-        <a href="#">정산내역 리스트</a>
-        <a href="#">정산상세</a>
+      <div class="side-submenu <%= "settlement".equals(menu) ? "open" : "" %>">
+        <a href="/vendor/settlement" class="<%= "settlement".equals(menu) ? "active" : "" %>">정산내역 리스트</a>
       </div>
 
       <a href="#" class="side-item">

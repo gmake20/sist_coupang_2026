@@ -1,8 +1,10 @@
 package com.goodpang.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,12 +19,25 @@ import com.goodpang.util.ConnectionProvider;
  */
 public class VendorOrderListDAO {
 
-    // 판매자(sellerNo)의 상품이 포함된 주문 목록 - 최근 주문순
-    public List<VendorOrderListDTO> findBySellerNo(int sellerNo) {
+    /*
+     * 판매자(sellerNo)의 상품이 포함된 주문 목록 - 최근 주문순.
+     * 검색 필터는 전부 선택사항(null/빈 문자열이면 조건 안 붙임).
+     *
+     * orderStatus / deliveryStatus / paymentStatus 세 필터는 결국 같은 컬럼(ORDER_STATUS)을
+     * 서로 다른 관점(주문 전체 상태 / 배송 진행도 / 결제 여부)으로 보여주는 것이라, 셋 다
+     * 이 컬럼 하나로 매핑해서 조건을 만든다 - 화면에 이 세 필터를 동시에 다르게 걸면 결과가
+     * 안 겹쳐서 0건이 될 수 있는데, 그건 원래 서로 다른 값을 요구했으니 정상 동작이다.
+     *   orderStatus:    결제완료 / 배송중 / 배송완료 / 주문취소 (실제 ORDER_STATUS 값 그대로)
+     *   deliveryStatus: 출고대기(=결제완료) / 배송중 / 배송완료 (주문취소 제외한 배송 관점)
+     *   paymentStatus:  결제완료(=주문취소 아님) / 결제취소(=주문취소) ("결제대기"는 시스템에 없는
+     *                   상태라 옵션 자체를 안 둠 - VendorDashboardStatDTO 관련 논의 참고)
+     */
+    public List<VendorOrderListDTO> findBySellerNo(int sellerNo, LocalDate startDate, LocalDate endDate,
+            String orderStatus, String deliveryStatus, String paymentStatus) {
 
         List<VendorOrderListDTO> list = new ArrayList<>();
 
-        String sql = """
+        StringBuilder sql = new StringBuilder("""
             SELECT
                 O.ORDER_NO,
                 OD.ORDER_DETAIL_NO,
@@ -42,15 +57,47 @@ public class VendorOrderListDAO {
                 JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO
                 LEFT JOIN PRODUCT_OPTION PO ON OD.OPTION_ID = PO.OPTION_ID
             WHERE P.SELLER_NO = ?
-            ORDER BY O.ORDER_DATE DESC, O.ORDER_NO DESC
-            """;
+            """);
+
+        List<Object> params = new ArrayList<>();
+        params.add(sellerNo);
+
+        if (startDate != null) {
+            sql.append(" AND TRUNC(O.ORDER_DATE) >= ?");
+            params.add(Date.valueOf(startDate));
+        }
+
+        if (endDate != null) {
+            sql.append(" AND TRUNC(O.ORDER_DATE) <= ?");
+            params.add(Date.valueOf(endDate));
+        }
+
+        if (orderStatus != null && !orderStatus.isBlank()) {
+            sql.append(" AND O.ORDER_STATUS = ?");
+            params.add(orderStatus);
+        }
+
+        if (deliveryStatus != null && !deliveryStatus.isBlank()) {
+            sql.append(" AND O.ORDER_STATUS = ?");
+            params.add("출고대기".equals(deliveryStatus) ? "결제완료" : deliveryStatus);
+        }
+
+        if ("결제완료".equals(paymentStatus)) {
+            sql.append(" AND O.ORDER_STATUS != '주문취소'");
+        } else if ("결제취소".equals(paymentStatus)) {
+            sql.append(" AND O.ORDER_STATUS = '주문취소'");
+        }
+
+        sql.append(" ORDER BY O.ORDER_DATE DESC, O.ORDER_NO DESC");
 
         try (
             Connection conn = ConnectionProvider.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString())
         ) {
 
-            pstmt.setInt(1, sellerNo);
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
 
             try (ResultSet rs = pstmt.executeQuery()) {
 

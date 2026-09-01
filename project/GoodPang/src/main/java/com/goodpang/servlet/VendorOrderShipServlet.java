@@ -34,9 +34,10 @@ public class VendorOrderShipServlet extends HttpServlet {
 		}
 
 		String invoiceNo = request.getParameter("invoiceNo");
+		String redirectTo = resolveRedirectTo(request);
 
 		if (invoiceNo == null || invoiceNo.isBlank()) {
-			response.sendRedirect(request.getContextPath() + "/vendor/order");
+			response.sendRedirect(request.getContextPath() + redirectTo);
 			return;
 		}
 
@@ -47,7 +48,21 @@ public class VendorOrderShipServlet extends HttpServlet {
 			// orderNo가 없거나 숫자가 아니면 아무 것도 바꾸지 않고 목록으로 돌려보낸다.
 		}
 
-		response.sendRedirect(request.getContextPath() + "/vendor/order");
+		response.sendRedirect(request.getContextPath() + redirectTo);
+	}
+
+	// "주문 목록"/"출고·운송장 관리" 등 여러 화면에서 같은 출고 처리 액션을 재사용하기 위해,
+	// 처리 후 돌아갈 화면을 폼에서 지정할 수 있게 함. 이 서블릿이 관리하는 두 경로 외에는
+	// 무시하고 기존 기본값(/vendor/order)으로 보낸다 - 오픈 리다이렉트 방지.
+	private String resolveRedirectTo(HttpServletRequest request) {
+
+		String redirectTo = request.getParameter("redirectTo");
+
+		if ("/vendor/shipping".equals(redirectTo)) {
+			return redirectTo;
+		}
+
+		return "/vendor/order";
 	}
 
 }
