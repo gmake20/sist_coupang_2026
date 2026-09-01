@@ -31,6 +31,10 @@
       border-radius: 6px;
       font-size: 13px;
     }
+    /* 상품 그룹이 한눈에 구분되도록, 한 상품에 속한 옵션 행들끼리 배경색을 번갈아 표시 */
+    .option-table tbody tr.option-group-alt > td {
+      background: #f5f6fa;
+    }
   </style>
 
 </head>
@@ -57,6 +61,20 @@
         </div>
 
       </div>
+
+
+      <!-- 상품 필터 -->
+      <form class="filter-row" method="get" action="${pageContext.request.contextPath}/vendor/product/options" style="margin-bottom: 12px;">
+        <div class="filter-field">
+          <label>상품 선택</label>
+          <select class="input select" name="productNo" onchange="this.form.submit()">
+            <option value="">전체 상품 (${fn:length(productFilterOptions)}개)</option>
+            <c:forEach var="p" items="${productFilterOptions}">
+              <option value="${p.productNo}" ${selectedProductNo == p.productNo ? 'selected' : ''}>${p.productName}</option>
+            </c:forEach>
+          </select>
+        </div>
+      </form>
 
 
       <!-- 결과 툴바 -->
@@ -93,38 +111,42 @@
               </c:when>
 
               <c:otherwise>
-                <c:forEach var="option" items="${optionList}">
-                  <%-- input/select/button 이 이 옵션 전용 <form id="optionForm{optionId}">에 속하도록
-                       form="..." 속성으로 연결 (그 form 태그 자체는 테이블 밖에 따로 둠 —
-                       <form>은 <tr> 안에서 여러 <td>에 걸쳐 감쌀 수 없어서 이 방식으로 우회) --%>
-                  <tr>
-                    <td class="col-product">
-                      <p class="product-name">
-                        <a href="${pageContext.request.contextPath}/vendor/product/detail?productNo=${option.productNo}"
-                           style="color:inherit; text-decoration:none;">${option.productName}</a>
-                      </p>
-                      <p class="product-sku">상품번호 ${option.productNo}</p>
-                    </td>
-                    <td class="col-option">${option.optionLabel}</td>
-                    <td class="col-price">
-                      <input type="number" name="price" min="0" step="1" value="${option.price}" form="optionForm${option.optionId}">
-                    </td>
-                    <td class="col-price">
-                      <input type="number" name="normalPrice" min="0" step="1" value="${option.normalPrice}" form="optionForm${option.optionId}">
-                    </td>
-                    <td class="col-stock">
-                      <input type="number" name="quantity" min="0" step="1" value="${option.quantity}" form="optionForm${option.optionId}">
-                    </td>
-                    <td class="col-status">
-                      <select class="status-select" name="status" form="optionForm${option.optionId}">
-                        <option value="Y" ${option.status == 'Y' ? 'selected' : ''}>정상</option>
-                        <option value="N" ${option.status == 'N' ? 'selected' : ''}>품절</option>
-                      </select>
-                    </td>
-                    <td class="col-manage">
-                      <button class="btn btn-primary btn-sm" type="submit" form="optionForm${option.optionId}">저장</button>
-                    </td>
-                  </tr>
+                <c:forEach var="group" items="${groupedOptions}" varStatus="groupStatus">
+                  <c:forEach var="option" items="${group.options}" varStatus="optionStatus">
+                    <%-- input/select/button 이 이 옵션 전용 <form id="optionForm{optionId}">에 속하도록
+                         form="..." 속성으로 연결 (그 form 태그 자체는 테이블 밖에 따로 둠 —
+                         <form>은 <tr> 안에서 여러 <td>에 걸쳐 감쌀 수 없어서 이 방식으로 우회) --%>
+                    <tr class="${groupStatus.index % 2 == 1 ? 'option-group-alt' : ''}">
+                      <c:if test="${optionStatus.first}">
+                        <td class="col-product" rowspan="${fn:length(group.options)}">
+                          <p class="product-name">
+                            <a href="${pageContext.request.contextPath}/vendor/product/detail?productNo=${group.productNo}"
+                               style="color:inherit; text-decoration:none;">${group.productName}</a>
+                          </p>
+                          <p class="product-sku">상품번호 ${group.productNo}</p>
+                        </td>
+                      </c:if>
+                      <td class="col-option">${option.optionLabel}</td>
+                      <td class="col-price">
+                        <input type="number" name="price" min="0" step="1" value="${option.price}" form="optionForm${option.optionId}">
+                      </td>
+                      <td class="col-price">
+                        <input type="number" name="normalPrice" min="0" step="1" value="${option.normalPrice}" form="optionForm${option.optionId}">
+                      </td>
+                      <td class="col-stock">
+                        <input type="number" name="quantity" min="0" step="1" value="${option.quantity}" form="optionForm${option.optionId}">
+                      </td>
+                      <td class="col-status">
+                        <select class="status-select" name="status" form="optionForm${option.optionId}">
+                          <option value="Y" ${option.status == 'Y' ? 'selected' : ''}>정상</option>
+                          <option value="N" ${option.status == 'N' ? 'selected' : ''}>품절</option>
+                        </select>
+                      </td>
+                      <td class="col-manage">
+                        <button class="btn btn-primary btn-sm" type="submit" form="optionForm${option.optionId}">저장</button>
+                      </td>
+                    </tr>
+                  </c:forEach>
                 </c:forEach>
               </c:otherwise>
 
