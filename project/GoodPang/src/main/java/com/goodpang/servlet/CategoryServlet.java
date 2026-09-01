@@ -38,15 +38,21 @@ public class CategoryServlet extends HttpServlet {
         // 평점 필터 — 원본처럼 "N점 이상"(0 = 전체)
         int minRating = Math.max(0, Math.min(5, parseIntOrDefault(request.getParameter("rating"), 0)));
 
+        // 색상 필터 — 실제 쿠팡 원본을 다시 확인해보니(2026-09-01 Playwright 재확인) 색상도 다중선택이고,
         // 선택한 값들은 OR("Black 또는 White"), 다른 필터 그룹과는 AND. 그래서 String 하나가 아니라 List 로 받음
-        // (color=Black&color=White 형태). 2026-09-02: 이 프로젝트에서 GET 쿼리스트링으로 한글을 넘기는 첫
-        // 케이스라 Tomcat이 ISO-8859-1로 잘못 해석하는 문제가 드러났었음 — 값 하나하나 UTF-8로 재해석해서 방어
+        // (color=Black&color=White 형태).
+        // ★ 2026-09-01: 예전엔 여기서 getBytes("ISO-8859-1")로 재해석하는 방어 코드가 있었는데, 실제
+        // 다중선택을 배포해서 확인해보니 "선택한 필터"에 한글이 "???"로 깨지고 체크 표시도 안 붙는
+        // 버그였음 — 원인은 이 프로젝트가 jakarta.servlet(Tomcat 10 계열)이라 URIEncoding 기본값이 이미
+        // UTF-8이라 request.getParameter()가 애초에 정상 한글을 돌려주는데, 거기다 대고 "깨졌을 것"이라며
+        // ISO-8859-1로 재해석하면 매핑 안 되는 한글이 전부 '?'로 대체돼버림(Java 인코더 기본 동작).
+        // 그래서 재해석 없이 받은 값을 그대로 씀. (이전 세션 진단은 재배포 확인 전의 추측이었음 — 틀렸던 것으로 결론)
         String[] colorParams = request.getParameterValues("color");
         List<String> colors = new ArrayList<>();
         if (colorParams != null) {
             for (String c : colorParams) {
                 if (c == null || c.isBlank()) continue;
-                colors.add(new String(c.getBytes("ISO-8859-1"), "UTF-8"));
+                colors.add(c);
             }
         }
         // JSP 에서 "이 색상이 선택됐는지" 를 EL 로 바로 물어볼 수 있게 Map 으로도 같이 넘김

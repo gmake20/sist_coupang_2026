@@ -1,5 +1,6 @@
 /*
  * 카테고리 목록 페이지(category_list.jsp) 전용 CSS.
+ * 값 출처: ref/category/원본_실측값.json (실제 coupang.com 을 Playwright MCP 로 1440px/1536px 두 폭에서 측정).
  * 전부 .category-page 안에서만 적용되게 스코프함 — 다른 페이지 클래스와 안 부딪히게(CLAUDE.md 8장 규칙).
  */
 
@@ -194,11 +195,9 @@ label.selected .filter-function-bar-asset::after,
 	cursor: pointer;
 }
 
-/* 실제 DB에 속성 데이터가 없어서 화면만 있고 클릭해도 동작 안 하는 필터 그룹 */
-.category-filter .is-inert label {
-	color: var(--text-gray);
-	cursor: default;
-}
+/* .is-inert = 실제 DB에 속성 컬럼이 없어서 "필터링 자체"는 동작 안 하는 그룹이라는 표시(클래스명은 유지).
+   2026-09-01: 예전엔 여기서 글자를 회색으로 죽여놨는데, 이제 체크박스는 진짜로 눌러지고 "선택한 필터"에도
+   잡히게 바꿨더니 회색이 안 맞게 됨(버그 리포트 4번) — 다른 필터랑 똑같이 검은 글자로 통일 */
 
 .filter-price-direct {
 	display: flex;
@@ -260,7 +259,7 @@ label.selected .filter-function-bar-asset::after,
 	color: #555555;
 }
 
-/* 선택한 필터 칩 줄 — 정렬줄 바로 아래, 상품목록 위(2026-09-02 원본 재확인 위치 그대로) */
+/* 선택한 필터 칩 줄 — 정렬줄 바로 아래, 상품목록 위(2026-09-01 원본 재확인 위치 그대로) */
 .filter-selected-bar {
 	display: flex;
 	align-items: center;
