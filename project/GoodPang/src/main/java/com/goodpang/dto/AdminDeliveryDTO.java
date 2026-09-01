@@ -24,6 +24,7 @@ public class AdminDeliveryDTO {
     private String buyerPhone;
 
     private String productName;
+    private String productImageUrl;
     private String storeName;
     private int itemCount;
 }

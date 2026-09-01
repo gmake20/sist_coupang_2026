@@ -25,9 +25,16 @@ public class VendorProductOptionDAO {
             SELECT
                 PO.OPTION_ID, PO.PRODUCT_NO, P.PRODUCT_NAME,
                 PO.OPTION1_VALUE, PO.OPTION2_VALUE, PO.OPTION3_VALUE,
-                NVL(PO.PRICE, 0) AS PRICE, PO.NORMAL_PRICE, PO.QUANTITY, PO.STATUS
+                NVL(PO.PRICE, 0) AS PRICE, PO.NORMAL_PRICE, PO.QUANTITY, PO.STATUS,
+                IMG.IMAGE_URL AS THUMBNAIL_URL
             FROM PRODUCT_OPTION PO
                 JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
+                LEFT JOIN (
+                    SELECT PRODUCT_NO, IMAGE_URL,
+                           ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID, IMAGE_ORDER) AS RN
+                    FROM PRODUCT_IMAGE
+                    WHERE IMAGE_PURPOSE = '대표'
+                ) IMG ON IMG.PRODUCT_NO = P.PRODUCT_NO AND IMG.RN = 1
             WHERE P.SELLER_NO = ?
               AND (? IS NULL OR P.PRODUCT_NO = ?)
             ORDER BY P.CREATED_DATE DESC, P.PRODUCT_NO DESC, PO.OPTION_ID
@@ -154,6 +161,7 @@ public class VendorProductOptionDAO {
         dto.setOptionId(rs.getInt("OPTION_ID"));
         dto.setProductNo(rs.getInt("PRODUCT_NO"));
         dto.setProductName(rs.getString("PRODUCT_NAME"));
+        dto.setThumbnailUrl(rs.getString("THUMBNAIL_URL"));
 
         dto.setOption1Value(rs.getString("OPTION1_VALUE"));
         dto.setOption2Value(rs.getString("OPTION2_VALUE"));

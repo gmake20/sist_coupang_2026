@@ -50,12 +50,19 @@ public class VendorOrderListDAO {
                 O.ORDER_STATUS,
                 O.ORDER_DATE,
                 M.MEMBER_NAME,
-                M.PHONE
+                M.PHONE,
+                IMG.IMAGE_URL AS THUMBNAIL_URL
             FROM ORDER_DETAIL OD
                 JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
                 JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
                 JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO
                 LEFT JOIN PRODUCT_OPTION PO ON OD.OPTION_ID = PO.OPTION_ID
+                LEFT JOIN (
+                    SELECT PRODUCT_NO, IMAGE_URL,
+                           ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID, IMAGE_ORDER) AS RN
+                    FROM PRODUCT_IMAGE
+                    WHERE IMAGE_PURPOSE = '대표'
+                ) IMG ON IMG.PRODUCT_NO = P.PRODUCT_NO AND IMG.RN = 1
             WHERE P.SELLER_NO = ?
             """);
 
@@ -283,6 +290,7 @@ public class VendorOrderListDAO {
         dto.setOrderNo(rs.getInt("ORDER_NO"));
         dto.setOrderDetailNo(rs.getInt("ORDER_DETAIL_NO"));
         dto.setProductName(rs.getString("PRODUCT_NAME"));
+        dto.setThumbnailUrl(rs.getString("THUMBNAIL_URL"));
         dto.setOptionLabel(buildOptionLabel(rs.getString("OPTION1_VALUE"), rs.getString("OPTION2_VALUE"), rs.getString("OPTION3_VALUE")));
         dto.setOrderQty(rs.getInt("ORDER_QTY"));
         dto.setPrice(rs.getInt("PRICE"));

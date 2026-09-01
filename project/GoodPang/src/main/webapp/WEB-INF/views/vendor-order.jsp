@@ -226,7 +226,11 @@
                         </td>
                         <td class="col-info">
                           <div class="product-cell">
-                            <span class="thumb"></span>
+                            <span class="thumb">
+                              <c:if test="${not empty order.thumbnailUrl}">
+                                <img src="${pageContext.request.contextPath}/${order.thumbnailUrl}" alt="${order.productName}">
+                              </c:if>
+                            </span>
                             <div class="product-text">
                               <p class="product-name">${order.productName}</p>
                               <c:if test="${not empty order.optionLabel}">

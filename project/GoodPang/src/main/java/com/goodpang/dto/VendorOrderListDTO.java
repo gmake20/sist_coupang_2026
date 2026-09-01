@@ -17,6 +17,7 @@ public class VendorOrderListDTO {
     private int orderDetailNo;
 
     private String productName;
+    private String thumbnailUrl;
     private String optionLabel;
     private int orderQty;
     private int price;
