@@ -174,6 +174,8 @@
 	<script>
 	const contextPath = "${pageContext.request.contextPath}";
 	
+	const isWowMember = ${isWowMember eq true};
+	
 	const checkAll =
 	    document.getElementById("chk-all");
 
@@ -254,6 +256,7 @@
 	        }
 	    );
 	}
+	
 </script>
 
 

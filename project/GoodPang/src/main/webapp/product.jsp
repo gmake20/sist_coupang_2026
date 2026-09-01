@@ -1406,8 +1406,7 @@
 				<form action="${pageContext.request.contextPath}/wow/join"
 					method="post" id="productWowPaymentForm">
 
-					<input type="hidden" name="joinMode" value="modal"> <input
-						type="hidden" name="productNo" value="${p.productNo}"> <input
+					<input type="hidden" name="joinMode" value="modal"><input
 						type="hidden" name="afterWowJoin" value="buy"> <input
 						type="hidden" name="productNo" value="${p.productNo}"> <input
 						type="hidden" name="optionId" id="productWowOptionId"> <input
@@ -1881,7 +1880,7 @@
         step2.style.display = "none";
     });
 
-    nextBtn.addEventListener("click", async function () {
+/*     nextBtn.addEventListener("click", async function () {
 
         try {
             await loadWowPaymentMethods();
@@ -1895,11 +1894,25 @@
             paymentList.innerHTML =
                 "결제수단을 불러오지 못했습니다.";
         }
-    });
+    }); */
+    
+    nextBtn.addEventListener("click", async function () {
 
-    backBtn.addEventListener("click", function () {
-        step2.style.display = "none";
-        step1.style.display = "block";
+        try {
+            const loaded = await loadWowPaymentMethods();
+
+            if (!loaded) {
+                return;
+            }
+
+            step1.style.display = "none";
+            step2.style.display = "block";
+
+        } catch (error) {
+            console.error(error);
+            paymentList.innerHTML =
+                "결제수단을 불러오지 못했습니다.";
+        }
     });
 
     function closeModal() {
@@ -1918,11 +1931,10 @@
         }
     });
 
-    async function loadWowPaymentMethods() {
+/*     async function loadWowPaymentMethods() {
 
         paymentList.innerHTML =
             "결제수단을 불러오는 중입니다...";
-
         const response = await fetch(
             contextPath + "/wow/payment-method",
             {
@@ -1942,12 +1954,42 @@
                 "결제수단을 불러오지 못했습니다."
             );
         }
-
         const html =
             await response.text();
 
         paymentList.innerHTML = html;
     }
+     */
+     async function loadWowPaymentMethods() {
+
+    	    paymentList.innerHTML =
+    	        "결제수단을 불러오는 중입니다...";
+    	    const response = await fetch(
+    	        contextPath + "/wow/payment-method",
+    	        {
+    	            method: "GET"
+    	        }
+    	    );
+
+    	    if (response.status === 401) {
+    	        window.location.replace(
+    	            contextPath + "/login"
+    	        );
+    	        return false;
+    	    }
+
+    	    if (!response.ok) {
+    	        throw new Error(
+    	            "결제수단을 불러오지 못했습니다."
+    	        );
+    	    }
+
+    	    const html =
+    	        await response.text();
+    	    paymentList.innerHTML = html;
+    	    return true;
+    	}
+     
 
     paymentForm.addEventListener("submit", function (event) {
 

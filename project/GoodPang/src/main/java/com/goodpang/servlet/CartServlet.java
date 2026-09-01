@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.goodpang.dao.CartDAO;
+import com.goodpang.dao.WowMembershipDAO;
 import com.goodpang.dto.CartItemDTO;
 import com.goodpang.dto.MemberDTO;
 
@@ -22,6 +23,7 @@ public class CartServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private final CartDAO cartDAO = new CartDAO();
+    private final WowMembershipDAO wowDAO = new WowMembershipDAO();
 
     @Override
     protected void doGet(
@@ -80,6 +82,20 @@ public class CartServlet extends HttpServlet {
                 }
             }
         }
+        
+        if (loginMember != null) {
+	        boolean isWowMember =
+	                wowDAO.isWowMember(
+	                        loginMember.getMemberNo()
+	                );
+	
+	        request.setAttribute(
+	                "isWowMember",
+	                isWowMember
+	        );
+        
+        }
+        
 
         int totalPrice = 0;
 
