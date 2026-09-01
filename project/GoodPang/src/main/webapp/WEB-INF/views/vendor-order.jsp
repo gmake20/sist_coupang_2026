@@ -109,7 +109,8 @@
       <!-- 검색 필터 -->
       <section class="panel filter-panel">
 
-        <div class="filter-row filter-row-main">
+        <form class="filter-row filter-row-main" id="searchForm" method="get"
+              action="${pageContext.request.contextPath}/vendor/order">
 
           <div class="filter-field date-field">
 
@@ -118,20 +119,22 @@
             <div class="date-controls">
 
               <div class="quick-range">
-                <button class="quick-btn" type="button">오늘</button>
-                <button class="quick-btn" type="button">7일</button>
-                <button class="quick-btn" type="button">1개월</button>
-                <button class="quick-btn" type="button">3개월</button>
+                <button class="quick-btn" type="button" data-range="0">오늘</button>
+                <button class="quick-btn" type="button" data-range="6">7일</button>
+                <button class="quick-btn" type="button" data-range="30">1개월</button>
+                <button class="quick-btn" type="button" data-range="90">3개월</button>
               </div>
 
               <div class="date-range">
                 <div class="date-input">
-                  <input class="input" type="text" value="2025-05-12">
+                  <input class="input" type="text" name="startDate" id="startDate"
+                         value="${searchStartDate}" placeholder="YYYY-MM-DD">
                   <svg class="icon"><use href="#ic-calendar" /></svg>
                 </div>
                 <span class="date-tilde">~</span>
                 <div class="date-input">
-                  <input class="input" type="text" value="2025-05-19">
+                  <input class="input" type="text" name="endDate" id="endDate"
+                         value="${searchEndDate}" placeholder="YYYY-MM-DD">
                   <svg class="icon"><use href="#ic-calendar" /></svg>
                 </div>
               </div>
@@ -142,41 +145,42 @@
 
           <div class="filter-field select-field">
             <label>주문상태</label>
-            <select class="input select">
-              <option>전체</option>
-              <option>결제 대기</option>
-              <option>상품 준비중</option>
-              <option>배송 중</option>
-              <option>배송 완료</option>
+            <select class="input select" name="orderStatus">
+              <option value="" ${empty searchOrderStatus ? 'selected' : ''}>전체</option>
+              <option value="결제완료" ${searchOrderStatus == '결제완료' ? 'selected' : ''}>결제 완료</option>
+              <option value="배송중" ${searchOrderStatus == '배송중' ? 'selected' : ''}>배송 중</option>
+              <option value="배송완료" ${searchOrderStatus == '배송완료' ? 'selected' : ''}>배송 완료</option>
+              <option value="주문취소" ${searchOrderStatus == '주문취소' ? 'selected' : ''}>주문 취소</option>
             </select>
           </div>
 
           <div class="filter-field select-field">
             <label>배송상태</label>
-            <select class="input select">
-              <option>전체</option>
-              <option>출고 대기</option>
-              <option>배송 중</option>
-              <option>배송 완료</option>
+            <select class="input select" name="deliveryStatus">
+              <option value="" ${empty searchDeliveryStatus ? 'selected' : ''}>전체</option>
+              <option value="출고대기" ${searchDeliveryStatus == '출고대기' ? 'selected' : ''}>출고 대기</option>
+              <option value="배송중" ${searchDeliveryStatus == '배송중' ? 'selected' : ''}>배송 중</option>
+              <option value="배송완료" ${searchDeliveryStatus == '배송완료' ? 'selected' : ''}>배송 완료</option>
             </select>
           </div>
 
           <div class="filter-field select-field">
             <label>결제상태</label>
-            <select class="input select">
-              <option>전체</option>
-              <option>결제 완료</option>
-              <option>결제 대기</option>
-              <option>결제 취소</option>
+            <select class="input select" name="paymentStatus">
+              <option value="" ${empty searchPaymentStatus ? 'selected' : ''}>전체</option>
+              <option value="결제완료" ${searchPaymentStatus == '결제완료' ? 'selected' : ''}>결제 완료</option>
+              <option value="결제취소" ${searchPaymentStatus == '결제취소' ? 'selected' : ''}>결제 취소</option>
             </select>
           </div>
 
-          <button class="btn btn-outline btn-detail" type="button">
+          <button class="btn btn-outline btn-detail" type="submit">
             <svg class="icon"><use href="#ic-filter" /></svg>
             상세검색
           </button>
 
-        </div>
+          <a class="btn btn-outline btn-sm" href="${pageContext.request.contextPath}/vendor/order">초기화</a>
+
+        </form>
 
       </section>
 
@@ -403,16 +407,29 @@
   <script>
 
     /* =========================================================
-       주문일 빠른선택 버튼
+       주문일 빠른선택 버튼 - 오늘 기준으로 시작/종료일을 채우고 바로 검색
        (사이드바 아코디언·사이드바 접기·사용자 메뉴는 vendor-common.js가 처리)
     ========================================================= */
 
+    function toDateInputValue(date) {
+      var year = date.getFullYear();
+      var month = String(date.getMonth() + 1).padStart(2, "0");
+      var day = String(date.getDate()).padStart(2, "0");
+      return year + "-" + month + "-" + day;
+    }
+
     document.querySelectorAll(".quick-btn").forEach(function (button) {
       button.addEventListener("click", function () {
-        document.querySelectorAll(".quick-btn").forEach(function (btn) {
-          btn.classList.remove("active");
-        });
-        button.classList.add("active");
+        var daysBack = Number(button.dataset.range);
+
+        var end = new Date();
+        var start = new Date();
+        start.setDate(start.getDate() - daysBack);
+
+        document.getElementById("startDate").value = toDateInputValue(start);
+        document.getElementById("endDate").value = toDateInputValue(end);
+
+        document.getElementById("searchForm").submit();
       });
     });
 
