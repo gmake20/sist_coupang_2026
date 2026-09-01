@@ -35,17 +35,6 @@
           <p class="page-desc">주문 처리 및 배송 현황을 확인하고 관리할 수 있습니다.</p>
         </div>
 
-        <div class="page-actions">
-
-          <div class="search-box">
-            <svg class="icon"><use href="#ic-search" /></svg>
-            <input type="text" placeholder="주문번호, 상품명, 구매자명 검색">
-          </div>
-
-          <button class="btn btn-outline" type="button">엑셀 다운로드</button>
-
-        </div>
-
       </div>
 
 
