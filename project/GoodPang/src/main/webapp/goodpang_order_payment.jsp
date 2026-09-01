@@ -1488,8 +1488,51 @@ document
 		if (event.target === this) {
 			closePaymentAddModal();
 		}
+		
 	});
+	
+const cardNumberInputs = [
+    document.getElementById("cardNumber1"),
+    document.getElementById("cardNumber2"),
+    document.getElementById("cardNumber3"),
+    document.getElementById("cardNumber4")
+];
 
+cardNumberInputs.forEach(function(input, index) {
+
+    input.addEventListener("input", function() {
+
+        // 숫자만 입력
+        this.value =
+            this.value.replace(/[^0-9]/g, "");
+
+        // 최대 4자리
+        if (this.value.length > 4) {
+            this.value = this.value.substring(0, 4);
+        }
+
+        // 4자리 입력 완료 → 다음 칸
+        if (
+            this.value.length === 4 &&
+            index < cardNumberInputs.length - 1
+        ) {
+            cardNumberInputs[index + 1].focus();
+        }
+    });
+
+    input.addEventListener("keydown", function(event) {
+
+        // 현재 칸이 비어있는데 Backspace
+        if (
+            event.key === "Backspace" &&
+            this.value.length === 0 &&
+            index > 0
+        ) {
+            cardNumberInputs[index - 1].focus();
+        }
+    });
+
+});
 </script>
 
 </body>
