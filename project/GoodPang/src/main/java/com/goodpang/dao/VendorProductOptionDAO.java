@@ -16,8 +16,8 @@ import com.goodpang.util.ConnectionProvider;
  */
 public class VendorProductOptionDAO {
 
-    // 판매자(sellerNo)의 전체 상품 옵션 - 상품번호, 옵션번호 순
-    public List<VendorProductOptionDTO> findBySellerNo(int sellerNo) {
+    // 판매자(sellerNo)의 상품 옵션 - 상품번호, 옵션번호 순. productNo가 null이면 전체 상품 대상
+    public List<VendorProductOptionDTO> findBySellerNo(int sellerNo, Integer productNo) {
 
         List<VendorProductOptionDTO> list = new ArrayList<>();
 
@@ -29,7 +29,50 @@ public class VendorProductOptionDAO {
             FROM PRODUCT_OPTION PO
                 JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
             WHERE P.SELLER_NO = ?
+              AND (? IS NULL OR P.PRODUCT_NO = ?)
             ORDER BY P.PRODUCT_NO, PO.OPTION_ID
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setInt(1, sellerNo);
+
+            if (productNo != null) {
+                pstmt.setInt(2, productNo);
+                pstmt.setInt(3, productNo);
+            } else {
+                pstmt.setNull(2, Types.INTEGER);
+                pstmt.setNull(3, Types.INTEGER);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // 옵션 관리 화면 상단 "상품 선택" 필터 드롭다운용 - 옵션이 하나라도 있는 상품만, 상품번호순
+    public List<VendorProductOptionDTO> findDistinctProductsBySellerNo(int sellerNo) {
+
+        List<VendorProductOptionDTO> list = new ArrayList<>();
+
+        String sql = """
+            SELECT DISTINCT P.PRODUCT_NO, P.PRODUCT_NAME
+            FROM PRODUCT_OPTION PO
+                JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
+            WHERE P.SELLER_NO = ?
+            ORDER BY P.PRODUCT_NO
             """;
 
         try (
@@ -42,7 +85,10 @@ public class VendorProductOptionDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
 
                 while (rs.next()) {
-                    list.add(mapRow(rs));
+                    VendorProductOptionDTO dto = new VendorProductOptionDTO();
+                    dto.setProductNo(rs.getInt("PRODUCT_NO"));
+                    dto.setProductName(rs.getString("PRODUCT_NAME"));
+                    list.add(dto);
                 }
             }
 
