@@ -31,6 +31,10 @@
       border-radius: 6px;
       font-size: 13px;
     }
+    /* 상품 그룹이 한눈에 구분되도록, 한 상품에 속한 옵션 행들끼리 배경색을 번갈아 표시 */
+    .option-table tbody tr.option-group-alt > td {
+      background: #f5f6fa;
+    }
   </style>
 
 </head>
@@ -107,12 +111,12 @@
               </c:when>
 
               <c:otherwise>
-                <c:forEach var="group" items="${groupedOptions}">
+                <c:forEach var="group" items="${groupedOptions}" varStatus="groupStatus">
                   <c:forEach var="option" items="${group.options}" varStatus="optionStatus">
                     <%-- input/select/button 이 이 옵션 전용 <form id="optionForm{optionId}">에 속하도록
                          form="..." 속성으로 연결 (그 form 태그 자체는 테이블 밖에 따로 둠 —
                          <form>은 <tr> 안에서 여러 <td>에 걸쳐 감쌀 수 없어서 이 방식으로 우회) --%>
-                    <tr>
+                    <tr class="${groupStatus.index % 2 == 1 ? 'option-group-alt' : ''}">
                       <c:if test="${optionStatus.first}">
                         <td class="col-product" rowspan="${fn:length(group.options)}">
                           <p class="product-name">
