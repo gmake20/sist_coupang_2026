@@ -1,6 +1,5 @@
 /*
  * 카테고리 목록 페이지(category_list.jsp) 전용 CSS.
- * 값 출처: ref/category/원본_실측값.json (실제 coupang.com 을 Playwright MCP 로 1440px/1536px 두 폭에서 측정).
  * 전부 .category-page 안에서만 적용되게 스코프함 — 다른 페이지 클래스와 안 부딪히게(CLAUDE.md 8장 규칙).
  */
 
@@ -49,11 +48,58 @@
 	flex: none;
 }
 
+.category-filter .filter-title-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16px;
+}
+
 .category-filter .filter-title {
 	font-size: 16px;
 	font-weight: 700;
 	color: #111111;
-	margin-bottom: 16px;
+}
+
+/* 필터 하나라도 선택돼 있을 때만 뜸(JSP 에서 조건부 렌더) — 원본 실측: 빨간 글씨 */
+.category-filter .filter-clear-all {
+	font-size: 12px;
+	color: #CB1400;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.category-filter .filter-clear-all:hover {
+	text-decoration: underline;
+}
+
+/* 체크박스형 필터 공통 — 진짜 <input type="checkbox"> 를 눈에는 안 보이게 숨기고
+   .filter-function-bar-asset(CSS로 그린 네모)를 대신 보여줌. 클릭은 label 전체가 받아서 그대로 토글됨.
+   색상(name="color", 서버로 감)이든 브랜드/핏 등 장식용(name 없음, 서버로 안 감)이든 규칙은 동일 —
+   "체크박스가 있으면 눌렀을 때 체크 표시는 난다"를 이 셀렉터 하나로 통일함(2026-09-01) */
+.category-filter label input[type="checkbox"] {
+	position: absolute;
+	width: 0;
+	height: 0;
+	opacity: 0;
+	margin: 0;
+}
+
+.category-filter label input[type="checkbox"]:checked + .filter-function-bar-asset {
+	background: var(--link-blue);
+	border-color: var(--link-blue);
+}
+
+.category-filter label input[type="checkbox"]:checked + .filter-function-bar-asset::after {
+	content: "";
+	position: absolute;
+	left: 3px;
+	top: 0px;
+	width: 4px;
+	height: 8px;
+	border: solid #fff;
+	border-width: 0 2px 2px 0;
+	transform: rotate(45deg);
 }
 
 .category-filter .filter-group {
@@ -212,6 +258,51 @@ label.selected .filter-function-bar-asset::after,
 .sort-bar .list-size {
 	font-size: 13px;
 	color: #555555;
+}
+
+/* 선택한 필터 칩 줄 — 정렬줄 바로 아래, 상품목록 위(2026-09-02 원본 재확인 위치 그대로) */
+.filter-selected-bar {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.filter-selected-label {
+	font-size: 13px;
+	color: #555555;
+}
+
+.filter-selected-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	list-style: none;
+}
+
+.filter-selected-chips a {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 10px;
+	border: 1px solid var(--line-gray);
+	border-radius: 15px;
+	font-size: 12px;
+	color: #111111;
+	text-decoration: none;
+}
+
+.filter-selected-chips .remove {
+	color: #888888;
+}
+
+.filter-selected-chips a:hover {
+	border-color: var(--link-blue);
+}
+
+.filter-selected-chips a:hover .remove {
+	color: var(--link-blue);
 }
 
 .empty-message {

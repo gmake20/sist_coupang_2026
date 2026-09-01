@@ -10,8 +10,7 @@
 <title>${breadcrumb[2].categoryName} | 굿팡</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet"
-	href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reset.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css">
@@ -21,12 +20,19 @@
 <body class="page-category">
 	<jsp:include page="/inc/header.jsp" />
 
-	<%-- 정렬/페이지/평점/가격/색상 링크에 항상 같이 실어야 하는 값들. 새 링크 만들 때마다 이어붙임.
-	     color 는 한글이라 <c:param> 으로 URL 인코딩까지 여기서 미리 해둠(직접 이어붙이면 깨짐) --%>
+	<%-- 정렬/페이지/평점/가격 링크에 항상 같이 실어야 하는 값들. 새 링크 만들 때마다 이어붙임.
+	     색상은 다중선택(2026-09-02)이라 선택된 개수만큼 color= 를 반복해서 실음.
+	     <c:param> 으로 URL 인코딩까지 여기서 미리 해둠(한글이라 직접 이어붙이면 깨짐) --%>
 	<c:url var="baseUrl" value="/category">
 		<c:param name="categoryNo" value="${categoryNo}" />
-		<c:param name="color" value="${selectedColor}" />
+		<c:forEach var="c" items="${selectedColors}">
+			<c:param name="color" value="${c}" />
+		</c:forEach>
 	</c:url>
+
+	<%-- 필터가 하나라도 선택돼 있는지 — "전체해제" 버튼과 "선택한 필터" 줄을 보여줄지 결정하는 데만 씀 --%>
+	<c:set var="hasActiveFilter"
+		value="${not empty selectedColors || rating > 0 || minPrice > 0 || not empty maxPrice}" />
 
 	<main class="category-page">
 
@@ -51,13 +57,23 @@
 			     ================================================== --%>
 			<aside class="category-filter">
 
-				<h2 class="filter-title">필터</h2>
+				<div class="filter-title-row">
+					<h2 class="filter-title">필터</h2>
+					<%-- 실제 쿠팡도 필터 하나라도 고르면 "전체해제" 버튼이 뜸(2026-09-02 Playwright 재확인).
+					     색상/평점/가격처럼 서버가 아는 필터만 초기화 대상 — categoryNo 만 남기고 나머지 다 뗀 URL로 이동 --%>
+					<c:if test="${hasActiveFilter}">
+						<a href="${pageContext.request.contextPath}/category?categoryNo=${categoryNo}" class="filter-clear-all">전체해제</a>
+					</c:if>
+				</div>
 
 				<%-- 원본은 "필터" 제목 바로 아래, 소제목 없이 로켓/무료배송 체크박스가 옴.
-				     실제 로켓 배지 이미지는 승인 안 된 도메인이라 못 받아와서 글자만(2026-08-31) --%>
+				     ★ 2026-09-02: 이 줄은 DB 연동이 없는 장식용 필터임 — 그래도 "체크박스가 있으면 눌렀을 때
+				     체크 표시는 나야 한다"는 요청으로 name 없는 진짜 <input type="checkbox"> 를 넣음. name 이
+				     없어서 폼에 실리지도 않고 서버에도 안 감 — 브라우저가 자체적으로 :checked 를 토글해주니
+				     JS 없이도 클릭하면 체크 표시가 남음(대신 새로고침하면 리셋됨, 이게 DB에 없는 필터의 정직한 동작) --%>
 				<ul class="filter-top-row">
 					<c:forEach var="item" items="${topFilterItems}">
-						<li><label><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
+						<li><label><input type="checkbox"><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
 					</c:forEach>
 				</ul>
 
@@ -84,35 +100,38 @@
 						<h3>${entry.key}</h3>
 						<ul>
 							<c:forEach var="item" items="${entry.value}">
-								<li><label><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
+								<li><label><input type="checkbox"><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
 							</c:forEach>
 						</ul>
 					</section>
 				</c:forEach>
 
 				<%-- 색상 — 하드코딩 아님, PRODUCT_OPTION 에 실제 등록된 값만 나옴(2026-08-30 확정).
-				     2026-09-01: 실제로 필터링되도록 링크로 바꿈(다른 필터와 같은 방식 — 클릭하면 전체 재요청).
-				     이미 선택된 색을 다시 누르면 해제(color= 빈값)되게 토글 --%>
+				     2026-09-02: 다중선택으로 바꿈(실제 쿠팡 Playwright 재확인 — 여러 색 동시 선택 가능,
+				     선택한 색상끼리는 OR). 체크박스 하나 바꿀 때마다 폼을 통째로 자동 제출해서 서버에 다시 물어봄
+				     (색상 조합 자체가 DB 조회 결과라 클라이언트에서만 처리할 수 없음 — 다른 실동작 필터와 같은 원칙) --%>
 				<c:if test="${not empty colorOptions}">
 					<section class="filter-group">
 						<h3>색상</h3>
-						<ul class="filter-chip-list">
-							<c:forEach var="color" items="${colorOptions}">
-								<c:url var="colorUrl" value="/category">
-									<c:param name="categoryNo" value="${categoryNo}" />
-									<c:param name="sort" value="${sort}" />
-									<c:param name="minPrice" value="${minPrice}" />
-									<c:param name="maxPrice" value="${maxPrice}" />
-									<c:param name="rating" value="${rating}" />
-									<c:param name="color" value="${color eq selectedColor ? '' : color}" />
-								</c:url>
-								<li>
-									<a href="${colorUrl}" class="${color eq selectedColor ? 'selected' : ''}">
-										<i class="filter-function-bar-asset"></i><span>${color}</span>
-									</a>
-								</li>
-							</c:forEach>
-						</ul>
+						<form id="colorFilterForm" method="get" action="${pageContext.request.contextPath}/category">
+							<input type="hidden" name="categoryNo" value="${categoryNo}">
+							<input type="hidden" name="sort" value="${sort}">
+							<input type="hidden" name="minPrice" value="${minPrice}">
+							<input type="hidden" name="maxPrice" value="${maxPrice}">
+							<input type="hidden" name="rating" value="${rating}">
+							<ul class="filter-chip-list">
+								<c:forEach var="color" items="${colorOptions}">
+									<li>
+										<label>
+											<input type="checkbox" name="color" value="${color}"
+												onchange="document.getElementById('colorFilterForm').submit()"
+												${selectedColorMap[color] ? 'checked' : ''}>
+											<i class="filter-function-bar-asset"></i><span>${color}</span>
+										</label>
+									</li>
+								</c:forEach>
+							</ul>
+						</form>
 					</section>
 				</c:if>
 
@@ -121,7 +140,7 @@
 						<h3>${entry.key}</h3>
 						<ul>
 							<c:forEach var="item" items="${entry.value}">
-								<li><label><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
+								<li><label><input type="checkbox"><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
 							</c:forEach>
 						</ul>
 					</section>
@@ -194,6 +213,54 @@
 					<%-- 60개 고정(2026-08-30 확정) — 원본처럼 오른쪽에 표시만 함, 드롭다운 아님 --%>
 					<span class="list-size">60개씩 보기</span>
 				</div>
+
+				<%-- 선택한 필터 — 실제 쿠팡 재확인(2026-09-02 Playwright): 정렬줄 바로 아래, 상품목록 위에 옴.
+				     칩 하나 지우면 그 값만 뺀 URL로 재요청, 나머지 선택은 그대로 유지 --%>
+				<c:if test="${hasActiveFilter}">
+					<div class="filter-selected-bar">
+						<span class="filter-selected-label">선택한 필터:</span>
+						<ul class="filter-selected-chips">
+							<c:forEach var="color" items="${selectedColors}">
+								<c:url var="removeColorUrl" value="/category">
+									<c:param name="categoryNo" value="${categoryNo}" />
+									<c:param name="sort" value="${sort}" />
+									<c:param name="minPrice" value="${minPrice}" />
+									<c:param name="maxPrice" value="${maxPrice}" />
+									<c:param name="rating" value="${rating}" />
+									<c:forEach var="other" items="${selectedColors}">
+										<c:if test="${other ne color}">
+											<c:param name="color" value="${other}" />
+										</c:if>
+									</c:forEach>
+								</c:url>
+								<li><a href="${removeColorUrl}">${color}<span class="remove">삭제</span></a></li>
+							</c:forEach>
+
+							<c:if test="${rating > 0}">
+								<c:url var="removeRatingUrl" value="/category">
+									<c:param name="categoryNo" value="${categoryNo}" />
+									<c:param name="sort" value="${sort}" />
+									<c:param name="minPrice" value="${minPrice}" />
+									<c:param name="maxPrice" value="${maxPrice}" />
+									<c:param name="rating" value="0" />
+									<c:forEach var="c" items="${selectedColors}"><c:param name="color" value="${c}" /></c:forEach>
+								</c:url>
+								<li><a href="${removeRatingUrl}">${rating}점 이상<span class="remove">삭제</span></a></li>
+							</c:if>
+
+							<c:if test="${minPrice > 0 || not empty maxPrice}">
+								<c:url var="removePriceUrl" value="/category">
+									<c:param name="categoryNo" value="${categoryNo}" />
+									<c:param name="sort" value="${sort}" />
+									<c:param name="rating" value="${rating}" />
+									<c:param name="minPrice" value="0" />
+									<c:forEach var="c" items="${selectedColors}"><c:param name="color" value="${c}" /></c:forEach>
+								</c:url>
+								<li><a href="${removePriceUrl}">가격<span class="remove">삭제</span></a></li>
+							</c:if>
+						</ul>
+					</div>
+				</c:if>
 
 				<c:choose>
 					<c:when test="${empty products}">

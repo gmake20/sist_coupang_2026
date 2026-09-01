@@ -1,6 +1,7 @@
 package com.goodpang.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,15 +38,29 @@ public class CategoryServlet extends HttpServlet {
         // 평점 필터 — 원본처럼 "N점 이상"(0 = 전체)
         int minRating = Math.max(0, Math.min(5, parseIntOrDefault(request.getParameter("rating"), 0)));
 
-        // 색상 필터 — 하나만 선택(원본도 실측상 클릭 시 전체 페이지 재요청, 다중선택 UI 아님). 안 고르면 null
-        String color = request.getParameter("color");
-        if (color != null && color.isBlank()) color = null;
+        // 선택한 값들은 OR("Black 또는 White"), 다른 필터 그룹과는 AND. 그래서 String 하나가 아니라 List 로 받음
+        // (color=Black&color=White 형태). 2026-09-02: 이 프로젝트에서 GET 쿼리스트링으로 한글을 넘기는 첫
+        // 케이스라 Tomcat이 ISO-8859-1로 잘못 해석하는 문제가 드러났었음 — 값 하나하나 UTF-8로 재해석해서 방어
+        String[] colorParams = request.getParameterValues("color");
+        List<String> colors = new ArrayList<>();
+        if (colorParams != null) {
+            for (String c : colorParams) {
+                if (c == null || c.isBlank()) continue;
+                colors.add(new String(c.getBytes("ISO-8859-1"), "UTF-8"));
+            }
+        }
+        // JSP 에서 "이 색상이 선택됐는지" 를 EL 로 바로 물어볼 수 있게 Map 으로도 같이 넘김
+        // (JSTL EL 은 List.contains() 를 직접 못 부르고, fn:contains 는 문자열 부분일치라 여기엔 안 맞음)
+        Map<String, Boolean> selectedColorMap = new LinkedHashMap<>();
+        for (String c : colors) {
+            selectedColorMap.put(c, Boolean.TRUE);
+        }
 
         CategoryProductDAO dao = new CategoryProductDAO();
 
         List<CategoryProductDTO> products =
-                dao.findByCategory(categoryNo, sort, minPrice, maxPrice, minRating, color, page, PAGE_SIZE);
-        int totalCount = dao.countByCategory(categoryNo, minPrice, maxPrice, minRating, color);
+                dao.findByCategory(categoryNo, sort, minPrice, maxPrice, minRating, colors, page, PAGE_SIZE);
+        int totalCount = dao.countByCategory(categoryNo, minPrice, maxPrice, minRating, colors);
         int totalPages = (int) Math.ceil(totalCount / (double) PAGE_SIZE);
 
         CategoryDTO[] breadcrumb = dao.findBreadcrumb(categoryNo);
@@ -60,7 +75,8 @@ public class CategoryServlet extends HttpServlet {
         request.setAttribute("minPrice", minPrice);
         request.setAttribute("maxPrice", maxPrice == Integer.MAX_VALUE ? "" : maxPrice);
         request.setAttribute("rating", minRating);
-        request.setAttribute("selectedColor", color);
+        request.setAttribute("selectedColors", colors);
+        request.setAttribute("selectedColorMap", selectedColorMap);
 
         request.setAttribute("categoryNo", categoryNo);
         request.setAttribute("breadcrumb", breadcrumb);          // [대분류, 중분류, 소분류]

@@ -364,8 +364,7 @@
 						<!-- 수량 -->
 						<div class="product-quantity">
 
-							<input type="text" class="qty-input" name="quantity" value="1"
-								readonly>
+							<input type="text" class="qty-input" name="quantity" value="1" inputmode="numeric">
 							<div class="qty-spin">
 								<button type="button" class="qty-plus">
 									<span class="blind"> 수량 더하기 </span>
