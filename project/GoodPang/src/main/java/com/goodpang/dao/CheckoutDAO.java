@@ -642,33 +642,6 @@ public class CheckoutDAO {
 	}
 
 	
-//	  public int updateCheckoutAmount(int checkoutNo) {
-//	  
-//	  String sql = """ 
-//	  				UPDATE CHECKOUT c SET c.PRODUCT_AMOUNT = ( SELECT
-//					  NVL(SUM(ci.PRICE * ci.ORDER_QTY), 0) FROM CHECKOUT_ITEM ci WHERE
-//					  ci.CHECKOUT_NO = c.CHECKOUT_NO ), c.TOTAL_PRICE = ( SELECT NVL(SUM(ci.PRICE *
-//					  ci.ORDER_QTY), 0) FROM CHECKOUT_ITEM ci WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
-//					  ) WHERE c.CHECKOUT_NO = ? 
-//							  """;
-//	  
-//	  try ( Connection conn = ConnectionProvider.getConnection();
-//	  
-//	  PreparedStatement pstmt = conn.prepareStatement(sql) ) {
-//	  
-//	  pstmt.setInt(1, checkoutNo);
-//	  
-//	  return pstmt.executeUpdate();
-//	 
-//	 } catch (Exception e) {
-//	  
-//	  e.printStackTrace();
-//	  
-//	  throw new RuntimeException( "CHECKOUT 금액 업데이트 실패", e );
-//	  
-//	  } }
-	 
-	
 	public int updateCheckoutAmount(int checkoutNo) {
 
 	    String sql = """
@@ -730,6 +703,99 @@ public class CheckoutDAO {
 	                        - NVL(c.CASH_USED, 0)
 	                    )
 
+	            WHERE c.CHECKOUT_NO = ?
+	            """;
+	    try (
+	            Connection conn =
+	                    ConnectionProvider.getConnection();
+	            PreparedStatement pstmt =
+	                    conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, checkoutNo);
+	        return pstmt.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException(
+	                "CHECKOUT 결제금액 계산 실패",
+	                e
+	        );
+	    }
+	}
+	
+	public int updateCheckoutAmountv2(int checkoutNo) {
+
+	    String sql = """
+	            UPDATE CHECKOUT c
+	            SET
+	                PRODUCT_AMOUNT = (
+	                    SELECT NVL(
+	                        SUM(ci.PRICE * ci.ORDER_QTY),
+	                        0
+	                    )
+	                    FROM CHECKOUT_ITEM ci
+	                    WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+	                ),
+	                DELIVERY_FEE =
+	                    CASE
+	                        -- 와우 회원이면 무조건 무료배송
+	                        WHEN EXISTS (
+	                            SELECT 1
+	                            FROM WOW_MEMBERSHIP wm
+	                            WHERE wm.MEMBER_NO = c.MEMBER_NO
+	                              AND wm.STATUS = 'ACTIVE'
+	                              OR wm.STATUS = 'CANCEL_PENDING'
+	                        )
+	                        THEN 0
+	                        -- 일반 회원은 19,800원 이상 무료배송
+	                        WHEN (
+	                            SELECT NVL(
+	                                SUM(ci.PRICE * ci.ORDER_QTY),
+	                                0
+	                            )
+	                            FROM CHECKOUT_ITEM ci
+	                            WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+	                        ) >= 19800
+	                        THEN 0
+	                        ELSE 3000
+	                    END,
+	                TOTAL_PRICE =
+	                    GREATEST(
+	                        0,
+	                        (
+	                            SELECT NVL(
+	                                SUM(ci.PRICE * ci.ORDER_QTY),
+	                                0
+	                            )
+	                            FROM CHECKOUT_ITEM ci
+	                            WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+	                        )
+	                        +
+	                        CASE
+	                            -- 와우 회원이면 배송비 0원
+	                            WHEN EXISTS (
+	                                SELECT 1
+	                                FROM WOW_MEMBERSHIP wm
+	                                WHERE wm.MEMBER_NO = c.MEMBER_NO
+	                                  AND wm.STATUS = 'ACTIVE'
+	                                  OR wm.STATUS = 'CANCEL_PENDING'
+	                            )
+	                            THEN 0
+	                            -- 일반 회원 19,800원 이상
+	                            WHEN (
+	                                SELECT NVL(
+	                                    SUM(ci.PRICE * ci.ORDER_QTY),
+	                                    0
+	                                )
+	                                FROM CHECKOUT_ITEM ci
+	                                WHERE ci.CHECKOUT_NO = c.CHECKOUT_NO
+	                            ) >= 19800
+	                            THEN 0
+	                            ELSE 3000
+	                        END
+	                        - NVL(c.INSTANT_DISCOUNT, 0)
+	                        - NVL(c.COUPON_DISCOUNT, 0)
+	                        - NVL(c.CASH_USED, 0)
+	                    )
 	            WHERE c.CHECKOUT_NO = ?
 	            """;
 	    try (

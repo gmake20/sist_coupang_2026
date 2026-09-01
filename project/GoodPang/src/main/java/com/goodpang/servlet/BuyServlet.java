@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 
 import com.goodpang.dao.CheckoutDAO;
+import com.goodpang.dao.WowMembershipDAO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.util.ConnectionProvider;
 import com.goodpang.util.LoginUtil;
@@ -18,6 +19,8 @@ import jakarta.servlet.http.HttpServletResponse;
 public class BuyServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    
+    private final WowMembershipDAO wowDao = new WowMembershipDAO();  
 
     @Override
     protected void doPost(
@@ -131,10 +134,18 @@ public class BuyServlet extends HttpServlet {
             int couponDiscount = 0;
             int cashUsed = 0;
 
-            int deliveryFee =
-                    productAmount >= 19800
-                            ? 0
-                            : 3000;
+            boolean isWowMember = wowDao.isWowMember(memberNo);
+            		
+            int deliveryFee = 0;
+
+            if (isWowMember) {
+            	deliveryFee = 0;
+            } else {
+            	deliveryFee = 
+                        productAmount >= 19800
+                                ? 0
+                                : 3000;
+            }
 
             int totalPrice =
                     productAmount
