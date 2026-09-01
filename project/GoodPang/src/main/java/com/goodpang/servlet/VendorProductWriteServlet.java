@@ -120,6 +120,9 @@ public class VendorProductWriteServlet extends HttpServlet {
 		dto.setProductName(request.getParameter("displayName"));
 		dto.setInternalName(blankToNull(request.getParameter("internalName")));
 
+		String optionYn = request.getParameter("optionYn");
+		dto.setOptionYn("N".equals(optionYn) ? "N" : "Y");
+
 		dto.setManufacturer(blankToNull(request.getParameter("manufacturer")));
 		dto.setCompositionType(request.getParameter("compositionType"));
 		dto.setCertificationType(request.getParameter("certificationType"));

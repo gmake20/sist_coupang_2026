@@ -133,11 +133,15 @@
 
               <div id="optionModeOn">
 
-                <div id="optionGroupList"></div>
+                <div id="optionGroupEditor">
+                  <div id="optionGroupList"></div>
 
-                <button class="btn btn-outline btn-sm" type="button" id="addOptionGroupButton">+ 옵션 그룹 추가 (최대 2개)</button>
+                  <button class="btn btn-outline btn-sm" type="button" id="addOptionGroupButton">+ 옵션 그룹 추가 (최대 2개)</button>
 
-                <a href="#" class="text-link">옵션 구성을 제안하고 싶어요</a>
+                  <a href="#" class="text-link">옵션 구성을 제안하고 싶어요</a>
+                </div>
+
+                <p class="field-hint" id="noOptionHint" hidden>옵션 없이 이 상품가격·재고·이미지 그대로 단일 상품으로 등록됩니다.</p>
 
                 <p class="option-count">옵션 목록 (총 <span id="optionCount">0</span>개) <span class="required-dot">•</span>
                 </p>
@@ -782,7 +786,10 @@
       }
 
       setupTabGroup("optionModeTabs", function (button) {
-        document.getElementById("optionModeOn").hidden = button.dataset.mode !== "on";
+        optionMode = button.dataset.mode;
+        document.getElementById("optionGroupEditor").hidden = optionMode !== "on";
+        document.getElementById("noOptionHint").hidden = optionMode === "on";
+        renderOptionTable();
       });
 
       setupTabGroup("imageModeTabs");
@@ -883,6 +890,8 @@
 
       const MAX_OPTION_GROUPS = 2;
 
+      let optionMode = "on"; // "on" = 옵션 설정함, "off" = 설정 안 함(단일 상품)
+
       const optionGroups = [
         { name: "사이즈", values: [] },
         { name: "색상", values: [] }
@@ -971,18 +980,26 @@
         const tbody = document.getElementById("optionTableBody");
         const emptyRow = document.getElementById("optionEmptyRow");
 
-        const activeGroups = optionGroups.filter((group) => group.values.length > 0);
+        let combinations;
 
-        const combinations = activeGroups.length === 0
-          ? []
-          : cartesianCombine(activeGroups).map(function (parts) {
-              return {
-                label: parts.map((part) => part.value).join(", "),
-                option1: parts[0] || null,
-                option2: parts[1] || null,
-                option3: parts[2] || null
-              };
-            });
+        if (optionMode === "off") {
+          // 옵션 설정 안 함 — PRODUCT_OPTION에는 옵션값 없이 단일 행 하나만 만들어서
+          // 기존 옵션별 가격/재고/이미지 등록 UI·서버 로직을 그대로 재사용한다.
+          combinations = [{ label: "단일 상품 (옵션 없음)", option1: null, option2: null, option3: null }];
+        } else {
+          const activeGroups = optionGroups.filter((group) => group.values.length > 0);
+
+          combinations = activeGroups.length === 0
+            ? []
+            : cartesianCombine(activeGroups).map(function (parts) {
+                return {
+                  label: parts.map((part) => part.value).join(", "),
+                  option1: parts[0] || null,
+                  option2: parts[1] || null,
+                  option3: parts[2] || null
+                };
+              });
+        }
 
         currentCombinations = combinations;
 
@@ -1555,7 +1572,7 @@
           return false;
         }
 
-        if (optionGroups.some((group) => group.values.length > 0 && !group.name.trim())) {
+        if (optionMode === "on" && optionGroups.some((group) => group.values.length > 0 && !group.name.trim())) {
           alert("옵션명을 입력해주세요.");
           return false;
         }
@@ -1634,6 +1651,7 @@
         formData.append("initialShippingFee", document.getElementById("initialShippingFee").value);
         formData.append("returnShippingFee", document.getElementById("returnShippingFee").value);
 
+        formData.append("optionYn", optionMode === "off" ? "N" : "Y");
         formData.append("optionCount", rows.length);
 
         rows.forEach(function (row, i) {
