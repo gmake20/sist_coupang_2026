@@ -33,6 +33,9 @@ public class OrderDetailDTO {
     private String detailAddress;
     private String memberName;
     private String phone;
+    
+    // 주문번호 당 총 가격
+    private int finalTotalPrice;
  
     
  // [취소/반품(PRODUCT_RETURN) 관련 추가 필드]

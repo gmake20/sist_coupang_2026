@@ -18,6 +18,7 @@ import com.goodpang.dto.ProductDTO;
 import com.goodpang.dto.ProductImageDTO;
 import com.goodpang.dto.ProductOptionDTO;
 import com.goodpang.dto.ReviewDTO;
+import com.goodpang.dao.ProductViewLogDAO;
 import com.google.gson.Gson;
 
 import jakarta.servlet.ServletException;

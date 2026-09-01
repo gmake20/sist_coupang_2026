@@ -187,11 +187,14 @@
 
 /* ── 빵부스러기 ─────────────────────────────
    "굿팡 홈 > 뷰티 > 헤어스타일링" 처럼 현재 위치를 보여주는 줄.
-   > 기호는 글자로 치지 않고 CSS 로 넣음 — HTML 에는 뜻이 있는 글자만 남기려고 */
+   > 기호는 글자로 치지 않고 CSS 로 넣음 — HTML 에는 뜻이 있는 글자만 남기려고
+   2026-08-31: 글자색이 회색(var(--text-gray))이었는데, 로그인해서 실제 쿠팡을
+   Playwright 로 열어 getComputedStyle 로 재보니 전부 완전 검정(rgb(0,0,0))이었음 —
+   화살표(>)만 옅은 회색(#AAB5C0)이고 글자 자체는 안 흐림 */
 .product-page .breadcrumb {
   padding: 12px 0;
   font-size: 12px;
-  color: var(--text-gray);
+  color: #000;
 }
 
 .product-page .breadcrumb ol {
@@ -203,11 +206,11 @@
 .product-page .breadcrumb li + li::before {
   content: '\003E';          /* > */
   margin: 0 6px;
-  color: #ccc;
+  color: #aab5c0;
 }
 
 .product-page .breadcrumb a {
-  color: var(--text-gray);
+  color: #000;
 }
 
 .product-page .breadcrumb a:hover {
@@ -360,12 +363,12 @@
   color: #212b36;
 }
 
-/* 찜 / 공유 — 원본은 SVG 아이콘.
-   ★ 임시 ★ 아이콘 파일이 없어서 글자(♡ ↗)로 대신 그림.
-   아이콘이 생기면 content 를 지우고 background-image 로 바꾸면 됨 */
+/* 찜 / 공유 — 2026-08-31: 로그인해서 실제 쿠팡을 Playwright 로 열어 다시 실측함.
+   전엔 "테두리 있는 원 버튼 + 선(stroke) 아이콘"으로 지어냈는데, 원본은 테두리/배경이
+   아예 없는 38x38 버튼에 채워진(fill) 도형 아이콘(20x20, #454F5B)이었음 — 완전히 다시 그림 */
 .product-page .wish-and-share {
   display: flex;
-  gap: 8px;
+  gap: 0;
   flex: none;
 }
 
@@ -373,28 +376,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--line-gray);
-  border-radius: 50%;
-  background: #fff;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  background: none;
   cursor: pointer;
 }
 
-/* 찜/공유 아이콘 — 글자(♡ ↗)로 그리면 원본과 모양이 다르고 폰트마다 달라져서
-   SVG 로 바꿈 (2026-08-21). 선으로만 그림: fill 없음 + stroke 로 윤곽선 */
 .product-page .wish-and-share svg {
-  width: 21px;
-  height: 21px;
-  fill: none;
-  stroke: #555;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  width: 20px;
+  height: 20px;
+  fill: #454f5b;
 }
 
-.product-page .wish-and-share button:hover {
-  border-color: #999;
+.product-page .wish-and-share button:hover svg {
+  fill: #212b36;
 }
 
 /* 별점 줄
@@ -452,12 +448,21 @@
   color: #212b36;
 }
 
-/* 판매가 — 실측 22px / 700 */
+/* 판매가 — 2026-08-31: 로그인해서 실제 쿠팡을 Playwright 로 재보니 22px/#212b36 이 아니라
+   20px/rgb(203,20,0)(빨강)이었음. 할인율(.discount)은 진회색이 맞는데 판매가 자체는 빨강 */
 .product-page .total-price {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
-  line-height: 26px;
-  color: #212b36;
+  line-height: 24px;
+  color: #cb1400;
+}
+
+/* "할인" 라벨 — 판매가 옆에 있는데 우리 코드엔 아예 없었음(2026-08-31 추가).
+   실측: 14px, 판매가와 같은 빨강 */
+.product-page .discount-label {
+  margin-left: 2px;
+  font-size: 14px;
+  color: #cb1400;
 }
 
 /* 배지 2개 — 원본은 이미지(79x16 / 29x16).
@@ -522,13 +527,75 @@
   line-height: 1;
 }
 
-/* 가격 아래 구분선 — 실측 1px / #dfe3e8 / margin 16px 0
-   <hr> 은 브라우저 기본 테두리가 있어서 border:0 으로 지우고 배경색으로 그림 */
-.product-page .price-bottom-divider {
-  height: 1px;
-  margin: 16px 0;
-  border: 0;
-  background: #dfe3e8;
+/* 2026-08-31: 여기 있던 .price-bottom-divider(가격 아래 회색 구분선)를 지움 —
+   로그인해서 실제 쿠팡을 Playwright 로 재보니 가격/배송 블록 사이에 선이 아예 없었음.
+   (JSP 에서도 <hr> 자체를 뺐음) */
+
+/* ── 와우회원 배지 (2026-08-31 추가) ──────────────
+   로그인해서 실제 쿠팡 와우회원 화면을 Playwright 로 열어 실측한 값 그대로 옮김.
+   로고는 실제 쿠팡 파일(wow@2x.png)을 사용자가 받아와서 webapp/images/ 에 넣음 —
+   webapp/images/gnb/wow.png 는 GNB 용이라 모양이 다르니(원형 %+WOW) 헷갈리지 말 것 */
+.product-page .wow-benefit-badge {
+  margin-top: 16px;
+}
+
+/* 로고 + "고객님은 와우회원으로" — 한 줄 */
+.product-page .wow-benefit-badge-top {
+  display: flex;
+  align-items: center;
+}
+
+/* 실측 40x16 — 파일 원본은 70x28(@2x 표기인데 정확히 2배는 아님)이라
+   width/height 를 실측값으로 못박아서 항상 같은 크기로 나오게 함 */
+.product-page .wow-benefit-badge-logo {
+  flex: none;
+  width: 40px;
+  height: 16px;
+}
+
+/* "고객님은 와우회원으로" — 실측 14px, "와우회원"만 700/파랑(rgb(78,131,212)) */
+.product-page .wow-benefit-badge-title {
+  margin-left: 4px;
+  font-size: 14px;
+  color: #111;
+}
+
+.product-page .wow-benefit-badge-title strong {
+  font-weight: 700;
+  color: rgb(78, 131, 212);
+}
+
+/* 초록 박스(실측 rgb(0,140,0) / border-radius 2px) — width 를 안 정하면
+   flex 가 내용 크기만큼만 잡아줘서(fit-content) 원본처럼 짧게 나옴.
+   ★ 예전엔 flex-basis:100% 를 써서 부모 폭(437px)까지 늘어나버려 너무 길어 보였던 버그가 있었음 */
+.product-page .wow-benefit-badge-items {
+  display: flex;
+  width: fit-content;
+  margin-top: 4px;
+  padding: 0 4px;
+  border-radius: 2px;
+  background: rgb(0, 140, 0);
+}
+
+.product-page .wow-benefit-badge-items li {
+  display: flex;
+  align-items: center;
+  padding: 4px 3px;
+  font-size: 12px;
+  color: #fff;
+}
+
+/* 체크 아이콘 — 실측 12x12 / margin-right 4px */
+.product-page .wow-benefit-check {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 
@@ -810,8 +877,9 @@
   flex: none;
   width: 83px;
   height: 42px;
-  border: 1px solid var(--line-gray);
-  border-radius: 2px;
+  margin-right: 10px;      /* 2026-08-31: 옆 버튼과 붙어있었는데 원본은 10px 떨어져 있었음 */
+  border: 1px solid #ccc;  /* 2026-08-31: var(--line-gray)(#ddd) 대신 실측값(#ccc) */
+  border-radius: 0;        /* 2026-08-31: 2px 줬었는데 원본은 각짐(0) */
   overflow: hidden;
 }
 
@@ -821,7 +889,9 @@
   border: 0;
   padding-left: 12px;
   background: #fff;
-  font-size: 14px;
+  font-size: 16px;    /* 2026-08-31: 14px → 실측 16px */
+  font-weight: 700;   /* 2026-08-31: 굵기 없었는데 원본은 굵게 */
+  color: #111;        /* 2026-08-31: 색 지정 없었음 */
 }
 
 /* 위/아래 버튼을 세로로 쌓는 칸 */
@@ -871,13 +941,14 @@
 }
 
 
-/* 두 버튼 공통 — 실측 높이 42 / 16px / 700 */
+/* 두 버튼 공통 — 실측 높이 42 / 16px / 700.
+   2026-08-31: border-radius:2px 를 줬었는데 실제로 재보니 0(완전 각짐)이었음 */
 .product-page .prod-cart-btn,
 .product-page .prod-buy-btn {
   flex: 1;
   height: 42px;
   border: 1px solid var(--coupang-blue);
-  border-radius: 2px;
+  border-radius: 0;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
@@ -926,7 +997,7 @@
   gap: 4px;
   height: 42px;
   border: 0;
-  border-radius: 2px;
+  border-radius: 0;   /* 2026-08-31: 다른 두 버튼과 맞춤(실측 0) */
   color: #fff;
   background: var(--coupang-blue);
   font-size: 16px;
@@ -1600,28 +1671,65 @@
 /* ★ 2026-08-27: 별점을 유니코드 글자(★★★★☆)로 그리면 폰트마다 생김새가 달라져서
    원본이랑 다르게 보임. 원본(ref/product/coupang_product.html) 실제로 열어서 대조해보니
    원본은 글자가 아니라 스프라이트 이미지 2장을 겹쳐서 씀 —
-     ① 바깥(.star-rating): 회색 빈 별 5개짜리 배경 (60x12, 스프라이트 아래쪽 절반)
+     ① 바깥(.star-rating): 회색 빈 별 5개짜리 배경 (스프라이트 아래쪽 절반)
      ② 안쪽(em, width:rating*20%): 주황 채운 별 배경을 rating 비율만큼만 폭을 줘서
         위에 겹쳐 보이게 함(별도 position 없이, 안쪽 요소가 그리는 순서상 위에 그려짐)
    이미지는 원본 CDN(img1a.coupangcdn.com, CLAUDE.md 6장에서 승인된 도메인)에서 받아둔 것
-   (images/icons/star_rating_improve_design.png) */
+   (images/icons/star_rating_improve_design.png)
+   2026-08-31: 60x12 로 썼는데 로그인해서 실제 쿠팡을 Playwright 로 다시 재보니 70x14 였음
+   (원래 있던 이미지는 60x24 짜리라 background-size 로 70x28 까지 통째로 키워서 맞춤 —
+   비율은 그대로라 별 모양은 안 찌그러짐) */
 .product-page .star-rating {
   display: block;
-  width: 60px;
-  height: 12px;
+  width: 70px;
+  height: 14px;
   background-image: url(../images/icons/star_rating_improve_design.png);
   background-repeat: no-repeat;
-  background-size: 60px 24px;
-  background-position: 0 -12px;   /* 아래쪽 절반 = 빈 별(회색) */
+  background-size: 70px 28px;
+  background-position: 0 -14px;   /* 아래쪽 절반 = 빈 별(회색) */
 }
 
 .product-page .star-rating em {
   display: block;
-  height: 12px;
+  height: 14px;
   background-image: url(../images/icons/star_rating_improve_design.png);
   background-repeat: no-repeat;
-  background-size: 60px 24px;
+  background-size: 70px 28px;
   background-position: 0 0;       /* 위쪽 절반 = 채운 별(주황) */
+}
+
+/* 2026-08-31: .star-rating 하나를 ATF/리뷰요약/리뷰카드 세 군데서 같은 크기로 재사용하고
+   있었는데, 로그인해서 실제 쿠팡을 Playwright 로 재보니 이 셋이 전부 크기가 달랐음
+   (별 1개 기준 — ATF 14px / 리뷰 섹션 큰 요약 24px / 개별 리뷰 카드 16px).
+   위 기본값(70x14, 14px)은 ATF 용이고, 아래 두 개는 문맥별로 덮어씀.
+   원본 이미지가 60x24(스타 1개당 12px, 위/아래 두 줄)라 배율만 다르게 줘도 별 모양은
+   안 찌그러짐 — 계산: 목표폭 ÷ 60 = 배율, 목표높이 = 12 × 배율 */
+.product-page .review-score .star-rating {
+  width: 120px;
+  height: 24px;
+  background-size: 120px 48px;
+  background-position: 0 -24px;
+}
+
+.product-page .review-score .star-rating em {
+  height: 24px;
+  background-size: 120px 48px;
+  background-position: 0 0;
+}
+
+.product-page .review-writer .meta .star-rating,
+.product-page .viewer-writer .meta .star-rating {
+  width: 80px;
+  height: 16px;
+  background-size: 80px 32px;
+  background-position: 0 -16px;
+}
+
+.product-page .review-writer .meta .star-rating em,
+.product-page .viewer-writer .meta .star-rating em {
+  height: 16px;
+  background-size: 80px 32px;
+  background-position: 0 0;
 }
 
 .product-page .review-writer .date {
@@ -2437,6 +2545,7 @@
 
 /* 가격 전부 회색 */
 .is-soldout .product-page .discount,
+.is-soldout .product-page .discount-label,
 .is-soldout .product-page .total-price,
 .is-soldout .product-page .origin-price {
   color: #aab5c0;
@@ -2457,7 +2566,8 @@
 }
 
 .is-soldout .product-page .delivery-date,
-.is-soldout .product-page .radio-group {
+.is-soldout .product-page .radio-group,
+.is-soldout .product-page .wow-benefit-badge {
   display: none;
 }
 

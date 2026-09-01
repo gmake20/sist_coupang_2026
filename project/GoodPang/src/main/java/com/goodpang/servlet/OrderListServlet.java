@@ -1,17 +1,11 @@
 package com.goodpang.servlet;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.naming.NamingException;
 
 import com.goodpang.dao.OrderListDAO;
-import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.dto.OrderItemDTO;
-import com.goodpang.dto.ReviewAvailableDTO;
 import com.goodpang.util.LoginUtil;
 
 import jakarta.servlet.ServletException;
@@ -20,46 +14,51 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-//http://localhost:8080/GoodPang/order/order_list
 @WebServlet("/order/order_list")
 public class OrderListServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    	
-        MemberDTO loginMember =
-                LoginUtil.requireLogin(
-                        request,
-                        response
-                );
 
-        if (loginMember == null) {
-            return;
+        MemberDTO loginMember = LoginUtil.requireLogin(request, response);
+        if (loginMember == null) return;
+
+        int memberNo = loginMember.getMemberNo();
+
+        // 1. 연도 필터 및 페이지 설정
+        String yearFilter = request.getParameter("year");
+        if (yearFilter == null || yearFilter.trim().isEmpty()) {
+            yearFilter = "recent";
         }
 
-        int memberNo =
-                loginMember.getMemberNo();
+        int curPage = 1;
+        String pageParam = request.getParameter("page");
+        if (pageParam != null && !pageParam.trim().isEmpty()) {
+            try {
+                curPage = Integer.parseInt(pageParam.trim());
+            } catch (NumberFormatException e) {
+                curPage = 1;
+            }
+        }
 
-        ReviewDAO reviewDAO = new ReviewDAO();
+        int pageSize = 5;
 
-        List<ReviewAvailableDTO> reviewList =
-                reviewDAO.getReviewStatus(memberNo);
+        // 2. OrderListDAO 연동
+        OrderListDAO dao = new OrderListDAO();
+        int totalCount = dao.getOrderCount(memberNo, yearFilter);
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+        if (totalPages == 0) totalPages = 1;
 
-        request.setAttribute("reviewList", reviewList);
-       
-        OrderListDAO orderListDAO = new OrderListDAO();
-        List<OrderItemDTO> orderList = null;
-		try {
-			orderList = orderListDAO.selectMyPageOrders(memberNo);
-		} catch (NamingException e) {
-			e.printStackTrace();
-		}
-		
+        List<OrderItemDTO> orderList = dao.getOrderListPaged(memberNo, yearFilter, curPage, pageSize);
+
+        // 3. JSP 데이터 바인딩
         request.setAttribute("orderList", orderList);
+        request.setAttribute("yearFilter", yearFilter);
+        request.setAttribute("curPage", curPage);
+        request.setAttribute("totalPages", totalPages);
 
-        request.getRequestDispatcher("/order_list.jsp")
-               .forward(request, response);
-            
+        request.getRequestDispatcher("/order_list.jsp").forward(request, response);
     }
 }
