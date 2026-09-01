@@ -7,7 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${p.productName}- ${p.subCategoryName} | 굿팡</title>
+<title>${p.productName}-${p.subCategoryName}|굿팡</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet"
@@ -214,7 +214,8 @@
 							<!-- "할인" 라벨 — 2026-08-31 추가. 로그인해서 실제 쿠팡을 Playwright 로 열어보니
 							     판매가 옆에 이 글자가 따로 있었는데 우리 코드엔 없었음. 정상가(할인 전)가
 							     있을 때만(=진짜 할인 중일 때만) 보이는 게 맞아서 discount 와 같은 조건 씀 -->
-							<span class="discount-label"${empty displayNormalPrice ? ' style="display:none"' : ''}>할인</span>
+							<span class="discount-label"
+								${empty displayNormalPrice ? ' style="display:none"' : ''}>할인</span>
 							<span class="badge-rocket">로켓배송</span> <span
 								class="badge-tomorrow">내일도착</span>
 						</div>
@@ -235,17 +236,20 @@
 								<div class="wow-benefit-badge-top">
 									<img class="wow-benefit-badge-logo"
 										src="${pageContext.request.contextPath}/images/wow@2x.png"
-										alt="와우">
-									<span class="wow-benefit-badge-title">고객님은 <strong>와우회원</strong>으로</span>
+										alt="와우"> <span class="wow-benefit-badge-title">고객님은
+										<strong>와우회원</strong>으로
+									</span>
 								</div>
 								<!-- 체크 아이콘 — 원본은 static.coupangcdn.com 이미지(승인 안 된 도메인)라
 								     못 받아옴. 공유 아이콘(위 svg)과 같은 방식으로 인라인 SVG 로 정확한
 								     크기(12x12)만 맞춰 그림. 나중에 실제 아이콘 파일 받으면 img 로 교체 가능 -->
 								<ul class="wow-benefit-badge-items">
-									<li><svg class="wow-benefit-check" viewBox="0 0 12 12" aria-hidden="true">
+									<li><svg class="wow-benefit-check" viewBox="0 0 12 12"
+											aria-hidden="true">
 											<polyline points="2.5,6.2 5,9 9.5,3.3" />
 										</svg>무조건 무료배송</li>
-									<li><svg class="wow-benefit-check" viewBox="0 0 12 12" aria-hidden="true">
+									<li><svg class="wow-benefit-check" viewBox="0 0 12 12"
+											aria-hidden="true">
 											<polyline points="2.5,6.2 5,9 9.5,3.3" />
 										</svg>무료반품</li>
 								</ul>
@@ -304,8 +308,8 @@
 					     우리는 그런 페이지가 없어서 href="#" 로 자리만 잡음 -->
 					<div class="seller-info">
 						<div class="seller-info-row">
-							판매자: <a href="#" class="seller-info-link">${p.storeName}
-								<span class="seller-info-visit">판매자 상품 보러가기</span>
+							판매자: <a href="#" class="seller-info-link">${p.storeName} <span
+								class="seller-info-visit">판매자 상품 보러가기</span>
 							</a>
 						</div>
 					</div>
@@ -990,35 +994,67 @@
 											<span class="review-avatar"></span>
 											<div class="review-writer">
 												<strong class="name">${r.maskedName}</strong> <span
-													class="seller">${r.storeName}</span>
+													class="seller"> ${r.storeName} </span>
 												<div class="meta">
-													<span class="star-rating" aria-label="별점 ${r.rating}점"><em
-														style="width:${r.rating * 20}%"></em></span> <span class="date">${r.reviewDate}</span>
+													<span class="star-rating" aria-label="별점 ${r.rating}점">
+														<em style="width:${r.rating * 20}%"></em>
+													</span> <span class="date"> ${r.reviewDate} </span>
 												</div>
 											</div>
 										</div>
-										<!-- 한줄요약(REVIEW.REVIEW_SUMMARY) — 2026-08-27 추가. 없는(NULL) 리뷰도 있어서
-                   있을 때만 보여줌. .review-headline 은 예전에 더미 리뷰에 있다가 DB 연동하면서 한 번 빠졌던 자리(js/product.js 354행 주석 참고) —그 자리 그대로 씀 -->
+										<c:if test="${not empty r.productName}">
+											<p class="review-option">
+												${r.productName}
+												<c:if test="${not empty r.optionText}">
+							· ${r.optionText}
+						</c:if>
+											</p>
+										</c:if>
+										<!-- 리뷰 사진 -->
+										<c:if test="${not empty r.imageUrls}">
+											<div class="review-photos">
+
+												<c:forEach items="${r.imageUrls}" var="imageUrl">
+													<div class="review-photo-item">
+
+														<%-- <img src="${pageContext.request.contextPath}${imageUrl}"
+															alt="리뷰 이미지" class="review-photo-img"> --%>
+														<img src="${pageContext.request.contextPath}${imageUrl}"
+															alt="리뷰 이미지" class="review-photo-img"
+															onclick="openReviewImage(this.src)">
+													</div>
+												</c:forEach>
+											</div>
+										</c:if>
+
+										<!-- 한줄 요약 -->
 										<c:if test="${not empty r.reviewSummary}">
 											<p class="review-headline">${r.reviewSummary}</p>
 										</c:if>
-										<c:if test="${not empty r.productName}">
-											<p class="review-option">${r.productName}<c:if
-													test="${not empty r.optionText}"> · ${r.optionText}</c:if>
-											</p>
-										</c:if>
+
+										<!-- 상세 리뷰 -->
 										<p class="review-text">${r.reviewContent}</p>
+
 										<div class="review-foot">
 											<button type="button" class="btn-helpful">도움이 돼요</button>
-											<a href="#" class="btn-report">신고하기</a>
+
+											<a href="#" class="btn-report"> 신고하기 </a>
 										</div>
+
 									</article>
+
 								</c:forEach>
+
 							</c:when>
+
 							<c:otherwise>
 								<p class="review-empty">조건에 맞는 후기가 없어요</p>
 							</c:otherwise>
+
 						</c:choose>
+
+
+
 						<!-- 페이지네이션 — 원본 실측(ref/product/vp_05_review2.jpeg): "‹ (1) 2 ›" 모양,
 						     지금 고른 페이지만 파란 원 테두리.
 						     번호 버튼은 JS(setupReviewTools)가 리뷰 개수를 보고 그때그때 새로 그림 —
@@ -1202,9 +1238,9 @@
 						</tr>
 						<tr>
 							<th>상호/대표자</th>
-							<td>${p.storeName} / ${p.ceoName}</td>
+							<td>${p.storeName}/${p.ceoName}</td>
 							<th>사업장 소재지</th>
-							<td>${p.businessAddress} ${p.businessDetailAddress}</td>
+							<td>${p.businessAddress}${p.businessDetailAddress}</td>
 						</tr>
 						<tr>
 							<th>e-mail</th>
@@ -2048,8 +2084,54 @@
             color ? color.value : "";
     });
 });
+	
+	
 </script>
+<div id="reviewImageModal"
+	class="review-image-modal"
+	onclick="closeReviewImage()">
 
+	<div class="review-image-modal-content"
+		onclick="event.stopPropagation();">
+
+		<button type="button"
+			class="review-image-close"
+			onclick="closeReviewImage()">
+			×
+		</button>
+
+		<img id="reviewImageLarge"
+			src=""
+			alt="확대된 리뷰 이미지">
+	</div>
+</div>
+<script>
+function openReviewImage(src) {
+	const modal = document.getElementById("reviewImageModal");
+	const image = document.getElementById("reviewImageLarge");
+
+	image.src = src;
+	modal.classList.add("show");
+
+	document.body.style.overflow = "hidden";
+}
+
+function closeReviewImage() {
+	const modal = document.getElementById("reviewImageModal");
+	const image = document.getElementById("reviewImageLarge");
+
+	modal.classList.remove("show");
+	image.src = "";
+
+	document.body.style.overflow = "";
+}
+
+document.addEventListener("keydown", function(event) {
+	if (event.key === "Escape") {
+		closeReviewImage();
+	}
+});
+</script>
 </body>
 </html>
 

@@ -1,9 +1,10 @@
 package com.goodpang.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,4 +32,6 @@ public class ReviewDTO2 {
     private String ratingStars;
     
     private int productNo;
+    
+    private List<String> imageUrls = new ArrayList<>();
 }
