@@ -43,7 +43,7 @@ public class OrderListServlet extends HttpServlet {
             }
         }
 
-        int pageSize = 5;
+        int pageSize = 3;
 
         // 2. OrderListDAO 연동
         OrderListDAO dao = new OrderListDAO();

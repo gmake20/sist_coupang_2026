@@ -50,14 +50,17 @@ public class OrderDetailServlet extends HttpServlet {
                 int orderNo = Integer.parseInt(orderNoParam.trim());
 
                 OrderDetailDAO dao = new OrderDetailDAO();
-                detailList = dao.getOrderDetailList(orderNo);
+                detailList = dao.getOrderDetailList(orderNo , memberNo);
 
                 // 주문 공통 정보(수령인, 배송지, 결제수단 등)를 JSP 상단에서 편하게 쓰기 위해 첫 번째 항목 바인딩
+				/*
+				 * if (detailList != null && !detailList.isEmpty()) { int result_size =
+				 * detailList.size() -1; orderInfo = detailList.get(result_size); }
+				 */
                 if (detailList != null && !detailList.isEmpty()) {
-                	int result_size = detailList.size() -1;
-                    orderInfo = detailList.get(result_size);
+                    orderInfo = detailList.get(0);
                 }
-
+                
                 int resultCount = (detailList != null) ? detailList.size() : 0;
                 System.out.println("[DEBUG OrderDetailServlet] DB 조회 완료건: " + resultCount);
             }
