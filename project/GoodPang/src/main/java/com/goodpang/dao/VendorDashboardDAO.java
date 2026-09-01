@@ -1,6 +1,7 @@
 package com.goodpang.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.format.DateTimeFormatter;
@@ -16,36 +17,37 @@ import com.goodpang.util.ConnectionProvider;
  */
 public class VendorDashboardDAO {
 
-    // 오늘/어제 주문수·매출·방문자수·상품노출수 - 이 판매자 상품 기준, 주문취소 건은 매출/주문수에서 제외
-    public VendorDashboardStatDTO getTodayStat(int sellerNo) {
+    // 기준일/전날 주문수·매출·방문자수·상품노출수 - 이 판매자 상품 기준, 주문취소 건은 매출/주문수에서 제외
+    public VendorDashboardStatDTO getTodayStat(int sellerNo, Date targetDate) {
 
         VendorDashboardStatDTO dto = new VendorDashboardStatDTO();
 
-        fillOrderSalesStat(dto, sellerNo);
-        fillTrafficStat(dto, sellerNo);
+        fillOrderSalesStat(dto, sellerNo, targetDate);
+        fillTrafficStat(dto, sellerNo, targetDate);
 
         return dto;
     }
 
-    // 오늘/어제 주문수·매출 - 이 판매자 상품이 포함된 주문(ORDER_DETAIL) 기준, 주문취소 건 제외
-    private void fillOrderSalesStat(VendorDashboardStatDTO dto, int sellerNo) {
+    // 기준일/전날 주문수·매출 - 이 판매자 상품이 포함된 주문(ORDER_DETAIL) 기준, 주문취소 건 제외
+    private void fillOrderSalesStat(VendorDashboardStatDTO dto, int sellerNo, Date targetDate) {
 
         String sql = """
             SELECT
-                COUNT(DISTINCT CASE WHEN TRUNC(O.ORDER_DATE) = TRUNC(SYSDATE)
+                COUNT(DISTINCT CASE WHEN TRUNC(O.ORDER_DATE) = D.TARGET_DATE
                                      THEN O.ORDER_NO END) AS TODAY_ORDER_COUNT,
-                NVL(SUM(CASE WHEN TRUNC(O.ORDER_DATE) = TRUNC(SYSDATE)
+                NVL(SUM(CASE WHEN TRUNC(O.ORDER_DATE) = D.TARGET_DATE
                               THEN OD.PRICE * OD.ORDER_QTY END), 0) AS TODAY_SALES,
-                COUNT(DISTINCT CASE WHEN TRUNC(O.ORDER_DATE) = TRUNC(SYSDATE) - 1
+                COUNT(DISTINCT CASE WHEN TRUNC(O.ORDER_DATE) = D.TARGET_DATE - 1
                                      THEN O.ORDER_NO END) AS YESTERDAY_ORDER_COUNT,
-                NVL(SUM(CASE WHEN TRUNC(O.ORDER_DATE) = TRUNC(SYSDATE) - 1
+                NVL(SUM(CASE WHEN TRUNC(O.ORDER_DATE) = D.TARGET_DATE - 1
                               THEN OD.PRICE * OD.ORDER_QTY END), 0) AS YESTERDAY_SALES
             FROM ORDER_DETAIL OD
                 JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
                 JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                CROSS JOIN (SELECT ? AS TARGET_DATE FROM DUAL) D
             WHERE P.SELLER_NO = ?
               AND O.ORDER_STATUS != '주문취소'
-              AND TRUNC(O.ORDER_DATE) IN (TRUNC(SYSDATE), TRUNC(SYSDATE) - 1)
+              AND TRUNC(O.ORDER_DATE) IN (D.TARGET_DATE, D.TARGET_DATE - 1)
             """;
 
         try (
@@ -53,7 +55,8 @@ public class VendorDashboardDAO {
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
 
-            pstmt.setInt(1, sellerNo);
+            pstmt.setDate(1, targetDate);
+            pstmt.setInt(2, sellerNo);
 
             try (ResultSet rs = pstmt.executeQuery()) {
 
@@ -71,25 +74,26 @@ public class VendorDashboardDAO {
     }
 
     /*
-     * 오늘/어제 방문자수·상품노출수 - PRODUCT_VIEW_LOG(상품 상세페이지 조회 로그) 기준.
+     * 기준일/전날 방문자수·상품노출수 - PRODUCT_VIEW_LOG(상품 상세페이지 조회 로그) 기준.
      * 방문자수 = 세션ID 중복제거(COUNT DISTINCT), 상품노출수 = 조회 건수 그대로(COUNT).
      */
-    private void fillTrafficStat(VendorDashboardStatDTO dto, int sellerNo) {
+    private void fillTrafficStat(VendorDashboardStatDTO dto, int sellerNo, Date targetDate) {
 
         String sql = """
             SELECT
-                COUNT(DISTINCT CASE WHEN TRUNC(L.VIEW_DATE) = TRUNC(SYSDATE)
+                COUNT(DISTINCT CASE WHEN TRUNC(L.VIEW_DATE) = D.TARGET_DATE
                                      THEN L.SESSION_ID END) AS TODAY_VISITOR_COUNT,
-                COUNT(CASE WHEN TRUNC(L.VIEW_DATE) = TRUNC(SYSDATE)
+                COUNT(CASE WHEN TRUNC(L.VIEW_DATE) = D.TARGET_DATE
                            THEN 1 END) AS TODAY_VIEW_COUNT,
-                COUNT(DISTINCT CASE WHEN TRUNC(L.VIEW_DATE) = TRUNC(SYSDATE) - 1
+                COUNT(DISTINCT CASE WHEN TRUNC(L.VIEW_DATE) = D.TARGET_DATE - 1
                                      THEN L.SESSION_ID END) AS YESTERDAY_VISITOR_COUNT,
-                COUNT(CASE WHEN TRUNC(L.VIEW_DATE) = TRUNC(SYSDATE) - 1
+                COUNT(CASE WHEN TRUNC(L.VIEW_DATE) = D.TARGET_DATE - 1
                            THEN 1 END) AS YESTERDAY_VIEW_COUNT
             FROM PRODUCT_VIEW_LOG L
                 JOIN PRODUCT P ON L.PRODUCT_NO = P.PRODUCT_NO
+                CROSS JOIN (SELECT ? AS TARGET_DATE FROM DUAL) D
             WHERE P.SELLER_NO = ?
-              AND TRUNC(L.VIEW_DATE) IN (TRUNC(SYSDATE), TRUNC(SYSDATE) - 1)
+              AND TRUNC(L.VIEW_DATE) IN (D.TARGET_DATE, D.TARGET_DATE - 1)
             """;
 
         try (
@@ -97,7 +101,8 @@ public class VendorDashboardDAO {
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
 
-            pstmt.setInt(1, sellerNo);
+            pstmt.setDate(1, targetDate);
+            pstmt.setInt(2, sellerNo);
 
             try (ResultSet rs = pstmt.executeQuery()) {
 

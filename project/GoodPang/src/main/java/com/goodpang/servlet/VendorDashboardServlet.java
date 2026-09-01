@@ -1,7 +1,12 @@
 package com.goodpang.servlet;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.goodpang.dao.VendorDashboardDAO;
 import com.goodpang.dao.VendorOrderListDAO;
@@ -26,6 +31,7 @@ public class VendorDashboardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private static final Gson gson = new Gson();
+	private static final String[] DAY_NAMES = { "일", "월", "화", "수", "목", "금", "토" };
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -37,9 +43,16 @@ public class VendorDashboardServlet extends HttpServlet {
 			return;
 		}
 
+		LocalDate today = LocalDate.now();
+		LocalDate selectedDate = parseSelectedDate(request.getParameter("date"), today);
+
 		VendorDashboardDAO dao = new VendorDashboardDAO();
-		VendorDashboardStatDTO dashboardStat = dao.getTodayStat(loginSeller.getSellerNo());
+		VendorDashboardStatDTO dashboardStat = dao.getTodayStat(loginSeller.getSellerNo(), java.sql.Date.valueOf(selectedDate));
 		request.setAttribute("dashboardStat", dashboardStat);
+
+		request.setAttribute("selectedDate", selectedDate.toString());
+		request.setAttribute("selectedDateLabel", formatDateLabel(selectedDate));
+		request.setAttribute("dateOptions", buildDateOptions(today));
 
 		// 주문/배송 현황 패널(배송중·배송완료) - vendor-order.jsp 상단 카드와 같은 집계를 재사용
 		VendorOrderListDAO orderListDAO = new VendorOrderListDAO();
@@ -57,6 +70,44 @@ public class VendorDashboardServlet extends HttpServlet {
 		request.setAttribute("monthlySalesJson", gson.toJson(monthlySales));
 
 		request.getRequestDispatcher("/WEB-INF/views/vendor-dashboard.jsp").forward(request, response);
+	}
+
+	// ?date=yyyy-MM-dd 파라미터를 파싱. 형식이 잘못됐거나 미래 날짜면 오늘로 대체한다.
+	private LocalDate parseSelectedDate(String dateParam, LocalDate today) {
+
+		if (dateParam == null || dateParam.isBlank()) {
+			return today;
+		}
+
+		try {
+			LocalDate parsed = LocalDate.parse(dateParam.trim());
+			return parsed.isAfter(today) ? today : parsed;
+		} catch (DateTimeParseException e) {
+			return today;
+		}
+	}
+
+	// 날짜 선택 드롭다운에 보여줄 최근 3일(오늘/어제/그제) 옵션
+	private List<Map<String, String>> buildDateOptions(LocalDate today) {
+
+		List<Map<String, String>> options = new ArrayList<>();
+
+		for (int i = 0; i < 3; i++) {
+			LocalDate date = today.minusDays(i);
+
+			Map<String, String> option = new LinkedHashMap<>();
+			option.put("date", date.toString());
+			option.put("label", formatDateLabel(date));
+
+			options.add(option);
+		}
+
+		return options;
+	}
+
+	private String formatDateLabel(LocalDate date) {
+		String dayName = DAY_NAMES[date.getDayOfWeek().getValue() % 7];
+		return String.format("%04d.%02d.%02d (%s)", date.getYear(), date.getMonthValue(), date.getDayOfMonth(), dayName);
 	}
 
 }

@@ -91,14 +91,15 @@
 
           <button class="date-picker-trigger" id="datePickerTrigger" type="button">
             <svg class="icon"><use href="#ic-calendar" /></svg>
-            <span>2025.05.19 (월)</span>
+            <span>${selectedDateLabel}</span>
             <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
           </button>
 
           <div class="date-picker-panel" id="datePickerPanel">
-            <a href="#">2025.05.19 (월)</a>
-            <a href="#">2025.05.18 (일)</a>
-            <a href="#">2025.05.17 (토)</a>
+            <c:forEach var="option" items="${dateOptions}">
+              <a href="${pageContext.request.contextPath}/vendor/dashboard?date=${option.date}"
+                 class="${option.date == selectedDate ? 'active' : ''}">${option.label}</a>
+            </c:forEach>
           </div>
 
         </div>
