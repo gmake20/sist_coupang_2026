@@ -152,25 +152,22 @@
 							<!-- <h1 class="product-title">무형광 남성 반팔 라운드 티셔츠 3종 세트, 화이트/그레이/블랙</h1> -->
 							<h1 class="product-title">${p.productName}</h1>
 
-							<!-- 찜 / 공유 버튼 — 원본은 SVG 아이콘이라 우리도 SVG 로 그림.
-                   글자(♡ ↗)로 대신하면 모양이 원본과 다르고 폰트에 따라 달라짐.
-                   stroke=선으로 그리기 / fill=none 이면 속이 빈 아이콘 -->
+							<!-- 찜 / 공유 버튼 — 2026-08-31: 로그인해서 실제 쿠팡을 Playwright 로 열어
+                   다시 확인해보니 우리가 그렸던 "테두리 원 + 선(stroke) 아이콘"은 원본과
+                   전혀 다른 방식이었음. 원본은 테두리/배경이 아예 없는 38x38 버튼에
+                   채워진(fill) 도형 아이콘(20x20, #454F5B) — path 를 그대로 옮김 -->
 							<div class="wish-and-share">
 								<button type="button" class="btn-wish">
 									<svg viewBox="0 0 24 24" aria-hidden="true">
-										<path
-											d="M12 20.3 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z" />
+										<path fill-rule="evenodd" clip-rule="evenodd"
+											d="M12.174 4.43124C13.4923 2.68731 15.0031 1.70166 16.9982 1.52692L17.2732 1.50812C18.8998 1.42763 20.5664 1.94772 21.7255 2.97238C23.1953 4.27167 24 6.252 24 8.31785C24 12.688 20.8931 16.8316 12.5507 22.3348C12.2166 22.5552 11.7834 22.5552 11.4493 22.3348C3.10692 16.8316 0 12.688 0 8.31785C0 6.252 0.80471 4.27167 2.27453 2.97238C3.43363 1.94772 5.10025 1.42763 6.72677 1.50812C8.8591 1.61362 10.4478 2.60804 11.826 4.43124L12 4.66712L12.174 4.43124ZM20.4008 4.47083C19.6531 3.80978 18.4997 3.44987 17.3721 3.50568C15.5061 3.598 14.1913 4.71228 12.8675 7.02107C12.4833 7.69117 11.5167 7.69117 11.1325 7.02107C9.80866 4.71228 8.49392 3.598 6.62792 3.50568C5.50027 3.44987 4.34694 3.80978 3.59916 4.47083C2.58082 5.37102 2 6.80038 2 8.31785C2 11.755 4.52788 15.2449 11.7579 20.1359L11.999 20.2981L12.6249 19.8752C19.4355 15.2067 21.9098 11.8187 21.9976 8.50204L22 8.31785C22 6.80038 21.4192 5.37102 20.4008 4.47083Z" />
 									</svg>
 									<span class="blind">찜하기</span>
 								</button>
 								<button type="button" class="btn-share">
-									<!-- 점 3개 + 연결선 = 공유 아이콘 -->
 									<svg viewBox="0 0 24 24" aria-hidden="true">
-										<circle cx="18" cy="5" r="2.6" />
-										<circle cx="6" cy="12" r="2.6" />
-										<circle cx="18" cy="19" r="2.6" />
-										<line x1="8.3" y1="10.8" x2="15.7" y2="6.2" />
-										<line x1="8.3" y1="13.2" x2="15.7" y2="17.8" />
+										<path fill-rule="evenodd" clip-rule="evenodd"
+											d="M22 4C22 5.933 20.433 7.5 18.5 7.5C17.604 7.5 16.7866 7.16332 16.1675 6.60956L8.88141 11.0933C8.95876 11.3825 9 11.6864 9 12C9 12.3136 8.95876 12.6175 8.88142 12.9067L16.1675 17.3904C16.7866 16.8367 17.604 16.5 18.5 16.5C20.433 16.5 22 18.067 22 20C22 21.933 20.433 23.5 18.5 23.5C16.567 23.5 15 21.933 15 20C15 19.6864 15.0412 19.3825 15.1186 19.0933L7.83249 14.6096C7.21338 15.1633 6.39601 15.5 5.5 15.5C3.567 15.5 2 13.933 2 12C2 10.067 3.567 8.50002 5.5 8.50002C6.396 8.50002 7.21337 8.83671 7.83248 9.39047L15.1186 4.90671C15.0412 4.61753 15 4.31358 15 4C15 2.067 16.567 0.5 18.5 0.5C20.433 0.5 22 2.067 22 4Z" />
 									</svg>
 									<span class="blind">공유하기</span>
 								</button>
@@ -197,9 +194,13 @@
 							<span class="discount"
 								${empty displayNormalPrice ? ' style="display:none"' : ''}>${discountRate}%</span>
 							<strong class="total-price" data-unit-price="${displayPrice}"
-								data-base-price="${p.productPrice}">${displayPrice}원</strong> <span
-								class="badge-rocket">로켓배송</span> <span class="badge-tomorrow">내일도착</span>
-
+								data-base-price="${p.productPrice}">${displayPrice}원</strong>
+							<!-- "할인" 라벨 — 2026-08-31 추가. 로그인해서 실제 쿠팡을 Playwright 로 열어보니
+							     판매가 옆에 이 글자가 따로 있었는데 우리 코드엔 없었음. 정상가(할인 전)가
+							     있을 때만(=진짜 할인 중일 때만) 보이는 게 맞아서 discount 와 같은 조건 씀 -->
+							<span class="discount-label"${empty displayNormalPrice ? ' style="display:none"' : ''}>할인</span>
+							<span class="badge-rocket">로켓배송</span> <span
+								class="badge-tomorrow">내일도착</span>
 						</div>
 						<!-- 원가 취소선 (#768695 + line-through). 정상 추가금(NORMAL_PRICE) 입력 안 한 옵션이면 안 보임 -->
 						<div class="price-origin"
@@ -214,14 +215,54 @@
 						<!-- 품절일 때만 보이는 줄. 평소엔 CSS 가 감춤 (body 에 .is-soldout 이 붙어야 나옴)
 						     원본 실측: 14px / 700 / rgb(170,181,192) -->
 						<p class="soldout-text">품절</p>
+
+						<!-- 와우회원 전용 배지 — 2026-08-31 추가.
+						     sessionScope.wowMember 는 로그인할 때(LoginServlet) WOW_MEMBERSHIP 테이블 기준으로
+						     세팅되고, 가입/해지 직후(WowJoinServlet/WowCancelServlet)에도 갱신됨.
+						     로그인 자체를 안 했으면 세션에 이 값이 아예 없어서 EL 이 false 로 취급 — 로그인 여부를
+						     따로 검사할 필요 없음. 로그인해서 실제 쿠팡 와우회원 화면을 Playwright 로 열어
+						     확인한 구조/실측값 그대로 옮김. 로고는 실제 쿠팡 파일(wow@2x.png, 40x16 실측)을
+						     사용자가 받아다 줌 -->
+						<c:if test="${sessionScope.wowMember}">
+							<div class="wow-benefit-badge">
+								<div class="wow-benefit-badge-top">
+									<img class="wow-benefit-badge-logo"
+										src="${pageContext.request.contextPath}/images/wow@2x.png"
+										alt="와우">
+									<span class="wow-benefit-badge-title">고객님은 <strong>와우회원</strong>으로</span>
+								</div>
+								<!-- 체크 아이콘 — 원본은 static.coupangcdn.com 이미지(승인 안 된 도메인)라
+								     못 받아옴. 공유 아이콘(위 svg)과 같은 방식으로 인라인 SVG 로 정확한
+								     크기(12x12)만 맞춰 그림. 나중에 실제 아이콘 파일 받으면 img 로 교체 가능 -->
+								<ul class="wow-benefit-badge-items">
+									<li><svg class="wow-benefit-check" viewBox="0 0 12 12" aria-hidden="true">
+											<polyline points="2.5,6.2 5,9 9.5,3.3" />
+										</svg>무조건 무료배송</li>
+									<li><svg class="wow-benefit-check" viewBox="0 0 12 12" aria-hidden="true">
+											<polyline points="2.5,6.2 5,9 9.5,3.3" />
+										</svg>무료반품</li>
+								</ul>
+							</div>
+						</c:if>
 					</div>
 
-					<hr class="price-bottom-divider">
-
-					<!-- ③ 배송 정보 -->
+					<!-- ③ 배송 정보
+					     2026-08-31: 여기 있던 <hr class="price-bottom-divider"> 를 지움 —
+					     로그인해서 실제 쿠팡을 Playwright 로 열어 재보니 가격 블록과 배송 블록
+					     사이에 선(border/hr) 자체가 없었음(둘 다 border:0, margin-top:16px 로만
+					     간격을 줌). 지어낸 선이었던 것 -->
 					<div class="delivery-container">
 						<p class="shipping-fee">
-							<em class="txt-bold">무료배송</em> (로켓배송 상품 19,800원 이상 구매 시)
+							<!-- 와우회원은 조건("19,800원 이상") 없이 항상 무료배송이라 문구도 다름 —
+							     원본에도 이 괄호 문구가 아예 없음 -->
+							<c:choose>
+								<c:when test="${sessionScope.wowMember}">
+									<em class="txt-bold">무료배송</em>
+								</c:when>
+								<c:otherwise>
+									<em class="txt-bold">무료배송</em> (로켓배송 상품 19,800원 이상 구매 시)
+								</c:otherwise>
+							</c:choose>
 						</p>
 						<p class="delivery-date">
 
@@ -230,24 +271,27 @@
 								20분 내 주문 시 / 서울·경기 기준)</span>
 						</p>
 
-						<!-- 배송 방법 선택 (2026-08-21 추가)
+						<!-- 배송 방법 선택 (2026-08-21 추가, 2026-08-31 와우회원 분기 추가)
 						     원본에 실제로 있는 라디오 버튼 2개. input[type=radio] 가 아니라
 						     span 을 CSS 로 동그랗게 그린 커스텀 라디오 (원본 클래스명 그대로 씀).
 						     ★ 둘째 항목(로켓와우)을 고르면 아래 [장바구니 담기][바로구매] 두 칸이
 						     [로켓와우로 무료배송 >] 한 칸으로 바뀜 — 원본을 Playwright 로 직접 클릭해서 확인함.
-						     ▶JSP: 지금은 앞쪽(로켓배송)이 기본 선택. 로그인/와우 여부에 따라 서버가
-						       기본값을 정하게 될 자리 -->
-						<ul class="radio-group">
-							<li class="radio-item is-on"><span class="radio"></span> <span
-								class="radio-text">로켓배송 상품 19,800원 이상 무료배송</span></li>
-							<li class="radio-item"><span class="radio"></span> <span
-								class="radio-text">무료배송 + 무료반품 <span class="separator">|</span>
-									로켓와우 신청시
-							</span>
-								<button type="button" class="radio-info">
-									<span class="blind">안내</span>
-								</button></li>
-						</ul>
+						     ▶ 와우회원은 이미 "무조건 무료배송"이라 이 선택 자체가 원본에 없음 —
+						       로그인해서 실제 와우회원 화면을 Playwright 로 열어 직접 확인함(라디오 0개, 위
+						       wow-benefit-badge 만 있음) -->
+						<c:if test="${not sessionScope.wowMember}">
+							<ul class="radio-group">
+								<li class="radio-item is-on"><span class="radio"></span> <span
+									class="radio-text">로켓배송 상품 19,800원 이상 무료배송</span></li>
+								<li class="radio-item"><span class="radio"></span> <span
+									class="radio-text">무료배송 + 무료반품 <span class="separator">|</span>
+										로켓와우 신청시
+								</span>
+									<button type="button" class="radio-info">
+										<span class="blind">안내</span>
+									</button></li>
+							</ul>
+						</c:if>
 					</div>
 
 					<!-- ④ 옵션 — "1번 축은 드롭박스, 그 다음 축은 사진 있으면 칩" (원본과 같은 모양)

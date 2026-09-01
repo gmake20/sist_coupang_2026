@@ -37,6 +37,7 @@ function setupQuantity() {
   const plus  = box.querySelector('.qty-plus');
   const priceEl = document.querySelector('.total-price');
   const discountEl = document.querySelector('.discount');
+  const discountLabelEl = document.querySelector('.discount-label');   // "할인" 글자 — 2026-08-31 추가
   const originBox = document.querySelector('.price-origin');
   const originPriceEl = originBox ? originBox.querySelector('.origin-price') : null;
   const basePrice = priceEl ? Number(priceEl.dataset.basePrice) || 0 : 0;
@@ -98,6 +99,7 @@ function setupQuantity() {
         discountEl.textContent = Math.round((1 - unitPrice / normalPrice) * 100) + '%';
       }
     }
+    if (discountLabelEl) discountLabelEl.style.display = hasDiscount ? '' : 'none';
     if (originBox) originBox.style.display = hasDiscount ? '' : 'none';
     if (hasDiscount && originPriceEl) {
       originPriceEl.textContent = normalPrice.toLocaleString('ko-KR') + '원';
