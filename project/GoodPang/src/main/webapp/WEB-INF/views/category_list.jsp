@@ -7,7 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${breadcrumb[2].categoryName} | 굿팡</title>
+<title>${categoryName} | 굿팡</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet"
@@ -65,9 +65,11 @@
 			<c:forEach var="crumb" items="${breadcrumb}">
 				<span class="sep">&gt;</span>
 				<%-- 2026-09-02: 소분류(현재 페이지)도 클릭 가능하게 링크로 바꿈(사용자 요청) —
-				     "current" 클래스는 그대로 둬서 색상 등 스타일 구분은 유지 --%>
+				     "current" 클래스는 그대로 둬서 색상 등 스타일 구분은 유지.
+				     2026-09-03: current 판정을 "레벨3이면" → "지금 보고 있는 번호와 같으면" 으로 바꿈.
+				     중분류 페이지는 마지막 칸이 레벨2라 예전 조건으론 아무 칸도 굵게 안 됐음 --%>
 				<a href="${pageContext.request.contextPath}/category?categoryNo=${crumb.categoryNo}"
-					class="${crumb.categoryLevel == 3 ? 'current' : ''}">${crumb.categoryName}</a>
+					class="${crumb.categoryNo == categoryNo ? 'current' : ''}">${crumb.categoryName}</a>
 			</c:forEach>
 		</nav>
 	</div>
@@ -147,7 +149,10 @@
 				<section class="filter-group">
 					<h3>카테고리</h3>
 					<ul>
-						<c:forEach var="sib" items="${siblingCategories}">
+						<%-- 2026-09-03: 중분류면 자식(티셔츠·바지…), 소분류면 예전처럼 형제 —
+						     어느 쪽을 담을지는 CategoryServlet 이 정해서 sidebarCategories 로 내려줌.
+						     맨 아래 "함께 본 카테고리"는 계속 siblingCategories 를 씀(원본도 거긴 형제) --%>
+						<c:forEach var="sib" items="${sidebarCategories}">
 							<li>
 								<a href="${pageContext.request.contextPath}/category?categoryNo=${sib.categoryNo}"
 									class="${sib.categoryNo == categoryNo ? 'selected' : ''}">
@@ -286,7 +291,58 @@
 
 				<%-- 카테고리 제목 — 2026-09-03 추가. 원본 재확인(Playwright, browser_evaluate): 24px/700/#000000,
 				     정렬줄과 12px 떨어져 있음. 그동안 아예 빠져있었음(브레드크럼의 소분류 이름과 헷갈려서 안 넣었던 듯) --%>
-				<h1 class="category-title">${breadcrumb[2].categoryName}</h1>
+				<%-- 2026-09-03: breadcrumb[2](소분류 칸)를 집어 쓰던 걸 categoryName 으로 바꿈 —
+				     중분류 페이지는 브레드크럼이 2칸뿐이라 [2]번이 없어서 제목이 빈칸이 됐음 --%>
+				<h1 class="category-title">${categoryName}</h1>
+
+				<%-- ==================================================
+				     중분류(레벨2) 페이지에만 나오는 영역 — 2026-09-03 추가.
+				     원본 쿠팡(www.coupang.com/np/categories/502993, Playwright 실측) 확인 결과
+				     제목 아래에 ① 하위 카테고리 원형 타일 ② 링크 배너 ③ 프로모션 배너 3장 순서로 옴.
+
+				     ★ 원본은 이 타일 그리드가 DOM 이 아니라 "배너 이미지 1장(1080x623) + 퍼센트 좌표로 얹은
+				       투명 <a> 11개" 였음(옛날 이미지맵 방식). 우리는 카테고리가 DB 에 있으니 그대로 흉내내지
+				       않고 타일을 하나씩 그림 — 카테고리가 늘면 화면도 같이 늘어나야 하니까.
+				       대신 원 크기·간격·글자는 원본 이미지를 픽셀로 재서 맞춤(category.css 참고).
+
+				     소분류 페이지에서는 isMidCategory 가 false 라 이 블록이 통째로 안 나옴 --%>
+				<c:if test="${isMidCategory}">
+					<div class="mid-extra">
+
+						<c:if test="${not empty categoryTiles}">
+							<ul class="category-tiles">
+								<c:forEach var="tile" items="${categoryTiles}">
+									<li>
+										<a href="${pageContext.request.contextPath}/category?categoryNo=${tile.categoryNo}">
+											<span class="tile-thumb">
+												<img src="${pageContext.request.contextPath}/images/category/tile_${tile.categoryNo}.png" alt="">
+											</span>
+											<span class="tile-name">${tile.categoryName}</span>
+										</a>
+									</li>
+								</c:forEach>
+							</ul>
+						</c:if>
+
+						<%-- 배너 4장 — 원본에서 받아온 이미지 그대로. 아직 연결할 기획전 페이지가 없어서 링크는 비워둠
+						     (href="#" 이라 눌러도 아무 데도 안 감). 나중에 기획전이 생기면 여기만 바꾸면 됨 --%>
+						<div class="mid-banners">
+							<a href="#" class="banner-quicklinks">
+								<img src="${pageContext.request.contextPath}/images/category/banner_quicklinks.png" alt="쿠팡 추천 모음">
+							</a>
+							<a href="#">
+								<img src="${pageContext.request.contextPath}/images/category/banner_promo1.png" alt="기획전 배너">
+							</a>
+							<a href="#">
+								<img src="${pageContext.request.contextPath}/images/category/banner_promo2.png" alt="기획전 배너">
+							</a>
+							<a href="#">
+								<img src="${pageContext.request.contextPath}/images/category/banner_promo3.png" alt="기획전 배너">
+							</a>
+						</div>
+
+					</div>
+				</c:if>
 
 				<%-- 이것도 마찬가지로 EL 리스트 리터럴 대신 4개를 그냥 하나씩 적음 --%>
 				<div class="sort-bar">
@@ -425,7 +481,7 @@
 												<span class="discount-rate">${item.discountRate}%</span>
 												<span class="normal-price"><fmt:formatNumber value="${item.normalPrice}" pattern="#,###"/>원</span>
 											</c:if>
-											<span class="price-badge-row">
+											<span class="price-badge-row ${item.soldOut ? 'is-soldout' : ''}">
 												<strong class="sale-price"><fmt:formatNumber value="${item.salePrice}" pattern="#,###"/>원</strong>
 												<%-- 실제 배송정보 컬럼(DELIVERY_METHOD 등)을 아직 안 써서 모든 카드에 똑같이 표시.
 												     내일도착 배지(badge_199cd481e67.png)는 우리 파일이 58×32 라 높이 16px 로 맞추면
@@ -434,6 +490,12 @@
 												<img class="badge-tomorrow" src="${pageContext.request.contextPath}/images/icons/badge_199cd481e67.png" alt="내일도착">
 											</span>
 										</p>
+										<%-- 품절 표시 — 2026-09-03 원본 실측(Playwright). 모든 옵션 재고 0(PRODUCT.SALE_STATUS='품절')일 때만.
+										     원본은 이미지·상품명은 그대로 두고 가격·배지만 흐리게(위 is-soldout, category.css 참고) +
+										     가격 줄 바로 밑에 이 문구만 추가하는 방식이었음(오버레이 아님) --%>
+										<c:if test="${item.soldOut}">
+											<p class="sold-out-text">일시품절</p>
+										</c:if>
 										<%-- 배송문구 — 2026-09-05 재실측으로 두 가지 정정(사용자 지적):
 										     ① 색상: 로켓(내일 도착) 상품은 초록색 #008C00 (원본 인라인 스타일에 그대로 박혀 있음).
 										        로켓이 아닌 상품만 검정계열 #212B36 이고 문구도 "9/5(토) 도착 예정" 형태였음

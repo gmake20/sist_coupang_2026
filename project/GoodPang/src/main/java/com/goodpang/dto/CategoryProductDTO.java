@@ -29,4 +29,5 @@ public class CategoryProductDTO {
     private int saleCount;             // ORDER_DETAIL.ORDER_QTY 합계(주문취소 제외). 판매량순 정렬 기준
 
     private int cashReward;            // 적립 
+    private boolean soldOut;
 }
