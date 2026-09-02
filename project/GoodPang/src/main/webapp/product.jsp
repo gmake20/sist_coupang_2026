@@ -389,7 +389,8 @@
 						<!-- 수량 -->
 						<div class="product-quantity">
 
-							<input type="text" class="qty-input" name="quantity" value="1" inputmode="numeric">
+							<input type="text" class="qty-input" name="quantity" value="1"
+								inputmode="numeric">
 							<div class="qty-spin">
 								<button type="button" class="qty-plus">
 									<span class="blind"> 수량 더하기 </span>
@@ -883,7 +884,7 @@
                  ★ 막대 길이를 style="width:78%" 처럼 인라인으로 준 이유:
                    이 값만 데이터에 따라 매번 달라지기 때문. CSS 파일에는 못 적음.
                    ▶JSP 로 가면 style="width:{r.percent}%" 가 될 자리 -->
-						<ul class="score-graph">
+						<!-- <ul class="score-graph">
 							<li><span class="label">최고</span> <span class="bar"><i
 									style="width: 78%"></i></span> <span class="pct">78%</span></li>
 							<li><span class="label">좋음</span> <span class="bar"><i
@@ -894,6 +895,28 @@
 									style="width: 0%"></i></span> <span class="pct">0%</span></li>
 							<li><span class="label">나쁨</span> <span class="bar"><i
 									style="width: 17%"></i></span> <span class="pct">17%</span></li>
+						</ul> -->
+
+						<ul class="score-graph">
+							<li><span class="label">최고</span> <span class="bar">
+									<i style="width:${reviewStats.bestPercent}%"></i>
+							</span> <span class="pct">${reviewStats.bestPercent}%</span></li>
+
+							<li><span class="label">좋음</span> <span class="bar">
+									<i style="width:${reviewStats.goodPercent}%"></i>
+							</span> <span class="pct">${reviewStats.goodPercent}%</span></li>
+
+							<li><span class="label">보통</span> <span class="bar">
+									<i style="width:${reviewStats.normalPercent}%"></i>
+							</span> <span class="pct">${reviewStats.normalPercent}%</span></li>
+
+							<li><span class="label">별로</span> <span class="bar">
+									<i style="width:${reviewStats.poorPercent}%"></i>
+							</span> <span class="pct">${reviewStats.poorPercent}%</span></li>
+
+							<li><span class="label">나쁨</span> <span class="bar">
+									<i style="width:${reviewStats.badPercent}%"></i>
+							</span> <span class="pct">${reviewStats.badPercent}%</span></li>
 						</ul>
 
 						<!-- 구매자 설문 요약 -->
@@ -2107,25 +2130,19 @@
 	
 	
 </script>
-<div id="reviewImageModal"
-	class="review-image-modal"
-	onclick="closeReviewImage()">
+	<div id="reviewImageModal" class="review-image-modal"
+		onclick="closeReviewImage()">
 
-	<div class="review-image-modal-content"
-		onclick="event.stopPropagation();">
+		<div class="review-image-modal-content"
+			onclick="event.stopPropagation();">
 
-		<button type="button"
-			class="review-image-close"
-			onclick="closeReviewImage()">
-			×
-		</button>
+			<button type="button" class="review-image-close"
+				onclick="closeReviewImage()">×</button>
 
-		<img id="reviewImageLarge"
-			src=""
-			alt="확대된 리뷰 이미지">
+			<img id="reviewImageLarge" src="" alt="확대된 리뷰 이미지">
+		</div>
 	</div>
-</div>
-<script>
+	<script>
 function openReviewImage(src) {
 	const modal = document.getElementById("reviewImageModal");
 	const image = document.getElementById("reviewImageLarge");

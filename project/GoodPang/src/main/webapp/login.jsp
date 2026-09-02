@@ -382,8 +382,17 @@
 
 </div>
 
+<script>
+window.addEventListener("pageshow", function(event) {
+    const navigation = performance.getEntriesByType("navigation")[0];
 
-
+    if (event.persisted || (navigation && navigation.type === "back_forward")) {
+        window.location.replace(
+            "${pageContext.request.contextPath}/login?t=" + Date.now()
+        );
+    }
+});
+</script>
 <!-- =========================
      로그인 JS
 ========================== -->
