@@ -41,7 +41,7 @@ public class VendorDeliveryDAO {
                     GROUP BY OD.ORDER_NO
                 ) PN ON PN.ORDER_NO = D.ORDER_NO
             WHERE D.DELIVERY_STATUS = '배송중'
-            ORDER BY D.DELIVERY_START_DATE ASC
+            ORDER BY D.DELIVERY_START_DATE DESC
             """;
 
         try (

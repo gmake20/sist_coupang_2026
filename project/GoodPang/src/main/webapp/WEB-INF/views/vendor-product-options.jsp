@@ -120,9 +120,10 @@
                       <c:if test="${optionStatus.first}">
                         <td class="col-product" rowspan="${fn:length(group.options)}">
                           <div class="product-cell">
-                            <span class="thumb">
+                            <span class="thumb" style="display:block; width:44px; height:44px; overflow:hidden;">
                               <c:if test="${not empty group.thumbnailUrl}">
-                                <img src="${pageContext.request.contextPath}/${group.thumbnailUrl}" alt="${group.productName}">
+                                <img src="${pageContext.request.contextPath}/${group.thumbnailUrl}" alt="${group.productName}"
+                                     style="width:44px; height:44px; object-fit:cover; border-radius:6px;">
                               </c:if>
                             </span>
                             <div class="product-text">
