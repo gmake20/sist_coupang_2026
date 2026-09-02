@@ -22,10 +22,10 @@
 
 	<div class="mypang-layout">
 
-			<!-- 리뷰관리 메뉴 파란색 활성화 -->
-	<jsp:include page="/inc/left_banner.jsp">
-	    <jsp:param name="activeMenu" value="review" />
-	</jsp:include>
+		<!-- 리뷰관리 메뉴 파란색 활성화 -->
+		<jsp:include page="/inc/left_banner.jsp">
+			<jsp:param name="activeMenu" value="review" />
+		</jsp:include>
 		<!-- 중앙 리뷰관리 -->
 		<main class="review-page">
 			<h1 class="review-title">리뷰관리</h1>
@@ -55,9 +55,9 @@
 				</div>
 			</div>
 
-			<c:set var="activeTab"
+<%-- 			<c:set var="activeTab"
 				value="${param.tab eq 'available' ? 'available' : 'written'}" />
-
+ --%>
 			<div class="review-tabs">
 				<a
 					href="${pageContext.request.contextPath}/review/list?tab=available"
@@ -205,6 +205,35 @@
 							</c:forEach>
 						</c:otherwise>
 					</c:choose>
+				</div>
+			</c:if>
+
+			<c:if test="${totalPages > 1}">
+				<div class="review-pagination">
+					<c:if test="${startPage > 1}">
+						<a
+							href="${pageContext.request.contextPath}/review/list?tab=${activeTab}&page=${startPage - 1}"
+							class="page-arrow">‹</a>
+					</c:if>
+
+					<c:forEach var="pageNo" begin="${startPage}" end="${endPage}">
+						<c:choose>
+							<c:when test="${pageNo eq currentPage}">
+								<span class="page-number active">${pageNo}</span>
+							</c:when>
+							<c:otherwise>
+								<a
+									href="${pageContext.request.contextPath}/review/list?tab=${activeTab}&page=${pageNo}"
+									class="page-number">${pageNo}</a>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+
+					<c:if test="${endPage < totalPages}">
+						<a
+							href="${pageContext.request.contextPath}/review/list?tab=${activeTab}&page=${endPage + 1}"
+							class="page-arrow">›</a>
+					</c:if>
 				</div>
 			</c:if>
 		</main>
