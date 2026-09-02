@@ -1,36 +1,30 @@
-
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
 
 <meta charset="UTF-8">
 
 <title>주문상세</title>
 
-
 <!-- 기본 초기화 CSS -->
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/reset.css">
-
 
 <!-- 공통 CSS -->
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/common.css">
 
-
 <!-- 주문상세 전용 CSS -->
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/order_detail.css">
 
-
 <!-- jQuery -->
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
 
 <!-- 주문상세 전용 JS -->
 <script src="${pageContext.request.contextPath}/js/order_detail.js"></script>
@@ -42,60 +36,9 @@
 	<script src="${pageContext.request.contextPath}/js/header.js"></script>
 	<div class="order-detail-wrap">
 
-		<!-- =========================
-         왼쪽 MY쿠팡 메뉴
-    ========================== -->
-		<aside class="mycoupang-side">
-
-			<div class="side-title">MY쿠팡</div>
-
-			<div class="side-section">
-				<h3>MY 쇼핑</h3>
-
-				<a href="${pageContext.request.contextPath}/order/order_list" class="active">주문목록/배송조회</a> <a
-					href="${pageContext.request.contextPath}/order/cancel_history">취소/반품/교환/환불 내역</a> <a href="#">와우 멤버십</a>
-				<a href="#">구독 서비스 <span class="new">N</span></a> <a href="#">로켓프레시
-					프레시백 <span class="new">N</span>
-				</a> <a href="#">영수증 조회/출력</a>
-			</div>
-
-			<div class="side-section">
-				<h3>MY 혜택</h3>
-
-				<a href="#">쿠폰 · 이용권</a> <a href="#">쿠팡캐시/기프트카드</a>
-			</div>
-
-			<div class="side-section">
-				<h3>MY 활동</h3>
-
-				<a href="#">문의하기</a> <a href="#">문의내역 확인</a> <a href="#">리뷰관리</a> <a
-					href="#">찜 리스트</a>
-			</div>
-
-			<div class="side-section">
-				<h3>MY 정보</h3>
-
-				<a href="${pageContext.request.contextPath}/member/modify">개인정보확인/수정</a> <a href="#">결제수단·쿠페이 관리</a> <a href="#">배송지
-					관리</a> <a href="#">패스키 관리</a> <a href="#">회원 탈퇴</a>
-			</div>
-
-
-			<!-- 고객센터 메뉴 -->
-			<div class="side-help">
-
-				<a href="#"> <span class="help-icon">📝</span> <span>쿠팡문의</span>
-				</a> <a href="#"> <span class="help-icon">📢</span> <span>
-						고객의 소리<br> <small>제안·칭찬·불편신고</small>
-				</span>
-				</a> <a href="#"> <span class="help-icon">📦</span> <span>취소/반품
-						안내</span>
-				</a>
-
-			</div>
-
-		</aside>
-
-
+		<jsp:include page="/inc/left_banner.jsp">
+		    <jsp:param name="activeMenu" value="order_list" />
+		</jsp:include>
 		<!-- =========================
          가운데 본문
     ========================== -->
@@ -107,15 +50,14 @@
 				<h1>주문상세</h1>
 
 				<div class="order-info">
-					<strong><fmt:formatDate value="${orderInfo.orderDate}"
-							pattern="yyyy. M. d" /></strong></strong> 주문 <span class="dot">·</span> 주문번호 <span
-						class="order-number">${orderInfo.orderNo}</span>
+					<strong><fmt:formatDate value="${orderInfo.orderDate}" pattern="yyyy. M. d" /></strong> 주문 
+					<span class="dot">·</span> 주문번호 
+					<span class="order-number">${orderInfo.orderNo}</span>
 				</div>
 
 			</section>
 
-
-			<!-- =========================
+<!-- =========================
      배송 상품 리스트 (JSTL 반복문)
 ========================== -->
 			<c:forEach var="item" items="${detailList}">
@@ -123,8 +65,9 @@
 
 					<div class="delivery-main">
 
+						<!-- 하드코딩 문구 제거 및 주문 상태값만 깔끔하게 출력 -->
 						<div class="delivery-title">
-							배송완료 <span>·</span> <strong>${item.orderStatus}</strong>
+							<strong>${item.orderStatus}</strong>
 						</div>
 
 						<div class="product-row">
@@ -138,7 +81,6 @@
 							<div class="product-info">
 
 								<div class="product-name">
-
 									<span class="rocket">🚀 로켓배송</span> ${item.productName}
 								</div>
 
@@ -148,18 +90,16 @@
 								</div>
 
 								<!-- 옵션 정보 동적 출력 -->
-								<c:if
-									test="${not empty item.option1Value or not empty item.option2Value}">
+								<c:if test="${not empty item.option1Value or not empty item.option2Value}">
 									<div class="product-option">
 										<span>옵션: </span>
 										<c:if test="${not empty item.option1Value}">
 											<c:if test="${not empty item.option1Type}">${item.option1Type}: </c:if>${item.option1Value}
-												</c:if>
-										<c:if
-											test="${not empty item.option1Value and not empty item.option2Value}"> / </c:if>
+										</c:if>
+										<c:if test="${not empty item.option1Value and not empty item.option2Value}"> / </c:if>
 										<c:if test="${not empty item.option2Value}">
 											<c:if test="${not empty item.option2Type}">${item.option2Type}: </c:if>${item.option2Value}
-												</c:if>
+										</c:if>
 									</div>
 								</c:if>
 
@@ -173,16 +113,50 @@
 					</div>
 
 
+					<!-- 기존 delivery-buttons 클래스 및 스타일 100% 유지 -->
 					<div class="delivery-buttons">
 
-						<button type="button" class="delivery-btn primary"
-							id="deliveryBtn" onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${item.orderNo}'">배송 조회</button>
+						<c:choose>
+							<%-- 1. 취소 관련 상태일 때: 배송조회/리뷰 버튼 제거, [취소 내역 조회] 버튼 1개만 출력 --%>
+							<c:when test="${item.orderStatus eq '취소처리' or item.orderStatus eq '주문취소' or item.orderStatus eq '취소완료'}">
+								<button type="button" class="delivery-btn" id="cancelHistoryBtn" style="width: 100%;"
+									onclick="location.href='${pageContext.request.contextPath}/order/cancel_history'">
+									취소 내역 조회
+								</button>
+							</c:when>
 
-						<button type="button" class="delivery-btn" id="exchangeBtn" 
-             onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${item.orderNo}'">교환, 반품 신청</button>
+							<%-- 2. 결제 완료 상태일 때: [배송 조회] | [주문 취소] | [리뷰 작성하기] 출력 --%>
+							<c:when test="${item.orderStatus eq '결제완료' or item.orderStatus eq '결제 완료'}">
+								<button type="button" class="delivery-btn primary" id="deliveryBtn"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${item.orderNo}'">
+									배송 조회
+								</button>
+								<button type="button" class="delivery-btn" id="cancelBtn"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${item.orderNo}'">
+									주문 취소
+								</button>
+								<button type="button" class="delivery-btn" id="reviewBtn"
+									onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${item.orderDetailNo}&productNo=${item.productNo}'">
+									리뷰 작성하기
+								</button>
+							</c:when>
 
-						<button type="button" class="delivery-btn" id="reviewBtn">
-							리뷰 작성하기</button>
+							<%-- 3. 배송중/배송완료 등 일반 상태일 때: [배송 조회] | [교환, 반품 신청] | [리뷰 작성하기] 출력 --%>
+							<c:otherwise>
+								<button type="button" class="delivery-btn primary" id="deliveryBtn"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${item.orderNo}'">
+									배송 조회
+								</button>
+								<button type="button" class="delivery-btn" id="exchangeBtn" 
+									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${item.orderNo}'">
+									교환, 반품 신청
+								</button>
+								<button type="button" class="delivery-btn" id="reviewBtn"
+									onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${item.orderDetailNo}&productNo=${item.productNo}'">
+									리뷰 작성하기
+								</button>
+							</c:otherwise>
+						</c:choose>
 
 					</div>
 
@@ -213,8 +187,7 @@
 
 					<div class="info-row">
 						<div class="info-title">받는주소</div>
-						<div class="info-value">${orderInfo.address}
-							${orderInfo.detailAddress}</div>
+						<div class="info-value">${orderInfo.address} ${orderInfo.detailAddress}</div>
 					</div>
 
 					<div class="info-row">
@@ -236,24 +209,26 @@
 						<c:choose>
 							<c:when test="${orderInfo.paymentMethod eq 'CARD'}">
 								${orderInfo.cardCompanyName} / 일시불
-								</c:when>
+							</c:when>
 							<c:when test="${orderInfo.paymentMethod eq 'BANK_TRANSFER'}">
 								${orderInfo.bankName} / 계좌이체
-								</c:when>
+							</c:when>
 							<c:otherwise>
 								${orderInfo.paymentMethod}
-								</c:otherwise>
+							</c:otherwise>
 						</c:choose>
 					</div>
 					<div class="payment-price">
 						<div class="price-row">
-							<span>총 상품가격</span> <strong> <fmt:formatNumber
-									value = "${orderInfo.totalPrice}" pattern="#,###" /> 원
+							<span>총 상품가격</span> 
+							<strong> 
+								<fmt:formatNumber value="${orderInfo.totalPrice}" pattern="#,###" /> 원
 							</strong>
 						</div>
 						<div class="price-row">
-							<span>배송비</span> <strong> <fmt:formatNumber
-									value="${orderInfo.deliveryFee}" pattern="#,###" /> 원
+							<span>배송비</span> 
+							<strong> 
+								<fmt:formatNumber value="${orderInfo.deliveryFee}" pattern="#,###" /> 원
 							</strong>
 						</div>
 					</div>
@@ -263,21 +238,20 @@
 						<c:choose>
 							<c:when test="${orderInfo.paymentMethod eq 'CARD'}">
 								${orderInfo.cardCompanyName} / 일시불
-								</c:when>
+							</c:when>
 							<c:when test="${orderInfo.paymentMethod eq 'BANK_TRANSFER'}">
 								${orderInfo.bankName} / 계좌이체
-								</c:when>
+							</c:when>
 							<c:otherwise>
 								${orderInfo.paymentMethod}
-								</c:otherwise>
+							</c:otherwise>
 						</c:choose>
 					</div>
 
 					<div>
-						<span>총 결제금액</span> <strong> <fmt:formatNumber
-								
-								value="${orderInfo.totalPrice + orderInfo.deliveryFee}"
-								pattern="#,###" /> 원
+						<span>총 결제금액</span> 
+						<strong> 
+							<fmt:formatNumber value="${orderInfo.totalPrice + orderInfo.deliveryFee}" pattern="#,###" /> 원
 						</strong>
 					</div>
 
@@ -295,36 +269,24 @@
 
 				<div class="section-line"></div>
 
-
 				<div class="receipt-row">
-
 					<span> 해당 주문건에 대해 구매 카드영수증 확인이 가능합니다. </span>
-
-					<button type="button" class="receipt-btn" id="cardReceiptBtn">
-						카드영수증</button>
-
+					<button type="button" class="receipt-btn" id="cardReceiptBtn">카드영수증</button>
 				</div>
 
-
 				<div class="receipt-row">
-
 					<span> 해당 주문건에 대해 거래명세서 확인이 가능합니다. </span>
-
-					<button type="button" class="receipt-btn" id="statementBtn">
-						거래명세서</button>
-
+					<button type="button" class="receipt-btn" id="statementBtn">거래명세서</button>
 				</div>
 
 			</section>
 
 
-
-
 			<!-- 배송상품 주문상태 안내 -->
 			<div class="delivery-step-box">
 				<div class="step-head">
-					<span>배송상품 주문상태 안내</span> <a href="#" class="link-more">자세한 내용
-						더보기 &gt;</a>
+					<span>배송상품 주문상태 안내</span> 
+					<a href="#" class="link-more">자세한 내용 더보기 &gt;</a>
 				</div>
 				<div class="step-flow">
 					<div class="step-item">
@@ -367,8 +329,7 @@
 					<h4>취소</h4>
 					<ul>
 						<li>여행/레저/숙박 상품은 취소 시 수수료가 발생할 수 있으며,</li>
-						<li>취소수수료를 확인하여 2일 이내(주말,공휴일 제외 처리결과)를 문자로 안내드립니다.(당일 접수 기준,
-							마감시간 오후 4시)</li>
+						<li>취소수수료를 확인하여 2일 이내(주말,공휴일 제외 처리결과)를 문자로 안내드립니다.(당일 접수 기준, 마감시간 오후 4시)</li>
 						<li>문화 상품은 사용 전날 24시까지 취소 신청 시 취소수수료가 발생되지 않습니다.</li>
 					</ul>
 				</div>
@@ -376,13 +337,9 @@
 
 		</main>
 
-
-
-	
-    <jsp:include page="/inc/right_banner.jsp" />
+		<jsp:include page="/inc/right_banner.jsp" />
 	</div>
 	<jsp:include page="/inc/footer.jsp" />
-
 
 </body>
 </html>
