@@ -76,7 +76,7 @@
 						<div class="product-image">
 						    <c:choose>
 						        <c:when test="${not empty item.imageUrl}">
-						            <img src="${pageContext.request.contextPath}/${img.imageUrl}" alt="${item.productName}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 6px;" />
+						            <img src="{pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 6px;" />
 						        </c:when>
 						      
 						    </c:choose>

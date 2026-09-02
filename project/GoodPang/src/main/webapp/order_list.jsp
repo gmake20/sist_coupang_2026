@@ -229,7 +229,7 @@
         <%-- DB에 저장된 이미지 경로가 있는 경우 --%>
         <c:when test="${not empty item.imageUrl}">
             <%-- 외부 이미지 서버 URL 경로이거나 풀 경로인 경우 그대로 출력 --%>
-            <img src="${pageContext.request.contextPath}/${img.imageUrl}" alt="${item.productName}" style="width: 100%; height: 100%; object-fit: cover;" />
+            <img src="${pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 100%; height: 100%; object-fit: cover;" />
         </c:when>
        
     </c:choose>
