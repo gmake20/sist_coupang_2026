@@ -239,6 +239,45 @@ public class OrderPaymentServlet extends HttpServlet {
 						"주문 상품 저장 실패"
 						);
 			}
+			
+			/*
+			 * ★ 재고 차감 — 주문 상세를 넣은 직후, 커밋 전에 한다.
+			 *
+			 * 위치가 여기인 이유:
+			 *   프로시저가 ORDER_DETAIL 을 읽어서 무엇을 몇 개 깎을지 정하므로
+			 *   insertOrderDetailsFromCheckout() 뒤여야 한다.
+			 *   그리고 conn.commit() 전이어야 재고 부족일 때 주문까지 통째로 되돌릴 수 있다.
+			 */
+			OrderDAO.StockFail stockFail =
+					dao.stockOut(
+							conn,
+							orderNo
+							);
+
+			if (stockFail != null) {
+
+				/*
+				 * 재고 부족은 "에러"가 아니라 흔히 일어나는 정상 상황이다.
+				 * 아래 catch 로 보내면 톰캣 500 화면이 떠버리므로,
+				 * 여기서 직접 롤백하고 주문서 페이지로 되돌려 보낸다.
+				 *
+				 * 롤백하면 CHECKOUT / CHECKOUT_ITEM 이 그대로 살아있으므로
+				 * 같은 checkoutNo 로 주문서 페이지를 다시 열 수 있다.
+				 */
+				conn.rollback();
+
+				response.sendRedirect(
+						request.getContextPath()
+						+ "/order/payment?checkoutNo=" + checkoutNo
+						+ "&stockFail="
+						+ java.net.URLEncoder.encode(
+								stockFail.productName, "UTF-8")
+						+ "&stockLeft=" + stockFail.left
+						);
+
+				return;
+			}
+					
 			dao.deleteCheckoutItems(
 					conn,
 					checkoutNo
