@@ -47,7 +47,12 @@ public class CancelActionServlet extends HttpServlet {
 
                 // 3. DAO를 통해 ORDERS 업데이트 & ORDER_DETAIL 조회 & PRODUCT_RETURN 데이터 등록 한 번에 실행
                 OrderCancelDAO dao = new OrderCancelDAO();
-                isSuccess = dao.cancelOrder(orderNo, cancelReason);
+				/* isSuccess = dao.cancelOrder(orderNo, cancelReason); */
+               // ★ 로그인한 회원 번호를 같이 넘긴다 — 남의 주문을 취소하지 못하게 하려는 것
+                isSuccess = dao.cancelOrder(
+                        orderNo,
+                        loginMember.getMemberNo(),
+                        cancelReason);
 
             } catch (NumberFormatException e) {
                 System.err.println("[ERROR CancelActionServlet] 주문번호 파싱 오류: " + orderNoParam);

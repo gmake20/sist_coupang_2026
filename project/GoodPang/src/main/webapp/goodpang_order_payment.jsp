@@ -25,6 +25,20 @@
 		</h1>
 
 		<h1 class="page-title">주문/결제</h1>
+		
+		<%-- 재고 부족으로 결제가 취소됐을 때만 보이는 안내.
+		     OrderPaymentServlet 이 주소에 stockFail / stockLeft 를 붙여서 되돌려보냄.
+		     <c:out> 을 쓰는 이유 — 상품명에 <, > 같은 글자가 들어있어도
+		     HTML 태그로 해석되지 않게 막아준다(그냥 ${param.stockFail} 로 찍으면 위험). --%>
+		<c:if test="${not empty param.stockFail}">
+			<div class="stock-alert">
+				<strong><c:out value="${param.stockFail}" /></strong>
+				상품의 재고가 부족합니다.
+				(남은 수량 <c:out value="${param.stockLeft}" />개)
+				<br>
+				수량을 줄이거나 장바구니에서 상품을 빼고 다시 시도해주세요.
+			</div>
+		</c:if>
 
 		<div class="breadcrumb">
 			<span>주문결제</span> &gt; 주문완료
