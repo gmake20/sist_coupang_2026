@@ -73,6 +73,10 @@ public class VendorProductWriteServlet extends HttpServlet {
 				writeJson(response, 400, new Result(false, "노출상품명을 입력해주세요.", 0));
 				return;
 			}
+			if (dto.getInternalName() == null || dto.getInternalName().isBlank()) {
+				writeJson(response, 400, new Result(false, "등록상품명(판매자관리용)을 입력해주세요.", 0));
+				return;
+			}
 			if (dto.getProductPrice() <= 0) {
 				writeJson(response, 400, new Result(false, "기본 상품가격을 입력해주세요.", 0));
 				return;
@@ -118,7 +122,7 @@ public class VendorProductWriteServlet extends HttpServlet {
 		dto.setBrandName(blankToNull(request.getParameter("brandName")));
 		dto.setNoBrandYn(request.getParameter("noBrandYn"));
 		dto.setProductName(request.getParameter("displayName"));
-		dto.setInternalName(blankToNull(request.getParameter("internalName")));
+		dto.setInternalName(request.getParameter("internalName"));
 
 		String optionYn = request.getParameter("optionYn");
 		dto.setOptionYn("N".equals(optionYn) ? "N" : "Y");

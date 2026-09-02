@@ -67,13 +67,8 @@
                 </div>
               </div>
 
-              <button class="collapse-line" type="button" data-target="managedNameBody">
-                등록상품명(판매자관리용) <svg class="icon chevron">
-                  <use href="#ic-chevron-down" />
-                </svg>
-              </button>
-              <div class="field-row collapsible" id="managedNameBody" hidden>
-                <label class="field-label"></label>
+              <div class="field-row">
+                <label class="field-label">등록상품명(판매자관리용) <span class="required-dot">•</span></label>
                 <div class="field-control">
                   <input class="input" id="internalNameInput" type="text" placeholder="판매자 내부 관리용 상품명 (고객에게 노출되지 않음)">
                 </div>
@@ -1550,6 +1545,11 @@
       function validateProductForm(rows) {
         if (!displayNameInput.value.trim()) {
           alert("노출상품명을 입력해주세요.");
+          return false;
+        }
+
+        if (!document.getElementById("internalNameInput").value.trim()) {
+          alert("등록상품명(판매자관리용)을 입력해주세요.");
           return false;
         }
 

@@ -144,7 +144,7 @@ CREATE TABLE PRODUCT (
     brand_name                  VARCHAR2(100), /* 브랜드 (브랜드 없음이면 NULL) */
     no_brand_yn                 CHAR(1) NOT NULL, /* 브랜드 없음(자체제작) 여부 Y/N */
     product_name                 VARCHAR2(150 CHAR) NOT NULL, /* 노출상품명 */
-    internal_name               VARCHAR2(100), /* 등록상품명(판매자관리용) */
+    internal_name               VARCHAR2(150 CHAR) NOT NULL, /* 등록상품명(판매자관리용) */
 
     /* 옵션 */
     option_yn                   CHAR(1) NOT NULL, /* 옵션 설정함(Y)/설정안함(N) */
@@ -173,7 +173,7 @@ CREATE TABLE PRODUCT (
     shipping_address               VARCHAR2(200) NOT NULL, /* 출고지 기본주소 */
     shipping_detail_address        VARCHAR2(200), /* 출고지 상세주소 */
     jeju_shipping_yn               CHAR(1) NOT NULL, /* 제주/도서산간 배송여부 */
-    delivery_service_code          VARCHAR2(30) NOT NULL, /* 택배사 */
+    delivery_service_code          VARCHAR2(50 CHAR) NOT NULL, /* 택배사 */
     delivery_method                VARCHAR2(40) NOT NULL, /* 배송방법 */
     bundle_shipping_yn             CHAR(1) NOT NULL, /* 묶음배송 가능여부 */
     shipping_fee_type              VARCHAR2(40) NOT NULL, /* 배송비 종류 */
