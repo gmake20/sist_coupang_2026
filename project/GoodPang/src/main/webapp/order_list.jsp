@@ -107,51 +107,78 @@
 
 
 
-
-
-			<!-- 3종 하단 액션 버튼 그룹 (가로 3개 나란히 배치) -->
-			<div class="delivery-buttons"
-				style="display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
-
-				<!-- [1] 배송조회 -->
-				<button type="button" class="delivery-btn btn-action primary"
-					onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'"
-					style="flex: 1; padding: 8px; border: 1px solid #0073e9; color: #0073e9; background: #fff; border-radius: 4px; cursor: pointer;">
-					배송 조회</button>
-
-				<!-- [2] 교환, 반품 신청 -->
-				<button type="button" class="delivery-btn btn-action"
-					onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'"
-					style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-					교환, 반품 신청</button>
-
-				<!-- [3] 리뷰 작성 / 내 리뷰 보기 -->
-				<c:set var="isReviewWritten" value="false" />
-
-				<c:forEach var="review" items="${reviewList}">
-					<c:if
-						test="${review.orderDetailNo eq prevItem.orderDetailNo and review.reviewWritten}">
-						<c:set var="isReviewWritten" value="true" />
-					</c:if>
-				</c:forEach>
-
-				<c:choose>
-					<c:when test="${isReviewWritten}">
+<!-- 하단 액션 버튼 그룹 (주문 상태별 분기) -->
+			<c:choose>
+				<%-- 1. 취소 관련 상태일 때: 배송조회/리뷰 버튼 제외, [취소 내역 조회] 단일 버튼만 출하 --%>
+				<c:when test="${prevItem.orderStatus eq '취소처리' or prevItem.orderStatus eq '주문취소' or prevItem.orderStatus eq '취소완료'}">
+					<div class="delivery-buttons"
+						style="display: flex; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
 						<button type="button" class="delivery-btn btn-action"
-							onclick="location.href='${pageContext.request.contextPath}/review/list?tab=written'"
+							onclick="location.href='${pageContext.request.contextPath}/order/cancel_history'"
 							style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-							내 리뷰 보기</button>
-					</c:when>
+							취소 내역 조회
+						</button>
+					</div>
+				</c:when>
 
-					<c:otherwise>
-						<button type="button" class="delivery-btn btn-action"
-							onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${prevItem.orderDetailNo}&productNo=${prevItem.productNo}'"
-							style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-							리뷰 작성하기</button>
-					</c:otherwise>
-				</c:choose>
+				<%-- 2. 일반 주문 상태일 때: 가로 3종 버튼 출력 --%>
+				<c:otherwise>
+					<div class="delivery-buttons"
+						style="display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
 
-			</div>
+						<!-- [1] 배송조회 버튼 -->
+						<button type="button" class="delivery-btn btn-action primary"
+							onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'"
+							style="flex: 1; padding: 8px; border: 1px solid #0073e9; color: #0073e9; background: #fff; border-radius: 4px; cursor: pointer;">
+							배송 조회
+						</button>
+
+						<!-- [2] 결제완료 / 기타 상태별 버튼 -->
+						<c:choose>
+							<c:when test="${prevItem.orderStatus eq '결제완료' or prevItem.orderStatus eq '결제 완료'}">
+								<button type="button" class="delivery-btn btn-action"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'"
+									style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
+									주문 취소
+								</button>
+							</c:when>
+							<c:otherwise>
+								<button type="button" class="delivery-btn btn-action"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'"
+									style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
+									교환, 반품 신청
+								</button>
+							</c:otherwise>
+						</c:choose>
+
+						<!-- [3] 리뷰 작성 / 작성한 리뷰 보기 버튼 -->
+						<c:set var="isReviewWritten" value="false" />
+						<c:forEach var="review" items="${reviewList}">
+							<c:if test="${review.orderDetailNo eq prevItem.orderDetailNo and review.reviewWritten}">
+								<c:set var="isReviewWritten" value="true" />
+							</c:if>
+						</c:forEach>
+
+						<c:choose>
+							<c:when test="${isReviewWritten}">
+								<button type="button" class="delivery-btn btn-action"
+									onclick="location.href='${pageContext.request.contextPath}/review/available'"
+									style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
+									작성한 리뷰 보기
+								</button>
+							</c:when>
+							<c:otherwise>
+								<button type="button" class="delivery-btn btn-action"
+									onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${prevItem.orderDetailNo}&productNo=${prevItem.productNo}'"
+									style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
+									리뷰 작성하기
+								</button>
+							</c:otherwise>
+						</c:choose>
+
+					</div>
+				</c:otherwise>
+			</c:choose>
 			<!-- // .delivery-buttons 닫기 -->
 	</div>
 	<!-- // .delivery-main 닫기 -->
