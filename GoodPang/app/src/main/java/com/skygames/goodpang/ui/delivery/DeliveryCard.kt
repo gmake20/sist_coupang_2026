@@ -115,6 +115,10 @@ fun DeliveryCard(
                 stringResource(R.string.delivery_label_buyer_phone), delivery.buyerPhone
             )
             InfoRow(
+                stringResource(R.string.delivery_label_address),
+                "(${delivery.zipcode}) ${delivery.address} ${delivery.detailAddress}"
+            )
+            InfoRow(
                 stringResource(R.string.delivery_label_status), delivery.deliveryStatus,
                 valueColor = DeliveryStatusColor
             )

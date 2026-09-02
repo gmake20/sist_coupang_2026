@@ -10,6 +10,7 @@
     <string name="delivery_label_invoice_no">송장번호</string>
     <string name="delivery_label_buyer_name">받는분</string>
     <string name="delivery_label_buyer_phone">연락처</string>
+    <string name="delivery_label_address">주소</string>
     <string name="delivery_label_status">배송상태</string>
     <string name="delivery_complete_button">배송완료</string>
     <string name="delivery_complete_confirm_title">배송완료 처리</string>
