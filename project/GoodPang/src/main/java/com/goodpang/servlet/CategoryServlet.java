@@ -104,9 +104,9 @@ public class CategoryServlet extends HttpServlet {
          * 색상(실제 동작)이 inert 그룹들 사이에 끼어있음. 별점/가격도 원본은 맨 끝이라 JSP에서 순서 맞춰 넣음. */
         request.setAttribute("beforeColorGroups", buildBeforeColorGroups());
         request.setAttribute("afterColorGroups", buildAfterColorGroups());
-        // "필터" 제목 바로 아래, 소제목(h3) 없이 나오는 체크박스 줄 — 2026-08-31 실측(1440px 스크린샷)한
-        // 실제 라벨 그대로("로켓럭셔리만 보기" 등은 처음에 잘못 짐작한 것, 이걸로 교체). 로켓 배지 이미지는 없어서 글자만
-        request.setAttribute("topFilterItems", new String[] { "로켓", "R.LUX만 보기", "로켓와우만 보기", "로켓직구만 보기", "C.에비뉴", "무료배송" });
+        // 2026-09-05: "필터" 제목 아래 배송 체크박스 줄(topFilterItems)은 여기서 안 내려줌 —
+        // 원본을 다시 재보니 평평한 목록이 아니라 "로켓 전체" 밑에 3줄이 들어가는 2단 구조여서,
+        // 문자열 배열로는 표현이 안 됨. DB 연동이 없는 장식용 줄이라 category_list.jsp 안에 직접 적어둠
 
         // 배송예정일 — ProductServlet(상세페이지)과 완전히 같은 계산식 재사용(2026-09-02 추가).
         // 실제 배송정보 컬럼(SHIPPING_FEE_TYPE/DELIVERY_METHOD/LEAD_TIME_DAYS)을 아직 어디서도 안 써서
@@ -114,7 +114,9 @@ public class CategoryServlet extends HttpServlet {
         // 모든 카드에 똑같이 씀. 실제 컬럼 연동되면 그때 상품별로 갈라줄 것
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         String dayOfWeek = tomorrow.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);
-        String deliveryDate = "내일(" + dayOfWeek + ") " + tomorrow.getMonthValue() + "/" + tomorrow.getDayOfMonth();
+        // 2026-09-05 재실측: 원본은 로켓 상품일 때 날짜(M/d) 없이 "내일(목) 도착 보장" 이라고만 씀
+        // (날짜가 붙는 건 "9/5(토) 도착 예정" 처럼 로켓이 아닌 상품 쪽). "도착 보장" 글자는 JSP 에 있음
+        String deliveryDate = "내일(" + dayOfWeek + ")";
         request.setAttribute("deliveryDate", deliveryDate);
 
         request.getRequestDispatcher("/WEB-INF/views/category_list.jsp").forward(request, response);

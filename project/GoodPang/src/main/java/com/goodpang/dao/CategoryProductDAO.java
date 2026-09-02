@@ -335,7 +335,7 @@ public class CategoryProductDAO {
         dto.setSaleCount(rs.getInt("SALE_COUNT"));
 
         // 적립 — 실제 적립 정책 테이블이 없어서 판매가 1%로 임의 계산
-        dto.setCashReward((int) Math.floor(dto.getSalePrice() * 0.01));
+        dto.setCashReward((int) Math.floor(dto.getSalePrice() * 0.05));
 
         return dto;
     }

@@ -75,9 +75,43 @@ document.addEventListener('DOMContentLoaded', function () {
 // "+ 더보기" 를 누르면 나머지가 펼쳐지며 버튼 글자가 "- 접기"로 바뀜.
 // 카테고리/평점/가격처럼 <a> 링크만 있는 목록은 원본도 접지 않으므로, "체크박스가 들어있는 ul"만 골라서 처리함
 // (li 개수가 아니라 checkbox 유무로 판별 — 카테고리 ul은 12개나 되지만 원본이 안 접기 때문).
+//
+// ★ 2026-09-05 버그 수정 — "색상에서 더보기를 눌러 펼친 뒤 새로고침하면 다시 접힘".
+// 원인: 펼침 상태를 이 파일 안 변수(folded)에만 들고 있었는데, 색상 필터를 하나 고르면
+// 페이지가 통째로 다시 요청되면서(=우리 필터는 전부 서버 재요청 방식) 그 변수가 사라짐.
+// 그래서 "색을 고르려고 더보기를 눌렀는데, 고르는 순간 다시 접혀버리는" 상황이 매번 생겼음.
+//
+// 고친 방법: 펼친 그룹의 제목을 sessionStorage 에 적어둠.
+//  - sessionStorage 는 "그 탭이 열려있는 동안"만 남는 저장소라, 새로고침·필터 이동에는 살아남고
+//    탭을 닫으면 깨끗이 지워짐 — 화면 설정 하나 기억하는 용도로 딱 맞음(로그인처럼 중요한 값 아님)
+//  - 그룹을 구분하는 열쇠는 그룹 제목(h3) 글자. 카테고리가 바뀌면 필터 구성도 달라질 수 있어서
+//    카테고리 번호(URL 의 categoryNo)까지 같이 열쇠에 넣음
+//  - 브라우저 설정에 따라 sessionStorage 를 아예 못 쓰는 경우가 있어서 try/catch 로 감쌈
+//    (못 쓰면 상태 유지만 안 될 뿐, 더보기 기능 자체는 그대로 동작)
 document.addEventListener('DOMContentLoaded', function () {
 	var FOLD_LIMIT = 5;
 	var lists = document.querySelectorAll('.category-filter .filter-group ul');
+
+	var categoryNo = new URLSearchParams(location.search).get('categoryNo') || '';
+	var STORAGE_KEY = 'category-filter-unfolded:' + categoryNo;
+
+	function loadUnfolded() {
+		try {
+			return JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || [];
+		} catch (e) {
+			return [];
+		}
+	}
+
+	function saveUnfolded(list) {
+		try {
+			sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+		} catch (e) {
+			/* 저장이 막힌 브라우저 — 상태 유지만 포기하고 그냥 넘어감 */
+		}
+	}
+
+	var unfolded = loadUnfolded();
 
 	lists.forEach(function (ul) {
 		if (!ul.querySelector('input[type="checkbox"]')) return;
@@ -85,24 +119,38 @@ document.addEventListener('DOMContentLoaded', function () {
 		var items = Array.prototype.slice.call(ul.children);
 		if (items.length <= FOLD_LIMIT) return;
 
+		// 그룹 제목 — <section class="filter-group"> 안의 h3. 제목 없는 그룹(맨 위 배송 줄)은 li 개수가
+		// 적어서 여기까지 안 오지만, 혹시 몰라 제목이 없으면 순서 번호로 대신함
+		var section = ul.closest('.filter-group');
+		var heading = section && section.querySelector('h3');
+		var groupKey = heading ? heading.textContent.trim() : ('group-' + Array.prototype.indexOf.call(lists, ul));
+
 		var hiddenItems = items.slice(FOLD_LIMIT);
-		hiddenItems.forEach(function (li) { li.hidden = true; });
+
+		// 새로고침 전에 펼쳐뒀던 그룹이면 처음부터 펼친 상태로 시작
+		var folded = unfolded.indexOf(groupKey) === -1;
+		hiddenItems.forEach(function (li) { li.hidden = folded; });
 
 		var toggleLi = document.createElement('li');
 		toggleLi.className = 'filter-fold-toggle';
 
 		var toggleBtn = document.createElement('a');
 		toggleBtn.href = '#';
-		toggleBtn.textContent = '+ 더보기';
+		toggleBtn.textContent = folded ? '+ 더보기' : '- 접기';
 		toggleLi.appendChild(toggleBtn);
 		ul.appendChild(toggleLi);
 
-		var folded = true;
 		toggleBtn.addEventListener('click', function (e) {
 			e.preventDefault();
 			folded = !folded;
 			hiddenItems.forEach(function (li) { li.hidden = folded; });
 			toggleBtn.textContent = folded ? '+ 더보기' : '- 접기';
+
+			// 펼쳤으면 목록에 추가, 접었으면 제거해서 다시 저장
+			var idx = unfolded.indexOf(groupKey);
+			if (!folded && idx === -1) unfolded.push(groupKey);
+			if (folded && idx !== -1) unfolded.splice(idx, 1);
+			saveUnfolded(unfolded);
 		});
 	});
 });
