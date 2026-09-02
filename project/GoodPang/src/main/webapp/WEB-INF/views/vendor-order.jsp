@@ -397,6 +397,10 @@
   </div>
 
 
+  <c:if test="${param.shipError == 'duplicateInvoice'}">
+    <script>alert("송장번호가 이미 사용 중입니다. 다른 송장번호를 입력해주세요.");</script>
+  </c:if>
+
   <script src="${pageContext.request.contextPath}/js/vendor-common.js"></script>
   <script>
 
