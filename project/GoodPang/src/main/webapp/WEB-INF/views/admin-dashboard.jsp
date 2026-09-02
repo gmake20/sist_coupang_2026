@@ -70,6 +70,11 @@
       <p>배송중인 주문 목록을 확인하고 배송완료 처리합니다.</p>
     </a>
 
+    <a class="menu-card" href="${pageContext.request.contextPath}/admin/notices">
+      <h2>공지사항 관리</h2>
+      <p>판매자에게 노출되는 공지사항을 등록/수정/삭제합니다.</p>
+    </a>
+
   </div>
 
 </body>

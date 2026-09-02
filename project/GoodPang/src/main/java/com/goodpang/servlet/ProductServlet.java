@@ -10,6 +10,7 @@ import java.util.Locale;
 import com.goodpang.dao.ProductDAO;
 import com.goodpang.dao.ProductImageDAO;
 import com.goodpang.dao.ProductOptionDAO;
+import com.goodpang.dao.ProductViewLogDAO;
 import com.goodpang.dao.ReviewDAO;
 import com.goodpang.dto.ProductDTO;
 import com.goodpang.dto.ProductImageDTO;
@@ -58,6 +59,10 @@ public class ProductServlet extends HttpServlet {
                 request.setAttribute("deliveryDate", deliveryDate);
 
                 request.setAttribute("p", product);
+
+                // 판매자 대시보드 "오늘 방문자수/상품노출수" 집계용 조회 로그
+                Integer memberNo = (Integer) request.getSession().getAttribute("memberNo");
+                new ProductViewLogDAO().logView(productNo, memberNo, request.getSession().getId());
 
                 // 옵션 + 옵션별/상세설명 사진
                 //  옵션 하나(OPTION_ID)마다 대표/추가 사진이 딸려있고, OPTION_ID 가 null 인 사진은
