@@ -108,7 +108,7 @@ function renderMidPanel(midItems, subList, mainImgUrl) {
 
     const isActive = mid.categoryNo === firstWithSub;
     return '<li data-mid="' + mid.categoryNo + '"' + (isActive ? ' class="is-active"' : '') + '>'
-      + '<a href="#">' + escapeCategoryHtml(mid.categoryName) + '<i class="si"></i></a>'
+      + '<a href="/category?categoryNo=' + mid.categoryNo + '">' + escapeCategoryHtml(mid.categoryName) + '<i class="si"></i></a>'
       + '</li>';
   }).join('');
 

@@ -16,11 +16,33 @@ import com.goodpang.util.ConnectionProvider;
  */
 public class CategoryProductDAO {
 
-    // 정렬 화이트리스트 — 원본은 5개(쿠팡랭킹순 포함)지만 우리는 4개만(2026-08-30 확정, 쿠팡랭킹순 제외)
+    // 정렬 화이트리스트
     public enum Sort {
-        LATEST, PRICE_ASC, PRICE_DESC, SALE_COUNT
+        LATEST, PRICE_ASC, PRICE_DESC, SALE_COUNT, RANKING
     }
-
+    
+    /*
+     * "이 카테고리 + 그 밑에 딸린 카테고리 전부" 를 뜻하는 조건 (2026-09-03 추가).
+     *
+     * 중분류 페이지(예: 남녀 공용 의류)는 자기 밑의 소분류(티셔츠·바지…) 상품까지 다 보여줘야 하는데,
+     * 예전 조건인 `P.SUB_CATEGORY_NO = ?` 는 딱 한 카테고리만 골라서 중분류로 열면 상품이 0개가 됩니다.
+     *
+     * START WITH / CONNECT BY 는 오라클이 "부모-자식으로 이어진 줄기"를 따라가는 문법입니다.
+     *   START WITH CATEGORY_NO = ?                        → 여기서 출발해서
+     *   CONNECT BY PRIOR CATEGORY_NO = PARENT_CATEGORY_NO → 자식 방향으로 계속 내려가며 모아라
+     * 그래서 103(남녀 공용 의류)을 넣으면 103, 10301, 10302 … 10312 가 전부 나옵니다.
+     *
+     * ★ 소분류(10301 등)를 넣으면 자기 밑에 자식이 없으니 자기 자신 하나만 나옵니다.
+     *   = 예전 `= ?` 와 결과가 완전히 같아서, 소분류 페이지는 아무것도 안 바뀝니다(그래서 분기 없이 이걸로 통일).
+     * ★ 물음표(?) 개수도 예전과 똑같이 1개라 자바 쪽 setInt 순서는 손댈 필요가 없습니다.
+     */
+    private static final String CATEGORY_TREE_CONDITION = """
+            P.SUB_CATEGORY_NO IN (
+                    SELECT CATEGORY_NO FROM CATEGORY
+                    START WITH CATEGORY_NO = ?
+                    CONNECT BY PRIOR CATEGORY_NO = PARENT_CATEGORY_NO
+                  )""";
+    
     // 상품 목록 하나의 SELECT 본문 + FROM/JOIN 은 count 조회와 겹쳐서 재사용.
     // 색상 조건은 다중선택(2026-09-02)이라 자리표시자 개수가 매번 달라져서 상수에서 뺐음 — buildColorCondition() 참고
     private static final String BASE_FROM_HEAD = """
@@ -29,7 +51,7 @@ public class CategoryProductDAO {
                 SELECT PRODUCT_NO, PRICE, NORMAL_PRICE
                 FROM (
                     SELECT PRODUCT_NO, PRICE, NORMAL_PRICE,
-                           ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY PRICE ASC) AS RN
+                           ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID ASC) AS RN
                     FROM PRODUCT_OPTION
                 )
                 WHERE RN = 1
@@ -55,7 +77,16 @@ public class CategoryProductDAO {
                 WHERE o.ORDER_STATUS != '주문취소'
                 GROUP BY od.PRODUCT_NO
             ) SC ON SC.PRODUCT_NO = P.PRODUCT_NO
-            WHERE P.SUB_CATEGORY_NO = ?
+            LEFT JOIN (
+                SELECT PRODUCT_NO, COUNT(*) AS OPTION_COUNT
+                FROM PRODUCT_OPTION
+                GROUP BY PRODUCT_NO
+            ) OC ON OC.PRODUCT_NO = P.PRODUCT_NO
+            WHERE
+            """
+            + CATEGORY_TREE_CONDITION
+            + """
+
               AND P.SALE_STATUS != '승인 대기'
               AND P.DISPLAY_YN = 'Y'
               AND (P.PRODUCT_PRICE + NVL(OPT.PRICE, 0)) BETWEEN ? AND ?
@@ -106,6 +137,7 @@ public class CategoryProductDAO {
                     P.PRODUCT_PRICE + NVL(OPT.PRICE, 0) AS SALE_PRICE,
                     CASE WHEN OPT.NORMAL_PRICE IS NOT NULL
                          THEN P.PRODUCT_PRICE + OPT.NORMAL_PRICE END AS NORMAL_PRICE,
+                    CASE WHEN P.SALE_STATUS = '품절' THEN 'Y' ELSE 'N' END AS SOLD_OUT,     
                     NVL(RV.AVG_RATING, 0) AS AVG_RATING,
                     NVL(RV.REVIEW_COUNT, 0) AS REVIEW_COUNT,
                     NVL(SC.SALE_COUNT, 0) AS SALE_COUNT
@@ -186,17 +218,29 @@ public class CategoryProductDAO {
                     SELECT PO.OPTION1_VALUE AS OPTION_VALUE
                     FROM PRODUCT_OPTION PO
                     JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
-                    WHERE P.SUB_CATEGORY_NO = ? AND PO.OPTION1_TYPE = '색상'
+                    WHERE
+                """
+                + CATEGORY_TREE_CONDITION
+                + """
+                 AND PO.OPTION1_TYPE = '색상'
                     UNION
                     SELECT PO.OPTION2_VALUE
                     FROM PRODUCT_OPTION PO
                     JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
-                    WHERE P.SUB_CATEGORY_NO = ? AND PO.OPTION2_TYPE = '색상'
+                    WHERE
+                """
+                + CATEGORY_TREE_CONDITION
+                + """
+                 AND PO.OPTION2_TYPE = '색상'
                     UNION
                     SELECT PO.OPTION3_VALUE
                     FROM PRODUCT_OPTION PO
                     JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
-                    WHERE P.SUB_CATEGORY_NO = ? AND PO.OPTION3_TYPE = '색상'
+                    WHERE
+                """
+                + CATEGORY_TREE_CONDITION
+                + """
+                 AND PO.OPTION3_TYPE = '색상'
                 )
                 WHERE OPTION_VALUE IS NOT NULL
                 ORDER BY OPTION_VALUE
@@ -224,18 +268,118 @@ public class CategoryProductDAO {
         return colors;
     }
 
-    // 브레드크럼 — [대분류, 중분류, 소분류] 순서로 3칸 고정. CATEGORY 가 자기참조 트리라 3번 자기조인.
+    /*
+     * 브레드크럼 — 2026-09-03 수정: 레벨에 상관없이 "루트부터 현재 카테고리까지" 를 돌려준다.
+     *
+     * 예전엔 CATEGORY 를 3번 자기조인해서 소분류(레벨3)에서만 결과가 나왔고, 중분류(레벨2)로 열면
+     * 한 줄도 안 나와서 브레드크럼이 통째로 사라졌음.
+     *
+     * 이번엔 CATEGORY_TREE_CONDITION 과 반대 방향으로, 자식에서 부모 쪽으로 거슬러 올라간다:
+     *   CONNECT BY PRIOR PARENT_CATEGORY_NO = CATEGORY_NO
+     * 그래서 10301(티셔츠)을 넣으면 [패션의류/잡화, 남녀 공용 의류, 티셔츠] 3칸,
+     *       103(남녀 공용 의류)을 넣으면 [패션의류/잡화, 남녀 공용 의류] 2칸이 나온다.
+     *
+     * ORDER BY CATEGORY_LEVEL 로 항상 [대분류 → … → 현재] 순서가 보장됨.
+     * ★ 칸 수가 레벨마다 달라지므로 화면에서 breadcrumb[2] 처럼 번호로 집어 쓰면 안 됨 —
+     *   그래서 JSP 의 제목은 서블릿이 따로 내려주는 categoryName 을 쓴다.
+     */
     public CategoryDTO[] findBreadcrumb(int categoryNo) {
 
+        List<CategoryDTO> crumbs = new ArrayList<>();
+
         String sql = """
-                SELECT
-                    SC.CATEGORY_NO   AS SUB_NO,   SC.CATEGORY_NAME   AS SUB_NAME,
-                    MC.CATEGORY_NO   AS MID_NO,   MC.CATEGORY_NAME   AS MID_NAME,
-                    MAINC.CATEGORY_NO AS MAIN_NO, MAINC.CATEGORY_NAME AS MAIN_NAME
-                FROM CATEGORY SC
-                JOIN CATEGORY MC    ON SC.PARENT_CATEGORY_NO = MC.CATEGORY_NO
-                JOIN CATEGORY MAINC ON MC.PARENT_CATEGORY_NO = MAINC.CATEGORY_NO
-                WHERE SC.CATEGORY_NO = ?
+                SELECT CATEGORY_NO, CATEGORY_NAME, PARENT_CATEGORY_NO, CATEGORY_LEVEL
+                FROM CATEGORY
+                START WITH CATEGORY_NO = ?
+                CONNECT BY PRIOR PARENT_CATEGORY_NO = CATEGORY_NO
+                ORDER BY CATEGORY_LEVEL
+                """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setInt(1, categoryNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    crumbs.add(mapCategoryRow(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return crumbs.toArray(new CategoryDTO[0]);
+    }
+
+    /*
+     * CATEGORY 한 줄 → CategoryDTO 로 바꾸는 공통 코드 (2026-09-03 추가).
+     * 아래 세 곳(브레드크럼/자식목록/자기자신)이 같이 쓴다.
+     * 대분류(레벨1)만 이미지 경로를 붙이는 규칙은 findSiblingCategories() 에 있던 걸 그대로 옮긴 것.
+     */
+    private CategoryDTO mapCategoryRow(ResultSet rs) throws java.sql.SQLException {
+        long no = rs.getLong("CATEGORY_NO");
+        int level = rs.getInt("CATEGORY_LEVEL");
+        return new CategoryDTO(
+            no,
+            rs.getString("CATEGORY_NAME"),
+            rs.getLong("PARENT_CATEGORY_NO"),
+            level,
+            level == 1 ? "./pds/category_" + no + ".png" : null,
+            null
+        );
+    }
+
+    /*
+     * 자식 카테고리 목록 (2026-09-03 추가) — 중분류 페이지에서 두 군데에 쓴다.
+     *   1) 제목 아래 원형 타일 그리드(티셔츠·맨투맨/후드티 …)
+     *   2) 왼쪽 필터 사이드바의 "카테고리" 그룹
+     * (소분류 페이지는 예전처럼 형제 목록인 findSiblingCategories() 를 쓴다)
+     */
+    public List<CategoryDTO> findChildCategories(int categoryNo) {
+
+        List<CategoryDTO> list = new ArrayList<>();
+
+        String sql = """
+                SELECT CATEGORY_NO, CATEGORY_NAME, PARENT_CATEGORY_NO, CATEGORY_LEVEL
+                FROM CATEGORY
+                WHERE PARENT_CATEGORY_NO = ?
+                ORDER BY CATEGORY_NO
+                """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setInt(1, categoryNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapCategoryRow(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    /*
+     * 현재 카테고리 자기 자신 (2026-09-03 추가) — 서블릿이 "이 페이지가 중분류인지 소분류인지"를
+     * CATEGORY_LEVEL 로 판단하고, 화면 제목(h1)에 쓸 이름도 여기서 가져온다. 없는 번호면 null.
+     */
+    public CategoryDTO findCategory(int categoryNo) {
+
+        String sql = """
+                SELECT CATEGORY_NO, CATEGORY_NAME, PARENT_CATEGORY_NO, CATEGORY_LEVEL
+                FROM CATEGORY
+                WHERE CATEGORY_NO = ?
                 """;
 
         try (
@@ -247,11 +391,7 @@ public class CategoryProductDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    long mainNo = rs.getLong("MAIN_NO");
-                    CategoryDTO main = new CategoryDTO(mainNo, rs.getString("MAIN_NAME"), null, 1, "./pds/category_" + mainNo + ".png", null);
-                    CategoryDTO mid = new CategoryDTO(rs.getLong("MID_NO"), rs.getString("MID_NAME"), mainNo, 2, null, null);
-                    CategoryDTO sub = new CategoryDTO(rs.getLong("SUB_NO"), rs.getString("SUB_NAME"), rs.getLong("MID_NO"), 3, null, null);
-                    return new CategoryDTO[] { main, mid, sub };
+                    return mapCategoryRow(rs);
                 }
             }
 
@@ -259,7 +399,7 @@ public class CategoryProductDAO {
             e.printStackTrace();
         }
 
-        return new CategoryDTO[0];
+        return null;
     }
 
     // 형제 카테고리 목록 — 필터 사이드바의 "카테고리" 그룹(예: 티셔츠와 같은 레벨의 맨투맨/셔츠/바지 등)
@@ -311,6 +451,11 @@ public class CategoryProductDAO {
             case PRICE_DESC -> "(P.PRODUCT_PRICE + NVL(OPT.PRICE, 0)) DESC";
             case SALE_COUNT -> "NVL(SC.SALE_COUNT, 0) DESC";
             case LATEST     -> "P.CREATED_DATE DESC";
+            // 다단계 우선순위 정렬(2026-09-02) — 데이터 규모가 작아 가중합/베이지안 보정 대신 선택.
+            // 판매량 → 평점 → 리뷰수 → 옵션수 순으로 동점 처리. 
+            case RANKING    -> "NVL(SC.SALE_COUNT, 0) DESC, NVL(RV.AVG_RATING, 0) DESC, "
+                              + "NVL(RV.REVIEW_COUNT, 0) DESC, NVL(OC.OPTION_COUNT, 0) DESC, "
+                              + "P.PRODUCT_NO DESC";   // 동점일 때 항상 같은 순서가 나오도록 최종 기준 추가(2026-09-03)
         };
     }
 
@@ -334,8 +479,7 @@ public class CategoryProductDAO {
         dto.setAvgRating(rs.getDouble("AVG_RATING"));
         dto.setReviewCount(rs.getInt("REVIEW_COUNT"));
         dto.setSaleCount(rs.getInt("SALE_COUNT"));
-
-        // 적립 — 실제 적립 정책 테이블이 없어서 판매가 1%로 임의 계산
+        dto.setSoldOut("Y".equals(rs.getString("SOLD_OUT")));
         dto.setCashReward((int) Math.floor(dto.getSalePrice() * 0.05));
 
         return dto;

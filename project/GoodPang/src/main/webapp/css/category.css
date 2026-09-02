@@ -443,7 +443,7 @@ label.selected .filter-function-bar-asset::after,
 	align-items: center;
 	justify-content: space-between;
 	background: #FAFAFA;
-	padding: 4px 0;
+	padding: 4px 10px;
 	margin-bottom: 15px;
 }
 
@@ -451,6 +451,21 @@ label.selected .filter-function-bar-asset::after,
 	display: flex;
 	list-style: none;
 	gap: 16px;
+}
+
+.sort-bar li {
+      position: relative;
+}
+
+.sort-bar li:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      right: -8px;                 /* gap(16px)의 정중앙 */
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 11px;
+      background: #B6B6B6;
 }
 
 .sort-bar a {
@@ -464,6 +479,12 @@ label.selected .filter-function-bar-asset::after,
 	color: var(--link-blue);
 	font-weight: 700;
 }
+
+.sort-bar li.Sort_selected a::before {
+      content: "\2713";  /* 체크마크(✓) — 텍스트 문자라 이미지 파일 없이 처리 가능 */
+      margin-right: 4px;
+}
+
 
 /* 60/120개씩 보기 — 2026-09-03 2차: 나란히 두 개 보여주는 방식이 원본과 달라서(원본은 호버 드롭다운)
    다시 실측(browser_evaluate + hover)해서 순수 CSS 드롭다운으로 재구현.
@@ -790,6 +811,24 @@ label.selected .filter-function-bar-asset::after,
 	margin-right: 2px;
 }
 
+/* 품절 — 2026-09-03 원본 실측(Playwright). 이미지·상품명은 그대로, 가격·배지만 흐리게 처리하고
+   가격 밑에 "일시품절" 문구를 붙임(오버레이 아님). CategoryProductDAO 의 SOLD_OUT
+   (PRODUCT.SALE_STATUS='품절' = 모든 옵션 재고 0) 기준 그대로 사용 */
+.product-card .price-badge-row.is-soldout .sale-price {
+	color: #CCCCCC;
+}
+
+.product-card .price-badge-row.is-soldout img {
+	opacity: 0.4;
+}
+
+.product-card .sold-out-text {
+	margin-top: 5px;
+	font-size: 14px;
+	font-weight: 700;
+	color: #333333;
+}
+
 /* 배송문구 — 2026-09-05 재실측으로 색상 정정(사용자 지적 "초록색이던데?" — 맞음).
    원본은 상품에 따라 두 가지로 갈림:
      · 로켓(내일 도착) 상품 → "내일(목) 도착 보장", 색 #008C00 (초록)
@@ -949,4 +988,102 @@ label.selected .filter-function-bar-asset::after,
 
 .also-viewed-list a:hover {
 	text-decoration: underline;
+}
+
+/* ==================================================
+   중분류(레벨2) 페이지 전용 — 제목 아래 카테고리 타일 + 배너 (2026-09-03 추가)
+
+   ★ 아래 숫자는 전부 원본 쿠팡에서 실제로 잰 값.
+     원본은 이 영역이 통짜 이미지(1080x623)라서 CSS 로 잴 수가 없어서,
+     이미지를 받아 픽셀을 직접 훑어서 원/글자의 경계 좌표를 뽑았음:
+       - 원 지름 110px, 원 배경 #F5F5F5
+       - 가로 중심 간격 132px  → 원 사이 여백 132-110 = 22px
+       - 세로 중심 간격 178px  → 아래 계산으로 행 간격 31px
+       - 글자 색 #0F0F0F, 원 아래 16px 떨어진 곳에서 글자가 시작
+       - 5칸이 본문(1080px) 한가운데 정렬 (좌우 여백 각 221px)
+
+   ★ 이 CSS 로 그린 결과를 브라우저에 띄워서 원본과 대조함 —
+     타일 영역 전체 높이가 우리 621px / 원본 623px 로 2px 차이.
+     글자 크기만 원본과 다른데 그 이유는 아래 .tile-name 주석 참고.
+   ================================================== */
+
+.mid-extra {
+	margin-bottom: 40px;
+}
+
+/* 타일 그리드 — 5칸 고정, 가운데 정렬.
+   위/아래 여백 60px / 58px 도 원본 이미지의 빈 공간을 잰 값 */
+.category-tiles {
+	display: grid;
+	grid-template-columns: repeat(5, 110px);
+	column-gap: 22px;
+	row-gap: 31px;
+	justify-content: center;
+	padding: 60px 0 58px;
+}
+
+.category-tiles li {
+	list-style: none;
+}
+
+.category-tiles a {
+	display: block;
+	text-align: center;
+	text-decoration: none;
+}
+
+/* 원형 사진 칸. 사진이 원 밖으로 안 삐져나오게 overflow:hidden 을 같이 줌 */
+.tile-thumb {
+	display: block;
+	width: 110px;
+	height: 110px;
+	border-radius: 50%;
+	background: #F5F5F5;
+	overflow: hidden;
+}
+
+.tile-thumb img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* 카테고리 이름.
+   원본은 글자 윗변이 원 아래에서 16px 떨어져 있는데, 글자 위아래로 생기는 빈틈(line-height 로
+   생기는 여백)이 약 7px 이라 margin-top 은 9px 로 줘야 실제로 16px 이 됨.
+
+   ★ font-size 만 원본(20px)과 다름 — 이유:
+     원본 배너는 이름을 줄여서("맨투맨/후디", "니트/조끼", "커플/패밀리룩") 넣어서 20px 여도 넉넉했는데,
+     우리는 DB 의 정식 이름("맨투맨/후드티", "니트류/조끼", "커플룩/패밀리룩")을 그대로 씀.
+     20px 로 그려보니 "후드집업/집업류" 가 타일 폭(110px)을 좌우 19px 씩 넘쳐서, 옆의 "니트류/조끼" 와
+     사이가 3px 밖에 안 남아 두 이름이 한 덩어리로 붙어 읽혔음(실제로 브라우저에 띄워서 확인).
+     16px 로 줄이면 넘침이 4px 로 줄어 사이가 18px 벌어짐.
+     원 크기(110px)·간격(132px)·가운데 정렬은 원본 실측값 그대로 두고 글자 크기만 조정한 것.
+
+   white-space:nowrap 은 이름이 두 줄로 접히는 걸 막음. 접히면 "맨투맨/후드 티" 처럼
+   엉뚱한 데서 끊기고, 그 타일만 키가 커져서 줄 간격이 원본과 어긋남 */
+.tile-name {
+	display: block;
+	white-space: nowrap;
+	margin-top: 9px;
+	font-size: 16px;
+	line-height: 1.4;
+	color: #0F0F0F;
+}
+
+/* 배너 4장 — 원본은 배너끼리 딱 붙어 있고, 첫 배너(링크 모음) 뒤에만 10px 이 뜸.
+   원본에선 그 10px 자리에 높이 10px 짜리 빈 이미지가 한 장 더 들어가 있었는데,
+   이미지를 한 장 더 받을 이유가 없어서 margin 으로 대신함 */
+.mid-banners a {
+	display: block;
+}
+
+.mid-banners img {
+	display: block;
+	width: 100%;
+}
+
+.mid-banners .banner-quicklinks {
+	margin-bottom: 10px;
 }

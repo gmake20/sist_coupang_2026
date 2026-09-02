@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.io.File;   // 2026-09-03 추가 — 타일 이미지 파일이 실제로 있는지 확인하는 데 씀
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -72,6 +73,19 @@ public class CategoryServlet extends HttpServlet {
 
         CategoryProductDAO dao = new CategoryProductDAO();
 
+        /*
+         * 2026-09-03 추가 — 이 페이지가 중분류(레벨2)인지 소분류(레벨3)인지 여기서 갈린다.
+         *
+         * 쿠팡 원본도 /np/categories/502993(남녀 공용 의류)와 /np/categories/502994(티셔츠)가
+         * 같은 주소 모양을 쓰고, 중분류일 때만 제목 아래에 카테고리 타일 + 배너가 더 붙는 구조.
+         * 그래서 우리도 서블릿·JSP 를 새로 만들지 않고 레벨로만 갈라 쓴다.
+         *
+         * 없는 카테고리 번호면 current 가 null 이 되는데, 그때는 소분류처럼(타일 없이) 그린다.
+         */
+        CategoryDTO current = dao.findCategory(categoryNo);
+        boolean isMidCategory = (current != null && current.getCategoryLevel() == 2);
+        List<CategoryDTO> childCategories = dao.findChildCategories(categoryNo);
+
         List<CategoryProductDTO> products =
                 dao.findByCategory(categoryNo, sort, minPrice, maxPrice, minRating, colors, page, listSize);
         int totalCount = dao.countByCategory(categoryNo, minPrice, maxPrice, minRating, colors);
@@ -97,6 +111,33 @@ public class CategoryServlet extends HttpServlet {
         request.setAttribute("breadcrumb", breadcrumb);          // [대분류, 중분류, 소분류]
         request.setAttribute("siblingCategories", siblingCategories);
         request.setAttribute("colorOptions", colorOptions);
+
+        /*
+         * 2026-09-03 추가 — 화면 제목(h1)과 <title> 에 쓸 이름.
+         * 예전엔 JSP 가 breadcrumb[2].categoryName 으로 소분류 이름을 집어 썼는데, 브레드크럼 칸 수가
+         * 레벨마다 달라져서(중분류는 2칸) [2]번이 없어 빈칸이 됐음. 그래서 이름은 따로 내려준다.
+         */
+        request.setAttribute("categoryName", current != null ? current.getCategoryName() : "");
+        request.setAttribute("isMidCategory", isMidCategory);
+
+        /*
+         * 왼쪽 필터 사이드바의 "카테고리" 그룹 —
+         *   중분류 페이지: 자식 목록(티셔츠·맨투맨/후드티 …)   ← 원본 쿠팡도 이럼
+         *   소분류 페이지: 예전 그대로 형제 목록
+         * 맨 아래 "함께 본 카테고리"는 두 경우 다 형제(siblingCategories)를 계속 쓴다 — 이것도 원본과 같음.
+         */
+        request.setAttribute("sidebarCategories", isMidCategory ? childCategories : siblingCategories);
+
+        /*
+         * 제목 아래 원형 타일 그리드에 쓸 목록.
+         *
+         * ★ "이미지 파일이 실제로 있는 카테고리만" 넣는다.
+         *   쿠팡 원본도 남녀 공용 의류 밑에 카테고리가 12개인데 타일은 11개뿐이고(스포츠의류는 사이드바에만 있음),
+         *   우리도 원본에서 가져온 타일 이미지가 11개뿐이라 같은 모양이 된다.
+         *   나중에 스포츠의류 타일 이미지가 생기면 webapp/images/category/tile_10312.png 로 넣기만 하면
+         *   코드는 안 고쳐도 타일이 12개로 늘어난다.
+         */
+        request.setAttribute("categoryTiles", isMidCategory ? tilesWithImage(childCategories) : null);
 
         /* 실제 DB에 속성 컬럼 자체가 없는 필터들 — 화면엔 보여주되(원본과 동일 구성) 동작은 안 함(2026-08-30 확정).
          * 2026-08-31: 원본 실측(Playwright browser_evaluate, ref/category/STRUCTURE.md)한 순서 그대로 맞추려고
@@ -180,5 +221,24 @@ public class CategoryServlet extends HttpServlet {
         groups.put("상하의세트 여부", new String[] { "상의", "하의", "상하의세트" });
         groups.put("스타일", new String[] { "캐주얼", "홈웨어", "오피스", "스포티" });
         return groups;
+    }
+
+    /*
+     * 타일 이미지가 실제로 있는 카테고리만 걸러낸다 (2026-09-03 추가).
+     *
+     * getRealPath() 는 "웹에서 보이는 경로(/images/...)"를 "하드디스크의 진짜 경로(C:\\...)"로 바꿔준다.
+     * 그래야 File.exists() 로 파일이 있는지 확인할 수 있다.
+     * 파일이 없는 카테고리는 타일에서 빼고, 왼쪽 사이드바 목록에는 그대로 남는다(원본과 같은 동작).
+     */
+    private List<CategoryDTO> tilesWithImage(List<CategoryDTO> children) {
+        List<CategoryDTO> tiles = new ArrayList<>();
+        for (CategoryDTO child : children) {
+            String realPath = getServletContext()
+                    .getRealPath("/images/category/tile_" + child.getCategoryNo() + ".png");
+            if (realPath != null && new File(realPath).exists()) {
+                tiles.add(child);
+            }
+        }
+        return tiles;
     }
 }
