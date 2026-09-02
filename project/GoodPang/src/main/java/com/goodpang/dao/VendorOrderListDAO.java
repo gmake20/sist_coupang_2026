@@ -190,6 +190,11 @@ public class VendorOrderListDAO {
                     return false;
                 }
 
+                if (invoiceNoInUse(conn, deliveryServiceCode, invoiceNo)) {
+                    conn.rollback();
+                    return false;
+                }
+
                 insertDelivery(conn, orderNo, deliveryServiceCode, invoiceNo);
 
                 boolean updated = updateStatusToShipping(conn, orderNo, sellerNo);
@@ -232,6 +237,27 @@ public class VendorOrderListDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next() ? rs.getString("DELIVERY_SERVICE_CODE") : null;
+            }
+        }
+    }
+
+    // 같은 택배사에 이미 등록된 송장번호인지 확인 (택배사가 다르면 번호가 겹쳐도 서로 다른 운송장이라 허용)
+    private boolean invoiceNoInUse(Connection conn, String deliveryServiceCode, String invoiceNo) throws Exception {
+
+        String sql = """
+            SELECT 1
+            FROM DELIVERY
+            WHERE DELIVERY_SERVICE_CODE = ?
+              AND INVOICE_NO = ?
+              AND ROWNUM = 1
+            """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, deliveryServiceCode);
+            pstmt.setString(2, invoiceNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
             }
         }
     }
