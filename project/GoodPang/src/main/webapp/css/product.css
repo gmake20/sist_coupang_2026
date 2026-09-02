@@ -419,12 +419,13 @@
   color: #212b36;
 }
 
-/* 찜 / 공유 — 2026-08-31: 로그인해서 실제 쿠팡을 Playwright 로 열어 다시 실측함.
-   전엔 "테두리 있는 원 버튼 + 선(stroke) 아이콘"으로 지어냈는데, 원본은 테두리/배경이
-   아예 없는 38x38 버튼에 채워진(fill) 도형 아이콘(20x20, #454F5B)이었음 — 완전히 다시 그림 */
+/* 찜 / 공유 — 2026-09-02: 사용자가 준 최신 캡처(로그아웃 상태)엔 원형 테두리가 다시 있었음.
+   2026-08-31엔 "로그인해서 보니 테두리 없더라"고 지우고 채운 아이콘으로 바꿨었는데,
+   이번 캡처는 그 반대라 되돌림(혜택보기 줄과 같은 패턴 — 로그인/로그아웃에 따라 갈리는
+   걸로 보이는데 확실친 않음). 테두리는 옅은 회색 1px, 버튼 사이 간격도 살짝 있었음 */
 .product-page .wish-and-share {
   display: flex;
-  gap: 0;
+  gap: 6px;
   flex: none;
 }
 
@@ -434,7 +435,8 @@
   justify-content: center;
   width: 38px;
   height: 38px;
-  border: 0;
+  border: 1px solid #dfe3e8;
+  border-radius: 50%;
   background: none;
   cursor: pointer;
 }
@@ -482,19 +484,24 @@
 
 
 /* ── 3-2. 가격 ─────────────────────────────
-   실측: 영역 margin 16px 0, 기준 글자 12px/18px */
+   실측: 영역 margin 16px 0, 기준 글자 12px/18px
+   2026-09-02: 사용자가 준 최신 캡처 기준으로 밑줄(구분선) 추가 — 별점 줄 자체가 아니라
+   가격 블록(할인율~배송배지) 전체 아래에 회색 줄이 있었음 */
 .product-page .price-container {
   margin: 16px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dfe3e8;
   font-size: 12px;
   line-height: 18px;
 }
 
+/* 2026-09-02: price-origin(원가 취소선)이 이 안으로 들어와서 한 줄에 다 모임 —
+   margin-top 은 "위에 price-origin 줄이 따로 있던 시절" 흔적이라 뺌 */
 .product-page .price-now {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 2px;
 }
 
 /* 할인율 — 원본은 빨강이 아니라 진회색(#212b36) 이었음.
@@ -514,33 +521,24 @@
   color: #cb1400;
 }
 
-/* "할인" 라벨 — 판매가 옆에 있는데 우리 코드엔 아예 없었음(2026-08-31 추가).
-   실측: 14px, 판매가와 같은 빨강 */
-.product-page .discount-label {
-  margin-left: 2px;
-  font-size: 14px;
-  color: #cb1400;
-}
+/* "할인" 라벨(.discount-label) — 2026-08-31에 추가했었는데 2026-09-02 최신 캡처엔
+   안 보여서 JSP 에서 태그 자체를 뺌. 이 규칙도 같이 지움(쓰는 곳이 없어짐) */
 
-/* 배지 2개 — 원본은 이미지(79x16 / 29x16).
-   이미지가 없어서 메인페이지 상품카드와 같은 방식으로 CSS 배지로 그림 */
+/* 배지 2개 — 2026-09-02: 사용자가 실제 이미지 파일(images/icons/logo_rocket_filter_medium.png,
+   badge_199cd481e67.png)을 구해와서 CSS 로 그리던 텍스트 배지 대신 <img> 로 교체.
+   두 파일 다 배경이 투명해서 배지 모양(로켓 배지는 아이콘+글자만, 내일 배지는 초록 테두리 알약)이
+   이미지 안에 이미 들어있음 — 여기선 높이만 16px 로 맞춰서 나란히 놓음 */
 .product-page .badge-rocket,
 .product-page .badge-tomorrow {
-  display: inline-block;
-  padding: 1px 5px;
-  border-radius: 2px;
-  font-size: 11px;
-  line-height: 14px;
+  display: inline-flex;
+  align-items: center;
 }
 
-.product-page .badge-rocket {
-  color: #fff;
-  background: var(--coupang-blue);
-}
-
-.product-page .badge-tomorrow {
-  color: var(--coupang-blue);
-  background: #eef2ff;
+.product-page .badge-rocket img,
+.product-page .badge-tomorrow img {
+  height: 16px;
+  width: auto;
+  display: block;
 }
 
 /* 원가 취소선 — 실측 14px / #768695 / line-through.
@@ -905,9 +903,13 @@
   border-top: 1px solid #dfe3e8;
 }
 
-/* 2026-09-01: "혜택보기" 화살표(.benefit-more)와 "PC에서도 간편한 결제" 줄(.pay-methods/.pay-chip),
-   그 둘을 나누던 구분선(:first-child border-bottom)까지 지움 — 로그인해서 실제 쿠팡을 Playwright 로
-   다시 확인하니 적립 줄 하나만 있고 셋 다 원본에 없었음(예전에 지어낸 것). JSP 쪽 마크업도 같이 뺐음 */
+/* 2026-09-02: "혜택보기"/"PC에서도 간편한 결제" 줄을 되살리면서(위 conditional-benefits
+   주석·JSP 참고) 이 둘을 같이 되살림 — 2026-09-01에 지웠던 걸 다시 넣는 것.
+   적립 줄 밑 회색 구분선(요청 #7)도 이 first-child 규칙이 자동으로 그려줌 */
+.product-page .conditional-benefits .benefit-row:first-child {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dfe3e8;
+}
 
 .product-page .benefit-row {
   display: flex;
@@ -923,6 +925,51 @@
 
 .product-page .benefit-text em {
   font-weight: 700;
+}
+
+/* "혜택보기 >" — 오른쪽 끝으로 밀기. margin-left:auto 가 남는 공간을 다 먹음 */
+.product-page .benefit-more {
+  margin-left: auto;
+  flex: none;
+  color: #212b36;
+}
+
+/* > 화살표는 이미지가 아니라 CSS 로 그림
+   (테두리 2개만 남기고 45도 회전 — index.html 의 "맨 위로" 와 같은 기법) */
+.product-page .benefit-more::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 4px;
+  border-top: 1px solid #666;
+  border-right: 1px solid #666;
+  transform: rotate(45deg);
+  vertical-align: 1px;
+}
+
+/* 결제수단 줄 */
+.product-page .pay-methods {
+  justify-content: center;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.product-page .pay-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border: 1px solid var(--line-gray);
+  border-radius: 2px;
+}
+
+/* 2026-09-02: 칩 안 아이콘 — 원본 파일이 56~65px 정사각형이라 줄 높이에 맞춰 14px로 줄임 */
+.product-page .pay-chip img {
+  width: 14px;
+  height: 14px;
+  display: block;
 }
 
 
@@ -2622,9 +2669,8 @@
 
 /* ── 여기부터 품절일 때 ───────────────────── */
 
-/* 가격 전부 회색 */
+/* 가격 전부 회색 (discount-label 은 2026-09-02에 태그를 뺐으니 같이 지움 — 안 쓰는 셀렉터라 무해하지만 정리) */
 .is-soldout .product-page .discount,
-.is-soldout .product-page .discount-label,
 .is-soldout .product-page .total-price,
 .is-soldout .product-page .origin-price {
   color: #aab5c0;
@@ -2650,11 +2696,12 @@
   display: none;
 }
 
-/* 배지도 회색으로 — 품절인데 "내일도착" 이 파랗게 남아 있으면 어색함 */
+/* 배지 숨김 — 2026-09-02: CSS 로 그리던 텍스트 배지에서 이미지로 바뀌면서
+   background/color 로 회색 처리하던 방식이 더 이상 안 먹힘(이미지 안에 색이 박혀있어서).
+   품절이면 "로켓배송/내일도착"이 어차피 의미 없어서 그냥 숨김 */
 .is-soldout .product-page .badge-rocket,
 .is-soldout .product-page .badge-tomorrow {
-  background: #eaedf0;
-  color: #aab5c0;
+  display: none;
 }
 
 /* 수량은 못 바꿈 */
@@ -3244,4 +3291,114 @@ body.is-modal-open {
 
 .cart-popup-link:hover {
     background: #f5f8ff;
+}
+
+.review-photos {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 14px;
+	margin-bottom: 16px;
+}
+
+.review-photo {
+	width: 100px;
+	height: 100px;
+	object-fit: cover;
+	border-radius: 2px;
+	cursor: pointer;
+}
+
+.review-photo-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 10px 0 14px;
+}
+
+.review-photo-item {
+    width: 98px;
+    height: 98px;
+    flex: 0 0 98px;
+    overflow: hidden;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+.review-photo-img {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    object-fit: cover;
+}
+
+.review-photo-img {
+	display: block;
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: cover;
+	cursor: pointer;
+}
+
+.review-image-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 9999;
+
+	width: 100%;
+	height: 100%;
+
+	display: none;
+	align-items: center;
+	justify-content: center;
+
+	background: rgba(0, 0, 0, 0.75);
+}
+
+.review-image-modal.show {
+	display: flex;
+}
+
+.review-image-modal-content {
+	position: relative;
+
+	max-width: 900px;
+	max-height: 90vh;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#reviewImageLarge {
+	display: block;
+
+	max-width: 900px;
+	max-height: 85vh;
+
+	width: auto;
+	height: auto;
+
+	object-fit: contain;
+
+	background: #fff;
+}
+
+.review-image-close {
+	position: absolute;
+	top: -45px;
+	right: 0;
+
+	width: 40px;
+	height: 40px;
+
+	border: 0;
+	background: transparent;
+
+	color: #fff;
+	font-size: 36px;
+	font-weight: 300;
+
+	cursor: pointer;
 }

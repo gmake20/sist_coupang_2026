@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
@@ -19,8 +18,6 @@
 <!-- jQuery -->
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-
 
 <style>
 
@@ -545,6 +542,16 @@ a {
 
     font-size: 42px;
 }
+
+/* 데이터가 없을 때 표시할 CSS */
+.empty-box {
+    border: 1px solid #d5d5d5;
+    padding: 60px 0;
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+}
+
 /* =========================
    FOOTER 자리
    ========================= */
@@ -576,73 +583,10 @@ footer {
 <div class="page-wrap">
 
 
-    <!-- 왼쪽 메뉴 -->
-
-    <aside class="side-menu">
-
-        <div class="side-title">
-            MY굿팡
-        </div>
-
-
-        <div class="side-section">
-
-            <h3>MY 쇼핑</h3>
-
-            	<a href="${pageContext.request.contextPath}/order/order_list" >주문목록/배송조회</a>
-
-            <a href="${pageContext.request.contextPath}/order/cancel_history"
-               class="active">
-                취소/반품/교환/환불 내역
-            </a>
-
-            <a href="#">
-                정기배송 관리
-            </a>
-
-            <a href="#">
-                영수증 조회/출력
-            </a>
-
-        </div>
-
-
-        <div class="side-section">
-
-            <h3>MY 혜택</h3>
-
-            <a href="#">쿠폰</a>
-            <a href="#">쿠팡캐시</a>
-
-        </div>
-
-
-        <div class="side-section">
-
-            <h3>MY 활동</h3>
-
-            <a href="#">문의하기</a>
-            <a href="#">문의내역 확인</a>
-            <a href="#">리뷰관리</a>
-            <a href="#">찜 리스트</a>
-
-        </div>
-
-
-        <div class="side-section">
-
-            <h3>MY 정보</h3>
-
-            <a href="#">개인정보확인/수정</a>
-            <a href="#">결제수단 관리</a>
-            <a href="#">배송지 관리</a>
-            <a href="#">회원 탈퇴</a>
-
-        </div>
-
-    </aside>
-
-
+   <!-- 취소/반품 내역 메뉴 파란색 활성화 -->
+<jsp:include page="/inc/left_banner.jsp">
+    <jsp:param name="activeMenu" value="cancel_history" />
+</jsp:include>
 
     <!-- =========================
          본문
@@ -659,7 +603,7 @@ footer {
 
            <a href="${pageContext.request.contextPath}/order/order_list" >주문목록/배송조회</a>
 
-            <a href="${pageContext.request.contextPath}/cancel_history.jsp"
+            <a href="${pageContext.request.contextPath}/order/cancel_history"
                class="active">
                 취소/반품/교환
             </a>
@@ -683,14 +627,14 @@ footer {
         </div>
 
 
-<c:choose>
+        <c:choose>
             <c:when test="${not empty cancelList}">
                 <c:forEach var="checkList" items="${cancelList}">
                     <div class="order-box">
 
                         <div class="order-header">
 
-                            <span>취소접수일 : ${checkList.requestDate}</span>
+                            <span>취소접수일 : <fmt:formatDate value="${checkList.requestDate}" pattern="yyyy/MM/dd" /></span>
 
                             <span class="bar">|</span>
 
@@ -752,8 +696,8 @@ footer {
                                     </c:if>
                                 </p>
 
-                                <!-- 이동 링크 제거 및 단순 버튼으로 수정 -->
-                                <button type="button" class="detail-btn">
+                                <!-- 이동 이벤트 핸들러 추가 -->
+                                <button type="button" class="detail-btn" onclick="alert('주문번호: ${checkList.orderNo} 의 취소 상세 정보입니다.');">
                                     취소상세
                                 </button>
 
@@ -770,20 +714,37 @@ footer {
                 </div>
             </c:otherwise>
         </c:choose>
+
         <!-- =========================
-             페이지
+             페이지 (동적 페이징 수정 반영)
              ========================= -->
 
         <div class="pagination">
+            <%-- 이전 페이지 버튼 --%>
+            <c:choose>
+                <c:when test="${curPage > 1}">
+                    <a href="${pageContext.request.contextPath}/order/cancel_history?page=${curPage - 1}">&lt;</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="javascript:void(0);" onclick="alert('첫 번째 페이지입니다.');">&lt;</a>
+                </c:otherwise>
+            </c:choose>
 
-            <a href="#">&lt;</a>
-            <a href="#" class="active">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
-            <a href="#">&gt;</a>
+            <%-- 페이지 번호 동적 출력 --%>
+            <c:forEach var="p" begin="1" end="${totalPages}">
+                <a href="${pageContext.request.contextPath}/order/cancel_history?page=${p}" 
+                   class="${p eq curPage ? 'active' : ''}">${p}</a>
+            </c:forEach>
 
+            <%-- 다음 페이지 버튼 --%>
+            <c:choose>
+                <c:when test="${curPage < totalPages}">
+                    <a href="${pageContext.request.contextPath}/order/cancel_history?page=${curPage + 1}">&gt;</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="javascript:void(0);" onclick="alert('마지막 페이지입니다.');">&gt;</a>
+                </c:otherwise>
+            </c:choose>
         </div>
 
     </main>

@@ -41,6 +41,7 @@
 		value="${empty orderComplete.paymentAmount ? 20200 : orderComplete.paymentAmount}" />
 
 	<jsp:include page="/inc/header.jsp" />
+	<script src="${pageContext.request.contextPath}/js/header.js"></script>
 
 	<div class="page-bg">
 		<main class="content-wrap">

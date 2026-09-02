@@ -85,6 +85,31 @@ function setupQuantity() {
 
   render(Number(input.value) || MIN);    // 페이지가 열릴 때 버튼 상태를 한 번 맞춰둠
 
+  /* ★ 2026-09-02 추가 — 사용자가 숫자를 직접 타이핑해서 수량을 정할 수 있게 함.
+     (그동안 readonly 라 +/- 버튼으로만 바꿀 수 있었음)
+
+     타이핑 도중(input 이벤트)엔 숫자가 아닌 글자만 지우고, 범위 보정(1~재고)은 하지 않음 —
+     "12"를 치려는데 "1"을 치는 순간 재고 부족으로 잘려버리면 뒷자리를 못 침.
+     범위 보정과 가격 재계산은 입력을 다 마친 시점(포커스 아웃 or Enter)에만 한다. */
+  input.addEventListener('input', function () {
+    const digitsOnly = input.value.replace(/[^0-9]/g, '');
+    input.value = digitsOnly;
+  });
+
+  function commit() {
+    const n = Number(input.value) || MIN;      // 빈 값/0 은 MIN 으로
+    render(Math.min(Math.max(n, MIN), max));   // 1 ~ max(재고) 범위로 보정
+  }
+
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();   // 폼 안에 있어서 Enter 로 submit 되는 것 방지
+      commit();
+      input.blur();
+    }
+  });
+
   /* 옵션이 바뀔 때마다 setupOptionSelect() 가 이 함수를 불러줌.
      지금 담아둔 수량이 새 재고보다 많으면 재고만큼으로 줄임
      (예: 10개 담아뒀는데 재고 3개짜리 옵션으로 바꾸면 3으로) */

@@ -38,7 +38,7 @@
 
         <button
             class="btn btn-orders"
-            onclick="location.href='${pageContext.request.contextPath}/order/list'">
+            onclick="location.href='${pageContext.request.contextPath}/order/order_list'">
             주문내역 보기
         </button>
 
