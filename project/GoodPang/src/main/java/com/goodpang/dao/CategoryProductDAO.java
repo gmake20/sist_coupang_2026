@@ -56,6 +56,8 @@ public class CategoryProductDAO {
                 GROUP BY od.PRODUCT_NO
             ) SC ON SC.PRODUCT_NO = P.PRODUCT_NO
             WHERE P.SUB_CATEGORY_NO = ?
+              AND P.SALE_STATUS != '승인 대기'
+              AND P.DISPLAY_YN = 'Y'
               AND (P.PRODUCT_PRICE + NVL(OPT.PRICE, 0)) BETWEEN ? AND ?
               AND NVL(RV.AVG_RATING, 0) >= ?
             """;

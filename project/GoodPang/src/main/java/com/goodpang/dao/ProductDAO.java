@@ -42,8 +42,10 @@ public class ProductDAO {
 			        JOIN CATEGORY MC
 			        ON SC.PARENT_CATEGORY_NO = MC.CATEGORY_NO   
 			        JOIN CATEGORY MAINC
-			        ON MC.PARENT_CATEGORY_NO = MAINC.CATEGORY_NO 
+			        ON MC.PARENT_CATEGORY_NO = MAINC.CATEGORY_NO
 			        WHERE P.PRODUCT_NO = ?
+			          AND P.SALE_STATUS != '승인 대기'
+			          AND P.DISPLAY_YN = 'Y'
         	    """;
         
         try (
