@@ -3,6 +3,7 @@ package com.goodpang.servlet;
 import java.io.IOException;
 
 import com.goodpang.dao.VendorOrderListDAO;
+import com.goodpang.dao.VendorOrderListDAO.ShipResult;
 import com.goodpang.dto.SellerDTO;
 
 import jakarta.servlet.ServletException;
@@ -41,14 +42,18 @@ public class VendorOrderShipServlet extends HttpServlet {
 			return;
 		}
 
+		ShipResult result = ShipResult.FAILED;
+
 		try {
 			int orderNo = Integer.parseInt(request.getParameter("orderNo"));
-			orderListDAO.shipOrder(orderNo, loginSeller.getSellerNo(), invoiceNo.trim());
+			result = orderListDAO.shipOrder(orderNo, loginSeller.getSellerNo(), invoiceNo.trim());
 		} catch (NumberFormatException e) {
 			// orderNo가 없거나 숫자가 아니면 아무 것도 바꾸지 않고 목록으로 돌려보낸다.
 		}
 
-		response.sendRedirect(request.getContextPath() + redirectTo);
+		String shipErrorParam = (result == ShipResult.INVOICE_DUPLICATE) ? "?shipError=duplicateInvoice" : "";
+
+		response.sendRedirect(request.getContextPath() + redirectTo + shipErrorParam);
 	}
 
 	// "주문 목록"/"출고·운송장 관리" 등 여러 화면에서 같은 출고 처리 액션을 재사용하기 위해,
