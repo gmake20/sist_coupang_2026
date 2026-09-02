@@ -143,7 +143,7 @@ CREATE TABLE PRODUCT (
     sale_method                 VARCHAR2(20) NOT NULL, /* 판매방식: 판매자배송 / 로켓그로스 */
     brand_name                  VARCHAR2(100), /* 브랜드 (브랜드 없음이면 NULL) */
     no_brand_yn                 CHAR(1) NOT NULL, /* 브랜드 없음(자체제작) 여부 Y/N */
-    product_name                 VARCHAR2(100) NOT NULL, /* 노출상품명 */
+    product_name                 VARCHAR2(150 CHAR) NOT NULL, /* 노출상품명 */
     internal_name               VARCHAR2(100), /* 등록상품명(판매자관리용) */
 
     /* 옵션 */
