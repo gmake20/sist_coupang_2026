@@ -847,7 +847,8 @@
 
             categorySearchList.innerHTML = categories
               .map(function (category) {
-                return "<li data-category-no='" + category.categoryNo + "'>" + category.categoryName + "</li>";
+                var displayText = category.categoryPath || category.categoryName;
+                return "<li data-category-no='" + category.categoryNo + "' data-category-name='" + category.categoryName + "'>" + displayText + "</li>";
               })
               .join("");
             categorySearchList.hidden = false;
@@ -871,7 +872,7 @@
         selectedCategoryNo = item.dataset.categoryNo;
         selectedCategory.textContent = "선택된 카테고리 : " + item.textContent;
         categorySearchList.hidden = true;
-        categorySearchInput.value = item.textContent;
+        categorySearchInput.value = item.dataset.categoryName;
       });
 
 

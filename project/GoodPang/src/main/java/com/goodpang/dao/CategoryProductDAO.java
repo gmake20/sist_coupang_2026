@@ -248,9 +248,9 @@ public class CategoryProductDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     long mainNo = rs.getLong("MAIN_NO");
-                    CategoryDTO main = new CategoryDTO(mainNo, rs.getString("MAIN_NAME"), null, 1, "./pds/category_" + mainNo + ".png");
-                    CategoryDTO mid = new CategoryDTO(rs.getLong("MID_NO"), rs.getString("MID_NAME"), mainNo, 2, null);
-                    CategoryDTO sub = new CategoryDTO(rs.getLong("SUB_NO"), rs.getString("SUB_NAME"), rs.getLong("MID_NO"), 3, null);
+                    CategoryDTO main = new CategoryDTO(mainNo, rs.getString("MAIN_NAME"), null, 1, "./pds/category_" + mainNo + ".png", null);
+                    CategoryDTO mid = new CategoryDTO(rs.getLong("MID_NO"), rs.getString("MID_NAME"), mainNo, 2, null, null);
+                    CategoryDTO sub = new CategoryDTO(rs.getLong("SUB_NO"), rs.getString("SUB_NAME"), rs.getLong("MID_NO"), 3, null, null);
                     return new CategoryDTO[] { main, mid, sub };
                 }
             }
@@ -291,7 +291,8 @@ public class CategoryProductDAO {
                         rs.getString("CATEGORY_NAME"),
                         rs.getLong("PARENT_CATEGORY_NO"),
                         categoryLevel,
-                        categoryLevel == 1 ? "./pds/category_" + categoryNoResult + ".png" : null
+                        categoryLevel == 1 ? "./pds/category_" + categoryNoResult + ".png" : null,
+                        null
                     ));
                 }
             }
