@@ -14,6 +14,7 @@ import com.goodpang.dto.ReviewAvailableDTO;
 import com.goodpang.dto.ReviewDTO;
 import com.goodpang.dto.ReviewDTO2;
 import com.goodpang.dto.ReviewItemDTO;
+import com.goodpang.dto.ReviewRatingSummaryDTO;
 import com.goodpang.util.ConnectionProvider;
 
 public class ReviewDAO {
@@ -1556,5 +1557,58 @@ public class ReviewDAO {
     	}
 
     	return list;
+    }
+    
+    public ReviewRatingSummaryDTO getRatingSummary(int productNo) {
+
+        ReviewRatingSummaryDTO dto = new ReviewRatingSummaryDTO();
+
+        String sql = """
+                SELECT
+                    COUNT(*) AS REVIEW_COUNT,
+                    NVL(ROUND(AVG(r.PRODUCT_RATING), 1), 0) AS AVG_RATING,
+                    CASE WHEN COUNT(*) = 0 THEN 0
+                         ELSE ROUND(SUM(CASE WHEN r.PRODUCT_RATING = 5 THEN 1 ELSE 0 END) * 100 / COUNT(*))
+                    END AS BEST_PERCENT,
+                    CASE WHEN COUNT(*) = 0 THEN 0
+                         ELSE ROUND(SUM(CASE WHEN r.PRODUCT_RATING = 4 THEN 1 ELSE 0 END) * 100 / COUNT(*))
+                    END AS GOOD_PERCENT,
+                    CASE WHEN COUNT(*) = 0 THEN 0
+                         ELSE ROUND(SUM(CASE WHEN r.PRODUCT_RATING = 3 THEN 1 ELSE 0 END) * 100 / COUNT(*))
+                    END AS NORMAL_PERCENT,
+                    CASE WHEN COUNT(*) = 0 THEN 0
+                         ELSE ROUND(SUM(CASE WHEN r.PRODUCT_RATING = 2 THEN 1 ELSE 0 END) * 100 / COUNT(*))
+                    END AS POOR_PERCENT,
+                    CASE WHEN COUNT(*) = 0 THEN 0
+                         ELSE ROUND(SUM(CASE WHEN r.PRODUCT_RATING = 1 THEN 1 ELSE 0 END) * 100 / COUNT(*))
+                    END AS BAD_PERCENT
+                FROM REVIEW r
+                JOIN ORDER_DETAIL od
+                  ON r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO
+                WHERE od.PRODUCT_NO = ?
+                """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setInt(1, productNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    dto.setReviewCount(rs.getInt("REVIEW_COUNT"));
+                    dto.setAvgRating(rs.getDouble("AVG_RATING"));
+                    dto.setBestPercent(rs.getInt("BEST_PERCENT"));
+                    dto.setGoodPercent(rs.getInt("GOOD_PERCENT"));
+                    dto.setNormalPercent(rs.getInt("NORMAL_PERCENT"));
+                    dto.setPoorPercent(rs.getInt("POOR_PERCENT"));
+                    dto.setBadPercent(rs.getInt("BAD_PERCENT"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dto;
     }
 }
