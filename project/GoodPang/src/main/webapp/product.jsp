@@ -179,29 +179,27 @@
 
 						<!-- 별점 + 리뷰수. 리뷰 영역으로 이동하는 링크(#reviews)
                            2026-08-27: 유니코드 별(★★★★☆) → 리뷰 카드와 같은 스프라이트(.star-rating)로 통일.
-                 여기 별은 "이 리뷰 하나"가 아니라 "이 상품 전체 평균 평점"이라 avgRating(서버가 reviews 리스트로 계산해서 내려줌, ProductServlet)을 씀 -->
+                 여기 별은 "이 리뷰 하나"가 아니라 "이 상품 전체 평균 평점"이라 avgRating(서버가 reviews 리스트로 계산해서 내려줌, ProductServlet)을 씀
+                 2026-09-02: "(1)" → "1개 상품평" 문구로 바꿈 — 사용자가 로그인 안 한 상태로 직접
+                 캡처한 최신 화면(ref/product/스크린샷 2026-09-02 083346.png) 기준 -->
 						<div class="review-atf">
 							<span class="star-rating" aria-label="평점 ${avgRating}점"><em
 								style="width:${avgRating * 20}%"></em></span> <a href="#reviews"
-								class="count">(${reviewCount})</a>
+								class="count">${reviewCount}개 상품평</a>
 						</div>
 					</div>
 
 					<!-- ② 가격
-					     2026-09-01: 순서가 다시 price-now(판매가) 위 / price-origin(원가) 아래로
-					     돌아가 있어서 원본과 반대였음(2026-08-31에 확인해서 뒤집었던 걸 머지하며 잃어버림).
-					     로그인해서 실제 쿠팡을 Playwright 로 다시 확인(원가 21,900원 위 → 판매가 9,890원
-					     아래, 클래스명도 원본이 그대로 original-price/final-price 였음) — 원가를 먼저 씀 -->
+					     2026-09-02: 사용자가 직접 캡처해서 준 최신 화면(위 스크린샷) 기준으로 다시 짬 —
+					     원가(취소선)가 따로 줄을 차지하는 게 아니라 할인율/판매가/원가/안내아이콘/배송배지가
+					     전부 한 줄에 나란히 있었음. price-origin 을 별도 줄에서 price-now 안쪽으로 옮김
+					     (JS 는 그대로 .price-origin 을 querySelector 하므로 product.js 는 안 건드려도 됨).
+					     "할인" 라벨(discount-label, 2026-08-31에 넣었던 것)은 이 캡처엔 안 보여서 뺌 —
+					     로그인 상태에서 다시 보이면 되살릴 것. "67%" 가 빨간 리본 모양 배지였고 그 아래
+					     "9,180원 할인 · 5시간 남음"같은 카운트다운 줄도 있었는데, 이건 이 상품이 마침
+					     타임특가 중이라 그런 걸로 보여서(일반 할인 표시가 아니라 특가 이벤트 전용 UI로
+					     추정) 지금은 안 옮김 — 우리 DB에 그런 이벤트 데이터 자체가 없음 -->
 					<div class="price-container">
-						<!-- 원가 취소선 (#768695 + line-through). 정상 추가금(NORMAL_PRICE) 입력 안 한 옵션이면 안 보임 -->
-						<div class="price-origin"
-							${empty displayNormalPrice ? ' style="display:none"' : ''}>
-							<span class="origin-price">${displayNormalPrice}원</span>
-							<!-- 원본에 있는 ⓘ — 눌러도 아무 일 없는 안내 아이콘. 이미지 없이 글자로 그림 -->
-							<button type="button" class="price-info">
-								<span class="blind">가격 안내</span>
-							</button>
-						</div>
 						<div class="price-now">
 							<!-- 2026-08-30 확정 — PRODUCT_OPTION.PRICE/NORMAL_PRICE 는 PRODUCT_PRICE(기본가)에 더해지는
 							     "추가금". 판매가/정상가 둘 다 ProductServlet 이 기본가+추가금으로 계산해둔 값을 씀.
@@ -211,13 +209,22 @@
 								${empty displayNormalPrice ? ' style="display:none"' : ''}>${discountRate}%</span>
 							<strong class="total-price" data-unit-price="${displayPrice}"
 								data-base-price="${p.productPrice}">${displayPrice}원</strong>
-							<!-- "할인" 라벨 — 2026-08-31 추가. 로그인해서 실제 쿠팡을 Playwright 로 열어보니
-							     판매가 옆에 이 글자가 따로 있었는데 우리 코드엔 없었음. 정상가(할인 전)가
-							     있을 때만(=진짜 할인 중일 때만) 보이는 게 맞아서 discount 와 같은 조건 씀 -->
-							<span class="discount-label"
-								${empty displayNormalPrice ? ' style="display:none"' : ''}>할인</span>
-							<span class="badge-rocket">로켓배송</span> <span
-								class="badge-tomorrow">내일도착</span>
+							<!-- 원가 취소선 (#768695 + line-through). 정상 추가금(NORMAL_PRICE) 입력 안 한 옵션이면 안 보임 -->
+							<div class="price-origin"
+								${empty displayNormalPrice ? ' style="display:none"' : ''}>
+								<span class="origin-price">${displayNormalPrice}원</span>
+								<!-- 원본에 있는 ⓘ — 눌러도 아무 일 없는 안내 아이콘. 이미지 없이 글자로 그림 -->
+								<button type="button" class="price-info">
+									<span class="blind">가격 안내</span>
+								</button>
+							</div>
+							<!-- 로켓배송/내일도착 배지 — 2026-09-02: CSS로 그리던 텍스트 배지 대신
+							     실제 이미지로 교체(사용자가 images/icons 에 받아다 줌) -->
+							<span class="badge-rocket"><img
+									src="${pageContext.request.contextPath}/images/icons/logo_rocket_filter_medium.png"
+									alt="로켓배송"></span> <span class="badge-tomorrow"><img
+									src="${pageContext.request.contextPath}/images/icons/badge_199cd481e67.png"
+									alt="내일도착"></span>
 						</div>
 
 						<!-- 품절일 때만 보이는 줄. 평소엔 CSS 가 감춤 (body 에 .is-soldout 이 붙어야 나옴)
@@ -334,14 +341,28 @@
 					</c:if>
 
 					<!-- ⑤ 적립 혜택
-					     2026-09-01: "혜택보기" 화살표와 "PC에서도 간편한 결제" 칩 줄이 다시 생겨 있어서
-					     지움. 로그인해서 실제 쿠팡을 Playwright 로 다시 확인 — 적립 줄 하나뿐, 오른쪽에
-					     아무 링크도 없고 그 아래 결제수단 줄 자체가 없음(둘 다 지어냈던 것) -->
+					     2026-09-02: "혜택보기" 링크와 "PC에서도 간편한 결제" 칩 줄을 다시 넣음 —
+					     로그인 여부와 상관없이 넣기로 확정(2026-09-01엔 "로그인해서 보니 없더라"고
+					     지웠던 건데, 사용자가 로그아웃 상태 최신 캡처에서 이 줄이 있는 걸 다시 확인함.
+					     로그인/로그아웃에 따라 갈리는지는 불확실하지만 이번엔 그냥 고정으로 넣기로 함).
+					     띄어쓰기도 정리 — em 안쪽 공백 하나 빼서 "원 " + " <u>" 두 번 겹치던 것 하나로 줄임 -->
 					<div class="conditional-benefits">
 						<div class="benefit-row">
 							<span class="benefit-label">적립</span> <span class="benefit-text">
-								<em>최대 ${rewardCash}원 </em> <u>굿팡캐시 적립</u> · 굿페이 머니 결제시
-							</span>
+								<em>최대 ${rewardCash}원</em> <u>굿팡캐시 적립</u> · 굿페이 머니 결제시
+							</span> <a href="#" class="benefit-more">혜택보기</a>
+						</div>
+						<!-- 2026-09-02: 결제수단 칩에 아이콘 추가 — 사용자가 images/icons 에 받아다 준
+						     coupaymoney_color@4x.png(굿페이머니 M) / card_color@4x.png(카드) /
+						     bankbook_color@4x.png(계좌이체) -->
+						<div class="benefit-row pay-methods">
+							<strong>PC에서도 간편한 결제</strong> <span class="pay-chip"><img
+									src="${pageContext.request.contextPath}/images/icons/coupaymoney_color@4x.png"
+									alt="">굿페이머니</span> <span class="pay-chip"><img
+									src="${pageContext.request.contextPath}/images/icons/card_color@4x.png"
+									alt="">카드</span> <span class="pay-chip"><img
+									src="${pageContext.request.contextPath}/images/icons/bankbook_color@4x.png"
+									alt="">계좌이체</span>
 						</div>
 					</div>
 

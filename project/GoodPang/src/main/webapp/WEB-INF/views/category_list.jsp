@@ -40,6 +40,10 @@
 	<%-- 정렬/페이지/평점/가격 링크에 항상 같이 실어야 하는 값들. 새 링크 만들 때마다 이어붙임.
 	     색상은 다중선택(2026-09-01)이라 선택된 개수만큼 color= 를 반복해서 실음.
 	     <c:param> 으로 URL 인코딩까지 여기서 미리 해둠(한글이라 직접 이어붙이면 깨짐) --%>
+	<%-- ★ listSize 는 여기 baseUrl 에 안 넣음 — 넣으면 60/120 토글 링크가 자기 값을 뒤에 또 붙일 때
+	     같은 파라미터가 두 번(listSize=기존값&...&listSize=새값) 들어가서 서블릿이 앞의(기존) 값을
+	     먼저 읽어버려 토글이 안 먹힘. 대신 아래 각 링크마다 "&listSize=${listSize}" 를 직접 붙임
+	     (60/120 토글 두 줄만 리터럴 60/120 을 씀) --%>
 	<c:url var="baseUrl" value="/category">
 		<c:param name="categoryNo" value="${categoryNo}" />
 		<c:forEach var="c" items="${selectedColors}">
@@ -83,7 +87,8 @@
 					     색상/평점/가격처럼 서버가 아는 필터만 초기화 대상 — categoryNo 만 남기고 나머지 다 뗀 URL로 이동.
 					     ★ 2026-09-01: 브랜드/핏 같은 장식용 체크박스만 골랐을 때도 이 버튼이 떠야 해서(버그 리포트 1번),
 					     서버가 모르는 상태라 JS가 관리할 수 있게 항상 DOM에 두고 hidden 속성만 토글하는 식으로 바꿈 --%>
-					<a href="${pageContext.request.contextPath}/category?categoryNo=${categoryNo}"
+					<%-- listSize 는 필터가 아니라 "몇 개씩 볼지" 화면 설정이라 전체해제해도 유지(2026-09-03) --%>
+					<a href="${pageContext.request.contextPath}/category?categoryNo=${categoryNo}&listSize=${listSize}"
 						id="filterClearAll" class="filter-clear-all" ${hasActiveFilter ? '' : 'hidden'}>전체해제</a>
 				</div>
 
@@ -142,6 +147,7 @@
 							<input type="hidden" name="minPrice" value="${minPrice}">
 							<input type="hidden" name="maxPrice" value="${maxPrice}">
 							<input type="hidden" name="rating" value="${rating}">
+							<input type="hidden" name="listSize" value="${listSize}">
 							<ul class="filter-chip-list">
 								<c:forEach var="color" items="${colorOptions}">
 									<li>
@@ -174,11 +180,11 @@
 					<h3>별점</h3>
 					<%-- JSP EL 은 리스트 리터럴이 없어서 5개를 그냥 하나씩 적음(0=전체) --%>
 					<ul>
-						<li><a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=0" class="${rating == 0 ? 'selected' : ''}">별점 전체</a></li>
-						<li><a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=4" class="${rating == 4 ? 'selected' : ''}">4점 이상</a></li>
-						<li><a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=3" class="${rating == 3 ? 'selected' : ''}">3점 이상</a></li>
-						<li><a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=2" class="${rating == 2 ? 'selected' : ''}">2점 이상</a></li>
-						<li><a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=1" class="${rating == 1 ? 'selected' : ''}">1점 이상</a></li>
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=0" class="${rating == 0 ? 'selected' : ''}">별점 전체</a></li>
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=4" class="${rating == 4 ? 'selected' : ''}">4점 이상</a></li>
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=3" class="${rating == 3 ? 'selected' : ''}">3점 이상</a></li>
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=2" class="${rating == 2 ? 'selected' : ''}">2점 이상</a></li>
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=1" class="${rating == 1 ? 'selected' : ''}">1점 이상</a></li>
 					</ul>
 				</section>
 
@@ -186,17 +192,17 @@
 				<section class="filter-group">
 					<h3>가격</h3>
 					<ul>
-						<li><a href="${baseUrl}&sort=${sort}&rating=${rating}&minPrice=0&maxPrice="
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=0&maxPrice="
 								class="${empty maxPrice ? 'selected' : ''}">전체</a></li>
-						<li><a href="${baseUrl}&sort=${sort}&rating=${rating}&minPrice=0&maxPrice=9000"
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=0&maxPrice=9000"
 								class="${maxPrice == 9000 ? 'selected' : ''}">9,000원 이하</a></li>
-						<li><a href="${baseUrl}&sort=${sort}&rating=${rating}&minPrice=9000&maxPrice=18000"
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=9000&maxPrice=18000"
 								class="${minPrice == 9000 && maxPrice == 18000 ? 'selected' : ''}">9,000원~18,000원</a></li>
-						<li><a href="${baseUrl}&sort=${sort}&rating=${rating}&minPrice=18000&maxPrice=27000"
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=18000&maxPrice=27000"
 								class="${minPrice == 18000 && maxPrice == 27000 ? 'selected' : ''}">18,000원~27,000원</a></li>
-						<li><a href="${baseUrl}&sort=${sort}&rating=${rating}&minPrice=27000&maxPrice=36000"
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=27000&maxPrice=36000"
 								class="${minPrice == 27000 && maxPrice == 36000 ? 'selected' : ''}">27,000원~36,000원</a></li>
-						<li><a href="${baseUrl}&sort=${sort}&rating=${rating}&minPrice=36000&maxPrice="
+						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=36000&maxPrice="
 								class="${minPrice == 36000 && empty maxPrice ? 'selected' : ''}">36,000원 이상</a></li>
 					</ul>
 					<%-- 2026-09-01: 여기 색상 hidden input 이 빠져있어서, 가격을 직접 입력해서 검색하면
@@ -206,6 +212,7 @@
 						<input type="hidden" name="categoryNo" value="${categoryNo}">
 						<input type="hidden" name="sort" value="${sort}">
 						<input type="hidden" name="rating" value="${rating}">
+						<input type="hidden" name="listSize" value="${listSize}">
 						<c:forEach var="c" items="${selectedColors}">
 							<input type="hidden" name="color" value="${c}">
 						</c:forEach>
@@ -223,24 +230,42 @@
 			     ================================================== --%>
 			<section class="category-list">
 
+				<%-- 카테고리 제목 — 2026-09-03 추가. 원본 재확인(Playwright, browser_evaluate): 24px/700/#000000,
+				     정렬줄과 12px 떨어져 있음. 그동안 아예 빠져있었음(브레드크럼의 소분류 이름과 헷갈려서 안 넣었던 듯) --%>
+				<h1 class="category-title">${breadcrumb[2].categoryName}</h1>
+
 				<%-- 이것도 마찬가지로 EL 리스트 리터럴 대신 4개를 그냥 하나씩 적음 --%>
 				<div class="sort-bar">
 					<ul>
 						<li class="${sort == 'LATEST' ? 'Sort_selected' : ''}">
-							<a href="${baseUrl}&sort=LATEST&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">최신순</a>
+							<a href="${baseUrl}&listSize=${listSize}&sort=LATEST&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">최신순</a>
 						</li>
 						<li class="${sort == 'PRICE_ASC' ? 'Sort_selected' : ''}">
-							<a href="${baseUrl}&sort=PRICE_ASC&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">낮은가격순</a>
+							<a href="${baseUrl}&listSize=${listSize}&sort=PRICE_ASC&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">낮은가격순</a>
 						</li>
 						<li class="${sort == 'PRICE_DESC' ? 'Sort_selected' : ''}">
-							<a href="${baseUrl}&sort=PRICE_DESC&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">높은가격순</a>
+							<a href="${baseUrl}&listSize=${listSize}&sort=PRICE_DESC&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">높은가격순</a>
 						</li>
 						<li class="${sort == 'SALE_COUNT' ? 'Sort_selected' : ''}">
-							<a href="${baseUrl}&sort=SALE_COUNT&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">판매량순</a>
+							<a href="${baseUrl}&listSize=${listSize}&sort=SALE_COUNT&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">판매량순</a>
 						</li>
 					</ul>
-					<%-- 60개 고정(2026-08-30 확정) — 원본처럼 오른쪽에 표시만 함, 드롭다운 아님 --%>
-					<span class="list-size">60개씩 보기</span>
+					<%-- 보기 개수 60/120 — 2026-09-03 2차 수정: 처음엔 정렬(ul.Sort_sort)처럼 두 개를 나란히
+					     늘어놓았는데, 실제 원본은 그게 아니라 "마우스 올리면 그 밑에 펼쳐지는" 호버 드롭다운이라는
+					     지적을 받아 다시 실측(browser_evaluate + hover)해서 구조를 고침:
+					     - 평소엔 현재 선택된 값 하나만 보임(li.selected 만 display, 나머지는 display:none)
+					     - .list-size-dropdown 에 마우스를 올리면 두 줄 다 세로로 펼쳐짐(순수 CSS :hover, JS 없음)
+					     - 클릭하면 그동안처럼 페이지 전체가 다시 요청됨(원본도 마찬가지 — STRUCTURE.md 10장) --%>
+					<div class="list-size-dropdown">
+						<ul>
+							<li class="${listSize == 60 ? 'selected' : ''}">
+								<a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&listSize=60">60개씩 보기</a>
+							</li>
+							<li class="${listSize == 120 ? 'selected' : ''}">
+								<a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&listSize=120">120개씩 보기</a>
+							</li>
+						</ul>
+					</div>
 				</div>
 
 				<%-- 선택한 필터 — 실제 쿠팡 재확인(2026-09-01 Playwright): 정렬줄 바로 아래, 상품목록 위에 옴.
@@ -254,6 +279,7 @@
 						<c:forEach var="color" items="${selectedColors}">
 							<c:url var="removeColorUrl" value="/category">
 								<c:param name="categoryNo" value="${categoryNo}" />
+								<c:param name="listSize" value="${listSize}" />
 								<c:param name="sort" value="${sort}" />
 								<c:param name="minPrice" value="${minPrice}" />
 								<c:param name="maxPrice" value="${maxPrice}" />
@@ -270,6 +296,7 @@
 						<c:if test="${rating > 0}">
 							<c:url var="removeRatingUrl" value="/category">
 								<c:param name="categoryNo" value="${categoryNo}" />
+								<c:param name="listSize" value="${listSize}" />
 								<c:param name="sort" value="${sort}" />
 								<c:param name="minPrice" value="${minPrice}" />
 								<c:param name="maxPrice" value="${maxPrice}" />
@@ -282,6 +309,7 @@
 						<c:if test="${minPrice > 0 || not empty maxPrice}">
 							<c:url var="removePriceUrl" value="/category">
 								<c:param name="categoryNo" value="${categoryNo}" />
+								<c:param name="listSize" value="${listSize}" />
 								<c:param name="sort" value="${sort}" />
 								<c:param name="rating" value="${rating}" />
 								<c:param name="minPrice" value="0" />
@@ -306,6 +334,9 @@
 												<img src="${pageContext.request.contextPath}/${item.thumbnailUrl}" alt="${item.productName}">
 											</c:if>
 										</figure>
+										<%-- 무료배송 뱃지 — 2026-09-02 추가. 실제 배송비 컬럼을 아직 안 써서(위 CLAUDE.md 4번
+										     미해결과 동일) 모든 카드에 똑같이 표시. 실동작 아님, product.jsp 배송문구와 같은 취급 --%>
+										<p class="free-shipping-badge">무료배송</p>
 										<p class="product-name">${item.productName}</p>
 										<p class="product-price">
 											<c:if test="${item.discountRate > 0}">
@@ -314,34 +345,65 @@
 											</c:if>
 											<strong class="sale-price"><fmt:formatNumber value="${item.salePrice}" pattern="#,###"/>원</strong>
 										</p>
-										<%-- 적립 — 실제 적립 정책 테이블이 없어서 판매가 1%로 임의 계산(2026-09-01 사용자 요청으로 재추가) --%>
-										<p class="cash-reward">적립 <fmt:formatNumber value="${item.cashReward}" pattern="#,###"/>원</p>
+										<p class="delivery-date">${deliveryDate} 도착 예정</p>
+										<%-- 2026-09-02 2차: 별점/적립 순서가 뒤바뀌어 있었음 — 원본은 배송문구 다음이 별점,
+										     그 다음이 적립(STRUCTURE.md 7장). 무료배송 뱃지 넣으면서 대조 없이 기존 순서에
+										     끼워넣었던 게 원인 --%>
 										<c:if test="${item.reviewCount > 0}">
 											<p class="product-rating">
 												<span class="star-rating" aria-label="평점 ${item.avgRating}점"><em style="width:${item.avgRating * 20}%"></em></span>
 												(${item.reviewCount})
 											</p>
 										</c:if>
+										<%-- 적립 — 실제 적립 정책 테이블이 없어서 판매가 1%로 임의 계산(2026-09-01 사용자 요청으로 재추가) --%>
+										<p class="cash-reward">적립 <fmt:formatNumber value="${item.cashReward}" pattern="#,###"/>원</p>
 									</a>
 								</li>
 							</c:forEach>
+
+							<%-- 채움 카드 — 2026-09-03 추가. 카드마다 border-bottom 이 있어서(위 .product-card 참고)
+							     4개씩 꽉 찬 줄은 자연스럽게 이어진 선처럼 보이는데, 마지막 줄이 4개를 못 채우면
+							     그 줄만큼만 선이 짧게 그려짐. 실제 원본도 구조상 똑같이 카드 하나하나에 선을 긋는
+							     방식이라 이 자체는 원본과 다른 게 아니지만(원본은 상품이 수백 개라 거의 안 보이는
+							     상황), 우리는 테스트 상품이 적어서 항상 짧은 줄로 끝나 어색해 보임 — 내용 없는
+							     채움 카드로 남은 자리를 메워서 선을 끝까지 이어지게 함(4의 배수로 맞춤) --%>
+							<c:set var="remainder" value="${fn:length(products) % 4}" />
+							<c:if test="${remainder > 0}">
+								<c:forEach begin="1" end="${4 - remainder}">
+									<li class="product-card product-card--filler" aria-hidden="true"></li>
+								</c:forEach>
+							</c:if>
 						</ul>
 
 						<%-- 페이지네이션 --%>
 						<nav class="pagination" aria-label="페이지">
 							<c:if test="${page > 1}">
-								<a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${page - 1}">이전</a>
+								<a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${page - 1}">이전</a>
 							</c:if>
 							<c:forEach var="p" begin="1" end="${totalPages}">
-								<a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${p}"
+								<a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${p}"
 									class="${p == page ? 'current' : ''}">${p}</a>
 							</c:forEach>
 							<c:if test="${page < totalPages}">
-								<a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${page + 1}">다음</a>
+								<a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${page + 1}">다음</a>
 							</c:if>
 						</nav>
 					</c:otherwise>
 				</c:choose>
+
+			<%-- 함께 본 카테고리 -- 2026-09-02 추가. 원본 재확인(Playwright, coupang.com):
+			     페이지네이션 바로 아래, 왼쪽 카테고리 필터와 같은 형제 목록에서 현재 카테고리만 뺀 11개가
+			     다시 한 번 나옴. findSiblingCategories() 를 그대로 재사용(새 쿼리 필요 없음) --%>
+			<div class="also-viewed">
+				<h2>함께 본 카테고리</h2>
+				<ul class="also-viewed-list">
+					<c:forEach var="sib" items="${siblingCategories}">
+						<c:if test="${sib.categoryNo != categoryNo}">
+							<li><a href="${pageContext.request.contextPath}/category?categoryNo=${sib.categoryNo}">${sib.categoryName}</a></li>
+						</c:if>
+					</c:forEach>
+				</ul>
+			</div>
 
 			</section>
 		</div>

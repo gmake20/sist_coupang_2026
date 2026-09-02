@@ -4,6 +4,16 @@
  * 전부 .category-page 안에서만 적용되게 스코프함 — 다른 페이지 클래스와 안 부딪히게(CLAUDE.md 8장 규칙).
  */
 
+/* ---------- 헤더 폭 — 카테고리 페이지만 넓게 (2026-09-03) ----------
+   CLAUDE.md 0번 항목에 "보류 중"으로 남아있던 것. product.jsp 가 이미 쓰던 방법(product.css 34~70번줄)을
+   그대로 재사용함 — common.css 가 헤더 안쪽 폭을 CSS 변수(--header-width)로 잡아두고 있어서
+   <body class="page-category"> 에서 그 변수만 덮어쓰면 header.jsp/common.css 는 안 건드리고
+   헤더까지 같이 넓어짐(변수는 자식에게 상속되므로). 원본 재실측(browser_evaluate, coupang.com
+   카테고리 페이지 헤더): max-width 1300px — 본문 폭(.category-page)과 정확히 같음 */
+.page-category {
+	--header-width: 1300px;
+}
+
 .category-page {
 	max-width: 1300px;
 	margin: 0 auto;
@@ -269,12 +279,25 @@ label.selected .filter-function-bar-asset::after,
 	flex: none;
 }
 
+/* 카테고리 제목("티셔츠"/"바지" 등) — 2026-09-03 추가. 원본 실측(browser_evaluate): 24px/700/#000000,
+   정렬줄과 12px 간격. 브레드크럼 소분류 이름이랑 같은 글자라 헷갈려서 그동안 빠뜨렸던 요소 */
+.category-title {
+	font-size: 24px;
+	font-weight: 700;
+	color: #000000;
+	margin-bottom: 12px;
+}
+
+/* 2026-09-03 2차 재실측: 정렬줄이 연한 회색 박스(#FAFAFA)로 감싸져 있는 걸 처음에 놓쳤음(h1 기준으로만
+   위쪽을 확인해서 h1 이 아니라 이 줄 자체를 감싸는 별도 wrapper라는 걸 못 봤던 것 — 사용자 지적으로 재확인해서 찾음).
+   박스 전체 높이 40px — list-size-dropdown(32px)이 정렬옵션(26px)보다 커서 그 기준으로 위아래 4px씩 */
 .sort-bar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	height: 26px;
-	margin-bottom: 16px;
+	background: #FAFAFA;
+	padding: 4px 0;
+	margin-bottom: 15px;
 }
 
 .sort-bar ul {
@@ -295,10 +318,71 @@ label.selected .filter-function-bar-asset::after,
 	font-weight: 700;
 }
 
-.sort-bar .list-size {
+/* 60/120개씩 보기 — 2026-09-03 2차: 나란히 두 개 보여주는 방식이 원본과 달라서(원본은 호버 드롭다운)
+   다시 실측(browser_evaluate + hover)해서 순수 CSS 드롭다운으로 재구현.
+   평소엔 li.selected 만 보이고, .list-size-dropdown 에 마우스를 올리면 ul 높이가 32→64px로 늘어나며
+   숨겨져있던 li 도 같이 보임(원본과 동일한 collapse/expand 방식, JS 없이 :hover 로만 처리) */
+.list-size-dropdown {
+	position: relative;
+	width: 118px;
+	height: 32px;
+}
+
+/* ★ 2026-09-03 3차 버그 수정: 위에 있는 ".sort-bar ul { display:flex }" 규칙이 자손 선택자라서
+   여기 이 <ul> 에도 그대로 걸려 60/120이 옆으로 나란히 나오는 버그가 있었음(사용자 지적으로 발견).
+   여기서 display:block 을 다시 명시해서 li들이 원래대로 세로로 쌓이게 함 */
+.list-size-dropdown ul {
+	display: block;
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 118px;
+	overflow: hidden;
+	height: 32px;
+	background: #fff;
+	list-style: none;
+	z-index: 2;
+}
+
+.list-size-dropdown:hover ul {
+	height: 64px;
+}
+
+.list-size-dropdown li {
+	display: none;
+	align-items: center;
+	justify-content: flex-end;
+	height: 32px;
+	padding: 0 4px;
+	box-sizing: border-box;
+}
+
+.list-size-dropdown li.selected,
+.list-size-dropdown:hover li {
+	display: flex;
+}
+
+.list-size-dropdown a {
 	font-size: 12px;
-	font-weight: 700;
 	color: #555555;
+	font-weight: 400;
+	text-decoration: none;
+}
+
+/* 선택된 값 — 실측(browser_evaluate): 굵기 bold 뿐 아니라 배경도 연한 회색(#FAFAFA)으로 깔림
+   (사용자 지적으로 재확인 — 처음엔 굵기만 반영하고 배경을 놓쳤었음) */
+.list-size-dropdown li.selected {
+	background: #FAFAFA;
+}
+
+.list-size-dropdown li.selected a {
+	font-weight: 700;
+}
+
+/* 평소 보이는 한 줄에만 화살표 표시 — 원본은 아이콘인데 승인된 이미지가 없어서 문자로 대체 */
+.list-size-dropdown li.selected a::after {
+	content: "▾";
+	margin-left: 4px;
 }
 
 /* 선택한 필터 칩 줄 — 정렬줄 바로 아래, 상품목록 위(2026-09-01 원본 재확인 위치 그대로) */
@@ -364,21 +448,43 @@ label.selected .filter-function-bar-asset::after,
 	list-style: none;
 }
 
+/* 2026-09-03 2차 추가 — 실측(browser_evaluate) 결과 두 가지 놓친 게 있었음:
+   1. 카드마다 border-bottom(#DDDDDD)이 있어서, 같은 줄 4장이 나란히 붙어있으면 결과적으로
+      "상품 4개 - 회색 줄 - 상품 4개 - 회색 줄" 처럼 보임(카드 하나하나에 선이 있는 것일 뿐, 줄 구분선을
+      따로 그린 게 아님 — gap:0 이라 자연스럽게 이어짐). 마지막 줄이 4개를 못 채우면 원본도 그 줄만큼만
+      선이 그려지는 구조라 원본과 같음 — 다만 우리는 테스트 상품이 적어 이 상황이 항상 나서 어색해 보이므로
+      빈 채움 카드(product-card--filler, category_list.jsp 에서 추가)로 선을 끝까지 채움(3장 참고)
+   2. 카드 링크(a)에 호버 시 box-shadow 가 붙음(가만있을 땐 none, transition 으로 부드럽게 나타남) */
 .product-card {
 	width: 270px;
 	padding: 10px 0 20px;
+	border-bottom: 1px solid #DDDDDD;
+	box-sizing: border-box;
 }
 
+/* 2026-09-03 3차 재실측 — 상품명이 "꽉 차 보인다"던 지적의 원인을 찾음: 카드(270px) 안에서
+   그동안 이미지만 margin:0 auto 로 가운데 맞추고 텍스트는 여백 없이 270px 꽉 채우고 있었음.
+   원본은 <a> 자체가 좌우 10px 마진 + 좌우 16px 패딩(border-box)이라 실제 내용 폭이 218px 로
+   고정되고, 그 안의 모든 자식(이미지·상품명·가격·배송문구·별점·적립)이 똑같이 이 폭을 따름.
+   그래서 특정 자식마다 따로 폭/마진을 주는 대신 <a> 하나에서 한 번에 해결 — 자식들은 그냥 100% */
 .product-card a {
 	display: block;
+	margin: 0 10px;
+	padding: 0 16px;
+	box-sizing: border-box;
 	text-decoration: none;
 	color: inherit;
+	transition: box-shadow 0.2s;
+}
+
+.product-card a:hover {
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .product-card figure {
-	width: 218px;
+	width: 100%;
 	height: 218px;
-	margin: 0 auto 10px;
+	margin: 0 0 10px;
 	background: var(--bg-gray);
 }
 
@@ -388,12 +494,28 @@ label.selected .filter-function-bar-asset::after,
 	object-fit: cover;
 }
 
+/* 무료배송 뱃지 — 2026-09-02 추가. 원본 실측(browser_evaluate): 12px/400/#555555.
+   상품명과의 간격도 재확인(2026-09-02 2차): 뱃지 아래쪽 여백이 10px이었음(2px는 눈대중, 틀렸던 값) */
+.product-card .free-shipping-badge {
+	font-size: 12px;
+	font-weight: 400;
+	color: #555555;
+	margin-bottom: 10px;
+}
+
+/* 2026-09-03 2차: 상품명 줄이 안 맞아 보인다는 지적 — 원본 실측(browser_evaluate)해보니 이름을
+   최대 3줄까지만 자르고 그 뒤는 잘라버리는 line-clamp 가 있었음(우리는 그게 없어서 이름이 길면
+   무한정 늘어나 같은 줄 카드끼리 가격 위치가 크게 어긋났던 것) */
 .product-card .product-name {
 	font-size: 14px;
 	font-weight: 400;
 	color: #212B36;
 	line-height: 18.2px;
 	margin-bottom: 4px;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
 .product-card a:hover .product-name {
@@ -402,9 +524,10 @@ label.selected .filter-function-bar-asset::after,
 }
 
 /* 원본 실측(2026-08-31, browser_evaluate): 할인정보 줄과 최종가 줄이 한 줄이 아니라 줄바꿈됨
-   (할인정보 span 들은 display:inline, 최종가 strong 만 display:block이라 자동으로 다음 줄로 감) */
+   (할인정보 span 들은 display:inline, 최종가 strong 만 display:block이라 자동으로 다음 줄로 감).
+   배송문구와의 간격도 재실측(2026-09-02 2차): 5px였음(4px는 이전 눈대중, 근사값이라 정정) */
 .product-card .product-price {
-	margin-bottom: 4px;
+	margin-bottom: 5px;
 }
 
 .product-card .discount-rate {
@@ -428,11 +551,26 @@ label.selected .filter-function-bar-asset::after,
 	margin-top: 2px;
 }
 
+/* 배송 예정일 — 2026-09-02 추가. 원본 실측(browser_evaluate): 14px/400/#212B36.
+   실제 배송정보 컬럼(SHIPPING_FEE_TYPE 등)을 아직 안 써서 모든 카드에 똑같은 문구(CategoryServlet 참고).
+   다음 줄(별점 또는 적립)과의 간격도 재실측(2026-09-02 2차): 1px 이하로 거의 붙어있어서 0으로 정정 */
+.product-card .delivery-date {
+	font-size: 14px;
+	font-weight: 400;
+	color: #212B36;
+	margin-bottom: 0;
+}
+
 /* 적립 — 실제 적립 정책 없어서 판매가 1%로 임의 계산(2026-09-01 재추가) */
 .product-card .cash-reward {
 	font-size: 12px;
 	color: var(--text-gray);
 	margin-bottom: 4px;
+}
+
+/* 별점 없는 카드는 배송문구 바로 다음이 적립 — 그 경우에만 위쪽 여백을 따로 줌(원본 실측 12px) */
+.product-card .delivery-date + .cash-reward {
+	margin-top: 12px;
 }
 
 .product-card .product-rating {
@@ -441,7 +579,7 @@ label.selected .filter-function-bar-asset::after,
 	display: flex;
 	align-items: center;
 	gap: 4px;
-	margin-bottom: 4px;
+	margin-bottom: 12px;
 }
 
 /* product.css 의 .product-page .star-rating 과 완전히 같은 스프라이트 재사용(2026-08-27 원본 실측 그대로).
@@ -492,4 +630,51 @@ label.selected .filter-function-bar-asset::after,
 	color: var(--link-blue);
 	font-weight: 700;
 	border: 1px solid var(--link-blue);
+}
+
+/* ---------- 함께 본 카테고리 ---------- */
+/* 2026-09-02 추가. 원본 실측(coupang.com, browser_evaluate): 제목 16px/700/#212B36,
+   링크 12px/400/#346AFF, 항목 사이 1×15px 구분선(#EEEEEE).
+   페이지네이션과의 간격도 재확인(2026-09-02 2차): 20px였음(30px는 눈대중, 틀렸던 값) */
+.also-viewed {
+	margin-top: 20px;
+}
+
+.also-viewed h2 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #212B36;
+	margin-bottom: 12px;
+}
+
+.also-viewed-list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	list-style: none;
+}
+
+.also-viewed-list li {
+	display: flex;
+	align-items: center;
+}
+
+.also-viewed-list li:not(:last-child)::after {
+	content: "";
+	display: inline-block;
+	width: 1px;
+	height: 15px;
+	background: #EEEEEE;
+	margin: 0 10px;
+}
+
+.also-viewed-list a {
+	font-size: 12px;
+	font-weight: 400;
+	color: #346AFF;
+	text-decoration: none;
+}
+
+.also-viewed-list a:hover {
+	text-decoration: underline;
 }

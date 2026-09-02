@@ -1,9 +1,12 @@
 package com.goodpang.servlet;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jakarta.servlet.ServletException;
@@ -20,7 +23,7 @@ import com.goodpang.dto.CategoryProductDTO;
 @WebServlet("/category")
 public class CategoryServlet extends HttpServlet {
 
-    private static final int PAGE_SIZE = 60;
+    private static final int DEFAULT_PAGE_SIZE = 60;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -29,6 +32,11 @@ public class CategoryServlet extends HttpServlet {
         int categoryNo = parseIntOrDefault(request.getParameter("categoryNo"), 10301);
         Sort sort = parseSortOrDefault(request.getParameter("sort"));
         int page = Math.max(1, parseIntOrDefault(request.getParameter("page"), 1));
+
+        // 보기 개수 60/120 — 2026-09-03 실동작으로 변경(예전엔 "60개 고정" 확정이었는데 사용자 요청으로 정정).
+        // 원본처럼 화이트리스트 두 개만 허용 — 그 외 값(잘못된 파라미터 조작 등)은 기본값 60으로
+        int listSize = parseIntOrDefault(request.getParameter("listSize"), DEFAULT_PAGE_SIZE);
+        if (listSize != 60 && listSize != 120) listSize = DEFAULT_PAGE_SIZE;
 
         // 가격대 필터 — 안 고르면 전체(0 ~ 최대) 그대로
         int minPrice = Math.max(0, parseIntOrDefault(request.getParameter("minPrice"), 0));
@@ -65,9 +73,9 @@ public class CategoryServlet extends HttpServlet {
         CategoryProductDAO dao = new CategoryProductDAO();
 
         List<CategoryProductDTO> products =
-                dao.findByCategory(categoryNo, sort, minPrice, maxPrice, minRating, colors, page, PAGE_SIZE);
+                dao.findByCategory(categoryNo, sort, minPrice, maxPrice, minRating, colors, page, listSize);
         int totalCount = dao.countByCategory(categoryNo, minPrice, maxPrice, minRating, colors);
-        int totalPages = (int) Math.ceil(totalCount / (double) PAGE_SIZE);
+        int totalPages = (int) Math.ceil(totalCount / (double) listSize);
 
         CategoryDTO[] breadcrumb = dao.findBreadcrumb(categoryNo);
         List<CategoryDTO> siblingCategories = dao.findSiblingCategories(categoryNo);
@@ -81,6 +89,7 @@ public class CategoryServlet extends HttpServlet {
         request.setAttribute("minPrice", minPrice);
         request.setAttribute("maxPrice", maxPrice == Integer.MAX_VALUE ? "" : maxPrice);
         request.setAttribute("rating", minRating);
+        request.setAttribute("listSize", listSize);
         request.setAttribute("selectedColors", colors);
         request.setAttribute("selectedColorMap", selectedColorMap);
 
@@ -98,6 +107,15 @@ public class CategoryServlet extends HttpServlet {
         // "필터" 제목 바로 아래, 소제목(h3) 없이 나오는 체크박스 줄 — 2026-08-31 실측(1440px 스크린샷)한
         // 실제 라벨 그대로("로켓럭셔리만 보기" 등은 처음에 잘못 짐작한 것, 이걸로 교체). 로켓 배지 이미지는 없어서 글자만
         request.setAttribute("topFilterItems", new String[] { "로켓", "R.LUX만 보기", "로켓와우만 보기", "로켓직구만 보기", "C.에비뉴", "무료배송" });
+
+        // 배송예정일 — ProductServlet(상세페이지)과 완전히 같은 계산식 재사용(2026-09-02 추가).
+        // 실제 배송정보 컬럼(SHIPPING_FEE_TYPE/DELIVERY_METHOD/LEAD_TIME_DAYS)을 아직 어디서도 안 써서
+        // (CLAUDE.md "지금 하는 일" 4번 미해결) 카드마다 다르게는 못 보여줌 — "내일(요일) M/d 도착 예정"을
+        // 모든 카드에 똑같이 씀. 실제 컬럼 연동되면 그때 상품별로 갈라줄 것
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        String dayOfWeek = tomorrow.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);
+        String deliveryDate = "내일(" + dayOfWeek + ") " + tomorrow.getMonthValue() + "/" + tomorrow.getDayOfMonth();
+        request.setAttribute("deliveryDate", deliveryDate);
 
         request.getRequestDispatcher("/WEB-INF/views/category_list.jsp").forward(request, response);
     }
