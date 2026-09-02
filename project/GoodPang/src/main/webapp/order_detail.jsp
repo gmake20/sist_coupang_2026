@@ -72,10 +72,15 @@
 
 						<div class="product-row">
 
-							<!-- 상품 이미지 -->
-							<div class="product-image">
-								<div class="clothes-icon">👕</div>
-							</div>
+							<!-- 상품 이미지 영역 -->
+						<div class="product-image">
+						    <c:choose>
+						        <c:when test="${not empty item.imageUrl}">
+						            <img src="${item.imageUrl}" alt="${item.productName}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 6px;" />
+						        </c:when>
+						      
+						    </c:choose>
+						</div>
 
 							<!-- 상품 정보 -->
 							<div class="product-info">

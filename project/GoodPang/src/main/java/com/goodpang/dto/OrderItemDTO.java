@@ -30,6 +30,8 @@ public class OrderItemDTO {
 	private Long orderDetailNo;
     private Long productNo;
     private int deliveryFee;       // 배송비
+    //이미지
+    private String imageUrl;
 
 
 }

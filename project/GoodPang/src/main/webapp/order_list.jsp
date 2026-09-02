@@ -223,11 +223,17 @@
 	<div class="product-row"
 		style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #f0f0f0;">
 
-		<!-- 의류 이미지 / 아이콘 -->
-		<div class="product-image"
-			style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 6px; font-size: 32px; margin-right: 15px; flex-shrink: 0;">
-			<div class="clothes-icon">👕</div>
-		</div>
+		<!-- 상품 이미지 영역 -->
+<div class="product-image" style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 6px; overflow: hidden; margin-right: 15px; flex-shrink: 0;">
+    <c:choose>
+        <%-- DB에 저장된 이미지 경로가 있는 경우 --%>
+        <c:when test="${not empty item.imageUrl}">
+            <%-- 외부 이미지 서버 URL 경로이거나 풀 경로인 경우 그대로 출력 --%>
+            <img src="${item.imageUrl}" alt="${item.productName}" style="width: 100%; height: 100%; object-fit: cover;" />
+        </c:when>
+       
+    </c:choose>
+</div>
 
 		<!-- 의류 상품 정보 명세 -->
 		<div class="product-info" style="flex: 1;">
