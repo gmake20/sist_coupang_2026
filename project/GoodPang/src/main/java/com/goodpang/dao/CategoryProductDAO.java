@@ -16,9 +16,9 @@ import com.goodpang.util.ConnectionProvider;
  */
 public class CategoryProductDAO {
 
-    // 정렬 화이트리스트 — 원본은 5개(쿠팡랭킹순 포함)지만 우리는 4개만(2026-08-30 확정, 쿠팡랭킹순 제외)
+    // 정렬 화이트리스트
     public enum Sort {
-        LATEST, PRICE_ASC, PRICE_DESC, SALE_COUNT
+        LATEST, PRICE_ASC, PRICE_DESC, SALE_COUNT, RANKING
     }
 
     // 상품 목록 하나의 SELECT 본문 + FROM/JOIN 은 count 조회와 겹쳐서 재사용.
@@ -55,6 +55,11 @@ public class CategoryProductDAO {
                 WHERE o.ORDER_STATUS != '주문취소'
                 GROUP BY od.PRODUCT_NO
             ) SC ON SC.PRODUCT_NO = P.PRODUCT_NO
+            LEFT JOIN (
+                SELECT PRODUCT_NO, COUNT(*) AS OPTION_COUNT
+                FROM PRODUCT_OPTION
+                GROUP BY PRODUCT_NO
+            ) OC ON OC.PRODUCT_NO = P.PRODUCT_NO
             WHERE P.SUB_CATEGORY_NO = ?
               AND P.SALE_STATUS != '승인 대기'
               AND P.DISPLAY_YN = 'Y'
@@ -311,6 +316,11 @@ public class CategoryProductDAO {
             case PRICE_DESC -> "(P.PRODUCT_PRICE + NVL(OPT.PRICE, 0)) DESC";
             case SALE_COUNT -> "NVL(SC.SALE_COUNT, 0) DESC";
             case LATEST     -> "P.CREATED_DATE DESC";
+            // 다단계 우선순위 정렬(2026-09-02) — 데이터 규모가 작아 가중합/베이지안 보정 대신 선택.
+            // 판매량 → 평점 → 리뷰수 → 옵션수 순으로 동점 처리. 
+            case RANKING    -> "NVL(SC.SALE_COUNT, 0) DESC, NVL(RV.AVG_RATING, 0) DESC, "
+                              + "NVL(RV.REVIEW_COUNT, 0) DESC, NVL(OC.OPTION_COUNT, 0) DESC, "
+                              + "P.PRODUCT_NO DESC";   // 동점일 때 항상 같은 순서가 나오도록 최종 기준 추가(2026-09-03)
         };
     }
 

@@ -291,6 +291,9 @@
 				<%-- 이것도 마찬가지로 EL 리스트 리터럴 대신 4개를 그냥 하나씩 적음 --%>
 				<div class="sort-bar">
 					<ul>
+			     	    <li class="${sort == 'RANKING' ? 'Sort_selected' : ''}">
+            			  <a href="${baseUrl}&listSize=${listSize}&sort=RANKING&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">쿠팡랭킹순</a>
+       				    </li>
 						<li class="${sort == 'LATEST' ? 'Sort_selected' : ''}">
 							<a href="${baseUrl}&listSize=${listSize}&sort=LATEST&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">최신순</a>
 						</li>

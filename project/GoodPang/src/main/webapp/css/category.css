@@ -443,7 +443,7 @@ label.selected .filter-function-bar-asset::after,
 	align-items: center;
 	justify-content: space-between;
 	background: #FAFAFA;
-	padding: 4px 0;
+	padding: 4px 10px;
 	margin-bottom: 15px;
 }
 
@@ -451,6 +451,21 @@ label.selected .filter-function-bar-asset::after,
 	display: flex;
 	list-style: none;
 	gap: 16px;
+}
+
+.sort-bar li {
+      position: relative;
+}
+
+.sort-bar li:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      right: -8px;                 /* gap(16px)의 정중앙 */
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 11px;
+      background: #B6B6B6;
 }
 
 .sort-bar a {
@@ -464,6 +479,12 @@ label.selected .filter-function-bar-asset::after,
 	color: var(--link-blue);
 	font-weight: 700;
 }
+
+.sort-bar li.Sort_selected a::before {
+      content: "\2713";  /* 체크마크(✓) — 텍스트 문자라 이미지 파일 없이 처리 가능 */
+      margin-right: 4px;
+}
+
 
 /* 60/120개씩 보기 — 2026-09-03 2차: 나란히 두 개 보여주는 방식이 원본과 달라서(원본은 호버 드롭다운)
    다시 실측(browser_evaluate + hover)해서 순수 CSS 드롭다운으로 재구현.
