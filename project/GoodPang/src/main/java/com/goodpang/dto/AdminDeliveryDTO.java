@@ -23,7 +23,12 @@ public class AdminDeliveryDTO {
     private String buyerName;
     private String buyerPhone;
 
+    private String zipcode;
+    private String address;
+    private String detailAddress;
+
     private String productName;
+    private String productImageUrl;
     private String storeName;
     private int itemCount;
 }

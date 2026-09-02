@@ -51,7 +51,11 @@
       "deliveryStartDate": "...",
       "buyerName": "홍*동",
       "buyerPhone": "010-0000-****",
+      "zipcode": "12345",
+      "address": "서울특별시 강남구 테헤란로 1",
+      "detailAddress": "101동 101호",
       "productName": "반팔 티셔츠",
+      "productImageUrl": "./pds/short_1.jpg",
       "storeName": "베이직루트",
       "itemCount": 2
     }

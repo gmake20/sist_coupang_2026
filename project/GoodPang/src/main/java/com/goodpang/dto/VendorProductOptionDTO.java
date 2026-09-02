@@ -14,6 +14,7 @@ public class VendorProductOptionDTO {
     private int optionId;
     private int productNo;
     private String productName;
+    private String thumbnailUrl;
 
     private String option1Value;
     private String option2Value;

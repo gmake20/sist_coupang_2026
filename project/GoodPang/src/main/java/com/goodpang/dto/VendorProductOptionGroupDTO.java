@@ -15,5 +15,6 @@ public class VendorProductOptionGroupDTO {
 
     private int productNo;
     private String productName;
+    private String thumbnailUrl;
     private List<VendorProductOptionDTO> options;
 }
