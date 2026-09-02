@@ -538,3 +538,42 @@ body {
 	font-weight: 700;
 }
 
+.review-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin: 40px 0 30px;
+}
+
+.review-pagination .page-number,
+.review-pagination .page-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+    box-sizing: border-box;
+    color: #555;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.review-pagination .page-number:hover,
+.review-pagination .page-arrow:hover {
+    border-color: #346aff;
+    color: #346aff;
+}
+
+.review-pagination .page-number.active {
+    border-color: #346aff;
+    background: #346aff;
+    color: #fff;
+    font-weight: 700;
+    cursor: default;
+}
+

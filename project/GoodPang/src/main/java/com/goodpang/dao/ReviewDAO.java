@@ -1611,4 +1611,224 @@ public class ReviewDAO {
 
         return dto;
     }
+    
+    public List<ReviewDTO2> selectReviewsByMemberNo(int memberNo, int offset, int pageSize) {
+
+        String sql = """
+            SELECT
+                r.REVIEW_NO,
+                r.PRODUCT_RATING,
+                r.SERVICE_RATING,
+                r.REVIEW_CONTENT,
+                r.REVIEW_SUMMARY,
+                r.REVIEW_DATE,
+                r.MEMBER_NO,
+                r.ORDER_DETAIL_NO,
+                od.PRODUCT_NO,
+                p.PRODUCT_NAME,
+                po.OPTION1_TYPE,
+                po.OPTION1_VALUE,
+                po.OPTION2_TYPE,
+                po.OPTION2_VALUE
+            FROM REVIEW r
+            JOIN ORDER_DETAIL od ON r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO
+            JOIN PRODUCT p ON od.PRODUCT_NO = p.PRODUCT_NO
+            LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID
+            WHERE r.MEMBER_NO = ?
+            ORDER BY r.REVIEW_DATE DESC, r.REVIEW_NO DESC
+            OFFSET ? ROWS
+            FETCH NEXT ? ROWS ONLY
+            """;
+
+        List<ReviewDTO2> list = new ArrayList<>();
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setInt(1, memberNo);
+            pstmt.setInt(2, offset);
+            pstmt.setInt(3, pageSize);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    ReviewDTO2 dto = new ReviewDTO2();
+
+                    dto.setReviewNo(rs.getInt("REVIEW_NO"));
+
+                    int productRating = rs.getInt("PRODUCT_RATING");
+                    dto.setProductRating(productRating);
+
+                    StringBuilder stars = new StringBuilder();
+
+                    for (int i = 0; i < productRating; i++) {
+                        stars.append("★");
+                    }
+
+                    for (int i = productRating; i < 5; i++) {
+                        stars.append("☆");
+                    }
+
+                    dto.setRatingStars(stars.toString());
+
+                    int serviceRating = rs.getInt("SERVICE_RATING");
+
+                    if (rs.wasNull()) {
+                        dto.setServiceRating(null);
+                    } else {
+                        dto.setServiceRating(serviceRating);
+                    }
+
+                    dto.setReviewContent(rs.getString("REVIEW_CONTENT"));
+                    dto.setReviewSummary(rs.getString("REVIEW_SUMMARY"));
+                    dto.setReviewDate(rs.getDate("REVIEW_DATE"));
+                    dto.setMemberNo(rs.getInt("MEMBER_NO"));
+                    dto.setOrderDetailNo(rs.getInt("ORDER_DETAIL_NO"));
+                    dto.setProductNo(rs.getInt("PRODUCT_NO"));
+                    dto.setProductName(rs.getString("PRODUCT_NAME"));
+
+                    String option1Type = rs.getString("OPTION1_TYPE");
+                    String option1Value = rs.getString("OPTION1_VALUE");
+                    String option2Type = rs.getString("OPTION2_TYPE");
+                    String option2Value = rs.getString("OPTION2_VALUE");
+
+                    StringBuilder option = new StringBuilder();
+
+                    if (option1Value != null && !option1Value.isBlank()) {
+                        if (option1Type != null && !option1Type.isBlank()) {
+                            option.append(option1Type).append(" ");
+                        }
+                        option.append(option1Value);
+                    }
+
+                    if (option2Value != null && !option2Value.isBlank()) {
+                        if (option.length() > 0) {
+                            option.append(" / ");
+                        }
+
+                        if (option2Type != null && !option2Type.isBlank()) {
+                            option.append(option2Type).append(" ");
+                        }
+
+                        option.append(option2Value);
+                    }
+
+                    dto.setOptionText(option.toString());
+                    list.add(dto);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    public List<ReviewItemDTO> selectAvailableReviewsByMemberNo(int memberNo, int offset, int pageSize) {
+
+        String sql = """
+            SELECT
+                od.ORDER_DETAIL_NO,
+                od.PRODUCT_NO,
+                p.PRODUCT_NAME,
+                po.OPTION1_TYPE,
+                po.OPTION1_VALUE,
+                po.OPTION2_TYPE,
+                po.OPTION2_VALUE
+            FROM ORDER_DETAIL od
+            JOIN ORDERS o ON od.ORDER_NO = o.ORDER_NO
+            JOIN PRODUCT p ON od.PRODUCT_NO = p.PRODUCT_NO
+            LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID
+            LEFT JOIN REVIEW r ON od.ORDER_DETAIL_NO = r.ORDER_DETAIL_NO
+            WHERE o.MEMBER_NO = ?
+              AND r.REVIEW_NO IS NULL
+            ORDER BY o.ORDER_DATE DESC, od.ORDER_DETAIL_NO DESC
+            OFFSET ? ROWS
+            FETCH NEXT ? ROWS ONLY
+            """;
+
+        List<ReviewItemDTO> list = new ArrayList<>();
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setInt(1, memberNo);
+            pstmt.setInt(2, offset);
+            pstmt.setInt(3, pageSize);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    ReviewItemDTO dto = new ReviewItemDTO();
+
+                    dto.setOrderDetailNo(rs.getInt("ORDER_DETAIL_NO"));
+                    dto.setProductNo(rs.getInt("PRODUCT_NO"));
+                    dto.setProductName(rs.getString("PRODUCT_NAME"));
+
+                    String option1Type = rs.getString("OPTION1_TYPE");
+                    String option1Value = rs.getString("OPTION1_VALUE");
+                    String option2Type = rs.getString("OPTION2_TYPE");
+                    String option2Value = rs.getString("OPTION2_VALUE");
+
+                    StringBuilder option = new StringBuilder();
+
+                    if (option1Value != null && !option1Value.isBlank()) {
+                        if (option1Type != null && !option1Type.isBlank()) {
+                            option.append(option1Type).append(" ");
+                        }
+                        option.append(option1Value);
+                    }
+
+                    if (option2Value != null && !option2Value.isBlank()) {
+                        if (option.length() > 0) {
+                            option.append(", ");
+                        }
+
+                        if (option2Type != null && !option2Type.isBlank()) {
+                            option.append(option2Type).append(" ");
+                        }
+
+                        option.append(option2Value);
+                    }
+
+                    dto.setOptionName(option.toString());
+                    list.add(dto);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    public int countAvailableReviewsByMemberNo(int memberNo) {
+
+        String sql = """
+            SELECT COUNT(*)
+            FROM ORDER_DETAIL od
+            JOIN ORDERS o ON od.ORDER_NO = o.ORDER_NO
+            LEFT JOIN REVIEW r ON od.ORDER_DETAIL_NO = r.ORDER_DETAIL_NO
+            WHERE o.MEMBER_NO = ?
+              AND r.REVIEW_NO IS NULL
+            """;
+
+        int count = 0;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setInt(1, memberNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
 }
