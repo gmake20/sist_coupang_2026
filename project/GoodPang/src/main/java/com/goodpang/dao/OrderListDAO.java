@@ -21,7 +21,7 @@ public class OrderListDAO {
     /**
      * 특정 회원의 전체 마이페이지 주문 내역 조회 (기존)
      */
-    public List<OrderItemDTO> selectMyPageOrders(int memberNo) throws NamingException {
+    public List<OrderItemDTO> selectMyPageOrders(int orderNo, int memberNo) throws NamingException {
         List<OrderItemDTO> list = new ArrayList<>();
 
         String sql = "SELECT "
@@ -106,7 +106,7 @@ public class OrderListDAO {
     }
 
     /**
-     * 연도 필터링 및 페이징 목록 조회 (OrderItemDTO 반환)
+     * 연도 필터링 및 페이징 목록 조회 (OrderItemDTO 반환 - 대표 이미지 포함)
      */
     public List<OrderItemDTO> getOrderListPaged(int memberNo, String yearFilter, int page, int pageSize) {
         List<OrderItemDTO> list = new ArrayList<>();
@@ -118,14 +118,24 @@ public class OrderListDAO {
         sql.append("  SELECT o.order_no, o.order_date, o.order_status, o.total_price AS order_total_price, o.delivery_fee, ");
         sql.append("         od.order_detail_no, od.order_qty, od.price AS item_price, ");
         sql.append("         p.product_no, p.product_name, ");
-        sql.append("         po.option1_type, po.option1_value, po.option2_type, po.option2_value ");
+        sql.append("         po.option1_type, po.option1_value, po.option2_type, po.option2_value, ");
+        sql.append("         img.IMAGE_URL "); // ★ 1. 대표 이미지 URL 컬럼 추가
         sql.append("  FROM ORDERS o ");
         sql.append("  JOIN ORDER_DETAIL od ON o.order_no = od.order_no ");
         sql.append("  JOIN PRODUCT p ON od.product_no = p.product_no ");
         sql.append("  LEFT JOIN PRODUCT_OPTION po ON od.option_id = po.option_id ");
+        sql.append("  LEFT JOIN ( "); // ★ 2. 대표 이미지 1건을 가져오는 서브쿼리 조인
+        sql.append("      SELECT product_no, image_url ");
+        sql.append("      FROM ( ");
+        sql.append("          SELECT product_no, image_url, ");
+        sql.append("                 ROW_NUMBER() OVER(PARTITION BY product_no ORDER BY image_no ASC) as rn ");
+        sql.append("          FROM PRODUCT_IMAGE ");
+        sql.append("          WHERE image_purpose = '대표' ");
+        sql.append("      ) WHERE rn = 1 ");
+        sql.append("  ) img ON p.product_no = img.product_no ");
         sql.append("  WHERE o.member_no = ? ");
-
-        // ★ 핵심: 상품(Row) 개수가 아니라 '주문번호 5건'을 먼저 추출하는 서브쿼리
+        
+        // 주문번호 기준 페이징을 위한 서브쿼리
         sql.append("    AND o.order_no IN ( ");
         sql.append("        SELECT order_no FROM ( ");
         sql.append("            SELECT order_no, ROWNUM as rnum FROM ( ");
@@ -176,6 +186,9 @@ public class OrderListDAO {
                     dto.setOption1Value(rs.getString("option1_value"));
                     dto.setOption2Type(rs.getString("option2_type"));
                     dto.setOption2Value(rs.getString("option2_value"));
+                    
+                    // ★ 3. ResultSet에서 IMAGE_URL 세팅
+                    dto.setImageUrl(rs.getString("IMAGE_URL"));
 
                     list.add(dto);
                 }
@@ -187,4 +200,5 @@ public class OrderListDAO {
         }
         return list;
     }
+    
 }

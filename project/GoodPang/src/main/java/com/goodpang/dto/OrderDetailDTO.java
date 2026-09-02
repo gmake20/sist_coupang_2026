@@ -37,6 +37,9 @@ public class OrderDetailDTO {
     
     // 주문번호 당 총 가격
     private int finalTotalPrice;
+    
+    //이미지
+    private String imageUrl;
  
     
  // [취소/반품(PRODUCT_RETURN) 관련 추가 필드]
