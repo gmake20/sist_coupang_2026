@@ -23,10 +23,12 @@ public class AdminDeliveryDAO {
                 D.DELIVERY_NO, D.ORDER_NO, D.DELIVERY_SERVICE_CODE, D.INVOICE_NO,
                 D.DELIVERY_STATUS, D.DELIVERY_START_DATE,
                 M.MEMBER_NAME, M.PHONE,
+                DA.ZIPCODE, DA.ADDRESS, DA.DETAIL_ADDRESS,
                 PN.PRODUCT_NAME, PN.STORE_NAME, PN.ITEM_COUNT, IMG.IMAGE_URL AS PRODUCT_IMAGE_URL
             FROM DELIVERY D
                 JOIN ORDERS O ON D.ORDER_NO = O.ORDER_NO
                 JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO
+                LEFT JOIN ORDER_ADDRESS DA ON O.ORDER_ADDRESS_NO = DA.ORDER_ADDRESS_NO
                 JOIN (
                     SELECT
                         OD.ORDER_NO,
@@ -157,6 +159,10 @@ public class AdminDeliveryDAO {
 
         dto.setBuyerName(rs.getString("MEMBER_NAME"));
         dto.setBuyerPhone(rs.getString("PHONE"));
+
+        dto.setZipcode(rs.getString("ZIPCODE"));
+        dto.setAddress(rs.getString("ADDRESS"));
+        dto.setDetailAddress(rs.getString("DETAIL_ADDRESS"));
 
         dto.setProductName(rs.getString("PRODUCT_NAME"));
         dto.setProductImageUrl(rs.getString("PRODUCT_IMAGE_URL"));

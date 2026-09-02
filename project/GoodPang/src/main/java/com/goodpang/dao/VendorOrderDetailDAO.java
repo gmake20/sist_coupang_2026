@@ -42,7 +42,7 @@ public class VendorOrderDetailDAO {
                 DA.ADDRESS, DA.DETAIL_ADDRESS, DA.REQUEST_MSG
             FROM ORDERS O
                 JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO
-                JOIN DELIVERY_ADDRESS DA ON O.ORDER_ADDRESS_NO = DA.ADDRESS_NO
+                JOIN ORDER_ADDRESS DA ON O.ORDER_ADDRESS_NO = DA.ORDER_ADDRESS_NO
             WHERE O.ORDER_NO = ?
               AND EXISTS (
                     SELECT 1
