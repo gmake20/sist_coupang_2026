@@ -28,5 +28,5 @@ public class CategoryProductDTO {
     private int reviewCount;           // 리뷰 없으면 0
     private int saleCount;             // ORDER_DETAIL.ORDER_QTY 합계(주문취소 제외). 판매량순 정렬 기준
 
-    private int cashReward;            // 적립 — 실제 적립 정책 없어서 판매가 1%로 임의 계산
+    private int cashReward;            // 적립 
 }

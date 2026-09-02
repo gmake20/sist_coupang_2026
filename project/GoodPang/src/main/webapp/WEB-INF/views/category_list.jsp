@@ -99,11 +99,49 @@
 				     없어서 폼에 실리지도 않고 서버에도 안 감. data-deco-id/data-label 은 category.js 가
 				     "선택한 필터" 줄에 칩을 추가하려고 씀(버그 리포트 1번 — 체크만 되고 전체해제/선택한 필터에
 				     안 잡히던 문제 수정) --%>
-				<ul class="filter-top-row">
-					<c:forEach var="item" items="${topFilterItems}" varStatus="st">
-						<li><label><input type="checkbox" data-deco-id="top-${st.index}" data-label="${item}"><i class="filter-function-bar-asset"></i><span>${item}</span></label></li>
-					</c:forEach>
-				</ul>
+				<%-- 2026-09-05: 원본 재실측 결과 이 줄도 "제목(h5)만 없는 그룹"이라 나머지 필터 그룹과
+				     똑같은 상자(padding 10px 10px 8px + 아래 1px 회색선)를 씀 — 그래서 section.filter-group
+				     으로 감싸서 그 규칙을 그대로 쓰게 함(전엔 .filter-top-row 에 따로 여백을 주고 있었음) --%>
+				<%-- ★ 2026-09-05 재실측으로 구조 교체(사용자 지적: "R.LUX부터 로켓직구만 보기까지 색상이 다르고
+				     배치도 조금 다름"). 원본은 6개를 평평하게 늘어놓은 게 아니라 아래처럼 2단으로 되어 있음:
+
+				       □ [로켓 배지]                  ← 로켓 전체(3종 한번에)
+				         ┌ 연회색(#FAFAFA) 띠 ─────┐
+				         □ R.LUX 만 보기   ← 흐림(못 고름)
+				         □ 로켓 만 보기
+				         □ 로켓직구 만 보기
+				         └──────────────────┘
+				       □ [탑브랜드 배지]
+				       □ 무료배송
+
+				     그래서 서버가 주던 평평한 문자열 배열(topFilterItems)은 더 못 쓰고 여기서 직접 씀
+				     (어차피 DB 연동이 없는 장식용 줄이라 서버가 알 필요가 없는 값임 — CategoryServlet 에서도 지움).
+				     배지 이미지는 로켓만 우리 폴더에 있고(logo_rocket_filter_medium.png) R.LUX·직구·C.에비뉴는
+				     아직 없어서 그 셋은 글자로 둠. data-deco-id/data-label 은 예전처럼 category.js 가
+				     "선택한 필터" 칩을 만드는 데 씀 --%>
+				<section class="filter-group">
+					<ul class="filter-top-row">
+						<li>
+							<label><input type="checkbox" data-deco-id="top-rocket-all" data-label="로켓"><i class="filter-function-bar-asset"></i><span class="service-badge"><img src="${pageContext.request.contextPath}/images/icons/logo_rocket_filter_medium.png" alt="로켓"></span></label>
+							<%-- ★ 2026-09-05 3차 수정. 원본은 이 줄들이 전부 "브랜드 로고 이미지 + '만 보기' 글자" 인데
+							     우리는 그 로고 이미지가 없어서 글자로 대신 씀. 그래서 최소한 색이라도 맞추려고
+							     원본 로고 이미지를 화면에서 캡처해 픽셀 색을 직접 뽑아왔음(눈대중 아님):
+							       로켓배송 #459DBF / 로켓직구 #9C27B0 / C.에비뉴 #41297F / R.LUX 검정(굵게)
+							     그래서 브랜드 이름 부분만 <span class="brand-*"> 로 감싸고 "만 보기"는 검정 그대로 둠.
+							     ★ 버그 수정: R.LUX 체크박스가 안 눌리던 문제 — 원본이 pointer-events:none 인 걸 그대로
+							     따라해서 disabled 를 걸어놨었음. 이 프로젝트 규칙("체크박스가 있으면 눌렀을 때 체크
+							     표시는 난다", 2026-09-01)에 맞춰 disabled 를 떼고 다른 항목과 똑같이 눌리게 함
+							     (흐린 색(opacity 0.4)은 원본 모습이라 그대로 둠) --%>
+							<ul class="filter-service-sub">
+								<li><label class="is-dimmed"><input type="checkbox" data-deco-id="top-rlux" data-label="R.LUX 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-rlux">R.LUX</span> 만 보기</label></li>
+								<li><label><input type="checkbox" data-deco-id="top-rocket" data-label="로켓배송 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-rocket">로켓배송</span> 만 보기</label></li>
+								<li><label><input type="checkbox" data-deco-id="top-jikgu" data-label="로켓직구 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-jikgu">로켓직구</span> 만 보기</label></li>
+							</ul>
+						</li>
+						<li><label><input type="checkbox" data-deco-id="top-topbrand" data-label="C.에비뉴"><i class="filter-function-bar-asset"></i><span class="brand-cavenue">C.에비뉴</span></label></li>
+						<li><label><input type="checkbox" data-deco-id="top-free" data-label="무료배송"><i class="filter-function-bar-asset"></i><span>무료배송</span></label></li>
+					</ul>
+				</section>
 
 				<%-- 카테고리 필터 — 실제로 동작함(클릭하면 그 카테고리로 이동) --%>
 				<section class="filter-group">
@@ -175,16 +213,23 @@
 					</section>
 				</c:forEach>
 
-				<%-- 평점 — 실제로 동작함. 원본은 맨 끝에서 두 번째 --%>
+				<%-- 평점 — 실제로 동작함. 원본은 맨 끝에서 두 번째.
+				     ★ 2026-09-05: 원본 재실측 결과 "4점 이상"~"1점 이상" 앞에는 항상 별 이미지가 붙어 있음
+				     (원본은 69×12 스프라이트를 점수별 background-position 으로 바꿔 씀 —
+				      ref/category/필터사이드바_원본_20260905.png 맨 아래쪽 참고).
+				     우리는 그 CDN 이미지를 못 받으므로 상품카드에서 이미 쓰는 우리 별 이미지를 재사용하고,
+				     채워진 별 개수는 em 의 폭(별 1개 = 20%)으로 표현함 — 카드 별점과 똑같은 방식.
+				     "별점 전체"에는 원본도 별이 없음 --%>
 				<section class="filter-group">
 					<h3>별점</h3>
 					<%-- JSP EL 은 리스트 리터럴이 없어서 5개를 그냥 하나씩 적음(0=전체) --%>
 					<ul>
 						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=0" class="${rating == 0 ? 'selected' : ''}">별점 전체</a></li>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=4" class="${rating == 4 ? 'selected' : ''}">4점 이상</a></li>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=3" class="${rating == 3 ? 'selected' : ''}">3점 이상</a></li>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=2" class="${rating == 2 ? 'selected' : ''}">2점 이상</a></li>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=1" class="${rating == 1 ? 'selected' : ''}">1점 이상</a></li>
+						<c:forEach var="r" begin="1" end="4" step="1">
+							<c:set var="star" value="${5 - r}" />
+							<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${star}"
+									class="${rating == star ? 'selected' : ''}"><span class="star-rating" aria-hidden="true"><em style="width:${star * 20}%"></em></span>${star}점 이상</a></li>
+						</c:forEach>
 					</ul>
 				</section>
 
@@ -216,9 +261,13 @@
 						<c:forEach var="c" items="${selectedColors}">
 							<input type="hidden" name="color" value="${c}">
 						</c:forEach>
-						<input type="number" name="minPrice" placeholder="최소" min="0">
+						<%-- 2026-09-05: placeholder("최소"/"최대") 글자가 잘린다는 지적 — 원본을 다시 보니
+						     입력칸에 placeholder 가 아예 없고(빈 칸) title 속성만 있음. 칸 폭이 44px 이라
+						     원본도 글자를 넣을 자리가 없는 것. 원본대로 placeholder 를 빼고, 대신 화면낭독기용
+						     title/aria-label 을 남겨서 무슨 칸인지는 알 수 있게 함 --%>
+						<input type="number" name="minPrice" min="0" title="최소 가격" aria-label="최소 가격">
 						<span>~</span>
-						<input type="number" name="maxPrice" placeholder="최대" min="0">
+						<input type="number" name="maxPrice" min="0" title="최대 가격" aria-label="최대 가격">
 						<button type="submit">검색</button>
 					</form>
 				</section>
@@ -338,14 +387,35 @@
 										     미해결과 동일) 모든 카드에 똑같이 표시. 실동작 아님, product.jsp 배송문구와 같은 취급 --%>
 										<p class="free-shipping-badge">무료배송</p>
 										<p class="product-name">${item.productName}</p>
+										<%-- ★ 2026-09-05 재실측으로 배지 위치 정정(사용자 지적: "로켓·내일 아이콘은 금액 옆에 나와야 함").
+										     원본 카드의 가격 줄은 이렇게 생겼음:
+										       <div style="display:flex; align-items:center; row-gap:2px; flex-wrap:wrap">
+										         <strong>9,900원</strong>(margin-right 5px)
+										         <img 로켓배지 79x16, margin-right 2px>
+										         <img 내일도착배지 29x16>
+										       </div>
+										     즉 판매가와 **같은 줄**에 배지가 붙고, 자리가 모자라면 그 줄 안에서 아래로 접힘(flex-wrap).
+										     전에는 배지를 별도의 줄(.delivery-badges)로 아래에 뒀는데 그게 원본과 달랐음 --%>
 										<p class="product-price">
 											<c:if test="${item.discountRate > 0}">
 												<span class="discount-rate">${item.discountRate}%</span>
 												<span class="normal-price"><fmt:formatNumber value="${item.normalPrice}" pattern="#,###"/>원</span>
 											</c:if>
-											<strong class="sale-price"><fmt:formatNumber value="${item.salePrice}" pattern="#,###"/>원</strong>
+											<span class="price-badge-row">
+												<strong class="sale-price"><fmt:formatNumber value="${item.salePrice}" pattern="#,###"/>원</strong>
+												<%-- 실제 배송정보 컬럼(DELIVERY_METHOD 등)을 아직 안 써서 모든 카드에 똑같이 표시.
+												     내일도착 배지(badge_199cd481e67.png)는 우리 파일이 58×32 라 높이 16px 로 맞추면
+												     폭이 29px — 원본 실측(29×16)과 정확히 같아짐 --%>
+												<img class="badge-rocket" src="${pageContext.request.contextPath}/images/icons/logo_rocket_filter_medium.png" alt="로켓배송">
+												<img class="badge-tomorrow" src="${pageContext.request.contextPath}/images/icons/badge_199cd481e67.png" alt="내일도착">
+											</span>
 										</p>
-										<p class="delivery-date">${deliveryDate} 도착 예정</p>
+										<%-- 배송문구 — 2026-09-05 재실측으로 두 가지 정정(사용자 지적):
+										     ① 색상: 로켓(내일 도착) 상품은 초록색 #008C00 (원본 인라인 스타일에 그대로 박혀 있음).
+										        로켓이 아닌 상품만 검정계열 #212B36 이고 문구도 "9/5(토) 도착 예정" 형태였음
+										     ② 문구: "도착 예정"이 아니라 **"도착 보장"** — 우리는 모든 카드에 로켓 배지를 달고 있으므로
+										        로켓 쪽 문구인 "내일(요일) 도착 보장" 으로 통일함(날짜 M/d 는 원본에도 안 붙음) --%>
+										<p class="delivery-date">${deliveryDate} 도착 보장</p>
 										<%-- 2026-09-02 2차: 별점/적립 순서가 뒤바뀌어 있었음 — 원본은 배송문구 다음이 별점,
 										     그 다음이 적립(STRUCTURE.md 7장). 무료배송 뱃지 넣으면서 대조 없이 기존 순서에
 										     끼워넣었던 게 원인 --%>
@@ -355,8 +425,16 @@
 												(${item.reviewCount})
 											</p>
 										</c:if>
-										<%-- 적립 — 실제 적립 정책 테이블이 없어서 판매가 1%로 임의 계산(2026-09-01 사용자 요청으로 재추가) --%>
-										<p class="cash-reward">적립 <fmt:formatNumber value="${item.cashReward}" pattern="#,###"/>원</p>
+										<%-- 적립 — 실제 적립 정책 테이블이 없어서 판매가 1%로 임의 계산(2026-09-01 사용자 요청으로 재추가).
+										     ★ 2026-09-05: 원본 카드와 모양을 맞춤. ref/category/live_snapshot_recheck.txt 606~607줄에
+										     찍힌 실제 원본 카드 구조가 "동전 아이콘(img) + '최대 795원 적립' 글자" 라서 그대로 따라감
+										     (그동안은 아이콘 없이 "적립 795원" 이라 어순도 원본과 달랐음).
+										     아이콘은 2026-09-05 사용자가 원본과 같은 파일(list-cash-icon@2x.png, 28×28)을
+										     images/icons 에 직접 넣어줘서 그걸 씀 — 동그란 테두리는 CSS 가 아니라 이 이미지 자체임 --%>
+										<p class="cash-reward">
+											<img src="${pageContext.request.contextPath}/images/icons/list-cash-icon@2x.png" alt="">
+											최대 <fmt:formatNumber value="${item.cashReward}" pattern="#,###"/>원 적립
+										</p>
 									</a>
 								</li>
 							</c:forEach>
@@ -408,6 +486,14 @@
 			</section>
 		</div>
 	</main>
+
+	<%-- 맨 위로 버튼 — 2026-09-05 추가. 메인(index.html 2278줄)/상세(product.jsp 1309줄)에 이미 있는 것을
+	     마크업 그대로 가져다 씀(새로 만든 것 없음). 스타일은 common.css `.goto-top`(1517줄~),
+	     스크롤 감지·클릭 동작은 header.js(264줄~)가 #goto-top 을 찾아서 붙여줌 —
+	     이 페이지는 아래에서 header.js 를 이미 읽고 common.css 도 이미 링크돼 있어서 이 버튼만 넣으면 됨 --%>
+	<button type="button" id="goto-top" class="goto-top">
+		<span class="blind">맨 위로</span>
+	</button>
 
 	<jsp:include page="/inc/footer.jsp" />
 
