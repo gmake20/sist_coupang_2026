@@ -675,10 +675,6 @@
 
           <!-- 하단 버튼 -->
           <div class="write-foot">
-            <button class="btn btn-outline" type="button">취소</button>
-            <button class="btn btn-outline" type="button">미리보기</button>
-            <button class="btn btn-outline" type="button">중간저장</button>
-            <button class="btn btn-outline" type="button">임시저장</button>
             <button class="btn btn-primary btn-lg" type="submit">판매요청</button>
           </div>
 
