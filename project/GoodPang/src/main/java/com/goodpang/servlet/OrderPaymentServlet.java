@@ -155,19 +155,42 @@ public class OrderPaymentServlet extends HttpServlet {
 
 			OrderDAO dao =
 					new OrderDAO();
+			
+			 // 중복 결제 확인
+
+			Integer existingOrderNo =
+			        dao.findOrderNoByCheckout(
+			                conn,
+			                checkoutNo,
+			                memberNo
+			        );
+
+			if (existingOrderNo != null) {
+
+			    conn.rollback();
+
+			    response.sendRedirect(
+			            request.getContextPath()
+			            + "/order/already-completed"
+			    );
+
+			    return;
+			}
 
 			boolean checkoutExists =
-					dao.existsCheckout(
-							conn,
-							checkoutNo,
-							memberNo
-							);
+			        dao.existsCheckout(
+			                conn,
+			                checkoutNo,
+			                memberNo
+			        );
+
 			if (!checkoutExists) {
 
-				throw new Exception(
-						"존재하지 않거나 접근할 수 없는 checkout입니다."
-						);
+			    throw new Exception(
+			            "존재하지 않거나 접근할 수 없는 checkout입니다."
+			    );
 			}
+
 			boolean addressExists =
 					dao.existsAddress(
 							conn,
