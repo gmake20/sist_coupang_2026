@@ -171,12 +171,19 @@ public class VendorOrderListDAO {
         return dto;
     }
 
+    // shipOrder()의 처리 결과. 화면에 실패 사유를 구분해서 보여주기 위해 boolean 대신 사용.
+    public enum ShipResult {
+        SUCCESS,
+        INVOICE_DUPLICATE,   // 같은 택배사에 이미 등록된 송장번호
+        FAILED               // 그 외(주문을 찾을 수 없음 등)
+    }
+
     /*
      * 결제완료 -> 배송중 전환 + DELIVERY 행 생성(송장번호 저장), 하나의 트랜잭션으로 처리.
      * ORDERS에는 seller_no가 없어서, 이 주문에 이 판매자의 상품이 실제로 포함돼 있는지
      * ORDER_DETAIL/PRODUCT로 확인한 뒤에만 처리한다.
      */
-    public boolean shipOrder(int orderNo, int sellerNo, String invoiceNo) {
+    public ShipResult shipOrder(int orderNo, int sellerNo, String invoiceNo) {
 
         try (Connection conn = ConnectionProvider.getConnection()) {
 
@@ -187,12 +194,12 @@ public class VendorOrderListDAO {
 
                 if (deliveryServiceCode == null) {
                     conn.rollback();
-                    return false;
+                    return ShipResult.FAILED;
                 }
 
                 if (invoiceNoInUse(conn, deliveryServiceCode, invoiceNo)) {
                     conn.rollback();
-                    return false;
+                    return ShipResult.INVOICE_DUPLICATE;
                 }
 
                 insertDelivery(conn, orderNo, deliveryServiceCode, invoiceNo);
@@ -201,11 +208,11 @@ public class VendorOrderListDAO {
 
                 if (!updated) {
                     conn.rollback();
-                    return false;
+                    return ShipResult.FAILED;
                 }
 
                 conn.commit();
-                return true;
+                return ShipResult.SUCCESS;
 
             } catch (Exception e) {
                 conn.rollback();
@@ -216,7 +223,7 @@ public class VendorOrderListDAO {
             e.printStackTrace();
         }
 
-        return false;
+        return ShipResult.FAILED;
     }
 
     // 이 판매자가 이 주문에 등록한 상품 중 하나의 택배사 코드를 대표로 사용
