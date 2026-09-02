@@ -16,6 +16,7 @@
     h1 { font-size: 20px; margin-bottom: 16px; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { padding: 10px 12px; border-bottom: 1px solid #eee; text-align: left; white-space: nowrap; }
+    td.col-address { white-space: normal; max-width: 260px; }
     th { background: #fafafa; color: #555; }
     .empty { padding: 40px; text-align: center; color: #999; }
     .btn { padding: 6px 12px; border-radius: 6px; border: none; font-size: 12px; cursor: pointer; }
@@ -43,6 +44,7 @@
             <th>판매자</th>
             <th>상품명</th>
             <th>구매자</th>
+            <th>배송주소</th>
             <th>택배사</th>
             <th>송장번호</th>
             <th>배송 시작일시</th>
@@ -59,6 +61,7 @@
                 <c:if test="${delivery.itemCount > 1}"> 외 ${delivery.itemCount - 1}건</c:if>
               </td>
               <td>${delivery.buyerName} (${delivery.buyerPhone})</td>
+              <td class="col-address">(${delivery.zipcode}) ${delivery.address} ${delivery.detailAddress}</td>
               <td>${delivery.deliveryServiceCode}</td>
               <td>${delivery.invoiceNo}</td>
               <td><fmt:formatDate value="${delivery.deliveryStartDate}" pattern="yyyy-MM-dd HH:mm" /></td>

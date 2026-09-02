@@ -1875,3 +1875,457 @@ body.modal-open {
     border-right: 1px solid #d5d5d5;
     box-sizing: border-box;
 }
+
+/* ============================= */
+/* PG 결제 모달 */
+/* ============================= */
+
+.pg-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+}
+
+.pg-modal-overlay.show {
+    display: flex;
+}
+
+.pg-modal {
+    width: 430px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow:
+        0 15px 50px
+        rgba(0, 0, 0, 0.28);
+}
+
+.pg-modal-header {
+    height: 65px;
+    padding: 0 22px;
+    background: #1769ff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pg-modal-header > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pg-modal-header strong {
+    font-size: 22px;
+}
+
+.pg-modal-header span {
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+.pg-modal-close {
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.pg-modal-body {
+    padding: 28px;
+}
+
+.pg-company-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 22px;
+}
+
+.pg-info-box {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 18px;
+}
+
+.pg-info-row {
+    min-height: 46px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.pg-info-row:last-child {
+    border-bottom: 0;
+}
+
+.pg-info-row > span {
+    color: #777;
+}
+
+.pg-price {
+    color: #e32636;
+    font-size: 19px;
+}
+
+.pg-card-box {
+    margin-top: 22px;
+}
+
+.pg-card-label {
+    margin-bottom: 9px;
+    font-size: 13px;
+    color: #555;
+}
+
+.pg-selected-card {
+    height: 50px;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.pg-agree-box {
+    margin-top: 22px;
+    padding: 14px;
+    background: #f7f7f7;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.pg-agree-box label {
+    display: flex;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.pg-pay-btn {
+    width: 100%;
+    height: 54px;
+    margin-top: 20px;
+    border: 0;
+    border-radius: 5px;
+    background: #1769ff;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.pg-pay-btn:hover {
+    background: #0957dd;
+}
+
+
+/* PG 처리화면 */
+
+.pg-result-screen {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.pg-result-screen.hidden {
+    display: none;
+}
+
+.pg-result-screen h3 {
+    margin-top: 20px;
+    font-size: 19px;
+}
+
+.pg-result-screen p {
+    margin-top: 10px;
+    color: #777;
+    font-size: 13px;
+}
+
+
+/* 로딩 */
+
+.pg-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #eee;
+    border-top-color: #1769ff;
+    border-radius: 50%;
+    animation: pg-spin 0.8s linear infinite;
+}
+
+@keyframes pg-spin {
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* 결제 성공 */
+
+.pg-success-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: #1769ff;
+    color: #fff;
+    font-size: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pg-success-price {
+    margin-top: 20px;
+    font-size: 25px;
+    font-weight: 700;
+    color: #e32636;
+}
+
+.pg-modal-footer {
+    padding: 13px;
+    border-top: 1px solid #eee;
+    text-align: center;
+    color: #aaa;
+    font-size: 11px;
+}
+
+/* 계좌이체 더미 결제 모달 */
+.bank-pay-modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 100000;
+}
+
+.bank-pay-modal-overlay.show {
+    display: flex;
+}
+
+.bank-pay-modal {
+    width: 430px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+}
+
+.bank-pay-header {
+    height: 65px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1769ff;
+    color: #fff;
+}
+
+.bank-pay-header > div {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.bank-pay-header strong {
+    font-size: 22px;
+}
+
+.bank-pay-header span {
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+.bank-pay-close {
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.bank-pay-body {
+    padding: 28px;
+}
+
+.bank-pay-title {
+    margin: 0 0 22px;
+    font-size: 20px;
+}
+
+.bank-pay-info {
+    padding: 7px 18px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.bank-pay-row {
+    min-height: 47px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.bank-pay-row:last-child {
+    border-bottom: 0;
+}
+
+.bank-pay-row span {
+    color: #777;
+}
+
+.bank-pay-price {
+    color: #e32636;
+    font-size: 19px;
+}
+
+.bank-account-area {
+    margin-top: 22px;
+}
+
+.bank-account-label {
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #555;
+}
+
+.bank-selected-account {
+    height: 52px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.bank-pay-notice {
+    margin-top: 15px;
+    padding: 13px;
+    background: #f7f7f7;
+    color: #666;
+    font-size: 12px;
+}
+
+.bank-pay-agree {
+    margin-top: 18px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.bank-auth-btn,
+.bank-auth-confirm-btn {
+    width: 100%;
+    height: 52px;
+    margin-top: 20px;
+    border: 0;
+    border-radius: 5px;
+    background: #1769ff;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.bank-auth-btn:hover,
+.bank-auth-confirm-btn:hover {
+    background: #0957dd;
+}
+
+.bank-pay-screen {
+    min-height: 310px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.bank-pay-screen.hidden {
+    display: none;
+}
+
+.bank-auth-icon {
+    font-size: 50px;
+}
+
+.bank-auth-guide {
+    margin-top: 14px;
+    padding: 10px 15px;
+    background: #f7f7f7;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.bank-auth-input {
+    width: 180px;
+    height: 45px;
+    margin-top: 18px;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 20px;
+    letter-spacing: 6px;
+}
+
+.bank-pay-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #eee;
+    border-top-color: #1769ff;
+    border-radius: 50%;
+    animation: bank-spin 0.8s linear infinite;
+}
+
+@keyframes bank-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.bank-success-icon {
+    width: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #1769ff;
+    color: #fff;
+    font-size: 38px;
+}
+
+.bank-success-price {
+    margin-top: 20px;
+    color: #e32636;
+    font-size: 25px;
+}
+
+.bank-pay-footer {
+    padding: 13px;
+    border-top: 1px solid #eee;
+    color: #aaa;
+    text-align: center;
+    font-size: 11px;
+}
