@@ -149,9 +149,10 @@
 						<div class="other-payment-list" id="otherPaymentList">
 
 							<!-- 신용/체크카드 -->
-							<label class="pay-radio-row other-radio"> <input
-								type="radio" name="paymentMethod" value="CARD"
-								form="paymentForm"> <span class="pay-title">신용/체크카드</span>
+							<label class="pay-radio-row other-radio" for="paymentCard">
+								<input type="radio" id="paymentCard" name="paymentMethod"
+								value="CARD" form="paymentForm"> <span class="pay-title">
+									신용/체크카드 </span>
 							</label>
 
 							<!-- 등록된 카드 -->
@@ -329,6 +330,11 @@
 
 						<input type="hidden" id="selectedAddressNo" name="addressNo"
 							value="${address.addressNo}">
+
+						<!-- PG 더미 결제 결과 -->
+						<input type="hidden" id="pgPaymentStatus" name="pgPaymentStatus"
+							value=""> <input type="hidden" id="pgTransactionId"
+							name="pgTransactionId" value="">
 
 						<button class="btn-pay" type="submit">결제하기</button>
 					</form>
@@ -657,9 +663,114 @@
 		</div>
 	</div>
 
+	<!-- PG 카드 결제 모달 -->
+	<div id="pgModalOverlay" class="pg-modal-overlay">
+		<div class="pg-modal" onclick="event.stopPropagation();">
+			<div class="pg-modal-header">
+				<div>
+					<strong>GoodPay</strong> <span>안전결제</span>
+				</div>
+				<button type="button" class="pg-modal-close"
+					onclick="closePgModal()">×</button>
+			</div>
+			<div class="pg-modal-body">
+
+				<!-- 최초 결제 화면 -->
+				<div id="pgPaymentScreen">
+					<div class="pg-company-title">신용 / 체크카드 결제</div>
+
+					<div class="pg-info-box">
+						<div class="pg-info-row">
+							<span>가맹점</span> <strong>GoodPang</strong>
+						</div>
+
+						<div class="pg-info-row">
+							<span>상품명</span> <strong>GoodPang 상품 구매</strong>
+						</div>
+
+						<div class="pg-info-row">
+							<span>결제금액</span> <strong class="pg-price"> <fmt:formatNumber
+									value="${checkout.totalPrice}" pattern="#,###" />원
+							</strong>
+						</div>
+					</div>
+
+					<div class="pg-card-box">
+						<div class="pg-card-label">결제 카드</div>
+						<div id="pgSelectedCard" class="pg-selected-card"></div>
+					</div>
+
+					<div class="pg-agree-box">
+						<label> <input type="checkbox" id="pgAgree"> <span>
+								결제 내용을 확인하였으며 결제에 동의합니다. </span>
+						</label>
+
+					</div>
+					<button type="button" class="pg-pay-btn"
+						onclick="processDummyPayment()">
+
+						<fmt:formatNumber value="${checkout.totalPrice}" pattern="#,###" />
+						원 결제하기
+					</button>
+				</div>
+
+
+				<!-- 결제 처리중 -->
+				<div id="pgLoadingScreen" class="pg-result-screen hidden">
+					<div class="pg-spinner"></div>
+					<h3>결제를 진행하고 있습니다.</h3>
+					<p>잠시만 기다려주세요.</p>
+				</div>
+
+				<!-- 결제 성공 -->
+				<div id="pgSuccessScreen" class="pg-result-screen hidden">
+					<div class="pg-success-icon">✓</div>
+					<h3>결제가 완료되었습니다.</h3>
+					<p>결제 승인이 정상적으로 처리되었습니다.</p>
+					<div class="pg-success-price">
+						<fmt:formatNumber value="${checkout.totalPrice}" pattern="#,###" />
+						원
+					</div>
+				</div>
+			</div>
+			<div class="pg-modal-footer">GoodPay Dummy Payment Gateway</div>
+		</div>
+	</div>
+
 	<script
 		src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script>
+	
+	document.addEventListener(
+		    "DOMContentLoaded",
+		    function() {
+		        const paymentRadios =
+		            document.querySelectorAll(
+		                'input[name="paymentMethod"]'
+		            );
+		        paymentRadios.forEach(function(radio) {
+		            radio.addEventListener(
+		                "change",
+		                function() {
+		                    changePaymentMethod(
+		                        this.value
+		                    );
+		                }
+		            );
+		        });
+
+		        const checkedPayment =
+		            document.querySelector(
+		                'input[name="paymentMethod"]:checked'
+		            );
+		        if (checkedPayment) {
+
+		            changePaymentMethod(
+		                checkedPayment.value
+		            );
+		        }
+		    }
+		);
 
 	const phone1 = document.getElementById("phone1");
 	const phone2 = document.getElementById("phone2");
@@ -735,7 +846,7 @@ function toggleOtherPayment() {
 
 
 /* 결제수단 변경 */
-document
+/* document
 	.querySelectorAll('input[name="paymentMethod"]')
 	.forEach(function(radio) {
 
@@ -744,9 +855,9 @@ document
 		});
 
 	});
+ */
 
-
-function changePaymentMethod(paymentMethod) {
+/* function changePaymentMethod(paymentMethod) {
 	const bankSetting = document.getElementById("bankSetting");
 	const bankCode = document.getElementById("bankCode");
 	const defaultPayment = document.getElementById("defaultPayment");
@@ -789,10 +900,86 @@ function changePaymentMethod(paymentMethod) {
 			cardCompany.disabled = true;
 		}
 	}
+} */
+
+function changePaymentMethod(paymentMethod) {
+
+    console.log("changePaymentMethod:", paymentMethod);
+
+    const bankSetting =
+        document.getElementById("bankSetting");
+
+    const bankCode =
+        document.getElementById("bankCode");
+
+    const defaultPayment =
+        document.getElementById("defaultPayment");
+
+    const cardSetting =
+        document.getElementById("cardSetting");
+
+    const cardCompany =
+        document.getElementById("cardCompany");
+
+
+    // 계좌이체
+    if (paymentMethod === "BANK_TRANSFER") {
+
+        if (bankSetting) {
+            bankSetting.classList.remove("hidden");
+        }
+
+        if (bankCode) {
+            bankCode.disabled = false;
+        }
+
+        if (defaultPayment) {
+            defaultPayment.disabled = false;
+        }
+
+    } else {
+
+        if (bankSetting) {
+            bankSetting.classList.add("hidden");
+        }
+
+        if (bankCode) {
+            bankCode.disabled = true;
+        }
+
+        if (defaultPayment) {
+            defaultPayment.disabled = true;
+        }
+    }
+
+
+    // 신용 / 체크카드
+    if (paymentMethod === "CARD") {
+
+        console.log("카드 활성화");
+
+        if (cardSetting) {
+            cardSetting.classList.remove("hidden");
+        }
+
+        if (cardCompany) {
+            cardCompany.disabled = false;
+        }
+
+    } else {
+
+        if (cardSetting) {
+            cardSetting.classList.add("hidden");
+        }
+
+        if (cardCompany) {
+            cardCompany.disabled = true;
+        }
+    }
 }
 
 /* 결제 검증 */
-function validatePayment() {
+/* function validatePayment() {
 
 	const addressNo =
 		document.getElementById("selectedAddressNo").value;
@@ -841,8 +1028,86 @@ function validatePayment() {
 	payButton.textContent = "결제 처리중...";
 
 	return true;
-}
+} */
 
+
+function validatePayment() {
+
+    const addressNo =
+        document.getElementById(
+            "selectedAddressNo"
+        ).value;
+
+    const paymentMethod =
+        document.querySelector(
+            'input[name="paymentMethod"]:checked'
+        );
+
+    if (!addressNo || addressNo.trim() === "") {
+
+        alert("배송지를 선택해주세요.");
+
+        return false;
+    }
+
+    if (!paymentMethod) {
+
+        alert("결제수단을 선택해주세요.");
+
+        return false;
+    }
+
+
+    if (paymentMethod.value === "BANK_TRANSFER") {
+
+        const bankCode =
+            document.getElementById(
+                "bankCode"
+            ).value;
+
+        if (!bankCode ||
+            bankCode.trim() === "") {
+
+            alert("은행을 선택해주세요.");
+
+            return false;
+        }
+    }
+
+    if (paymentMethod.value === "CARD") {
+
+        const cardCompany =
+            document.getElementById(
+                "cardCompany"
+            );
+
+        if (!cardCompany ||
+            !cardCompany.value ||
+            cardCompany.value.trim() === "") {
+
+            alert("결제할 카드를 선택해주세요.");
+
+            return false;
+        }
+        
+        openPgModal();
+
+        return false;
+    }
+        
+
+    const payButton =
+        document.querySelector(
+            ".btn-pay"
+        );
+
+    payButton.disabled = true;
+
+    payButton.textContent =
+        "결제 처리중...";
+
+    return true;
+}
 
 /* 배송지 모달 */
 function openAddressModal() {
@@ -1146,18 +1411,6 @@ document.addEventListener(
 );
 
 
-/* 최초 결제수단 상태 */
-const initialPaymentMethod =
-	document.querySelector(
-		'input[name="paymentMethod"]:checked'
-	);
-
-if (initialPaymentMethod) {
-	changePaymentMethod(
-		initialPaymentMethod.value
-	);
-}
-
 let paymentAddType = "BANK";
 
 
@@ -1322,6 +1575,8 @@ function openEditAddressModal(button) {
         "modal-open"
     );
 }
+
+
 
 function addPaymentMethod() {
 
@@ -1593,6 +1848,155 @@ cardNumberInputs.forEach(function(input, index) {
     });
 
 });	
+
+function openPgModal() {
+
+    const modal =
+        document.getElementById(
+            "pgModalOverlay"
+        );
+
+    const cardSelect =
+        document.getElementById(
+            "cardCompany"
+        );
+
+    const selectedOption =
+        cardSelect.options[
+            cardSelect.selectedIndex
+        ];
+
+    document.getElementById(
+        "pgSelectedCard"
+    ).textContent =
+        selectedOption.textContent.trim();
+
+    /*
+     * 화면 초기화
+     */
+    document.getElementById(
+        "pgPaymentScreen"
+    ).classList.remove("hidden");
+
+    document.getElementById(
+        "pgLoadingScreen"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "pgSuccessScreen"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "pgAgree"
+    ).checked = false;
+
+    modal.classList.add("show");
+
+    document.body.classList.add(
+        "modal-open"
+    );
+}
+
+
+function closePgModal() {
+
+    const modal =
+        document.getElementById(
+            "pgModalOverlay"
+        );
+
+    modal.classList.remove("show");
+
+    document.body.classList.remove(
+        "modal-open"
+    );
+}
+
+function processDummyPayment() {
+
+    const agree =
+        document.getElementById(
+            "pgAgree"
+        );
+
+    if (!agree.checked) {
+
+        alert(
+            "결제 동의에 체크해주세요."
+        );
+
+        return;
+    }
+
+    document.getElementById(
+        "pgPaymentScreen"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "pgLoadingScreen"
+    ).classList.remove("hidden");
+
+
+    setTimeout(function() {
+
+        dummyPaymentSuccess();
+
+    }, 1500);
+}
+
+
+function dummyPaymentSuccess() {
+
+    document.getElementById(
+        "pgLoadingScreen"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "pgSuccessScreen"
+    ).classList.remove("hidden");
+
+
+    /*
+     * 가짜 PG 거래번호 생성
+     */
+    const transactionId =
+        "GOODPAY_" +
+        Date.now();
+
+
+    document.getElementById(
+        "pgPaymentStatus"
+    ).value = "SUCCESS";
+
+    document.getElementById(
+        "pgTransactionId"
+    ).value = transactionId;
+
+
+    setTimeout(function() {
+
+        const form =
+            document.getElementById(
+                "paymentForm"
+            );
+
+        form.submit();
+
+    }, 1000);
+}
+
+document
+.getElementById("pgModalOverlay")
+.addEventListener(
+    "click",
+    function(event) {
+
+        if (event.target === this) {
+
+            closePgModal();
+        }
+    }
+);
 </script>
 
 </body>
