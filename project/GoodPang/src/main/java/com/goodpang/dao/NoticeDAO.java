@@ -15,8 +15,8 @@ import com.goodpang.util.ConnectionProvider;
  */
 public class NoticeDAO {
 
-    // 목록 - '공지'가 항상 '안내'보다 위, 그 안에서는 최신순
-    public List<NoticeDTO> findAll() {
+    // 목록 - '공지'가 항상 '안내'보다 위, 그 안에서는 최신순. page는 1부터
+    public List<NoticeDTO> findAll(int page, int pageSize) {
 
         List<NoticeDTO> list = new ArrayList<>();
 
@@ -25,16 +25,21 @@ public class NoticeDAO {
             FROM NOTICE N
                 JOIN ADMIN A ON N.ADMIN_NO = A.ADMIN_NO
             ORDER BY CASE WHEN N.NOTICE_TYPE = '공지' THEN 0 ELSE 1 END, N.NOTICE_NO DESC
+            OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
             """;
 
         try (
             Connection conn = ConnectionProvider.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery()
+            PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
 
-            while (rs.next()) {
-                list.add(mapListRow(rs));
+            pstmt.setInt(1, (page - 1) * pageSize);
+            pstmt.setInt(2, pageSize);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapListRow(rs));
+                }
             }
 
         } catch (Exception e) {
@@ -42,6 +47,28 @@ public class NoticeDAO {
         }
 
         return list;
+    }
+
+    // 페이지네이션용 총 개수
+    public int countAll() {
+
+        String sql = "SELECT COUNT(*) FROM NOTICE";
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery()
+        ) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 
     // 판매자 대시보드 위젯용 - '공지'가 항상 '안내'보다 위, 그 안에서는 최신순으로 limit건만

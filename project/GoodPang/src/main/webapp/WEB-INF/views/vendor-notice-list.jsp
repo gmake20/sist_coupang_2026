@@ -49,7 +49,7 @@
       <section class="panel table-panel">
 
         <div class="result-toolbar">
-          <p class="result-count">공지사항 <strong>${fn:length(noticeList)}</strong>건</p>
+          <p class="result-count">공지사항 <strong>${totalCount}</strong>건</p>
         </div>
 
         <div class="table-scroll">
@@ -95,6 +95,28 @@
             </tbody>
           </table>
         </div>
+
+        <c:if test="${totalPages > 1}">
+          <nav class="pagination" aria-label="페이지 이동">
+
+            <c:if test="${page > 1}">
+              <a class="page-arrow" href="${pageContext.request.contextPath}/vendor/notice?page=${page - 1}">
+                <svg class="icon"><use href="#ic-chevron-left" /></svg>
+              </a>
+            </c:if>
+
+            <c:forEach var="p" begin="1" end="${totalPages}">
+              <a class="page-num ${p == page ? 'active' : ''}" href="${pageContext.request.contextPath}/vendor/notice?page=${p}">${p}</a>
+            </c:forEach>
+
+            <c:if test="${page < totalPages}">
+              <a class="page-arrow" href="${pageContext.request.contextPath}/vendor/notice?page=${page + 1}">
+                <svg class="icon rotate-180"><use href="#ic-chevron-left" /></svg>
+              </a>
+            </c:if>
+
+          </nav>
+        </c:if>
 
       </section>
 

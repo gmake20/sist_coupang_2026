@@ -24,6 +24,11 @@
     .btn-primary { background: #346aff; color: #fff; }
     .btn-outline { background: #fff; color: #333; border: 1px solid #ddd; }
     .btn-danger { background: #f4514a; color: #fff; }
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 20px 0; }
+    .pagination a { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      border-radius: 6px; font-size: 13px; font-weight: 600; color: #555; text-decoration: none; }
+    .pagination a:hover { background: #f4f6fb; }
+    .pagination a.active { background: #346aff; color: #fff; font-weight: 700; }
   </style>
 
 </head>
@@ -33,7 +38,7 @@
   <a class="back-link" href="${pageContext.request.contextPath}/admin/dashboard">&larr; 대시보드로</a>
 
   <div class="top-row">
-    <h1>공지사항 관리 (${fn:length(noticeList)}건)</h1>
+    <h1>공지사항 관리 (${totalCount}건)</h1>
     <a class="btn btn-primary" href="${pageContext.request.contextPath}/admin/notice/write">새 공지 등록</a>
   </div>
 
@@ -82,6 +87,24 @@
     </c:otherwise>
 
   </c:choose>
+
+  <c:if test="${totalPages > 1}">
+    <nav class="pagination" aria-label="페이지 이동">
+
+      <c:if test="${page > 1}">
+        <a href="${pageContext.request.contextPath}/admin/notices?page=${page - 1}">&larr;</a>
+      </c:if>
+
+      <c:forEach var="p" begin="1" end="${totalPages}">
+        <a class="${p == page ? 'active' : ''}" href="${pageContext.request.contextPath}/admin/notices?page=${p}">${p}</a>
+      </c:forEach>
+
+      <c:if test="${page < totalPages}">
+        <a href="${pageContext.request.contextPath}/admin/notices?page=${page + 1}">&rarr;</a>
+      </c:if>
+
+    </nav>
+  </c:if>
 
 </body>
 
