@@ -265,9 +265,14 @@
 						     입력칸에 placeholder 가 아예 없고(빈 칸) title 속성만 있음. 칸 폭이 44px 이라
 						     원본도 글자를 넣을 자리가 없는 것. 원본대로 placeholder 를 빼고, 대신 화면낭독기용
 						     title/aria-label 을 남겨서 무슨 칸인지는 알 수 있게 함 --%>
-						<input type="number" name="minPrice" min="0" title="최소 가격" aria-label="최소 가격">
+						<%-- 2026-09-05: type="number" 는 브라우저가 칸 오른쪽에 위아래 화살표(스피너)를 그려주는데,
+						     44px 짜리 좁은 칸이라 그 버튼이 자리를 다 잡아먹음 → 빼달라는 요청.
+						     원본도 type="text" + maxlength="10" 이라 그대로 따라감.
+						     inputmode="numeric" 은 휴대폰에서 숫자 자판이 뜨게 하는 것(모양은 안 바뀜).
+						     숫자가 아닌 값이 들어와도 CategoryServlet 의 parseIntOrDefault 가 기본값으로 넘김 --%>
+						<input type="text" name="minPrice" maxlength="10" inputmode="numeric" title="최소 가격" aria-label="최소 가격">
 						<span>~</span>
-						<input type="number" name="maxPrice" min="0" title="최대 가격" aria-label="최대 가격">
+						<input type="text" name="maxPrice" maxlength="10" inputmode="numeric" title="최대 가격" aria-label="최대 가격">
 						<button type="submit">검색</button>
 					</form>
 				</section>
@@ -374,6 +379,11 @@
 						<p class="empty-message">조건에 맞는 상품이 없습니다.</p>
 					</c:when>
 					<c:otherwise>
+						<%-- 무료배송 기준 금액 — 실제 쿠팡 정책이 "로켓배송 상품 19,800원 이상 구매 시 무료배송"이고,
+						     우리 상세페이지(product.jsp 300줄)와 장바구니(cart.jsp 41줄)도 이미 같은 숫자를 쓰고 있어서 맞춤.
+						     숫자를 카드 안에 직접 적지 않고 여기 변수로 한 번만 둔 이유: 나중에 정책이 바뀌거나
+						     PRODUCT.SHIPPING_FEE_TYPE 컬럼을 실제로 연동할 때 고칠 곳이 한 군데로 모이기 때문 --%>
+						<c:set var="freeShipMin" value="19800" />
 						<ul class="product-grid">
 							<c:forEach var="item" items="${products}">
 								<li class="product-card">
@@ -383,9 +393,20 @@
 												<img src="${pageContext.request.contextPath}/${item.thumbnailUrl}" alt="${item.productName}">
 											</c:if>
 										</figure>
-										<%-- 무료배송 뱃지 — 2026-09-02 추가. 실제 배송비 컬럼을 아직 안 써서(위 CLAUDE.md 4번
-										     미해결과 동일) 모든 카드에 똑같이 표시. 실동작 아님, product.jsp 배송문구와 같은 취급 --%>
-										<p class="free-shipping-badge">무료배송</p>
+										<%-- 무료배송 뱃지 — 2026-09-02 추가, 2026-09-05 조건 추가(사용자 지시).
+										     전에는 모든 카드에 무조건 "무료배송"이 찍혔는데, 실제 정책은 19,800원 이상일 때만 무료라
+										     판매가가 그 아래인 상품에는 글자를 안 띄우도록 <c:if> 로 감쌌음.
+										     ★ <p> 자체는 조건과 상관없이 항상 남겨둠 — 이 줄이 통째로 사라지면 그 카드만 아래 내용이
+										       위로 딸려 올라가서 같은 줄 카드끼리 상품명·가격 위치가 어긋남(=1번 항목에서 고쳤던
+										       "카드마다 크기가 제각각" 문제가 되살아남). 그래서 글자만 빼고 자리는 CSS 의
+										       min-height 로 잡아둠.
+										     ★ 2026-09-05 2차(사용자 요청 "무료배송 아닌 상품은 상품명을 사진과 조금 더 가깝게"):
+										       글자가 없을 때는 is-empty 클래스를 붙여서 그 빈 자리를 절반으로 줄임.
+										       클래스를 JSP 에서 붙이는 이유 — CSS 의 :empty 선택자는 "안에 아무것도 없을 때"만
+										       걸리는데, 이 <p> 안에는 줄바꿈·들여쓰기 공백이 남아 있어서 :empty 가 안 먹음 --%>
+										<p class="free-shipping-badge ${item.salePrice >= freeShipMin ? '' : 'is-empty'}">
+											<c:if test="${item.salePrice >= freeShipMin}">무료배송</c:if>
+										</p>
 										<p class="product-name">${item.productName}</p>
 										<%-- ★ 2026-09-05 재실측으로 배지 위치 정정(사용자 지적: "로켓·내일 아이콘은 금액 옆에 나와야 함").
 										     원본 카드의 가격 줄은 이렇게 생겼음:

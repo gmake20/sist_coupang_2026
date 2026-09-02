@@ -294,7 +294,16 @@ label.selected .filter-function-bar-asset::after,
 /* 브랜드 이름 글자색 — 원본은 이 자리가 전부 로고 **이미지**라 우리한테 없음.
    그래서 원본 로고를 화면에서 캡처해 픽셀 색을 직접 뽑아 글자색으로 옮겼음(2026-09-05, 눈대중 아님).
    ref/category/원본_실측값.json "2026-09-05_4차_배지색_픽셀추출" 참고.
-   ★ "만 보기" 는 로고가 아니라 그냥 글자라서 원본에서도 검정 — 브랜드 이름만 색을 입힘 */
+   ★ "만 보기" 는 로고가 아니라 그냥 글자라서 원본에서도 검정 — 브랜드 이름만 색을 입힘.
+   ★ 2026-09-05 2차: 네 개 다 굵게(700). 원본은 로고 이미지라 글자보다 훨씬 도드라져 보이는데,
+     우리는 같은 12px 글자로 대체하다 보니 색만 입혀선 배지처럼 안 보였음(사용자 지적) */
+.filter-top-row .brand-rlux,
+.filter-top-row .brand-rocket,
+.filter-top-row .brand-jikgu,
+.filter-top-row .brand-cavenue {
+	font-weight: 700;
+}
+
 .filter-top-row .brand-rocket {
 	color: #459DBF;
 }
@@ -307,12 +316,9 @@ label.selected .filter-function-bar-asset::after,
 	color: #41297F;
 }
 
-/* R.LUX 는 로고가 검정 워드마크라 색은 기본값 그대로 두고 굵기만 줌(사용자 요청).
+/* R.LUX 는 로고가 검정 워드마크라 색은 기본값(#111111) 그대로 두고 굵기만 줌.
    실제 캡처 색은 #9E9E9F 였는데, 그건 위 opacity 0.4 가 이미 먹은 상태로 찍힌 것 —
-   되돌려 계산하면 거의 검정(#0D0D0E)이라 우리 기본 글자색 #111111 과 사실상 같음 */
-.filter-top-row .brand-rlux {
-	font-weight: 700;
-}
+   되돌려 계산하면 거의 검정(#0D0D0E)이라 우리 기본 글자색과 사실상 같음 */
 
 /* 맨 위 줄의 배지 이미지 — 원본 실측: 로켓 전체 배지 40×16, 세로 가운데 정렬(vertical-align:middle),
    감싼 span 에 margin-top:-2px. 우리 로켓 이미지(164×64)는 높이를 16px 로 맞추면 폭이 41px 이 돼서
@@ -363,7 +369,9 @@ label.selected .filter-function-bar-asset::after,
 	margin-left: 10px;
 }
 
-.filter-price-direct input[type="number"] {
+/* 2026-09-05: type=number 의 위아래 화살표(스피너) 버튼을 빼달라는 요청 — 원본도 type="text" 라
+   JSP 쪽에서 아예 text 로 바꿨음. 그래서 선택자에서 [type="number"] 조건을 뗌 */
+.filter-price-direct input {
 	width: 44px;
 	height: 26px;
 	box-sizing: border-box;
@@ -524,13 +532,17 @@ label.selected .filter-function-bar-asset::after,
 	margin-left: 4px;
 }
 
-/* 선택한 필터 칩 줄 — 정렬줄 바로 아래, 상품목록 위(2026-09-01 원본 재확인 위치 그대로) */
+/* 선택한 필터 칩 줄 — 정렬줄 바로 아래, 상품목록 위(2026-09-01 원본 재확인 위치 그대로).
+   ★ 2026-09-05 재실측(원본에서 가격 필터를 실제로 눌러 칩이 뜬 상태로 측정, div.selected-filters):
+     줄 전체 padding 0 0 15px / 높이 42px, 라벨 "선택한 필터:" 12px/400/#000000 + 오른쪽 여백 10px,
+     칩끼리 간격은 칩의 margin-right 5px 로 벌림(그래서 여기 gap 은 0) */
 .filter-selected-bar {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 8px;
-	margin-bottom: 16px;
+	gap: 0;
+	padding-bottom: 15px;
+	margin-bottom: 0;
 }
 
 /* 위 .filter-clear-all[hidden] 과 같은 이유(author CSS가 UA 기본 [hidden] 을 이김) — 여기도 같이 고침 */
@@ -538,40 +550,78 @@ label.selected .filter-function-bar-asset::after,
 	display: none;
 }
 
+/* 원본 실측: 12px / 400 / #000000 / line-height 18px / 오른쪽 여백 10px (13px·회색은 눈대중이었음) */
 .filter-selected-label {
-	font-size: 13px;
-	color: #555555;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 18px;
+	color: #000000;
+	padding-right: 10px;
 }
 
 .filter-selected-chips {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 8px;
+	gap: 0;
 	list-style: none;
 }
 
+/* ★ 2026-09-05 재실측으로 모양 정정(사용자 지적: "둥그런 타원형이 아니고 연한 회색 네모 상자").
+   원본 실측: display inline-block / background #FAFAFA / **테두리 없음(border 0)** /
+             **border-radius 0 = 각진 네모** / padding 5px 10px 4px / margin-right 5px /
+             12px / 400 / color #333333 / line-height 18px / 전체 높이 27px
+   전에 쓰던 "1px 테두리 + radius 15px 알약 모양"은 눈대중이었고 원본과 전혀 달랐음 */
 .filter-selected-chips a {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
-	padding: 4px 10px;
-	border: 1px solid var(--line-gray);
-	border-radius: 15px;
+	height: 27px;
+	box-sizing: border-box;
+	padding: 5px 10px 4px;
+	margin-right: 5px;
+	border: 0;
+	border-radius: 0;
+	background: #FAFAFA;
 	font-size: 12px;
-	color: #111111;
+	font-weight: 400;
+	line-height: 18px;
+	color: #333333;
 	text-decoration: none;
 }
 
+/* ★ "삭제" 글자가 아니라 X 아이콘 (사용자 지적 — 원본 실측으로 확인).
+   원본은 글자를 지우지 않고 남겨둔 채(화면낭독기용) font-size:0 + overflow:hidden 으로 안 보이게 하고,
+   그 자리에 10×10 스프라이트 이미지를 배경으로 깔아 X 를 그림.
+   우리는 그 스프라이트가 없으므로 체크박스처럼 CSS 로 직접 그림 — 1px 선 두 개를 45도/-45도로 돌려서 X.
+   크기·여백은 원본 실측 그대로: 10×10, margin -2px 0 0 5px, vertical-align middle */
 .filter-selected-chips .remove {
-	color: #888888;
+	position: relative;
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin: -2px 0 0 5px;
+	vertical-align: middle;
+	overflow: hidden;
+	font-size: 0;
+	line-height: 0;
 }
 
-.filter-selected-chips a:hover {
-	border-color: var(--link-blue);
+.filter-selected-chips .remove::before,
+.filter-selected-chips .remove::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	height: 1px;
+	background: #333333;
 }
 
-.filter-selected-chips a:hover .remove {
-	color: var(--link-blue);
+.filter-selected-chips .remove::before {
+	transform: rotate(45deg);
+}
+
+.filter-selected-chips .remove::after {
+	transform: rotate(-45deg);
 }
 
 .empty-message {
@@ -647,12 +697,28 @@ label.selected .filter-function-bar-asset::after,
 }
 
 /* 무료배송 뱃지 — 2026-09-02 추가. 원본 실측(browser_evaluate): 12px/400/#555555.
-   상품명과의 간격도 재확인(2026-09-02 2차): 뱃지 아래쪽 여백이 10px이었음(2px는 눈대중, 틀렸던 값) */
+   상품명과의 간격도 재확인(2026-09-02 2차): 뱃지 아래쪽 여백이 10px이었음(2px는 눈대중, 틀렸던 값).
+   ★ 2026-09-05: 19,800원 미만 상품은 글자가 비게 됨(JSP 참고). 빈 <p> 는 높이가 0 이 돼서
+   그 카드만 아래 내용이 위로 올라가 버리므로, 글자 한 줄 높이(12px × 1.5 = 18px)를 min-height 로
+   미리 잡아둠 — 이러면 무료배송이든 아니든 같은 줄 카드들의 상품명·가격 위치가 그대로 맞음 */
 .product-card .free-shipping-badge {
 	font-size: 12px;
 	font-weight: 400;
+	line-height: 18px;
+	min-height: 18px;
 	color: #555555;
 	margin-bottom: 10px;
+}
+
+/* 무료배송이 아닌 상품(=글자가 비는 카드) — 사진과 상품명 사이가 너무 벌어져 보인다는 지적(2026-09-05).
+   자리를 0 으로 없애버리면 그 카드만 상품명·가격이 통째로 위로 올라가서 같은 줄 카드끼리 어긋나므로
+   (=1번 항목에서 고쳤던 "카드마다 크기가 제각각" 버그가 되살아남) 없애지 않고 절반만 줄였음.
+   28px(18+10) → 14px(10+4). 줄어드는 14px 만큼은 카드 아래쪽 빈 공간이 대신 흡수함
+   (.product-card 에 min-height 439px + flex 가 걸려 있어서 카드 자체 높이는 그대로 유지됨) */
+.product-card .free-shipping-badge.is-empty {
+	min-height: 10px;
+	line-height: 10px;
+	margin-bottom: 4px;
 }
 
 /* 2026-09-03 2차: 상품명 줄이 안 맞아 보인다는 지적 — 원본 실측(browser_evaluate)해보니 이름을
