@@ -549,3 +549,44 @@ ORDER BY PERIOD_START DESC
 - `SALES_AMOUNT`는 이 판매자 상품 라인들의 `PRICE*ORDER_QTY` 합(수수료 차감 전 총매출 근사치)
 - 화면 상단 총 정산금액은 이 쿼리 결과를 자바에서 다시 합산한 값
 - 각 기간 행 상세(`/vendor/settlement/detail`)는 이 쿼리를 GROUP BY 없이 풀어서 보여주는 별도 쿼리(`findDetailBySellerNo`)를 씀
+
+# 판매자 취소/반품/교환 관리 - /vendor/return Query
+
+`VendorReturnServlet` (GET) 이 `VendorReturnDAO.findBySellerNo` (project/GoodPang/src/main/java/com/goodpang/dao/VendorReturnDAO.java) 쿼리 하나만 사용. `PRODUCT_RETURN`에는 취소/반품/교환을 구분하는 컬럼이 따로 없고 `RETURN_STATUS`(문자열) 하나뿐이라, `'취소%'`/`'반품%'`/`'교환%'`로 시작하는 상태값을 기준으로 유형을 나눠서 보여줌. 지금은 주문취소(`OrderCancelDAO.cancelOrder`)만 실제로 이 테이블에 `'취소완료'` 상태로 데이터를 쌓고 있고, 반품/교환 신청 화면은 아직 없어 그 두 유형은 데이터가 비어있을 수 있음.
+
+바인드 변수(`?`) 순서: `sellerNo`
+
+```sql
+SELECT
+    PR.RETURN_NO, PR.ORDER_DETAIL_NO, O.ORDER_NO,
+    PR.RETURN_QTY, PR.REFUND_AMOUNT, PR.RETURN_REASON, PR.RETURN_STATUS, PR.REQUEST_DATE,
+    CASE
+        WHEN PR.RETURN_STATUS LIKE '취소%' THEN '취소'
+        WHEN PR.RETURN_STATUS LIKE '반품%' THEN '반품'
+        WHEN PR.RETURN_STATUS LIKE '교환%' THEN '교환'
+        ELSE '기타'
+    END AS RETURN_TYPE,
+    P.PRODUCT_NAME,
+    PO.OPTION1_VALUE, PO.OPTION2_VALUE, PO.OPTION3_VALUE,
+    M.MEMBER_NAME, M.PHONE,
+    IMG.IMAGE_URL AS THUMBNAIL_URL
+FROM PRODUCT_RETURN PR
+    JOIN ORDER_DETAIL OD ON PR.ORDER_DETAIL_NO = OD.ORDER_DETAIL_NO
+    JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+    JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+    JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO
+    LEFT JOIN PRODUCT_OPTION PO ON OD.OPTION_ID = PO.OPTION_ID
+    LEFT JOIN (
+        SELECT PRODUCT_NO, IMAGE_URL,
+               ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID, IMAGE_ORDER) AS RN
+        FROM PRODUCT_IMAGE
+        WHERE IMAGE_PURPOSE = '대표'
+    ) IMG ON IMG.PRODUCT_NO = P.PRODUCT_NO AND IMG.RN = 1
+WHERE P.SELLER_NO = 1        -- 확인할 sellerNo로 교체
+ORDER BY PR.REQUEST_DATE DESC
+```
+
+## 사용 방법
+- `P.SELLER_NO` : 확인하고 싶은 판매자 번호로 교체
+- `RETURN_TYPE`은 저장된 컬럼이 아니라 `RETURN_STATUS` 값을 조회 시점에 분류한 계산 컬럼 — 나중에 반품/교환 신청을 추가할 때 `RETURN_STATUS`를 `'반품...'`/`'교환...'`으로 시작하게만 넣으면 이 쿼리가 자동으로 분류함
+- 화면 상단 취소/반품/교환 건수 통계는 이 쿼리 결과를 자바(`VendorReturnServlet`)에서 `RETURN_TYPE` 기준으로 세어서 계산
