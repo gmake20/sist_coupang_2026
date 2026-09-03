@@ -169,11 +169,13 @@ public class OrderCancelDAO {
 	                pr.return_reason,
 	                pr.refund_amount,
 	                pr.expected_cancel_date
+	                
 	            FROM ORDERS o
 	            JOIN ORDER_DETAIL od ON o.order_no = od.order_no
 	            JOIN PRODUCT p ON od.product_no = p.product_no
 	            LEFT JOIN PRODUCT_OPTION po ON od.option_id = po.option_id
 	            JOIN PRODUCT_RETURN pr ON od.order_detail_no = pr.order_detail_no
+	            
 	            WHERE o.member_no = ?
 	            ORDER BY pr.request_date DESC
 	            """;
@@ -208,10 +210,13 @@ public class OrderCancelDAO {
 
 	                    // 취소/반품(PRODUCT_RETURN) 정보
 	                    dto.setReturnNo(rs.getLong("return_no"));
-	                    dto.setRequestDate(rs.getTimestamp("request_date"));
 	                    dto.setReturnReason(rs.getString("return_reason"));
 	                    dto.setRefundAmount(rs.getInt("refund_amount"));
+	                    dto.setRequestDate(rs.getTimestamp("request_date"));
 	                    dto.setExpectedCancelDate(rs.getTimestamp("expected_cancel_date"));
+	                    
+	                    // 대표 이미지 URL 바인딩
+	                    dto.setImageUrl(rs.getString("IMAGE_URL"));
 
 	                    list.add(dto);
 	                }
@@ -347,32 +352,160 @@ public class OrderCancelDAO {
 
         return isSuccess;
     }
-    /*
-     * 재고 복원 — DB 프로시저 PRC_ORDER_STOCK_IN 을 부른다.
-     *
-     * ★ 이 메서드는 "이미 취소가 확정된 주문"에만 불러야 한다.
-     *   호출하는 자리가 UPDATE ORDERS ... 가 1행을 바꾼 경우 안쪽이라 그 조건이 지켜진다.
-     *   (이미 취소된 주문은 UPDATE 가 0행이 되어 여기까지 오지 않음 → 재고 2배 방지)
+
+
+    /**
+     * 취소 상세 페이지 정보 조회 (PAYMENT_METHOD 조인 수정)
      */
-    private void restoreStock(
-            Connection conn,
-            int orderNo)
-            throws SQLException {
+    public List<OrderDetailDTO> getCancelDetailList(int orderNo) {
+        List<OrderDetailDTO> list = new ArrayList<>();
 
-        String sql = "{ call PRC_ORDER_STOCK_IN(?, ?) }";
+        String sql = """
+            SELECT 
+                o.ORDER_NO,
+                o.ORDER_DATE,
+                o.ORDER_STATUS,
+                o.DELIVERY_FEE,
+                p.PRODUCT_NO,
+                p.PRODUCT_NAME,
+                od.ORDER_DETAIL_NO,
+                od.ORDER_QTY AS QUANTITY,
+                od.PRICE AS ITEM_PRICE,
+                po.OPTION1_TYPE, po.OPTION1_VALUE,
+                po.OPTION2_TYPE, po.OPTION2_VALUE,
+                pr.RETURN_NO,
+                pr.REQUEST_DATE,
+                pr.EXPECTED_CANCEL_DATE,
+                pr.RETURN_REASON,
+                pr.REFUND_AMOUNT,
+                pay.PAYMENT_METHOD,
+                img.IMAGE_URL,
+                
+                /* PAYMENT_METHOD 테이블 내 CARD_COMPANY 한글 변환 */
+                CASE pm.CARD_COMPANY
+                    WHEN 'BC'      THEN '비씨카드'
+                    WHEN 'SHINHAN' THEN '신한카드'
+                    WHEN 'KB'      THEN 'KB국민카드'
+                    WHEN 'SAMSUNG' THEN '삼성카드'
+                    WHEN 'HYUNDAI' THEN '현대카드'
+                    WHEN 'LOTTE'   THEN '롯데카드'
+                    WHEN 'HANA'    THEN '하나카드'
+                    WHEN 'WOORI'   THEN '우리카드'
+                    WHEN 'NH'      THEN 'NH농협카드'
+                    ELSE pm.CARD_COMPANY
+                END AS CARD_COMPANY_NAME,
 
-        try (CallableStatement cstmt = conn.prepareCall(sql)) {
+                /* PAYMENT_METHOD 테이블 내 BANK_CODE 한글 변환 */
+                CASE pm.BANK_CODE
+                    WHEN 'SHINHAN' THEN '신한은행'
+                    WHEN 'KB'      THEN 'KB국민은행'
+                    WHEN 'WOORI'   THEN '우리은행'
+                    WHEN 'NH'      THEN 'NH농협은행'
+                    WHEN 'HANA'    THEN '하나은행'
+                    WHEN 'KAKAO'   THEN '카카오뱅크'
+                    WHEN 'TOSS'    THEN '토스뱅크'
+                    ELSE pm.BANK_CODE
+                END AS BANK_NAME
 
-            cstmt.setInt(1, orderNo);
-            cstmt.registerOutParameter(2, Types.NUMERIC);
+            FROM ORDERS o
+            JOIN ORDER_DETAIL od ON o.ORDER_NO = od.ORDER_NO
+            JOIN PRODUCT p ON od.PRODUCT_NO = p.PRODUCT_NO
+            LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID
+            LEFT JOIN PRODUCT_RETURN pr ON od.ORDER_DETAIL_NO = pr.ORDER_DETAIL_NO
+            LEFT JOIN PAYMENT pay ON o.ORDER_NO = pay.ORDER_NO
+            LEFT JOIN PAYMENT_METHOD pm ON pay.PAYMENT_METHOD_NO = pm.PAYMENT_METHOD_NO
+            LEFT JOIN (
+                SELECT product_no, image_url 
+                FROM (
+                    SELECT product_no, image_url, 
+                           ROW_NUMBER() OVER(PARTITION BY product_no ORDER BY image_no ASC) as rn 
+                    FROM PRODUCT_IMAGE 
+                    WHERE image_purpose = '대표'
+                ) WHERE rn = 1
+            ) img ON p.PRODUCT_NO = img.PRODUCT_NO
+            WHERE o.ORDER_NO = ?
+            """;
 
-            cstmt.execute();
+        try (Connection conn = ConnectionProvider.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            System.out.println(
-                    "[DEBUG OrderCancelDAO] 재고 복원 완료 - orderNo: "
-                    + orderNo + ", 복원 줄 수: " + cstmt.getInt(2));
+            pstmt.setInt(1, orderNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    OrderDetailDTO dto = new OrderDetailDTO();
+
+                    // 주문 기본 정보
+                    dto.setOrderNo(rs.getInt("ORDER_NO"));
+                    dto.setOrderDate(rs.getTimestamp("ORDER_DATE"));
+                    dto.setOrderStatus(rs.getString("ORDER_STATUS"));
+                    dto.setDeliveryFee(rs.getInt("DELIVERY_FEE"));
+
+                    // 상품 및 옵션 정보
+                    dto.setProductNo(rs.getLong("PRODUCT_NO"));
+                    dto.setProductName(rs.getString("PRODUCT_NAME"));
+                    dto.setOrderDetailNo(rs.getLong("ORDER_DETAIL_NO"));
+                    dto.setQuantity(rs.getInt("QUANTITY"));
+                    dto.setItemPrice(rs.getInt("ITEM_PRICE"));
+
+                    dto.setOption1Type(rs.getString("OPTION1_TYPE"));
+                    dto.setOption1Value(rs.getString("OPTION1_VALUE"));
+                    dto.setOption2Type(rs.getString("OPTION2_TYPE"));
+                    dto.setOption2Value(rs.getString("OPTION2_VALUE"));
+
+                    // 취소/반품 상세 정보
+                    dto.setReturnNo(rs.getLong("RETURN_NO"));
+                    dto.setRequestDate(rs.getTimestamp("REQUEST_DATE"));
+                    dto.setExpectedCancelDate(rs.getTimestamp("EXPECTED_CANCEL_DATE"));
+                    dto.setReturnReason(rs.getString("RETURN_REASON"));
+                    dto.setRefundAmount(rs.getInt("REFUND_AMOUNT"));
+
+                    // 결제 수단 및 카드사/은행명 매핑 (PAYMENT_METHOD 테이블 참조)
+                    dto.setPaymentMethod(rs.getString("PAYMENT_METHOD"));
+                    dto.setCardCompanyName(rs.getString("CARD_COMPANY_NAME"));
+                    dto.setBankName(rs.getString("BANK_NAME"));
+                    
+                    dto.setImageUrl(rs.getString("IMAGE_URL"));
+
+                    list.add(dto);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR OrderCancelDAO] 취소 상세 정보 조회 실패");
+            e.printStackTrace();
+        } finally {
+            DBConn.close();
         }
+
+        return list;
     }
-    
-    
+
+
+/*
+ * 재고 복원 — DB 프로시저 PRC_ORDER_STOCK_IN 을 부른다.
+ *
+ * ★ 이 메서드는 "이미 취소가 확정된 주문"에만 불러야 한다.
+ *   호출하는 자리가 UPDATE ORDERS ... 가 1행을 바꾼 경우 안쪽이라 그 조건이 지켜진다.
+ *   (이미 취소된 주문은 UPDATE 가 0행이 되어 여기까지 오지 않음 → 재고 2배 방지)
+ */
+		private void restoreStock(
+		        Connection conn,
+		        int orderNo)
+		        throws SQLException {
+
+    String sql = "{ call PRC_ORDER_STOCK_IN(?, ?) }";
+
+    try (CallableStatement cstmt = conn.prepareCall(sql)) {
+
+        cstmt.setInt(1, orderNo);
+        cstmt.registerOutParameter(2, Types.NUMERIC);
+
+        cstmt.execute();
+
+        System.out.println(
+                "[DEBUG OrderCancelDAO] 재고 복원 완료 - orderNo: "
+                + orderNo + ", 복원 줄 수: " + cstmt.getInt(2));
+    }
+}
+
 }
