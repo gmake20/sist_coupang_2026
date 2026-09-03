@@ -77,7 +77,7 @@
     </nav>
 
     <div class="side-foot">
-      <a href="#" class="side-item">
+      <a href="/vendor/business-info" class="side-item">
         <svg class="icon"><use href="#ic-gear" /></svg>
         <span>판매자 정보관리</span>
       </a>

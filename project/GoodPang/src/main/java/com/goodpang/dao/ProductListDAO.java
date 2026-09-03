@@ -121,6 +121,37 @@ public class ProductListDAO {
     }
 
     /*
+     * 판매자 탈퇴 시 그 판매자의 상품을 전부 숨김 처리(DISPLAY_YN='N').
+     * 카테고리/검색 목록 쿼리(CategoryProductDAO/SearchDAO의 BASE_FROM_HEAD)가 전부
+     * DISPLAY_YN='Y'만 보여주므로, 이 한 줄이면 판매 상태와 무관하게 고객 화면에서 즉시 사라진다.
+     */
+    public int hideAllBySeller(int sellerNo) {
+
+        String sql = """
+            UPDATE PRODUCT
+            SET DISPLAY_YN = 'N',
+                UPDATED_DATE = SYSDATE
+            WHERE SELLER_NO = ?
+              AND DISPLAY_YN = 'Y'
+            """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setInt(1, sellerNo);
+
+            return pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /*
      * 판매중지/판매재개 토글. '승인 대기'나 '품절' 상태인 상품은 이 토글 대상이 아니므로
      * 현재 상태가 '판매 중'/'판매 중지'인 행만 바꾸도록 WHERE에 조건을 건다.
      */
