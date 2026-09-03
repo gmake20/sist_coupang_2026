@@ -791,7 +791,7 @@
 																<c:choose>
 																	<c:when test="${not empty item.imageUrl}">
 																		<img
-																			src="${pageContext.request.contextPath}${item.imageUrl}"
+																			src="${pageContext.request.contextPath}/${item.imageUrl}"
 																			alt="${item.productName}">
 																	</c:when>
 																	<c:otherwise>
