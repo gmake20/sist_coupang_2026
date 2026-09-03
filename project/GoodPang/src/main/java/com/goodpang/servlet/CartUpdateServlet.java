@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.goodpang.dao.CartDAO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.util.CartUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -80,31 +81,30 @@ public class CartUpdateServlet extends HttpServlet {
 		// 로그인 회원
 		if (loginMember != null) {
 
-			cartDAO.updateQuantity(
-					loginMember.getMemberNo(),
-					optionId,
-					quantity
-					);
+			int memberNo = loginMember.getMemberNo();
 
+			cartDAO.updateQuantity(memberNo, optionId, quantity);
+			CartUtil.refreshCartSession(request, memberNo);
+			
+			
 		}
 
 		// 비로그인 회원
 		else {
 
-			@SuppressWarnings("unchecked")
 			Map<Integer, Integer> guestCart =
-			(Map<Integer, Integer>)
-			session.getAttribute("guestCart");
+					(Map<Integer, Integer>) session.getAttribute("guestCart");
 
-			if (guestCart != null
-					&& guestCart.containsKey(optionId)) {
-
-				guestCart.put(
-						optionId,
-						quantity
-						);
-
+			if (guestCart == null || !guestCart.containsKey(optionId)) {
+				response.sendError(
+						HttpServletResponse.SC_BAD_REQUEST,
+						"장바구니에 존재하지 않는 상품입니다."
+				);
+				return;
 			}
+
+			guestCart.put(optionId, quantity);
+			CartUtil.refreshGuestCartSession(request, guestCart);
 
 		}
 

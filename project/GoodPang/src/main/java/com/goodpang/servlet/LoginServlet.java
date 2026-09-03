@@ -9,6 +9,7 @@ import com.goodpang.dao.CartDAO;
 import com.goodpang.dao.MemberDAO;
 import com.goodpang.dao.WowMembershipDAO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.util.CartUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -129,10 +130,22 @@ public class LoginServlet extends HttpServlet {
 
             return;
         }
+        
+        if (member.getStatus() == 0) {
+            request.setAttribute("withdrawnMember", member);
+            request.getRequestDispatcher("/member_withdrawn.jsp").forward(request, response);
+            return;
+        }
 
         HttpSession session = request.getSession();
 
         session.setAttribute("loginMember", member);
+        
+        CartUtil.refreshCartSession(
+        		request,
+        		member.getMemberNo()
+        );
+        
         session.setAttribute("memberNo", member.getMemberNo());
         session.setAttribute("memberName", member.getMemberName());
 
