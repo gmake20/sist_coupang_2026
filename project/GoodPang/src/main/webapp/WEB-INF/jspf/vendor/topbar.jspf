@@ -63,7 +63,7 @@
       </button>
 
       <div class="user-menu-panel" id="userMenuPanel">
-        <a href="<%= request.getContextPath() %>/vendor_dashboard">판매자 정보 관리</a>
+        <a href="<%= request.getContextPath() %>/vendor/business-info">판매자 정보 관리</a>
         <a href="<%= request.getContextPath() %>/vendor/logout">로그아웃</a>
       </div>
 

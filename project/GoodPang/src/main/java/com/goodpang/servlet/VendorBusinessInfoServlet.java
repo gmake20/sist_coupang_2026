@@ -30,7 +30,7 @@ public class VendorBusinessInfoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+		System.out.println("VendorBusinessInfoServlet Get");
 		HttpSession session = request.getSession(false);
 
 		if (session == null || session.getAttribute("loginSeller") == null) {
@@ -38,6 +38,7 @@ public class VendorBusinessInfoServlet extends HttpServlet {
 			return;
 		}
 
+		System.out.println("VendorBusinessInfoServlet2");
 		request.getRequestDispatcher("/WEB-INF/views/vendor-business-info.jsp")
 			   .forward(request, response);
 	}
