@@ -63,6 +63,13 @@
 .main-today {
   position: relative;
   width: 100%;
+
+  /* ★ 2026-09-03 추가 — 안쪽 .main-today__selected-product 가 1020px 고정이라
+     창을 1020px 아래로 줄이면 문서는 1020 인데 이 상자만 뷰포트 폭(예: 985)이 됐음.
+     그래서 배경(.main-today__bg 는 width:100%)이 35px 모자라 오른쪽 끝에 맨바닥이 드러남.
+     배너 폭 1020 고정은 원본과 같으므로 그대로 두고, 배경이 깔릴 바닥만 안 줄어들게 함 */
+  min-width: 1020px;
+
   height: 450px;
   background: #fafafa;   /* 이미지가 뜨기 전까지 보일 바탕색 */
 }
