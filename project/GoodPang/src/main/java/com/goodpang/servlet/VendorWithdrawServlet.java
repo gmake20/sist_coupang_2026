@@ -26,7 +26,8 @@ public class VendorWithdrawServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
 		request.setCharacterEncoding("UTF-8");
 
@@ -43,7 +44,7 @@ public class VendorWithdrawServlet extends HttpServlet {
 		if (password == null || !BCrypt.checkpw(password, loginSeller.getSellerPw())) {
 			request.setAttribute("error", "비밀번호가 일치하지 않습니다.");
 			request.getRequestDispatcher("/WEB-INF/views/vendor-business-info.jsp")
-				   .forward(request, response);
+					.forward(request, response);
 			return;
 		}
 
@@ -55,7 +56,7 @@ public class VendorWithdrawServlet extends HttpServlet {
 
 		session.invalidate();
 
-		response.sendRedirect(request.getContextPath() + "/index.html");
+		response.sendRedirect(request.getContextPath() + "/index.jsp");
 	}
 
 }

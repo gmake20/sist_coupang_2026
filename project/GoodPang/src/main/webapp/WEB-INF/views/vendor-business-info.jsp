@@ -25,7 +25,7 @@
     <main class="vendor-signup">
 
       <div class="logo-area">
-        <a href="${pageContext.request.contextPath}/index.html" class="brand-goodpang">GoodPang marketplace</a>
+        <a href="${pageContext.request.contextPath}/index.jsp" class="brand-goodpang">GoodPang marketplace</a>
       </div>
 
       <h1 class="title">
