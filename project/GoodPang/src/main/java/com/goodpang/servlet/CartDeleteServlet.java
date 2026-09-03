@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.goodpang.dao.CartDAO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.util.CartUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -68,16 +69,24 @@ public class CartDeleteServlet extends HttpServlet {
 		
 		if (loginMember != null) {
 
+			int memberNo =
+					loginMember.getMemberNo();
+			
 			cartDAO.deleteCart(
-					loginMember.getMemberNo(),
+					memberNo,
 					optionId
 					);
 
 			// 헤더 장바구니 상품 종류 수 갱신
 			int cartCount =
 					cartDAO.getCartCount(
-							loginMember.getMemberNo()
+							memberNo
 							);
+			
+			CartUtil.refreshCartSession(
+					request,
+					memberNo
+			);
 			session.setAttribute(
 					"cartCount",
 					cartCount
@@ -85,21 +94,25 @@ public class CartDeleteServlet extends HttpServlet {
 		}
 		else {
 
+			/*
+			 * @SuppressWarnings("unchecked") Map<Integer, Integer> guestCart =
+			 * (Map<Integer, Integer>) session.getAttribute("guestCart");
+			 * 
+			 * if (guestCart != null) {
+			 * 
+			 * guestCart.remove(optionId);
+			 * 
+			 * // 상품 종류 수 session.setAttribute( "cartCount", guestCart.size() );
+			 * 
+			 * }
+			 */
 			@SuppressWarnings("unchecked")
 			Map<Integer, Integer> guestCart =
-			(Map<Integer, Integer>)
-			session.getAttribute("guestCart");
+					(Map<Integer, Integer>) session.getAttribute("guestCart");
 
 			if (guestCart != null) {
-
 				guestCart.remove(optionId);
-
-				// 상품 종류 수
-				session.setAttribute(
-						"cartCount",
-						guestCart.size()
-						);
-
+				CartUtil.refreshGuestCartSession(request, guestCart);
 			}
 		}
 		// 다시 장바구니 페이지로 이동

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.goodpang.dao.CartDAO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.util.CartUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,40 +19,25 @@ import jakarta.servlet.http.HttpSession;
 public class CartAddServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-
-	private final CartDAO cartDAO =
-			new CartDAO();
+	private final CartDAO cartDAO = new CartDAO();
 
 	@Override
-	protected void doPost(
-			HttpServletRequest request,
-			HttpServletResponse response)
-					throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
 		request.setCharacterEncoding("UTF-8");
 
 		int optionId;
 		int quantity;
-		
+
 		try {
-
-			optionId =
-					Integer.parseInt(
-							request.getParameter("optionId")
-							);
-
-			quantity =
-					Integer.parseInt(
-							request.getParameter("quantity")
-							);
-
+			optionId = Integer.parseInt(request.getParameter("optionId"));
+			quantity = Integer.parseInt(request.getParameter("quantity"));
 		} catch (Exception e) {
-
 			response.sendError(
 					HttpServletResponse.SC_BAD_REQUEST,
 					"잘못된 상품 정보입니다."
-					);
-
+			);
 			return;
 		}
 
@@ -59,90 +45,63 @@ public class CartAddServlet extends HttpServlet {
 			quantity = 1;
 		}
 
-		HttpSession session =
-				request.getSession();
-
+		HttpSession session = request.getSession();
 		MemberDTO loginMember =
-				(MemberDTO)
-				session.getAttribute("loginMember");
+				(MemberDTO) session.getAttribute("loginMember");
 
+		int cartCount;
 
-		// ===============================
 		// 로그인 사용자
-		// ===============================
-
 		if (loginMember != null) {
+			int memberNo = loginMember.getMemberNo();
 
-			cartDAO.addCart(
-					loginMember.getMemberNo(),
-					optionId,
-					quantity
-					);
+			cartDAO.addCart(memberNo, optionId, quantity);
+			CartUtil.refreshCartSession(request, memberNo);
 
+			cartCount =
+					(Integer) session.getAttribute("cartCount");
 		}
 
-		// ===============================
 		// 비로그인 사용자
-		// ===============================
-
 		else {
-
 			@SuppressWarnings("unchecked")
 			Map<Integer, Integer> guestCart =
-			(Map<Integer, Integer>)
-			session.getAttribute("guestCart");
+					(Map<Integer, Integer>) session.getAttribute("guestCart");
 
 			if (guestCart == null) {
-
 				guestCart = new HashMap<>();
-
-				session.setAttribute(
-						"guestCart",
-						guestCart
-						);
-
+				session.setAttribute("guestCart", guestCart);
 			}
 
-			guestCart.merge(
-					optionId,
-					quantity,
-					Integer::sum
-					);
+			guestCart.merge(optionId, quantity, Integer::sum);
 
-			int cartCount =
-					guestCart.size();
+			CartUtil.refreshGuestCartSession(
+					request,
+					guestCart
+			);
 
-			session.setAttribute(
-					"cartCount",
-					cartCount
-					);
-
+			cartCount = guestCart.size();
 		}
-		
+
 		boolean ajax =
-		        "XMLHttpRequest".equals(
-		                request.getHeader(
-		                        "X-Requested-With"
-		                )
-		        );
-		
+				"XMLHttpRequest".equals(
+						request.getHeader("X-Requested-With")
+				);
+
 		if (ajax) {
+			response.setContentType(
+					"application/json; charset=UTF-8"
+			);
 
-		    response.setContentType(
-		            "application/json; charset=UTF-8"
-		    );
+			response.getWriter().write(
+					"{\"success\":true,\"cartCount\":" + cartCount + "}"
+			);
 
-		    response.getWriter().write(
-		            "{\"success\":true}"
-		    );
-
-		    return;
+			return;
 		}
-
 
 		response.sendRedirect(
-				request.getContextPath()
-				+ "/cart"
-				);
+				request.getContextPath() + "/cart"
+		);
 	}
 }
