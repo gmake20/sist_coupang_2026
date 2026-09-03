@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import com.goodpang.dao.AdminActionLogDAO;
 import com.goodpang.dao.AdminDeliveryDAO;
+import com.goodpang.dao.AdminDeliveryDAO.CompleteResult;
+import com.goodpang.dao.VendorActionLogDAO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,11 +29,18 @@ public class AdminDeliveryCompleteServlet extends HttpServlet {
 		try {
 			int deliveryNo = Integer.parseInt(request.getParameter("deliveryNo"));
 
-			if (dao.completeDelivery(deliveryNo)) {
+			CompleteResult result = dao.completeDelivery(deliveryNo);
+
+			if (result != null) {
 				HttpSession session = request.getSession(false);
 				Integer adminNo = (session != null) ? (Integer) session.getAttribute("adminNo") : null;
 				if (adminNo != null) {
 					new AdminActionLogDAO().log(adminNo, "배송완료 처리", "DELIVERY", deliveryNo, null);
+				}
+
+				VendorActionLogDAO vendorActionLogDAO = new VendorActionLogDAO();
+				for (int sellerNo : result.getSellerNos()) {
+					vendorActionLogDAO.log(sellerNo, "배송 완료", "ORDERS", result.getOrderNo(), null);
 				}
 			}
 		} catch (NumberFormatException e) {
