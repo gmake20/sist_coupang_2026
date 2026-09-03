@@ -266,35 +266,32 @@
 
           <div class="panel-head">
             <h2>공지사항</h2>
-            <a href="#" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
+            <a href="${pageContext.request.contextPath}/vendor/notice" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
           </div>
 
           <ul class="notice-list">
-            <li>
-              <span class="notice-tag tag-notice">공지</span>
-              <span class="notice-title">2025년 5월 정산 일정 안내</span>
-              <span class="notice-date">05.16</span>
-            </li>
-            <li>
-              <span class="notice-tag tag-notice">공지</span>
-              <span class="notice-title">배송 지연 보상 정책 변경 안내</span>
-              <span class="notice-date">05.14</span>
-            </li>
-            <li>
-              <span class="notice-tag tag-info">안내</span>
-              <span class="notice-title">판매자 이용약관 개정 안내</span>
-              <span class="notice-date">05.10</span>
-            </li>
-            <li>
-              <span class="notice-tag tag-info">안내</span>
-              <span class="notice-title">여름맞이 프로모션 참여 안내</span>
-              <span class="notice-date">05.08</span>
-            </li>
-            <li>
-              <span class="notice-tag tag-info">안내</span>
-              <span class="notice-title">시스템 점검 안내 (5/25 새벽)</span>
-              <span class="notice-date">05.07</span>
-            </li>
+
+            <c:choose>
+
+              <c:when test="${empty recentNotices}">
+                <li><span class="notice-title" style="color:#999;">등록된 공지사항이 없습니다.</span></li>
+              </c:when>
+
+              <c:otherwise>
+                <c:forEach var="notice" items="${recentNotices}">
+                  <li>
+                    <a href="${pageContext.request.contextPath}/vendor/notice/detail?noticeNo=${notice.noticeNo}"
+                       style="display:contents; color:inherit; text-decoration:none;">
+                      <span class="notice-tag ${notice.noticeType == '공지' ? 'tag-notice' : 'tag-info'}">${notice.noticeType}</span>
+                      <span class="notice-title">${notice.title}</span>
+                      <span class="notice-date"><fmt:formatDate value="${notice.createdDate}" pattern="MM.dd" /></span>
+                    </a>
+                  </li>
+                </c:forEach>
+              </c:otherwise>
+
+            </c:choose>
+
           </ul>
 
         </article>

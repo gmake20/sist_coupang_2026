@@ -62,7 +62,7 @@
                제일 먼저 쓴 판매자 가입이 제일 오른쪽에 붙고,그 다음 것들이 왼쪽으로 하나씩 밀려 들어옴.
                → 화면에는 로그인 · 회원가입 · 고객센터 · 판매자 가입 순으로 보임 -->
 				<ul class="top-bar-right">
-					<li><a href="vendor-signup.html">판매자 가입</a></li>
+					<li><a href="vendor/signup">판매자 가입</a></li>
 
 					<li class="cs-center"><a href="#">고객센터</a>
 						<ul class="cs-menu">
@@ -72,7 +72,7 @@
 							<li><a href="#">취소 / 반품 안내</a></li>
 						</ul></li>
 
-					<li><a href="./signup.html">회원가입</a></li>
+					<li><a href="./signup.jsp">회원가입</a></li>
 					<li><a href="./login.jsp">로그인</a></li>
 				</ul>
 
@@ -130,7 +130,7 @@
 						</h1>
 
 						<!-- 검색폼 (높이 41px, 파란 테두리 2px) -->
-						<form class="search-form" action="#" method="get">
+						<form class="search-form" action="${pageContext.request.contextPath}/search" method="get">
 
 							<!-- 왼쪽 "전체" 드롭다운 (135 x 37) -->
 							<div class="select--category">
@@ -142,7 +142,7 @@
 							<div class="header-search">
 								<!-- label 은 화면엔 안 보이지만 화면낭독기가 읽어줌 -->
 								<label for="search-keyword" class="blind">상품 검색</label> <input
-									type="text" id="search-keyword" name="q" class="search-keyword"
+									type="text" id="search-keyword" name="keyword" class="search-keyword"
 									placeholder="찾고 싶은 상품을 검색해보세요!" maxlength="150"
 									autocomplete="off">
 
@@ -213,7 +213,7 @@
 
                ⚠ id 는 페이지에 하나만 있어야 해서 위 검색폼과 겹치지 않게 -tablet 을 붙였음 -->
 					<div class="search-row">
-						<form class="search-form" action="#" method="get">
+						<form class="search-form" action="${pageContext.request.contextPath}/search" method="get">
 
 							<div class="select--category">
 								<a href="#" class="select--category__current">전체</a> <span
@@ -222,7 +222,7 @@
 
 							<div class="header-search">
 								<label for="search-keyword-tablet" class="blind">상품 검색</label> <input
-									type="text" id="search-keyword-tablet" name="q"
+									type="text" id="search-keyword-tablet" name="keyword"
 									class="search-keyword" placeholder="찾고 싶은 상품을 검색해보세요!"
 									maxlength="150" autocomplete="off">
 

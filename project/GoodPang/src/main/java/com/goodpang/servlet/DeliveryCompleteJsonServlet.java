@@ -6,6 +6,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import com.goodpang.dao.AdminDeliveryDAO;
+import com.goodpang.dao.AdminDeliveryDAO.CompleteResult;
+import com.goodpang.dao.VendorActionLogDAO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,11 +36,17 @@ public class DeliveryCompleteJsonServlet extends HttpServlet {
 			int deliveryNo = Integer.parseInt(request.getParameter("deliveryNo"));
 
 			AdminDeliveryDAO dao = new AdminDeliveryDAO();
-			boolean success = dao.completeDelivery(deliveryNo);
+			CompleteResult completeResult = dao.completeDelivery(deliveryNo);
+			boolean success = completeResult != null;
 
 			result.addProperty("success", success);
 			if (!success) {
 				result.addProperty("message", "이미 처리되었거나 존재하지 않는 배송번호입니다.");
+			} else {
+				VendorActionLogDAO vendorActionLogDAO = new VendorActionLogDAO();
+				for (int sellerNo : completeResult.getSellerNos()) {
+					vendorActionLogDAO.log(sellerNo, "배송 완료", "ORDERS", completeResult.getOrderNo(), null);
+				}
 			}
 
 		} catch (NumberFormatException e) {

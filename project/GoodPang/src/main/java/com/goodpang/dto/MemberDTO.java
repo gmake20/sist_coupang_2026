@@ -14,4 +14,6 @@ public class MemberDTO {
     private String phone;
     private String email;
     private String rank;
+    
+    private int status;
 }

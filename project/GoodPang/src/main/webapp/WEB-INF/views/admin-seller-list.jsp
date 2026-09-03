@@ -13,6 +13,7 @@
 
   <style>
     body { font-family: Arial, "Malgun Gothic", sans-serif; margin: 24px; color: #111; }
+    .back-link { display: inline-block; margin-bottom: 16px; color: #555; text-decoration: none; }
     h1 { font-size: 20px; margin-bottom: 16px; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { padding: 10px 12px; border-bottom: 1px solid #eee; text-align: left; white-space: nowrap; }
@@ -25,11 +26,15 @@
     .badge-review { background: #e8f0fe; color: #1a56db; }
     .badge-approved { background: #e6f7ec; color: #0f7b3c; }
     .badge-rejected { background: #fdecea; color: #c0392b; }
+    .badge-suspended { background: #f3f0ff; color: #6c3ce9; }
+    .badge-withdrawn { background: #f2f2f2; color: #666; }
   </style>
 
 </head>
 
 <body>
+
+  <a class="back-link" href="${pageContext.request.contextPath}/admin/dashboard">&larr; 대시보드로</a>
 
   <h1>판매자 목록 (${fn:length(sellerList)}건)</h1>
 
@@ -81,6 +86,12 @@
                   </c:when>
                   <c:when test="${seller.approvalStatus == '반려'}">
                     <span class="badge badge-rejected">반려</span>
+                  </c:when>
+                  <c:when test="${seller.approvalStatus == '정지'}">
+                    <span class="badge badge-suspended">정지</span>
+                  </c:when>
+                  <c:when test="${seller.approvalStatus == '탈퇴'}">
+                    <span class="badge badge-withdrawn">탈퇴</span>
                   </c:when>
                   <c:otherwise>
                     ${seller.approvalStatus}

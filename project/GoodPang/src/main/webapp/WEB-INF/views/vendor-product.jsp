@@ -354,7 +354,7 @@
                           </form>
                         </c:when>
                         <c:otherwise>
-                          <button class="btn btn-outline btn-sm" type="button">수정</button>
+                          <button class="btn btn-outline btn-sm" type="button" disabled title="준비 중인 기능입니다">수정</button>
                           <c:if test="${product.saleStatus == '판매 중'}">
                             <form method="post" action="${pageContext.request.contextPath}/vendor/product/status"
                                   style="display:inline;"

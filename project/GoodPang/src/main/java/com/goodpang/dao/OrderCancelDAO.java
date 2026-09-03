@@ -238,13 +238,34 @@ public class OrderCancelDAO {
      * 2) ORDER_DETAIL 조회: order_detail_no, order_qty, price 추출
      * 3) PRODUCT_RETURN 테이블: 정확한 컬럼(order_detail_no)으로 취소 내역 INSERT
      */
-    public boolean cancelOrder(int orderNo, String cancelReason) {
-
+    public boolean cancelOrder(int orderNo, int memberNo, String cancelReason) {
+        /*
+         * ★ WHERE 조건 세 개가 각각 다른 사고를 막는다.
+         *
+         *  order_no = ?            어떤 주문인지
+         *
+         *  member_no = ?           남의 주문 취소 방지.
+         *                          취소는 GET 링크(/order/cancel_action?orderNo=87)라
+         *                          주소창에 남의 주문번호만 넣으면 취소가 되던 상태였음.
+         *
+         *  order_status IN (...)   ① 이미 '주문취소'면 0행 → 재고 복원이 두 번 실행되지 않음
+         *                             (GET 이라 F5 한 번으로 재실행되기 쉬움)
+         *                          ② '배송완료'된 주문은 취소가 아니라 반품으로 처리해야 함
+         *
+         * ★ 왜 자바에서 미리 SELECT 로 확인하지 않고 WHERE 에 넣는가
+         *   취소 버튼을 따닥 눌러 요청이 동시에 두 개 들어오면, 둘 다 '결제완료'를 읽고
+         *   둘 다 통과해버린다(경쟁 조건). WHERE 안에 넣으면 오라클이 그 행을 잠그고
+         *   판단까지 한 문장에서 하기 때문에 두 번째는 반드시 0행이 된다.
+         */
+    	
+    	
         // 1. ORDERS 테이블 상태 변경 SQL
         String sqlOrderUpdate = """
             UPDATE ORDERS 
                SET order_status = '주문취소' 
              WHERE order_no = ?
+             AND member_no = ?
+             AND order_status IN ('주문접수', '결제완료')
             """;
 
         // 2. ORDER_DETAIL 정보 조회 SQL (order_detail_no 및 수량/금액 추출)
@@ -278,6 +299,7 @@ public class OrderCancelDAO {
             // [Step 1] ORDERS 상태 업데이트
             pstmtOrder = conn.prepareStatement(sqlOrderUpdate);
             pstmtOrder.setInt(1, orderNo);
+            pstmtOrder.setInt(2, memberNo);
             int orderResult = pstmtOrder.executeUpdate();
 
             // [Step 2 & 3] ORDER_DETAIL 조회 후 PRODUCT_RETURN에 등록
@@ -303,7 +325,10 @@ public class OrderCancelDAO {
                 }
 
                 if (returnResultCount > 0) {
-                    conn.commit(); // 성공 시 DB 적용
+                	// ★ 재고 복원 — 커밋 전에 한다. 실패하면 취소 전체가 롤백돼야 하므로.
+                    restoreStock(conn, orderNo);
+                	
+                	conn.commit(); // 성공 시 DB 적용
                     isSuccess = true;
                 } else {
                     conn.rollback();

@@ -1,18 +1,17 @@
 package com.goodpang.dao;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.goodpang.dto.AddressDTO;
 import com.goodpang.dto.OrderCompleteDTO;
-import com.goodpang.dto.OrderItemDTO;
 import com.goodpang.dto.OrderSummaryDTO;
 import com.goodpang.util.ConnectionProvider;
-import com.goodpang.util.DBConn;
 
 public class OrderDAO {
 
@@ -940,4 +939,70 @@ public class OrderDAO {
 		return null;
 	}
 
+	/*
+	 * 재고 부족 정보를 담는 작은 그릇.
+	 * 상품명과 남은 수량 두 개를 같이 돌려줘야 하는데, 이거 하나 때문에
+	 * DTO 파일을 새로 만들기는 아까워서 OrderDAO 안에 넣어둠.
+	 */
+	public static class StockFail {
+
+		public final String productName;   // 재고가 모자란 상품 이름
+		public final int    left;          // 그 상품의 남은 재고
+
+		public StockFail(String productName, int left) {
+			this.productName = productName;
+			this.left = left;
+		}
+	}
+
+	/*
+	 * 재고 차감 — DB 프로시저 PRC_ORDER_STOCK_OUT 을 부른다.
+	 *
+	 * ★ 반드시 주문 트랜잭션이 쓰고 있는 conn 을 그대로 받아서 쓴다.
+	 *   여기서 ConnectionProvider.getConnection() 으로 새 커넥션을 따면
+	 *   완전히 다른 트랜잭션이 되어버려서, 주문이 롤백돼도 재고는 안 돌아온다.
+	 *
+	 * 반환값
+	 *   null        → 차감 성공
+	 *   StockFail   → 재고 부족 (어느 상품이 몇 개 남았는지 들어있음)
+	 *
+	 * ★ 프로시저가 예외를 던지지 않고 결과값으로 알려주는 이유
+	 *   PL/SQL 에서 RAISE_APPLICATION_ERROR 로 예외를 던지면 OUT 파라미터 값이
+	 *   자바로 넘어오지 않는다(호출 자체가 실패로 끝나서 값이 안 채워짐).
+	 *   화면에 "○○ 재고가 부족합니다(남은 수량 3개)" 를 띄우려면 상품명이 필요하므로
+	 *   예외 대신 o_result(0/1)로 돌려받고, 롤백 여부는 자바가 판단한다.
+	 */
+	public StockFail stockOut(
+			Connection conn,
+			int orderNo)
+			throws Exception {
+
+		String sql = "{ call PRC_ORDER_STOCK_OUT(?, ?, ?, ?) }";
+
+		try (CallableStatement cstmt = conn.prepareCall(sql)) {
+
+			// 1번은 넣는 값(IN), 2~4번은 되받을 자리(OUT)
+			cstmt.setInt(1, orderNo);
+
+			cstmt.registerOutParameter(2, Types.NUMERIC);   // o_result   0=성공 1=재고부족
+			cstmt.registerOutParameter(3, Types.VARCHAR);   // o_fail_product
+			cstmt.registerOutParameter(4, Types.NUMERIC);   // o_fail_left
+
+			cstmt.execute();
+
+			int result = cstmt.getInt(2);
+
+			if (result == 0) {
+				return null;   // 성공
+			}
+
+			return new StockFail(
+					cstmt.getString(3),
+					cstmt.getInt(4)
+					);
+		}
+	}	
+	
+	
+	
 }

@@ -8,8 +8,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.goodpang.dao.NoticeDAO;
 import com.goodpang.dao.VendorDashboardDAO;
 import com.goodpang.dao.VendorOrderListDAO;
+import com.goodpang.dto.NoticeDTO;
 import com.goodpang.dto.SellerDTO;
 import com.goodpang.dto.VendorDailySalesDTO;
 import com.goodpang.dto.VendorDailyTrafficDTO;
@@ -82,6 +84,10 @@ public class VendorDashboardServlet extends HttpServlet {
 		// KPI 카드 스파크라인용 - 기준일 포함 최근 7일 방문자수/상품노출수 추이
 		List<VendorDailyTrafficDTO> dailyTraffic = dao.getDailyTrafficStat(loginSeller.getSellerNo(), targetSqlDate);
 		request.setAttribute("dailyTrafficJson", gson.toJson(dailyTraffic));
+
+		// 공지사항 위젯 - 최신 5건만, "더보기"는 /vendor/notice 전체 목록으로 연결
+		List<NoticeDTO> recentNotices = new NoticeDAO().findRecent(5);
+		request.setAttribute("recentNotices", recentNotices);
 
 		request.getRequestDispatcher("/WEB-INF/views/vendor-dashboard.jsp").forward(request, response);
 	}

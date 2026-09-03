@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import com.goodpang.dao.ProductWriteDAO;
+import com.goodpang.dao.VendorActionLogDAO;
 import com.goodpang.dto.ProductOptionWriteDTO;
 import com.goodpang.dto.ProductWriteDTO;
 import com.goodpang.dto.SellerDTO;
@@ -61,7 +62,7 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		if (loginSeller.getZipcode() == null || loginSeller.getZipcode().isBlank()
 				|| loginSeller.getBusinessAddress() == null || loginSeller.getBusinessAddress().isBlank()) {
-			writeJson(response, 400, new Result(false, "사업자 정보에 출고지/반품지 주소가 등록되어 있지 않습니다. 판매자센터에서 사업자 정보를 먼저 등록해주세요.", 0));
+			writeJson(response, 400, new Result(false, "사업자 정보에 주소가 등록되어 있지 않습니다. 판매자센터에서 사업자 정보를 먼저 등록해주세요.", 0));
 			return;
 		}
 
@@ -81,12 +82,20 @@ public class VendorProductWriteServlet extends HttpServlet {
 				writeJson(response, 400, new Result(false, "기본 상품가격을 입력해주세요.", 0));
 				return;
 			}
+			if (dto.getShippingZipcode() == null || dto.getShippingZipcode().isBlank()
+					|| dto.getShippingAddress() == null || dto.getShippingAddress().isBlank()) {
+				writeJson(response, 400, new Result(false, "출고지 우편번호와 주소를 입력해주세요.", 0));
+				return;
+			}
 			if (dto.getOptions().isEmpty()) {
 				writeJson(response, 400, new Result(false, "옵션을 최소 1개 이상 추가해주세요.", 0));
 				return;
 			}
 
 			int productNo = productWriteDAO.insertProduct(dto);
+
+			new VendorActionLogDAO().log(loginSeller.getSellerNo(), "상품 등록", "PRODUCT", productNo, dto.getProductName());
+
 			writeJson(response, 200, new Result(true, null, productNo));
 
 		} catch (IllegalStateException e) {
@@ -127,24 +136,16 @@ public class VendorProductWriteServlet extends HttpServlet {
 		String optionYn = request.getParameter("optionYn");
 		dto.setOptionYn("N".equals(optionYn) ? "N" : "Y");
 
-		dto.setManufacturer(blankToNull(request.getParameter("manufacturer")));
-		dto.setCompositionType(request.getParameter("compositionType"));
-		dto.setCertificationType(request.getParameter("certificationType"));
-		dto.setParallelImportYn(request.getParameter("parallelImportYn"));
-		dto.setMinorPurchaseYn(request.getParameter("minorPurchaseYn"));
-		dto.setMaxPurchaseYn(request.getParameter("maxPurchaseYn"));
-		dto.setSalePeriodYn(request.getParameter("salePeriodYn"));
-		dto.setVatType(request.getParameter("vatType"));
-
 		dto.setDetailType(request.getParameter("detailType"));
 
-		// 출고지/반품지 주소록 기능이 아직 없어서, 판매자 입점 시 등록한 사업장 주소를 그대로 사용
-		dto.setShippingZipcode(loginSeller.getZipcode());
-		dto.setShippingAddress(loginSeller.getBusinessAddress());
-		dto.setShippingDetailAddress(loginSeller.getBusinessDetailAddress());
-		dto.setReturnZipcode(loginSeller.getZipcode());
-		dto.setReturnAddress(loginSeller.getBusinessAddress());
-		dto.setReturnDetailAddress(loginSeller.getBusinessDetailAddress());
+		// 출고지 주소록 기능이 아직 없어서, 등록 폼에서 입력받되 비어 있으면 사업장 주소로 대체
+		String shippingZipcode = blankToNull(request.getParameter("shippingZipcode"));
+		String shippingAddress = blankToNull(request.getParameter("shippingAddress"));
+		String shippingDetailAddress = blankToNull(request.getParameter("shippingDetailAddress"));
+
+		dto.setShippingZipcode(shippingZipcode != null ? shippingZipcode : loginSeller.getZipcode());
+		dto.setShippingAddress(shippingAddress != null ? shippingAddress : loginSeller.getBusinessAddress());
+		dto.setShippingDetailAddress(shippingDetailAddress != null ? shippingDetailAddress : loginSeller.getBusinessDetailAddress());
 
 		dto.setJejuShippingYn(request.getParameter("jejuShippingYn"));
 		dto.setDeliveryServiceCode(request.getParameter("courier"));
@@ -156,9 +157,6 @@ public class VendorProductWriteServlet extends HttpServlet {
 		dto.setLeadTimeDays(parseIntOrNull(request.getParameter("leadTimeDays")));
 		dto.setSameDayShipYn(request.getParameter("sameDayShipYn"));
 		dto.setSameDayCutoffTime(blankToNull(request.getParameter("cutoffTime")));
-
-		dto.setInitialShippingFee(parseIntOrZero(request.getParameter("initialShippingFee")));
-		dto.setReturnShippingFee(parseIntOrZero(request.getParameter("returnShippingFee")));
 
 		dto.setSaleStatus("승인 대기");
 

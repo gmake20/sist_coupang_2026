@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.io.File;   // 2026-09-03 추가 — 타일 이미지 파일이 실제로 있는지 확인하는 데 씀
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -72,6 +73,22 @@ public class CategoryServlet extends HttpServlet {
 
         CategoryProductDAO dao = new CategoryProductDAO();
 
+        /*
+         * 2026-09-03 추가 — 이 페이지가 중분류(레벨2)인지 소분류(레벨3)인지 여기서 갈린다.
+         *
+         * 쿠팡 원본도 /np/categories/502993(남녀 공용 의류)와 /np/categories/502994(티셔츠)가
+         * 같은 주소 모양을 쓰고, 중분류일 때만 제목 아래에 카테고리 타일 + 배너가 더 붙는 구조.
+         * 그래서 우리도 서블릿·JSP 를 새로 만들지 않고 레벨로만 갈라 쓴다.
+         *
+         * 없는 카테고리 번호면 current 가 null 이 되는데, 그때는 소분류처럼(타일 없이) 그린다.
+         */
+        CategoryDTO current = dao.findCategory(categoryNo);
+        boolean isMidCategory = (current != null && current.getCategoryLevel() == 2);
+        // 2026-09-03 추가 — 대분류(레벨1) 페이지 구분용. 사이드바 "카테고리"를 자식(중분류) 목록으로
+        // 보여줘야 하는 게 중분류뿐 아니라 대분류도 해당돼서 따로 뺌(아래 sidebarCategories 참고)
+        boolean isTopCategory = (current != null && current.getCategoryLevel() == 1);
+        List<CategoryDTO> childCategories = dao.findChildCategories(categoryNo);
+
         List<CategoryProductDTO> products =
                 dao.findByCategory(categoryNo, sort, minPrice, maxPrice, minRating, colors, page, listSize);
         int totalCount = dao.countByCategory(categoryNo, minPrice, maxPrice, minRating, colors);
@@ -98,15 +115,52 @@ public class CategoryServlet extends HttpServlet {
         request.setAttribute("siblingCategories", siblingCategories);
         request.setAttribute("colorOptions", colorOptions);
 
+        /*
+         * 2026-09-03 추가 — 화면 제목(h1)과 <title> 에 쓸 이름.
+         * 예전엔 JSP 가 breadcrumb[2].categoryName 으로 소분류 이름을 집어 썼는데, 브레드크럼 칸 수가
+         * 레벨마다 달라져서(중분류는 2칸) [2]번이 없어 빈칸이 됐음. 그래서 이름은 따로 내려준다.
+         */
+        request.setAttribute("categoryName", current != null ? current.getCategoryName() : "");
+        request.setAttribute("isMidCategory", isMidCategory);
+        request.setAttribute("isTopCategory", isTopCategory);   // 2026-09-03 추가
+
+        /*
+         * 왼쪽 필터 사이드바의 "카테고리" 그룹 —
+         *   대분류 페이지: 자식 목록(여성패션·남성패션 …)      ← 2026-09-03 추가, 원본도 이럼
+         *   중분류 페이지: 자식 목록(티셔츠·맨투맨/후드티 …)   ← 원본 쿠팡도 이럼
+         *   소분류 페이지: 예전 그대로 형제 목록
+         * 맨 아래 "함께 본 카테고리"는 세 경우 다 형제(siblingCategories)를 계속 쓴다 — 이것도 원본과 같음.
+         * (대분류는 findSiblingCategories() 를 NULL-세이프하게 고쳐서 "다른 대분류들"이 형제로 잡히게 함)
+         */
+        // request.setAttribute("sidebarCategories", isMidCategory ? childCategories : siblingCategories);
+        request.setAttribute("sidebarCategories", (isMidCategory || isTopCategory) ? childCategories : siblingCategories);
+
+        /*
+         * 제목 아래 원형 타일 그리드에 쓸 목록.
+         *
+         * ★ "이미지 파일이 실제로 있는 카테고리만" 넣는다.
+         *   쿠팡 원본도 남녀 공용 의류 밑에 카테고리가 12개인데 타일은 11개뿐이고(스포츠의류는 사이드바에만 있음),
+         *   우리도 원본에서 가져온 타일 이미지가 11개뿐이라 같은 모양이 된다.
+         *   나중에 스포츠의류 타일 이미지가 생기면 webapp/images/category/tile_10312.png 로 넣기만 하면
+         *   코드는 안 고쳐도 타일이 12개로 늘어난다.
+         */
+        request.setAttribute("categoryTiles", isMidCategory ? tilesWithImage(childCategories) : null);
+
+        /*
+         * 대분류(레벨1) 제목 아래 "원형 타일" 이미지(l1_tiles.png)의 10칸을 우리 DB 카테고리와 잇는다
+         * (2026-09-03 추가). 중분류 타일과 달리 이건 글자가 이미지에 박혀 있어서 칸 순서가 고정이다.
+         */
+        request.setAttribute("tileSlots", isTopCategory ? buildTileSlots(childCategories) : null);
+
         /* 실제 DB에 속성 컬럼 자체가 없는 필터들 — 화면엔 보여주되(원본과 동일 구성) 동작은 안 함(2026-08-30 확정).
          * 2026-08-31: 원본 실측(Playwright browser_evaluate, ref/category/STRUCTURE.md)한 순서 그대로 맞추려고
          * "색상 앞"/"색상 뒤" 두 그룹으로 나눔 — 원본은 카테고리→브랜드→상품상태→색상→핏→...→별점→가격 순서라
          * 색상(실제 동작)이 inert 그룹들 사이에 끼어있음. 별점/가격도 원본은 맨 끝이라 JSP에서 순서 맞춰 넣음. */
         request.setAttribute("beforeColorGroups", buildBeforeColorGroups());
         request.setAttribute("afterColorGroups", buildAfterColorGroups());
-        // "필터" 제목 바로 아래, 소제목(h3) 없이 나오는 체크박스 줄 — 2026-08-31 실측(1440px 스크린샷)한
-        // 실제 라벨 그대로("로켓럭셔리만 보기" 등은 처음에 잘못 짐작한 것, 이걸로 교체). 로켓 배지 이미지는 없어서 글자만
-        request.setAttribute("topFilterItems", new String[] { "로켓", "R.LUX만 보기", "로켓와우만 보기", "로켓직구만 보기", "C.에비뉴", "무료배송" });
+        // 2026-09-05: "필터" 제목 아래 배송 체크박스 줄(topFilterItems)은 여기서 안 내려줌 —
+        // 원본을 다시 재보니 평평한 목록이 아니라 "로켓 전체" 밑에 3줄이 들어가는 2단 구조여서,
+        // 문자열 배열로는 표현이 안 됨. DB 연동이 없는 장식용 줄이라 category_list.jsp 안에 직접 적어둠
 
         // 배송예정일 — ProductServlet(상세페이지)과 완전히 같은 계산식 재사용(2026-09-02 추가).
         // 실제 배송정보 컬럼(SHIPPING_FEE_TYPE/DELIVERY_METHOD/LEAD_TIME_DAYS)을 아직 어디서도 안 써서
@@ -114,7 +168,9 @@ public class CategoryServlet extends HttpServlet {
         // 모든 카드에 똑같이 씀. 실제 컬럼 연동되면 그때 상품별로 갈라줄 것
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         String dayOfWeek = tomorrow.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN);
-        String deliveryDate = "내일(" + dayOfWeek + ") " + tomorrow.getMonthValue() + "/" + tomorrow.getDayOfMonth();
+        // 2026-09-05 재실측: 원본은 로켓 상품일 때 날짜(M/d) 없이 "내일(목) 도착 보장" 이라고만 씀
+        // (날짜가 붙는 건 "9/5(토) 도착 예정" 처럼 로켓이 아닌 상품 쪽). "도착 보장" 글자는 JSP 에 있음
+        String deliveryDate = "내일(" + dayOfWeek + ")";
         request.setAttribute("deliveryDate", deliveryDate);
 
         request.getRequestDispatcher("/WEB-INF/views/category_list.jsp").forward(request, response);
@@ -178,5 +234,72 @@ public class CategoryServlet extends HttpServlet {
         groups.put("상하의세트 여부", new String[] { "상의", "하의", "상하의세트" });
         groups.put("스타일", new String[] { "캐주얼", "홈웨어", "오피스", "스포티" });
         return groups;
+    }
+
+    /*
+     * 타일 이미지가 실제로 있는 카테고리만 걸러낸다 (2026-09-03 추가).
+     *
+     * getRealPath() 는 "웹에서 보이는 경로(/images/...)"를 "하드디스크의 진짜 경로(C:\\...)"로 바꿔준다.
+     * 그래야 File.exists() 로 파일이 있는지 확인할 수 있다.
+     * 파일이 없는 카테고리는 타일에서 빼고, 왼쪽 사이드바 목록에는 그대로 남는다(원본과 같은 동작).
+     */
+    /*
+     * 대분류 타일 이미지(l1_tiles.png)의 10칸 순서 — 이미지에 글자가 박혀 있어서 순서를 바꿀 수 없다.
+     *   윗줄  : 여성 / 남성 / 남녀공용 / 속옷·잠옷 / 신발
+     *   아랫줄 : 가방·잡화 / 유아동 / C.에비뉴 / C.스트리트 / R.LUX
+     *
+     * 각 칸에 "우리 DB 카테고리 이름에 이 낱말이 들어 있으면 거기로 연결" 이라는 키워드만 적어둔다.
+     * 카테고리 번호를 여기 직접 적지 않는 이유: 번호는 DB 에 있는 값이라 팀에서 바뀔 수 있고,
+     * 이름으로 찾으면 카테고리가 바뀌어도 코드를 안 고쳐도 되기 때문.
+     * null 인 칸(C.에비뉴/C.스트리트)은 우리한테 해당 카테고리가 없어서 링크를 안 만든다 —
+     * 없는 페이지로 보내면 안 되니까. "신발"/"가방" 도 DB 에 없으면 자동으로 링크가 안 생긴다.
+     */
+    private static final String[] TILE_KEYWORDS = {
+            "여성", "남성", "남녀", "속옷", "신발",
+            "가방", "유아동", null, null, "럭셔리"
+    };
+
+    /*
+     * 타일 10칸 각각에 붙일 카테고리를 찾아준다 (2026-09-03 추가).
+     * 찾은 게 없으면 categoryNo 가 0 이고, JSP 는 0 이면 링크 없는 빈 칸으로 그린다.
+     * (칸 위치는 CSS 가 :nth-child 로 잡으므로 없는 칸도 자리는 그대로 둬야 함)
+     */
+    private List<Map<String, Object>> buildTileSlots(List<CategoryDTO> children) {
+        List<Map<String, Object>> slots = new ArrayList<>();
+
+        for (String keyword : TILE_KEYWORDS) {
+            Map<String, Object> slot = new LinkedHashMap<>();
+            long categoryNo = 0;
+            String categoryName = "";
+
+            if (keyword != null && children != null) {
+                for (CategoryDTO child : children) {
+                    String name = child.getCategoryName();
+                    if (name != null && name.contains(keyword)) {
+                        categoryNo = child.getCategoryNo();
+                        categoryName = name;
+                        break;
+                    }
+                }
+            }
+
+            slot.put("categoryNo", categoryNo);
+            slot.put("categoryName", categoryName);
+            slots.add(slot);
+        }
+
+        return slots;
+    }
+
+    private List<CategoryDTO> tilesWithImage(List<CategoryDTO> children) {
+        List<CategoryDTO> tiles = new ArrayList<>();
+        for (CategoryDTO child : children) {
+            String realPath = getServletContext()
+                    .getRealPath("/images/category/tile_" + child.getCategoryNo() + ".png");
+            if (realPath != null && new File(realPath).exists()) {
+                tiles.add(child);
+            }
+        }
+        return tiles;
     }
 }

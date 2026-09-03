@@ -51,8 +51,27 @@ public class VendorLoginServlet extends HttpServlet {
 			return;
 		}
 
-		// 입점심사 상태(입점 대기/심사 중/승인/반려)와 무관하게 로그인은 허용하고,
-		// 상태별 안내는 대시보드(vendor-dashboard.jsp)에서 분기 처리한다.
+		// '정지'/'탈퇴' 상태만 로그인 자체를 차단한다. 그 외 입점심사 상태(입점 대기/심사 중/승인/반려)는
+		// 로그인을 허용하고, 상태별 안내는 대시보드(vendor-dashboard.jsp)에서 분기 처리한다.
+		if ("정지".equals(seller.getApprovalStatus())) {
+
+			String reason = seller.getRejectReason();
+			request.setAttribute("error",
+					"정지된 계정입니다. 문의사항은 고객센터로 연락 주시기 바랍니다."
+					+ (reason != null && !reason.isBlank() ? " (사유: " + reason + ")" : ""));
+			request.getRequestDispatcher("/WEB-INF/views/vendor-login.jsp")
+				   .forward(request, response);
+			return;
+		}
+
+		if ("탈퇴".equals(seller.getApprovalStatus())) {
+
+			request.setAttribute("error", "탈퇴한 계정입니다.");
+			request.getRequestDispatcher("/WEB-INF/views/vendor-login.jsp")
+				   .forward(request, response);
+			return;
+		}
+
 		HttpSession session = request.getSession();
 
 		session.setAttribute("loginSeller", seller);

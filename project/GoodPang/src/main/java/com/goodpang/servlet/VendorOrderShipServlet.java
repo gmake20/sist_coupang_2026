@@ -2,6 +2,7 @@ package com.goodpang.servlet;
 
 import java.io.IOException;
 
+import com.goodpang.dao.VendorActionLogDAO;
 import com.goodpang.dao.VendorOrderListDAO;
 import com.goodpang.dao.VendorOrderListDAO.ShipResult;
 import com.goodpang.dto.SellerDTO;
@@ -47,6 +48,10 @@ public class VendorOrderShipServlet extends HttpServlet {
 		try {
 			int orderNo = Integer.parseInt(request.getParameter("orderNo"));
 			result = orderListDAO.shipOrder(orderNo, loginSeller.getSellerNo(), invoiceNo.trim());
+
+			if (result == ShipResult.SUCCESS) {
+				new VendorActionLogDAO().log(loginSeller.getSellerNo(), "배송 처리", "ORDERS", orderNo, "송장번호 " + invoiceNo.trim());
+			}
 		} catch (NumberFormatException e) {
 			// orderNo가 없거나 숫자가 아니면 아무 것도 바꾸지 않고 목록으로 돌려보낸다.
 		}

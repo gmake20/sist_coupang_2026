@@ -40,6 +40,9 @@ function setupQuantity() {
   const discountLabelEl = document.querySelector('.discount-label');   // "할인" 글자 — 2026-08-31 추가
   const originBox = document.querySelector('.price-origin');
   const originPriceEl = originBox ? originBox.querySelector('.origin-price') : null;
+  // 재고보다 많이 입력했을 때 뜨는 말풍선 — 2026-09-03 추가 (원본 쿠팡 실측 결과 반영)
+  const maxTip = document.getElementById('qtyMaxTip');
+  let tipTimer = null;
   const basePrice = priceEl ? Number(priceEl.dataset.basePrice) || 0 : 0;
   let unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
   // 2026-09-01 추가 — 정상가(취소선)의 "1개당" 값. 할인 중이 아니면 null(취소선 자체를 안 보여줌).
@@ -96,8 +99,20 @@ function setupQuantity() {
     input.value = digitsOnly;
   });
 
+  // 재고보다 많이 입력했을 때 말풍선을 잠깐 보여줌 (2초 후 자동으로 사라짐 — 원본과 같은 방식)
+  function showMaxTip() {
+    if (!maxTip) return;
+    maxTip.textContent = '선택 가능한 수량은 ' + max + '개 입니다.';
+    maxTip.classList.add('show');
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(function () {
+      maxTip.classList.remove('show');
+    }, 2000);
+  }
+
   function commit() {
     const n = Number(input.value) || MIN;      // 빈 값/0 은 MIN 으로
+    if (n > max) showMaxTip();                 // 재고보다 많이 입력했을 때만 알림
     render(Math.min(Math.max(n, MIN), max));   // 1 ~ max(재고) 범위로 보정
   }
 
@@ -397,6 +412,12 @@ function setupOptionSelect(setStock, setPrice) {
     if (!picked) return;   // 이론상 항상 찾아져야 함(모든 조합이 다 있다고 가정) — 방어코드
 
     if (optionIdInput) optionIdInput.value = picked.optionId;
+
+    // 2026-09-03 추가 — 맨 아래 "굿팡상품번호: 95 - 395" 줄이 옵션을 바꿔도 안 바뀌던 버그.
+    // 서버(/option)에 다시 물어볼 필요 없이 지금 고른 조합(picked)이 이미 optionId 를 갖고 있으므로 바로 찍음.
+    const goodpangOptionNoEl = document.getElementById('goodpangOptionNo');
+    if (goodpangOptionNoEl) goodpangOptionNoEl.textContent = picked.optionId;
+
     if (colorInput) {
       // 원래 "색상"만 담던 자리인데, 지금은 고른 값들을 다 이어붙여서 담음 (예: "M / Black")
       colorInput.value = controls.map(function (ctl) { return ctl.getValue(); }).join(' / ');
@@ -815,6 +836,151 @@ function setupDeliveryOption() {
   });
 }
 
+function refreshCartPreview() {
+
+    const preview =
+        document.getElementById(
+            "cartPreviewWrapper"
+        );
+
+    if (!preview) return;
+
+    const productOptionsData =
+        document.getElementById(
+            "productOptionsData"
+        );
+
+    const contextPath =
+        productOptionsData
+            ? productOptionsData.dataset.contextPath
+            : "";
+
+    fetch(contextPath + "/cart/preview", {
+        method: "GET",
+        headers: {
+            "X-Requested-With":
+                "XMLHttpRequest"
+        }
+    })
+    .then(function(response) {
+
+        if (!response.ok) {
+            throw new Error(
+                "장바구니 미리보기를 불러오지 못했습니다."
+            );
+        }
+
+        return response.text();
+    })
+    .then(function(html) {
+
+        preview.innerHTML = html;
+    })
+    .catch(function(error) {
+
+        console.error(error);
+    });
+}
+
+
+function setupCartAdd() {
+
+     const cartAddBtn =
+         document.getElementById("cartAddBtn");
+
+     const cartAddedPopup =
+         document.getElementById("cartAddedPopup");
+
+     const cartPopupClose =
+         document.getElementById("cartPopupClose");
+
+     if (!cartAddBtn) return;
+
+     cartAddBtn.addEventListener("click", function(e) {
+
+         e.preventDefault();
+
+         const form =
+             cartAddBtn.closest("form");
+
+         if (!form) return;
+
+         const formData =
+             new FormData(form);
+
+         const params =
+             new URLSearchParams();
+
+         formData.forEach(function(value, key) {
+             params.append(key, value);
+         });
+
+         cartAddBtn.disabled = true;
+
+         fetch(form.action, {
+             method: "POST",
+             body: params,
+             headers: {
+                 "X-Requested-With": "XMLHttpRequest"
+             }
+         })
+         .then(function(response) {
+
+             if (!response.ok) {
+                 throw new Error(
+                     "장바구니 담기에 실패했습니다."
+                 );
+             }
+
+             return response.json();
+         })
+         .then(function(data) {
+
+             if (!data.success) return;
+
+             // 팝업 표시
+             if (cartAddedPopup) {
+                 cartAddedPopup.classList.add("show");
+             }
+
+             // 헤더 장바구니 개수만 변경
+             const cartCount =
+                 document.getElementById("cartCount");
+
+             if (cartCount && data.cartCount != null) {
+                 cartCount.textContent = data.cartCount;
+             }
+			 
+			 refreshCartPreview();
+         })
+         .catch(function(error) {
+
+             console.error(error);
+
+             alert(
+                 "장바구니 담기 중 오류가 발생했습니다."
+             );
+         })
+         .finally(function() {
+
+             cartAddBtn.disabled = false;
+         });
+     });
+
+     if (cartPopupClose) {
+
+         cartPopupClose.addEventListener(
+             "click",
+             function() {
+
+                 if (cartAddedPopup) {
+                     cartAddedPopup.classList.remove("show");
+                 }
+             }
+         );
+     }
+ }
+
 
 /* ── 7. 품절 상태 ───────────────────────────────
    <body class="page-product is-soldout"> 가 붙으면 화면이 품절 모습으로 바뀜.
@@ -837,6 +1003,7 @@ setupAdSlider();
 setupOptionSelect(quantityControls.setStock, quantityControls.setPrice);
 setupReviewTools();
 setupDeliveryOption();
+setupCartAdd();
 /* ── 9. 리뷰 사진 갤러리 (2단 모달) ────────────────
    2026-08-24 추가. 원본을 Playwright 로 직접 열어서 확인한 흐름 그대로:
      ① 리뷰 사진 썸네일 클릭       → "갤러리" 모달 (사진 전체를 격자로)
@@ -919,100 +1086,7 @@ function setupReviewGallery() {
     lockScroll();
   }
   
-  const cartAddBtn =
-      document.getElementById("cartAddBtn");
-
-  const cartAddedPopup =
-      document.getElementById("cartAddedPopup");
-
-  const cartPopupClose =
-      document.getElementById("cartPopupClose");
-
-  if (cartAddBtn) {
-
-      cartAddBtn.addEventListener("click", function() {
-
-          const form =
-              cartAddBtn.closest("form");
-
-          const formData =
-              new FormData(form);
-
-          const params =
-              new URLSearchParams();
-
-          formData.forEach(function(value, key) {
-              params.append(key, value);
-          });
-
-          console.log(
-              "optionId:",
-              params.get("optionId")
-          );
-
-          console.log(
-              "quantity:",
-              params.get("quantity")
-          );
-
-          cartAddBtn.disabled = true;
-
-          fetch(form.action, {
-              method: "POST",
-              body: params,
-              headers: {
-                  "X-Requested-With":
-                      "XMLHttpRequest"
-              }
-          })
-          .then(function(response) {
-
-              if (!response.ok) {
-                  throw new Error(
-                      "장바구니 담기에 실패했습니다."
-                  );
-              }
-
-              return response.json();
-          })
-          .then(function(data) {
-
-              if (data.success) {
-                  cartAddedPopup.classList.add(
-                      "show"
-                  );
-              }
-
-          })
-          .catch(function(error) {
-
-              console.error(error);
-
-              alert(
-                  "장바구니 담기 중 오류가 발생했습니다."
-              );
-
-          })
-          .finally(function() {
-
-              cartAddBtn.disabled = false;
-          });
-      });
-  }
-
-  if (cartPopupClose) {
-
-      cartPopupClose.addEventListener(
-          "click",
-          function() {
-
-              cartAddedPopup.classList.remove(
-                  "show"
-              );
-          }
-      );
-  }
-
+ 
   /* ── ② 사진 뷰어 ── */
   function openViewer(index) {
     current = index;

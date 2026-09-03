@@ -29,18 +29,6 @@ public class VendorProductDetailDTO {
     private String internalName;
     private int productPrice;
 
-    private String manufacturer;
-    private String compositionType;
-    private String certificationType;
-    private String parallelImportYn;
-    private String minorPurchaseYn;
-    private String maxPurchaseYn;
-    private Integer maxPurchaseQty;
-    private String salePeriodYn;
-    private Date saleStartDate;
-    private Date saleEndDate;
-    private String vatType;
-
     private String detailType;
     private String productDesc;
 
@@ -57,12 +45,6 @@ public class VendorProductDetailDTO {
     private Integer leadTimeDays;
     private String sameDayShipYn;
     private String sameDayCutoffTime;
-
-    private String returnZipcode;
-    private String returnAddress;
-    private String returnDetailAddress;
-    private int initialShippingFee;
-    private int returnShippingFee;
 
     private String saleStatus;
     private String displayYn;
