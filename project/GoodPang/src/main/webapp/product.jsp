@@ -400,6 +400,8 @@
 								</button>
 							</div>
 						</div>
+						<!-- 재고 초과 입력 시 말풍선 — 2026-09-03 추가 -->
+						<div class="qty-max-tip" id="qtyMaxTip"></div>
 
 						<!-- 장바구니 -->
 						<button type="button" class="prod-cart-btn" id="cartAddBtn">
@@ -445,11 +447,15 @@
 
 					</form>
 
-					<!-- ⑦ 맨 아래 작은 글씨 색상계열, 굿팡상품번호 텍스트만 삭제, 통째로 삭제하면 배치 달라짐-->
+					<!-- ⑦ 맨 아래 작은 글씨 색상계열, 굿팡상품번호 텍스트만 삭제, 통째로 삭제하면 배치 달라짐
+					     ★ 2026-09-03: 굿팡상품번호 줄 복구 — 하드코딩 아니고 DB 값(p.productNo, mainOption.optionId).
+					       색상계열은 ProductDTO 에 컬럼이 없어서 아직 못 살림, 자리만 비워둠 -->
 					<div class="product-description">
 						<ul>
 							<li></li>
-							<li></li>
+							<!-- 2026-09-03: optionId 에 id 부여 — 옵션 바꿀 때 product.js 가 이 글자만 갱신함
+							     (옵션 변경은 페이지 새로고침 없이 ajax 로만 처리돼서, id 없이는 이 값이 처음 그대로 남아있었음) -->
+							<li>굿팡상품번호: ${p.productNo}<c:if test="${not empty mainOption}"> - <span id="goodpangOptionNo">${mainOption.optionId}</span></c:if></li>
 						</ul>
 					</div>
 
@@ -660,8 +666,7 @@
 
 			<!-- ===== 광고 캐러셀 ② 오늘의 판매자 특가 =====
 			     원본: div.personalizedGW (높이 496px) — 메인페이지에도 같은 이름의 섹션이 있음
-			     실측: 카드 225px / 사진 160x160 / 제목 가운데 + 오른쪽에 1/5
-			     ★ 메인과 다른 점: 카드마다 "N % 남음" 재고 게이지가 붙음 -->
+			     실측: 카드 225px / 사진 160x160 / 제목 가운데 + 오른쪽에 1/5 -->
 			<section class="gw-deal">
 				<div class="gw-deal__head">
 					<h2>
@@ -679,9 +684,7 @@
 								헬스 운동 기능성</span> <span class="gw-card__was">할인 <em>43%</em> <del>15,000</del></span>
 							<strong class="gw-card__price">8,550원</strong> <span
 							class="gw-card__ship">내일(목) 도착 보장</span> <span
-							class="gw-card__rating"><em class="stars">★★★★☆</em>(60)</span> <!-- 재고 게이지 — 길이가 데이터라서 인라인 style. ▶JSP: style="width:{d.left}%%" -->
-							<span class="gw-card__stock"><span class="bar"><i
-									style="width: 99%"></i></span>99 % 남음</span>
+							class="gw-card__rating"><em class="stars">★★★★☆</em>(60)</span>
 					</a></li>
 
 

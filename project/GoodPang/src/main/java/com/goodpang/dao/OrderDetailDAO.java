@@ -17,7 +17,9 @@ public class OrderDetailDAO {
      */
     public List<OrderDetailDTO> getOrderDetailList(int orderNo, int memberNo) {
         List<OrderDetailDTO> list = new ArrayList<>();
-
+        
+        // 주소창에 orderNo = 다른 사람 주문 번호 넣으면 조회 가능해서 AND o.MEMBER_NO = ? 이거 한줄 추가함 26/09/02
+        // ORDERS, ORDER_DETAIL, PRODUCT, MEMBER, ORDER_ADDRESS, PAYMENT, PRODUCT_OPTION + PRODUCT_IMAGE 조인
         String sql = """
             SELECT 
                 od.ORDER_DETAIL_NO, 
@@ -88,6 +90,7 @@ public class OrderDetailDAO {
                 ) WHERE rn = 1
             ) img ON p.PRODUCT_NO = img.PRODUCT_NO
             WHERE o.ORDER_NO = ?
+            AND o.MEMBER_NO = ?
             ORDER BY od.ORDER_DETAIL_NO ASC
             """;
 
@@ -95,6 +98,7 @@ public class OrderDetailDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, orderNo);
+            pstmt.setInt(2, memberNo); // 추가 - 다른 사람 주문번호 조회 방지
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {

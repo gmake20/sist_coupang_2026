@@ -2,6 +2,7 @@ package com.goodpang.servlet;
 
 import java.io.IOException;
 
+import com.goodpang.dao.AdminActionLogDAO;
 import com.goodpang.dao.AdminProductDAO;
 
 import jakarta.servlet.ServletException;
@@ -9,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * 상품 승인/반려 처리 (관리자 계정이 아직 없어서, 목록 화면에서 바로 처리).
@@ -38,10 +40,19 @@ public class AdminProductApprovalServlet extends HttpServlet {
 
 		AdminProductDAO dao = new AdminProductDAO();
 
+		HttpSession session = request.getSession(false);
+		Integer adminNo = (session != null) ? (Integer) session.getAttribute("adminNo") : null;
+
 		if ("approve".equals(action)) {
 			dao.updateApprovalStatus(productNo, "판매 중");
+			if (adminNo != null) {
+				new AdminActionLogDAO().log(adminNo, "상품 승인", "PRODUCT", productNo, null);
+			}
 		} else if ("reject".equals(action)) {
 			dao.updateApprovalStatus(productNo, "판매 중지");
+			if (adminNo != null) {
+				new AdminActionLogDAO().log(adminNo, "상품 반려", "PRODUCT", productNo, null);
+			}
 		}
 
 		response.sendRedirect(request.getContextPath() + "/admin/products");

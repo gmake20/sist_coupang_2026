@@ -28,6 +28,8 @@
     .badge-review { background: #e8f0fe; color: #1a56db; }
     .badge-approved { background: #e6f7ec; color: #0f7b3c; }
     .badge-rejected { background: #fdecea; color: #c0392b; }
+    .badge-suspended { background: #f3f0ff; color: #6c3ce9; }
+    .badge-withdrawn { background: #f2f2f2; color: #666; }
 
     .doc-link { display: inline-block; margin-right: 12px; padding: 8px 14px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #111; }
     .doc-link.disabled { color: #bbb; border-color: #eee; pointer-events: none; }
@@ -73,12 +75,18 @@
           <c:when test="${seller.approvalStatus == '반려'}">
             <span class="badge badge-rejected">반려</span>
           </c:when>
+          <c:when test="${seller.approvalStatus == '정지'}">
+            <span class="badge badge-suspended">정지</span>
+          </c:when>
+          <c:when test="${seller.approvalStatus == '탈퇴'}">
+            <span class="badge badge-withdrawn">탈퇴</span>
+          </c:when>
           <c:otherwise>${seller.approvalStatus}</c:otherwise>
         </c:choose>
       </dd>
 
       <c:if test="${not empty seller.rejectReason}">
-        <dt>반려 사유</dt>
+        <dt>${seller.approvalStatus == '정지' ? '정지 사유' : '반려 사유'}</dt>
         <dd>${seller.rejectReason}</dd>
       </c:if>
 
@@ -107,6 +115,29 @@
         <input class="reject-reason-input" type="text" name="rejectReason" placeholder="반려 사유를 입력해주세요">
         <button class="btn btn-reject" type="submit">반려</button>
       </form>
+
+      <c:choose>
+
+        <c:when test="${seller.approvalStatus == '정지'}">
+          <form method="post" action="${pageContext.request.contextPath}/admin/seller-approve"
+            onsubmit="return confirm('이 판매자의 정지를 해제하고 승인 상태로 되돌리시겠습니까?');">
+            <input type="hidden" name="sellerNo" value="${seller.sellerNo}">
+            <input type="hidden" name="action" value="reactivate">
+            <button class="btn btn-approve" type="submit">정지 해제</button>
+          </form>
+        </c:when>
+
+        <c:otherwise>
+          <form method="post" action="${pageContext.request.contextPath}/admin/seller-approve"
+            onsubmit="return confirm('이 판매자 계정을 정지시키겠습니까? 정지되면 로그인이 차단됩니다.');">
+            <input type="hidden" name="sellerNo" value="${seller.sellerNo}">
+            <input type="hidden" name="action" value="suspend">
+            <input class="reject-reason-input" type="text" name="suspendReason" placeholder="정지 사유를 입력해주세요">
+            <button class="btn btn-reject" type="submit">계정 정지</button>
+          </form>
+        </c:otherwise>
+
+      </c:choose>
 
     </div>
   </div>

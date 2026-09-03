@@ -15,18 +15,21 @@
   ```json
   [
     {
-    "deliveryNo": 32,
-    "orderNo": 93,
-    "deliveryServiceCode": "경동택배",
-    "invoiceNo": "111223352142314",
+    "deliveryNo": 30,
+    "orderNo": 104,
+    "deliveryServiceCode": "로젠택배",
+    "invoiceNo": "111222333444",
     "deliveryStatus": "배송중",
-    "deliveryStartDate": "Sep 1, 2026, 8:11:39 AM",
-    "buyerName": "관*자",
-    "buyerPhone": "010-1234-****",
-    "productName": "레몬소울 띠비 프린팅 반팔 티셔츠",
-    "productImageUrl": "upload/7/24aefce9-6f67-49df-b0a7-9dd6f8c210cf.png",
+    "deliveryStartDate": "Sep 1, 2026, 7:26:44 AM",
+    "buyerName": "김*수",
+    "buyerPhone": "010-1111-****",
+    "zipcode": "06035",
+    "address": "서울 강남구 가로수길 9",
+    "detailAddress": "111-11",
+    "productName": "블랙몬스터핏 남녀공용 냉감 통기성 무지 쿨론 기능성 쿨 반팔 티셔츠 3p",
+    "productImageUrl": "upload/7/240bdc0c-f965-4fb6-87a4-65be402e02eb.jpg",
     "storeName": "모던웨어",
-    "itemCount": 2
+    "itemCount": 1
     }
   ]
   ```

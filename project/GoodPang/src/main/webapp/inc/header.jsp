@@ -1,13 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-
 	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
 <link rel="stylesheet"
-  
 	href="${pageContext.request.contextPath}/css/common.css">
-	
-	
+
+
 
 <header id="header">
 
@@ -53,9 +51,7 @@
 
 			<ul class="top-bar-right">
 
-				<li><a
-
-					href="${pageContext.request.contextPath}/vendor/login">
+				<li><a href="${pageContext.request.contextPath}/vendor/login">
 
 						판매자 로그인 </a></li>
 
@@ -72,33 +68,22 @@
 						<li><a href="#">취소 / 반품 안내</a></li>
 
 					</ul></li>
-			<c:choose>
-				<c:when test="${not empty sessionScope.loginMember}">
-					<li>
-						<span>${sessionScope.loginMember.memberName}님</span>
-					</li>
+				<c:choose>
+					<c:when test="${not empty sessionScope.loginMember}">
+						<li><span>${sessionScope.loginMember.memberName}님</span></li>
 
-					<li>
-						<a href="${pageContext.request.contextPath}/logout">
-							로그아웃
-						</a>
-					</li>
-				</c:when>
-				
-				<c:otherwise>
-					<li>
-						<a href="${pageContext.request.contextPath}/signup">
-							회원가입
-						</a>
-					</li>
-					<li>
-						<a href="${pageContext.request.contextPath}/login">
-							로그인
-						</a>
-					</li>
-				</c:otherwise>
+						<li><a href="${pageContext.request.contextPath}/logout">
+								로그아웃 </a></li>
+					</c:when>
 
-			</c:choose>
+					<c:otherwise>
+						<li><a href="${pageContext.request.contextPath}/signup">
+								회원가입 </a></li>
+						<li><a href="${pageContext.request.contextPath}/login">
+								로그인 </a></li>
+					</c:otherwise>
+
+				</c:choose>
 
 			</ul>
 
@@ -679,7 +664,6 @@
 					<h1 class="logo">
 
 						<a href="${pageContext.request.contextPath}/"
-
 							class="brand-goodpang"> GoodPang </a>
 
 					</h1>
@@ -688,12 +672,11 @@
 
 					<!-- 검색 -->
 
-					<form class="search-form" action="#" method="get">
+					<form class="search-form" action="${pageContext.request.contextPath}/search" method="get">
 
 						<div class="select--category">
 
 							<a href="#" class="select--category__current"> 전체 </a> <span
-
 								class="select--category--button"></span>
 
 						</div>
@@ -704,10 +687,9 @@
 
 							<label for="search-keyword" class="blind"> 상품 검색 </label> <input
 
-								type="text" id="search-keyword" name="q" class="search-keyword"
+								type="text" id="search-keyword" name="keyword" class="search-keyword"
 
 								placeholder="찾고 싶은 상품을 검색해보세요!" maxlength="150"
-
 								autocomplete="off">
 
 
@@ -719,7 +701,6 @@
 								<div class="history-btns">
 
 									<span class="delete-all-kwdhistory del-button"> 전체삭제 </span> <span
-
 										class="history-on-off on"> 최근검색어끄기 </span>
 
 								</div>
@@ -745,9 +726,7 @@
 						<button type="submit" class="search-btn" title="검색">
 
 							<img
-
 								src="${pageContext.request.contextPath}/images/icons/search.png"
-
 								width="20" height="21" alt="검색">
 
 						</button>
@@ -769,13 +748,9 @@
 						<!-- 마이쿠팡 -->
 
 						<li class="my-coupang"><a
-
 							href="${pageContext.request.contextPath}/order/order_list"> <img
-
 								src="${pageContext.request.contextPath}/images/icons/person.png"
-
 								width="44" height="44" alt="마이쿠팡"> <span
-
 								class="icon-label"> 마이쿠팡 </span>
 
 						</a>
@@ -785,7 +760,6 @@
 							<p class="my-coupang-menu">
 
 								<span class="wrapper"> <i class="arrow"></i> <a
-
 									href="${pageContext.request.contextPath}/order/order_list">
 
 										주문목록 </a> <a href="#"> 취소/반품 </a> <a href="#"> 찜 리스트 </a>
@@ -797,43 +771,61 @@
 
 
 						<!-- 장바구니 -->
-
 						<li class="cart"><a
-
 							href="${pageContext.request.contextPath}/cart"> <img
-
 								src="${pageContext.request.contextPath}/images/icons/cart.png"
-
-								width="44" height="44" alt="장바구니">
-								
-								 <em class="cart-count">
-									${empty sessionScope.cartCount ? 0 : sessionScope.cartCount}
-									</em> <span class="icon-label"> 장바구니 </span>
-
+								width="44" height="44" alt="장바구니"> <em class="cart-count">
+									${empty sessionScope.cartCount ? 0 : sessionScope.cartCount} </em> <span
+								class="icon-label">장바구니</span>
 						</a>
 
-
-
 							<div class="cart-preview">
+								<span class="wrapper"> <i class="arrow"></i> <c:choose>
+										<c:when test="${not empty sessionScope.cartPreviewItems}">
+											<ul class="cart-preview-list">
+												<c:forEach var="item"
+													items="${sessionScope.cartPreviewItems}">
+													<li class="cart-preview-item"><a
+														href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
+															<div class="cart-preview-image">
+																<c:choose>
+																	<c:when test="${not empty item.imageUrl}">
+																		<img
+																			src="${pageContext.request.contextPath}${item.imageUrl}"
+																			alt="${item.productName}">
+																	</c:when>
+																	<c:otherwise>
+																		<span>이미지</span>
+																	</c:otherwise>
+																</c:choose>
+															</div>
 
-								<span class="wrapper"> <i class="arrow"></i>
+															<div class="cart-preview-info">
+																<p class="cart-preview-name">${item.productName}</p>
 
-									<ul>
+																<p class="cart-preview-price">
+																	<fmt:formatNumber value="${item.unitPrice}"
+																		pattern="#,###" />
+																	원
+																</p>
 
-										<li class="empty-cart">장바구니에 담은 상품이 없습니다.</li>
+																<p class="cart-preview-quantity">수량
+																	${item.quantity}개</p>
+															</div>
+													</a></li>
+												</c:forEach>
+											</ul>
+										</c:when>
 
-									</ul> <a href="${pageContext.request.contextPath}/cart"
-
-									class="cart-btn"> <span> 장바구니 전체보기 <i
-
-											class="blue-arrow"></i>
-
+										<c:otherwise>
+											<div class="cart-preview-empty">장바구니에 담은 상품이 없습니다.</div>
+										</c:otherwise>
+									</c:choose> <a href="${pageContext.request.contextPath}/cart"
+									class="cart-btn"> <span> 장바구니 전체보기 <!-- <i
+											class="blue-arrow"></i> -->
 									</span>
-
 								</a>
-
 								</span>
-
 							</div></li>
 
 					</ul>
@@ -850,14 +842,13 @@
 
 				<div class="search-row">
 
-					<form class="search-form" action="#" method="get">
+					<form class="search-form" action="${pageContext.request.contextPath}/search" method="get">
 
 
 
 						<div class="select--category">
 
 							<a href="#" class="select--category__current"> 전체 </a> <span
-
 								class="select--category--button"></span>
 
 						</div>
@@ -868,10 +859,9 @@
 
 							<label for="search-keyword-tablet" class="blind"> 상품 검색 </label>
 
-							<input type="text" id="search-keyword-tablet" name="q"
+							<input type="text" id="search-keyword-tablet" name="keyword"
 
 								class="search-keyword" placeholder="찾고 싶은 상품을 검색해보세요!"
-
 								maxlength="150" autocomplete="off">
 
 
@@ -883,7 +873,6 @@
 								<div class="history-btns">
 
 									<span class="delete-all-kwdhistory del-button"> 전체삭제 </span> <span
-
 										class="history-on-off on"> 최근검색어끄기 </span>
 
 								</div>
@@ -905,9 +894,7 @@
 						<button type="submit" class="search-btn" title="검색">
 
 							<img
-
 								src="${pageContext.request.contextPath}/images/icons/search.png"
-
 								width="20" height="21" alt="검색">
 
 						</button>
@@ -935,7 +922,6 @@
 
 
 						<button type="button" class="gnb-menu-btn gnb-menu-btn-left"
-
 							disabled>
 
 							<span class="blind"> 이전 메뉴 보기 </span>
@@ -953,9 +939,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/coupang-play.png"
-
 										alt=""> <span> 굿팡플레이 </span>
 
 								</a></li>
@@ -963,9 +947,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/rocket-delivery.png"
-
 										alt=""> <span> 로켓배송 </span>
 
 								</a></li>
@@ -973,9 +955,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/rocket-fresh.png"
-
 										alt=""> <span> 로켓프레시 </span>
 
 								</a></li>
@@ -983,11 +963,8 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/fbi_icon_3x.png"
-
 										alt=""> <span> 다시 구매 </span> <i class="in"> N <span
-
 											class="blind"> 신규 </span>
 
 									</i>
@@ -997,9 +974,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/biz.png"
-
 										alt=""> <span> 굿팡비즈 </span>
 
 								</a></li>
@@ -1007,9 +982,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/oversea-delivery.png"
-
 										alt=""> <span> 로켓직구 </span>
 
 								</a></li>
@@ -1017,9 +990,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/gold-box.png"
-
 										alt=""> <span> 골드박스 </span>
 
 								</a></li>
@@ -1027,9 +998,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/new-item-of-month.png"
-
 										alt=""> <span> 이달의 신상 </span>
 
 								</a></li>
@@ -1037,9 +1006,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/sell-on-coupang.png"
-
 										alt=""> <span> 입점신청 </span>
 
 								</a></li>
@@ -1047,9 +1014,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/omp.png"
-
 										alt=""> <span> 판매자특가 </span>
 
 								</a></li>
@@ -1057,9 +1022,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/wow.png"
-
 										alt=""> <span> 와우회원 할인 </span>
 
 								</a></li>
@@ -1067,9 +1030,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/benefit.png"
-
 										alt=""> <span> 이벤트/쿠폰 </span>
 
 								</a></li>
@@ -1077,9 +1038,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/returned-market.png"
-
 										alt=""> <span> 반품마켓 </span>
 
 								</a></li>
@@ -1087,11 +1046,8 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/sustainable-market.png"
-
 										alt=""> <span> 착한상점 </span> <i class="in"> N <span
-
 											class="blind"> 신규 </span>
 
 									</i>
@@ -1101,9 +1057,7 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/event.png"
-
 										alt=""> <span> 기획전 </span>
 
 								</a></li>
@@ -1111,11 +1065,8 @@
 
 
 								<li class="gnb-menu-item"><a href="#"> <img
-
 										src="${pageContext.request.contextPath}/images/gnb/travel.png"
-
 										alt=""> <span> 굿팡트래블 </span> <i class="in"> N <span
-
 											class="blind"> 신규 </span>
 
 									</i>
@@ -1131,7 +1082,6 @@
 
 
 						<button type="button"
-
 							class="gnb-menu-btn
 
                                        gnb-menu-btn-right

@@ -144,7 +144,7 @@
 		<a href="${pageContext.request.contextPath}/address/list" 
 		   class="${param.activeMenu eq 'address' ? 'active' : ''}">배송지 관리</a>
 		<a href="#" class="${param.activeMenu eq 'passkey' ? 'active' : ''}">패스키 관리</a>
-		<a href="#" class="${param.activeMenu eq 'leave' ? 'active' : ''}">회원 탈퇴</a>
+		<a href="${pageContext.request.contextPath}/member/withdraw" class="${param.activeMenu eq 'leave' ? 'active' : ''}">회원 탈퇴</a>
 	</div>
 
 	<!-- 고객센터 메뉴 -->

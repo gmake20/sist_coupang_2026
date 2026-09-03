@@ -16,4 +16,5 @@ public class CategoryDTO {
     private Long parentCategoryNo;
     private int categoryLevel;
     private String imgUrl;
+    private String categoryPath; // 검색 결과 자동완성 표시용 - 루트부터 이 카테고리까지 "대분류 > 중분류 > 소분류" 형태
 }

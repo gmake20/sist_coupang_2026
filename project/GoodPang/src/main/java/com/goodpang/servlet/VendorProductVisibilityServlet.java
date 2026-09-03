@@ -3,6 +3,7 @@ package com.goodpang.servlet;
 import java.io.IOException;
 
 import com.goodpang.dao.ProductListDAO;
+import com.goodpang.dao.VendorActionLogDAO;
 import com.goodpang.dto.SellerDTO;
 
 import jakarta.servlet.ServletException;
@@ -42,7 +43,11 @@ public class VendorProductVisibilityServlet extends HttpServlet {
 
 		try {
 			int productNo = Integer.parseInt(request.getParameter("productNo"));
-			productListDAO.updateDisplayYn(productNo, loginSeller.getSellerNo(), displayYn);
+
+			if (productListDAO.updateDisplayYn(productNo, loginSeller.getSellerNo(), displayYn)) {
+				String actionType = "Y".equals(displayYn) ? "상품 노출" : "상품 숨김";
+				new VendorActionLogDAO().log(loginSeller.getSellerNo(), actionType, "PRODUCT", productNo, null);
+			}
 		} catch (NumberFormatException e) {
 			// productNo가 없거나 숫자가 아니면 아무 것도 바꾸지 않고 목록으로 돌려보낸다.
 		}
