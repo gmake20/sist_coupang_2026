@@ -76,7 +76,7 @@
 						<div class="product-image">
 						    <c:choose>
 						        <c:when test="${not empty item.imageUrl}">
-						            <img src="{pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 6px;" />
+						            <img src="${pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 6px;" />
 						        </c:when>
 						      
 						    </c:choose>
@@ -204,67 +204,79 @@
 
 			</section>
 
-			<section class="detail-section payment-section">
-				<h2>결제 정보</h2>
-				<div class="section-line"></div>
+	<!-- =========================
+     결제 정보
+========================== -->
+<!-- =========================
+     결제 정보
+========================== -->
+<section class="detail-section payment-section">
+	<h2>결제 정보</h2>
+	<div class="section-line"></div>
 
-				<div class="payment-box">
+	<div class="payment-box">
 
-					<div class="payment-method">
-						<c:choose>
-							<c:when test="${orderInfo.paymentMethod eq 'CARD'}">
-								${orderInfo.cardCompanyName} / 일시불
-							</c:when>
-							<c:when test="${orderInfo.paymentMethod eq 'BANK_TRANSFER'}">
-								${orderInfo.bankName} / 계좌이체
-							</c:when>
-							<c:otherwise>
-								${orderInfo.paymentMethod}
-							</c:otherwise>
-						</c:choose>
-					</div>
-					<div class="payment-price">
-						<div class="price-row">
-							<span>총 상품가격</span> 
-							<strong> 
-								<fmt:formatNumber value="${orderInfo.totalPrice}" pattern="#,###" /> 원
-							</strong>
-						</div>
-						<div class="price-row">
-							<span>배송비</span> 
-							<strong> 
-								<fmt:formatNumber value="${orderInfo.deliveryFee}" pattern="#,###" /> 원
-							</strong>
-						</div>
-					</div>
-				</div>
-				<div class="payment-total">
-					<div>
-						<c:choose>
-							<c:when test="${orderInfo.paymentMethod eq 'CARD'}">
-								${orderInfo.cardCompanyName} / 일시불
-							</c:when>
-							<c:when test="${orderInfo.paymentMethod eq 'BANK_TRANSFER'}">
-								${orderInfo.bankName} / 계좌이체
-							</c:when>
-							<c:otherwise>
-								${orderInfo.paymentMethod}
-							</c:otherwise>
-						</c:choose>
-					</div>
+		<div class="payment-method">
+			<c:choose>
+				<%-- 1. 카드 결제 시: 카드사명 / 일시불 (예: 우리카드 / 일시불) --%>
+				<c:when test="${not empty orderInfo.cardCompanyName}">
+					${orderInfo.cardCompanyName} / 일시불
+				</c:when>
+				
+				<%-- 2. 계좌이체 결제 시: 은행명 / 계좌이체 (예: 우리은행 / 계좌이체) --%>
+				<c:when test="${not empty orderInfo.bankName}">
+					${orderInfo.bankName} / 계좌이체
+				</c:when>
+				
+				<%-- 3. 그 외 결제 방식 --%>
+				<c:otherwise>
+					${orderInfo.paymentMethod}
+				</c:otherwise>
+			</c:choose>
+		</div>
 
-					<div>
-						<span>총 결제금액</span> 
-						<strong> 
-							<fmt:formatNumber value="${orderInfo.totalPrice + orderInfo.deliveryFee}" pattern="#,###" /> 원
-						</strong>
-					</div>
+		<div class="payment-price">
+			<div class="price-row">
+				<span>총 상품가격</span> 
+				<strong> 
+					<fmt:formatNumber value="${orderInfo.totalPrice}" pattern="#,###" /> 원
+				</strong>
+			</div>
+			<div class="price-row">
+				<span>배송비</span> 
+				<strong> 
+					<fmt:formatNumber value="${orderInfo.deliveryFee}" pattern="#,###" /> 원
+				</strong>
+			</div>
+		</div>
 
-				</div>
+	</div>
 
-			</section>
+	<div class="payment-total">
+		<div>
+			<c:choose>
+				<c:when test="${not empty orderInfo.cardCompanyName}">
+					${orderInfo.cardCompanyName} / 일시불
+				</c:when>
+				<c:when test="${not empty orderInfo.bankName}">
+					${orderInfo.bankName} / 계좌이체
+				</c:when>
+				<c:otherwise>
+					${orderInfo.paymentMethod}
+				</c:otherwise>
+			</c:choose>
+		</div>
 
+		<div>
+			<span>총 결제금액</span> 
+			<strong> 
+				<fmt:formatNumber value="${orderInfo.totalPrice + orderInfo.deliveryFee}" pattern="#,###" /> 원
+			</strong>
+		</div>
 
+	</div>
+
+</section>
 			<!-- =========================
              결제영수증 정보
         ========================== -->
