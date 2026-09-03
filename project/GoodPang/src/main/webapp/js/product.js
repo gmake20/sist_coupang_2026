@@ -40,6 +40,9 @@ function setupQuantity() {
   const discountLabelEl = document.querySelector('.discount-label');   // "할인" 글자 — 2026-08-31 추가
   const originBox = document.querySelector('.price-origin');
   const originPriceEl = originBox ? originBox.querySelector('.origin-price') : null;
+  // 재고보다 많이 입력했을 때 뜨는 말풍선 — 2026-09-03 추가 (원본 쿠팡 실측 결과 반영)
+  const maxTip = document.getElementById('qtyMaxTip');
+  let tipTimer = null;
   const basePrice = priceEl ? Number(priceEl.dataset.basePrice) || 0 : 0;
   let unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
   // 2026-09-01 추가 — 정상가(취소선)의 "1개당" 값. 할인 중이 아니면 null(취소선 자체를 안 보여줌).
@@ -96,8 +99,20 @@ function setupQuantity() {
     input.value = digitsOnly;
   });
 
+  // 재고보다 많이 입력했을 때 말풍선을 잠깐 보여줌 (2초 후 자동으로 사라짐 — 원본과 같은 방식)
+  function showMaxTip() {
+    if (!maxTip) return;
+    maxTip.textContent = '선택 가능한 수량은 ' + max + '개 입니다.';
+    maxTip.classList.add('show');
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(function () {
+      maxTip.classList.remove('show');
+    }, 2000);
+  }
+
   function commit() {
     const n = Number(input.value) || MIN;      // 빈 값/0 은 MIN 으로
+    if (n > max) showMaxTip();                 // 재고보다 많이 입력했을 때만 알림
     render(Math.min(Math.max(n, MIN), max));   // 1 ~ max(재고) 범위로 보정
   }
 
