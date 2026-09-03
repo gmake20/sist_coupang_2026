@@ -302,106 +302,6 @@
 
 
 
-          <!-- 상품정보제공고시 -->
-          <section class="panel form-block">
-            <div class="block-head">
-              <h2>상품정보제공고시 <span class="required-dot">•</span> <a href="#" class="help-link">도움말</a></h2>
-              <button class="collapse-toggle" type="button" data-target="noticeBlockBody">
-                <svg class="icon chevron">
-                  <use href="#ic-chevron-down" />
-                </svg>
-              </button>
-            </div>
-            <div class="block-body" id="noticeBlockBody">
-
-              <p class="warning-text">⚠ 이 항목은 아직 서버에 저장되지 않습니다. 입력하셔도 상품 등록 시 반영되지 않으니 참고해주세요.</p>
-
-              <div class="notice-select-row">
-                <select class="input select" id="noticeTypeSelect">
-                  <option value="">선택하세요</option>
-                  <option value="fashion">의류</option>
-                  <option value="kitchen">주방용품</option>
-                  <option value="food">가공식품</option>
-                  <option value="cosmetic">화장품</option>
-                </select>
-                <label class="checkbox-item">
-                  <input type="checkbox" id="noticeReferAllCheck">
-                  전체 상품 상세페이지 참조
-                </label>
-              </div>
-
-              <div class="info-box">
-                각 카테고리에 해당하는 상품 고시정보를 선택하여 입력해주세요.<br>
-                ※ 판매 상품에 여러 구성품이 포함되어 있는 경우 모든 구성품에 대해 '상품정보제공고시'를 상품 상세페이지에 제공해주세요.
-                <a href="#">자세히보기</a>
-              </div>
-
-              <table class="notice-table">
-                <thead>
-                  <tr>
-                    <th>고시정보명</th>
-                    <th>내용</th>
-                    <th class="col-refer">상품 상세페이지 참조</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>제품 소재</td>
-                    <td><textarea class="input textarea"
-                        placeholder="섬유의 조성 또는 혼용율을 백분율로 표시, 충전재를 사용한 제품은 충전재를 함께 표기&#10;예) 면 50%, 폴리에스터 50% (혼용율 100%가 되도록 기재)"></textarea>
-                    </td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>색상</td>
-                    <td><textarea class="input textarea" placeholder="직접 입력해주세요"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>치수</td>
-                    <td><textarea class="input textarea"
-                        placeholder="예) 이불 : 400x2000mm / 패드 : 400x2200mm (mm, cm 단위로 기재해주세요)"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>제품구성</td>
-                    <td><textarea class="input textarea" placeholder="예) 이불 + 패드"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>제조자(수입자)</td>
-                    <td><textarea class="input textarea" placeholder="예) CPLB/쿠팡 (수입상품의 경우 수입자도 함께 기재해주세요)"></textarea>
-                    </td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>제조국</td>
-                    <td><textarea class="input textarea" placeholder="한글로 기재해주세요 (2개 이상의 국가일 경우 모두 기재해주세요)"></textarea>
-                    </td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>세탁방법 및 취급시 주의사항</td>
-                    <td><textarea class="input textarea" placeholder="예) 손세탁, 드라이클리닝 등"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>품질보증기준</td>
-                    <td><textarea class="input textarea" placeholder="예) 관련 법령 및 소비자분쟁해결기준에 따름"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>A/S 책임자와 전화번호</td>
-                    <td><textarea class="input textarea" placeholder="예) 판매자 고객센터 1600-0000"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                </tbody>
-              </table>
-
-            </div>
-          </section>
-
-
           <!-- 구비서류 -->
           <section class="panel form-block collapsed" id="docsBlock">
             <div class="block-head">
@@ -538,48 +438,6 @@
                     <option>18:00</option>
                   </select>
                   <p class="side-note">당일출고가 지켜지지 않는 경우, 판매자 점수 하락 등 페널티가 발생할 수 있습니다.</p>
-                </div>
-              </div>
-
-            </div>
-          </section>
-
-
-          <!-- 반품/교환 -->
-          <section class="panel form-block">
-            <div class="block-head">
-              <h2>반품/교환 <span class="required-dot">•</span> <a href="#" class="help-link">도움말</a></h2>
-            </div>
-            <div class="block-body">
-
-              <div class="field-row">
-                <label class="field-label">반품/교환지 <span class="required-dot">•</span></label>
-                <div class="field-control">
-                  <button class="address-box" type="button">주소록에서 반품/교환지를 선택해주세요 &gt;</button>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">초도배송비(편도) <span class="required-dot">•</span></label>
-                <div class="field-control">
-                  <div class="unit-input">
-                    <input class="input" id="initialShippingFee" type="number" value="3000">
-                    <span>원</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">반품배송비(편도) <span class="required-dot">•</span></label>
-                <div class="field-control">
-                  <div class="unit-input">
-                    <input class="input" id="returnShippingFee" type="number" value="3000">
-                    <span>원</span>
-                  </div>
-                  <p class="side-note">
-                    고객사유로 인한 반품 시, 왕복 반품/배송비는 초도배송비 + 반품배송비의 합계인
-                    <strong id="totalReturnFee">6,000</strong>원이 청구됩니다.
-                  </p>
                 </div>
               </div>
 
@@ -1278,46 +1136,12 @@
 
 
       /* =========================================================
-         상품정보제공고시 — 참조 체크 시 textarea 비활성화
-      ========================================================= */
-
-      document.querySelectorAll(".notice-refer").forEach(function (checkbox) {
-        checkbox.addEventListener("change", function () {
-          const textarea = checkbox.closest("tr").querySelector("textarea");
-          textarea.disabled = checkbox.checked;
-        });
-      });
-
-      document.getElementById("noticeReferAllCheck").addEventListener("change", function () {
-        const checked = this.checked;
-        document.querySelectorAll(".notice-refer").forEach(function (checkbox) {
-          checkbox.checked = checked;
-          checkbox.dispatchEvent(new Event("change"));
-        });
-      });
-
-
-      /* =========================================================
          배송 — 출고 소요일 / 당일출고
       ========================================================= */
 
       document.getElementById("sameDayShipCheck").addEventListener("change", function () {
         document.getElementById("sameDayCutoffRow").hidden = !this.checked;
       });
-
-
-      /* =========================================================
-         반품/교환 — 왕복 배송비 자동 계산
-      ========================================================= */
-
-      function updateTotalReturnFee() {
-        const initial = Number(document.getElementById("initialShippingFee").value) || 0;
-        const returnFee = Number(document.getElementById("returnShippingFee").value) || 0;
-        document.getElementById("totalReturnFee").textContent = (initial + returnFee).toLocaleString();
-      }
-
-      document.getElementById("initialShippingFee").addEventListener("input", updateTotalReturnFee);
-      document.getElementById("returnShippingFee").addEventListener("input", updateTotalReturnFee);
 
 
       /* =========================================================
@@ -1555,9 +1379,6 @@
         const sameDayShipYn = document.getElementById("sameDayShipCheck").checked ? "Y" : "N";
         formData.append("sameDayShipYn", sameDayShipYn);
         formData.append("cutoffTime", sameDayShipYn === "Y" ? document.getElementById("cutoffTimeSelect").value : "");
-
-        formData.append("initialShippingFee", document.getElementById("initialShippingFee").value);
-        formData.append("returnShippingFee", document.getElementById("returnShippingFee").value);
 
         formData.append("optionYn", optionMode === "off" ? "N" : "Y");
         formData.append("optionCount", rows.length);

@@ -225,7 +225,7 @@
 
 
       <section class="panel detail-section">
-        <h2>배송 / 반품 정보</h2>
+        <h2>배송 정보</h2>
         <dl class="detail-grid">
           <dt>출고지</dt>
           <dd>(${product.shippingZipcode}) ${product.shippingAddress} ${product.shippingDetailAddress}</dd>
@@ -260,14 +260,6 @@
             <c:if test="${product.sameDayShipYn == 'Y' && not empty product.sameDayCutoffTime}"> (마감 ${product.sameDayCutoffTime})</c:if>
           </dd>
 
-          <dt>반품/교환지</dt>
-          <dd>(${product.returnZipcode}) ${product.returnAddress} ${product.returnDetailAddress}</dd>
-
-          <dt>초도배송비</dt>
-          <dd><fmt:formatNumber value="${product.initialShippingFee}" pattern="#,##0" />원</dd>
-
-          <dt>반품배송비</dt>
-          <dd><fmt:formatNumber value="${product.returnShippingFee}" pattern="#,##0" />원</dd>
         </dl>
       </section>
 
