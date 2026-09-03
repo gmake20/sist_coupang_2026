@@ -271,217 +271,6 @@
           </section>
 
 
-          <!-- 상품 주요 정보 -->
-          <section class="panel form-block">
-            <div class="block-head">
-              <h2>상품 주요 정보 <span class="required-dot">•</span> <a href="#" class="help-link">도움말</a></h2>
-            </div>
-            <div class="block-body">
-
-              <div class="field-row">
-                <label class="field-label">제조사</label>
-                <div class="field-control">
-                  <input class="input" id="manufacturerInput" type="text" placeholder="제조사를 알 수 없는 경우 브랜드명을 입력해주세요.">
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">상품 구성 <span class="required-dot">•</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="productComposition" value="동일한 상품으로 구성됨" checked>동일한 상품으로 구성됨 <span
-                      class="help-q">?</span></label>
-                  <label class="radio-item"><input type="radio" name="productComposition" value="다양한 상품이 혼합되어 구성됨">다양한 상품이 혼합되어 구성됨 <span
-                      class="help-q">?</span></label>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">인증정보 <span class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="certification" value="인증·신고 대상">인증·신고 대상</label>
-                  <label class="radio-item"><input type="radio" name="certification" value="상세페이지 별도표기">상세페이지 별도표기</label>
-                  <label class="radio-item"><input type="radio" name="certification" value="인증·신고 대상 아님" checked>인증·신고 대상 아님</label>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">병행수입 <span class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="parallelImport" value="Y">병행수입</label>
-                  <label class="radio-item"><input type="radio" name="parallelImport" value="N" checked>병행수입 아님</label>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">미성년자 구매 <span class="required-dot">•</span> <span
-                    class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="minorPurchase" value="Y" checked>가능</label>
-                  <label class="radio-item"><input type="radio" name="minorPurchase" value="N">불가능</label>
-                  <p class="warning-text">
-                    ⚠ 상품 등록 후에는 미성년자 구매 '가능'으로 변경할 수 없습니다. 실수로 '불가능'을 선택하신 경우, 상품을 새로 등록해 주세요.
-                  </p>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">인당 최대구매수량 <span class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="maxPurchase" value="Y">설정함</label>
-                  <label class="radio-item"><input type="radio" name="maxPurchase" value="N" checked>설정안함</label>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">판매기간 <span class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="salePeriod" value="Y">설정함</label>
-                  <label class="radio-item"><input type="radio" name="salePeriod" value="N" checked>설정안함</label>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">부가세 <span class="required-dot">•</span> <span class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="vat" value="과세" checked>과세</label>
-                  <label class="radio-item"><input type="radio" name="vat" value="면세">면세</label>
-                </div>
-              </div>
-
-            </div>
-          </section>
-
-
-          <!-- 검색어 -->
-          <section class="panel form-block">
-            <div class="block-head">
-              <h2>검색어 <a href="#" class="help-link">도움말</a></h2>
-              <button class="collapse-toggle" type="button" data-target="tagBlockBody">
-                <svg class="icon chevron">
-                  <use href="#ic-chevron-down" />
-                </svg>
-              </button>
-            </div>
-            <div class="block-body" id="tagBlockBody">
-
-              <p class="warning-text">⚠ 이 항목은 아직 서버에 저장되지 않습니다. 입력하셔도 상품 등록 시 반영되지 않으니 참고해주세요.</p>
-
-              <div class="field-row">
-                <label class="field-label">태그</label>
-                <div class="field-control">
-                  <div class="option-add-row">
-                    <input class="input" id="tagInput" type="text" placeholder="쉼표(,)로 구분하여 최대 20개까지 입력 가능">
-                    <button class="btn btn-primary" type="button" id="tagAddButton">추가</button>
-                  </div>
-                  <div class="chip-list" id="tagChipList"></div>
-                  <p class="hint">검색어는 고객이 내 상품을 빠르게 찾을 수 있게 합니다. 상품과 관계없는 검색어는 삭제/변경 될 수 있습니다.</p>
-                </div>
-              </div>
-
-            </div>
-          </section>
-
-
-
-          <!-- 상품정보제공고시 -->
-          <section class="panel form-block">
-            <div class="block-head">
-              <h2>상품정보제공고시 <span class="required-dot">•</span> <a href="#" class="help-link">도움말</a></h2>
-              <button class="collapse-toggle" type="button" data-target="noticeBlockBody">
-                <svg class="icon chevron">
-                  <use href="#ic-chevron-down" />
-                </svg>
-              </button>
-            </div>
-            <div class="block-body" id="noticeBlockBody">
-
-              <p class="warning-text">⚠ 이 항목은 아직 서버에 저장되지 않습니다. 입력하셔도 상품 등록 시 반영되지 않으니 참고해주세요.</p>
-
-              <div class="notice-select-row">
-                <select class="input select" id="noticeTypeSelect">
-                  <option value="">선택하세요</option>
-                  <option value="fashion">의류</option>
-                  <option value="kitchen">주방용품</option>
-                  <option value="food">가공식품</option>
-                  <option value="cosmetic">화장품</option>
-                </select>
-                <label class="checkbox-item">
-                  <input type="checkbox" id="noticeReferAllCheck">
-                  전체 상품 상세페이지 참조
-                </label>
-              </div>
-
-              <div class="info-box">
-                각 카테고리에 해당하는 상품 고시정보를 선택하여 입력해주세요.<br>
-                ※ 판매 상품에 여러 구성품이 포함되어 있는 경우 모든 구성품에 대해 '상품정보제공고시'를 상품 상세페이지에 제공해주세요.
-                <a href="#">자세히보기</a>
-              </div>
-
-              <table class="notice-table">
-                <thead>
-                  <tr>
-                    <th>고시정보명</th>
-                    <th>내용</th>
-                    <th class="col-refer">상품 상세페이지 참조</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>제품 소재</td>
-                    <td><textarea class="input textarea"
-                        placeholder="섬유의 조성 또는 혼용율을 백분율로 표시, 충전재를 사용한 제품은 충전재를 함께 표기&#10;예) 면 50%, 폴리에스터 50% (혼용율 100%가 되도록 기재)"></textarea>
-                    </td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>색상</td>
-                    <td><textarea class="input textarea" placeholder="직접 입력해주세요"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>치수</td>
-                    <td><textarea class="input textarea"
-                        placeholder="예) 이불 : 400x2000mm / 패드 : 400x2200mm (mm, cm 단위로 기재해주세요)"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>제품구성</td>
-                    <td><textarea class="input textarea" placeholder="예) 이불 + 패드"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>제조자(수입자)</td>
-                    <td><textarea class="input textarea" placeholder="예) CPLB/쿠팡 (수입상품의 경우 수입자도 함께 기재해주세요)"></textarea>
-                    </td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>제조국</td>
-                    <td><textarea class="input textarea" placeholder="한글로 기재해주세요 (2개 이상의 국가일 경우 모두 기재해주세요)"></textarea>
-                    </td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>세탁방법 및 취급시 주의사항</td>
-                    <td><textarea class="input textarea" placeholder="예) 손세탁, 드라이클리닝 등"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>품질보증기준</td>
-                    <td><textarea class="input textarea" placeholder="예) 관련 법령 및 소비자분쟁해결기준에 따름"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                  <tr>
-                    <td>A/S 책임자와 전화번호</td>
-                    <td><textarea class="input textarea" placeholder="예) 판매자 고객센터 1600-0000"></textarea></td>
-                    <td class="col-refer"><input type="checkbox" class="notice-refer"></td>
-                  </tr>
-                </tbody>
-              </table>
-
-            </div>
-          </section>
-
 
           <!-- 구비서류 -->
           <section class="panel form-block collapsed" id="docsBlock">
@@ -512,9 +301,27 @@
             <div class="block-body" id="shippingBlockBody">
 
               <div class="field-row">
-                <label class="field-label">출고지 <span class="required-dot">•</span></label>
+                <label class="field-label">출고지 우편번호 <span class="required-dot">•</span></label>
                 <div class="field-control">
-                  <button class="address-box" type="button">주소록에서 출고지를 선택해주세요 &gt;</button>
+                  <input class="input" id="shippingZipcodeInput" type="text" placeholder="우편번호"
+                         value="${sessionScope.loginSeller.zipcode}">
+                </div>
+              </div>
+
+              <div class="field-row">
+                <label class="field-label">출고지 주소 <span class="required-dot">•</span></label>
+                <div class="field-control">
+                  <input class="input" id="shippingAddressInput" type="text" placeholder="기본주소"
+                         value="${sessionScope.loginSeller.businessAddress}">
+                </div>
+              </div>
+
+              <div class="field-row">
+                <label class="field-label">출고지 상세주소</label>
+                <div class="field-control">
+                  <input class="input" id="shippingDetailAddressInput" type="text" placeholder="상세주소"
+                         value="${sessionScope.loginSeller.businessDetailAddress}">
+                  <p class="side-note">기본값은 사업자 정보에 등록된 사업장 주소이며, 이 상품만 다른 출고지를 쓰려면 직접 수정해주세요.</p>
                 </div>
               </div>
 
@@ -619,48 +426,6 @@
                     <option>18:00</option>
                   </select>
                   <p class="side-note">당일출고가 지켜지지 않는 경우, 판매자 점수 하락 등 페널티가 발생할 수 있습니다.</p>
-                </div>
-              </div>
-
-            </div>
-          </section>
-
-
-          <!-- 반품/교환 -->
-          <section class="panel form-block">
-            <div class="block-head">
-              <h2>반품/교환 <span class="required-dot">•</span> <a href="#" class="help-link">도움말</a></h2>
-            </div>
-            <div class="block-body">
-
-              <div class="field-row">
-                <label class="field-label">반품/교환지 <span class="required-dot">•</span></label>
-                <div class="field-control">
-                  <button class="address-box" type="button">주소록에서 반품/교환지를 선택해주세요 &gt;</button>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">초도배송비(편도) <span class="required-dot">•</span></label>
-                <div class="field-control">
-                  <div class="unit-input">
-                    <input class="input" id="initialShippingFee" type="number" value="3000">
-                    <span>원</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">반품배송비(편도) <span class="required-dot">•</span></label>
-                <div class="field-control">
-                  <div class="unit-input">
-                    <input class="input" id="returnShippingFee" type="number" value="3000">
-                    <span>원</span>
-                  </div>
-                  <p class="side-note">
-                    고객사유로 인한 반품 시, 왕복 반품/배송비는 초도배송비 + 반품배송비의 합계인
-                    <strong id="totalReturnFee">6,000</strong>원이 청구됩니다.
-                  </p>
                 </div>
               </div>
 
@@ -1335,70 +1100,12 @@
 
 
       /* =========================================================
-         검색어 태그
-      ========================================================= */
-
-      const tagValues = [];
-
-      function handleTagRemove(index) {
-        tagValues.splice(index, 1);
-        renderChips(document.getElementById("tagChipList"), tagValues, handleTagRemove);
-      }
-
-      document.getElementById("tagAddButton").addEventListener("click", function () {
-        const input = document.getElementById("tagInput");
-        const rawValues = input.value.split(",").map((value) => value.trim()).filter(Boolean);
-
-        rawValues.forEach(function (value) {
-          if (tagValues.length < 20 && !tagValues.includes(value)) tagValues.push(value);
-        });
-
-        input.value = "";
-        renderChips(document.getElementById("tagChipList"), tagValues, handleTagRemove);
-      });
-
-
-      /* =========================================================
-         상품정보제공고시 — 참조 체크 시 textarea 비활성화
-      ========================================================= */
-
-      document.querySelectorAll(".notice-refer").forEach(function (checkbox) {
-        checkbox.addEventListener("change", function () {
-          const textarea = checkbox.closest("tr").querySelector("textarea");
-          textarea.disabled = checkbox.checked;
-        });
-      });
-
-      document.getElementById("noticeReferAllCheck").addEventListener("change", function () {
-        const checked = this.checked;
-        document.querySelectorAll(".notice-refer").forEach(function (checkbox) {
-          checkbox.checked = checked;
-          checkbox.dispatchEvent(new Event("change"));
-        });
-      });
-
-
-      /* =========================================================
          배송 — 출고 소요일 / 당일출고
       ========================================================= */
 
       document.getElementById("sameDayShipCheck").addEventListener("change", function () {
         document.getElementById("sameDayCutoffRow").hidden = !this.checked;
       });
-
-
-      /* =========================================================
-         반품/교환 — 왕복 배송비 자동 계산
-      ========================================================= */
-
-      function updateTotalReturnFee() {
-        const initial = Number(document.getElementById("initialShippingFee").value) || 0;
-        const returnFee = Number(document.getElementById("returnShippingFee").value) || 0;
-        document.getElementById("totalReturnFee").textContent = (initial + returnFee).toLocaleString();
-      }
-
-      document.getElementById("initialShippingFee").addEventListener("input", updateTotalReturnFee);
-      document.getElementById("returnShippingFee").addEventListener("input", updateTotalReturnFee);
 
 
       /* =========================================================
@@ -1569,6 +1276,12 @@
           return false;
         }
 
+        if (!document.getElementById("shippingZipcodeInput").value.trim()
+            || !document.getElementById("shippingAddressInput").value.trim()) {
+          alert("출고지 우편번호와 주소를 입력해주세요.");
+          return false;
+        }
+
         if (optionMode === "on" && optionGroups.some((group) => group.values.length > 0 && !group.name.trim())) {
           alert("옵션명을 입력해주세요.");
           return false;
@@ -1613,14 +1326,6 @@
         formData.append("categoryNo", selectedCategoryNo);
         formData.append("productPrice", basePriceInput.value.trim());
 
-        formData.append("manufacturer", document.getElementById("manufacturerInput").value.trim());
-        formData.append("compositionType", document.querySelector('input[name="productComposition"]:checked').value);
-        formData.append("certificationType", document.querySelector('input[name="certification"]:checked').value);
-        formData.append("parallelImportYn", document.querySelector('input[name="parallelImport"]:checked').value);
-        formData.append("minorPurchaseYn", document.querySelector('input[name="minorPurchase"]:checked').value);
-        formData.append("maxPurchaseYn", document.querySelector('input[name="maxPurchase"]:checked').value);
-        formData.append("salePeriodYn", document.querySelector('input[name="salePeriod"]:checked').value);
-        formData.append("vatType", document.querySelector('input[name="vat"]:checked').value);
 
         const detailTypeMap = { image: "이미지 업로드", editor: "에디터 작성", html: "HTML 작성" };
         const activeDescType = document.querySelector("#descTypeTabs .tab-btn.active").dataset.type;
@@ -1633,6 +1338,9 @@
           });
         }
 
+        formData.append("shippingZipcode", document.getElementById("shippingZipcodeInput").value.trim());
+        formData.append("shippingAddress", document.getElementById("shippingAddressInput").value.trim());
+        formData.append("shippingDetailAddress", document.getElementById("shippingDetailAddressInput").value.trim());
         formData.append("jejuShippingYn", document.querySelector('input[name="jejuShipping"]:checked').value);
         formData.append("courier", document.getElementById("courierSelect").value);
         formData.append("deliveryMethod", document.getElementById("deliveryMethodSelect").value);
@@ -1644,9 +1352,6 @@
         const sameDayShipYn = document.getElementById("sameDayShipCheck").checked ? "Y" : "N";
         formData.append("sameDayShipYn", sameDayShipYn);
         formData.append("cutoffTime", sameDayShipYn === "Y" ? document.getElementById("cutoffTimeSelect").value : "");
-
-        formData.append("initialShippingFee", document.getElementById("initialShippingFee").value);
-        formData.append("returnShippingFee", document.getElementById("returnShippingFee").value);
 
         formData.append("optionYn", optionMode === "off" ? "N" : "Y");
         formData.append("optionCount", rows.length);

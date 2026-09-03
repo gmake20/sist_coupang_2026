@@ -51,7 +51,11 @@ function renderCategoryMenu(data) {
 		 return '<li><a href="/category?categoryNo=' + main.categoryNo + '">' + iconHtml + escapeCategoryHtml(main.categoryName) + '</a></li>';
     }
 
-    return '<li><a href="#">' + iconHtml + escapeCategoryHtml(main.categoryName) + '<i class="si"></i></a>'
+    // 2026-09-03: 대분류(레벨1) 페이지가 생겨서 실제 이동이 가능해짐 — 예전엔 미완성 페이지로
+    // 못 가게 일부러 href="#" 로 막아뒀었음(CLAUDE.md 4장 참고). 패널이 열리는 건 CSS :hover
+    // (common.css:1239)라서 href 값과 무관 — 여기 바꿔도 호버 동작엔 영향 없음
+    // return '<li><a href="#">' + iconHtml + escapeCategoryHtml(main.categoryName) + '<i class="si"></i></a>'
+    return '<li><a href="/category?categoryNo=' + main.categoryNo + '">' + iconHtml + escapeCategoryHtml(main.categoryName) + '<i class="si"></i></a>'
       + renderMidPanel(children, subList, main.imgUrl)
       + '</li>';
   }).join('');
@@ -452,15 +456,21 @@ function setupSearchAutocomplete(box) {
   const form = box.closest('form');
   if (form) {
     form.addEventListener('submit', function (e) {
-      e.preventDefault();          // 아직 검색 결과 페이지가 없으므로 이동은 막음
       const word = input.value.trim();
-      if (word && !isHistoryOff()) {
+
+      if (!word) {
+        e.preventDefault();   // 빈 검색어로는 이동하지 않음
+        return;
+      }
+
+      if (!isHistoryOff()) {
         let list = loadHistory();
         list = list.filter(function (w) { return w !== word; });   // 중복 제거
         list.unshift(word);                                        // 맨 앞에 넣기
         saveHistory(list.slice(0, 10));                            // 최대 10개
       }
       close();
+      // preventDefault 하지 않음 — /search?keyword=... 로 실제 이동
     });
   }
 

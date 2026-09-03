@@ -672,7 +672,7 @@
 
 					<!-- 검색 -->
 
-					<form class="search-form" action="#" method="get">
+					<form class="search-form" action="${pageContext.request.contextPath}/search" method="get">
 
 						<div class="select--category">
 
@@ -686,7 +686,9 @@
 						<div class="header-search">
 
 							<label for="search-keyword" class="blind"> 상품 검색 </label> <input
-								type="text" id="search-keyword" name="q" class="search-keyword"
+
+								type="text" id="search-keyword" name="keyword" class="search-keyword"
+
 								placeholder="찾고 싶은 상품을 검색해보세요!" maxlength="150"
 								autocomplete="off">
 
@@ -840,7 +842,7 @@
 
 				<div class="search-row">
 
-					<form class="search-form" action="#" method="get">
+					<form class="search-form" action="${pageContext.request.contextPath}/search" method="get">
 
 
 
@@ -857,7 +859,8 @@
 
 							<label for="search-keyword-tablet" class="blind"> 상품 검색 </label>
 
-							<input type="text" id="search-keyword-tablet" name="q"
+							<input type="text" id="search-keyword-tablet" name="keyword"
+
 								class="search-keyword" placeholder="찾고 싶은 상품을 검색해보세요!"
 								maxlength="150" autocomplete="off">
 

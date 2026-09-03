@@ -1900,10 +1900,8 @@
 /* ------------------------------------------------------------------
    ⏸ 보류 — 2026-08-20 사용자 판단으로 뺌 (이미지는 남겨둠, 나중에 다시)
 
-   1) 카테고리 패널 오른쪽 배너  → 그냥 "배너 영역" 회색 상자로 둠
-      images/banners/gnb-banner.jpg  (590x413) 는 그대로 있음
-   2) 푸터 SNS 3개               → 그냥 컬러 동그라미로 둠
-      images/icons/sns-facebook.png / sns-blog.png / sns-instagram.png 는 그대로 있음
+   카테고리 패널 오른쪽 배너 → 그냥 "배너 영역" 회색 상자로 둠
+   images/banners/gnb-banner.jpg (590x413) 는 그대로 있음
 
    다시 켜려면 아래 주석을 풀면 됨:
 
@@ -1912,16 +1910,10 @@
   background: #fff url(../images/banners/gnb-banner.jpg) no-repeat center / cover;
   border-left: 0;
 }
-
-.sns-link a::before {
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
-.sns-link .facebook::before  { background-image: url(../images/icons/sns-facebook.png); }
-.sns-link .blog::before      { background-image: url(../images/icons/sns-blog.png); }
-.sns-link .instagram::before { background-image: url(../images/icons/sns-instagram.png); }
    ------------------------------------------------------------------ */
+
+/* 푸터 SNS 3개는 2026-09-03 에 적용 완료 — 여기가 아니라 common.css 1955줄 근처에 넣었음.
+   (footer.jsp 는 20개 페이지가 쓰는데 main.css 는 4개 페이지에서만 읽어서) */
 
 
 /* --- 카테고리 패널 왼쪽 아이콘 18개 (원본 스프라이트 icons.03b3790b.png) --- */

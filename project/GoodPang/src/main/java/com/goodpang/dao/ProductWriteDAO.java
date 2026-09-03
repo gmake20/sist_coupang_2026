@@ -68,31 +68,21 @@ public class ProductWriteDAO {
                 product_no, seller_no, sub_category_no,
                 sale_method, brand_name, no_brand_yn, product_name, internal_name,
                 option_yn, product_price, quantity,
-                manufacturer, composition_type, certification_type, parallel_import_yn,
-                minor_purchase_yn, max_purchase_yn, max_purchase_qty,
-                sale_period_yn, sale_start_date, sale_end_date, vat_type,
                 detail_type, product_desc,
                 shipping_zipcode, shipping_address, shipping_detail_address, jeju_shipping_yn,
                 delivery_service_code, delivery_method, bundle_shipping_yn,
                 shipping_fee_type, shipping_fee,
                 lead_time_input_type, lead_time_days, same_day_ship_yn, same_day_cutoff_time,
-                return_zipcode, return_address, return_detail_address,
-                initial_shipping_fee, return_shipping_fee,
                 sale_status, created_date, updated_date
             ) VALUES (
                 ?, ?, ?,
                 ?, ?, ?, ?, ?,
                 ?, ?, 0,
-                ?, ?, ?, ?,
-                ?, ?, NULL,
-                ?, NULL, NULL, ?,
                 ?, NULL,
                 ?, ?, ?, ?,
                 ?, ?, ?,
                 ?, 0,
                 ?, ?, ?, ?,
-                ?, ?, ?,
-                ?, ?,
                 ?, SYSDATE, SYSDATE
             )
             """;
@@ -112,17 +102,6 @@ public class ProductWriteDAO {
 
             pstmt.setString(i++, dto.getOptionYn());
             pstmt.setInt(i++, dto.getProductPrice());
-
-            pstmt.setString(i++, dto.getManufacturer());
-            pstmt.setString(i++, dto.getCompositionType());
-            pstmt.setString(i++, dto.getCertificationType());
-            pstmt.setString(i++, dto.getParallelImportYn());
-
-            pstmt.setString(i++, dto.getMinorPurchaseYn());
-            pstmt.setString(i++, dto.getMaxPurchaseYn());
-
-            pstmt.setString(i++, dto.getSalePeriodYn());
-            pstmt.setString(i++, dto.getVatType());
 
             pstmt.setString(i++, dto.getDetailType());
 
@@ -145,13 +124,6 @@ public class ProductWriteDAO {
             }
             pstmt.setString(i++, dto.getSameDayShipYn());
             pstmt.setString(i++, dto.getSameDayCutoffTime());
-
-            pstmt.setString(i++, dto.getReturnZipcode());
-            pstmt.setString(i++, dto.getReturnAddress());
-            pstmt.setString(i++, dto.getReturnDetailAddress());
-
-            pstmt.setInt(i++, dto.getInitialShippingFee());
-            pstmt.setInt(i++, dto.getReturnShippingFee());
 
             pstmt.setString(i++, dto.getSaleStatus());
 
