@@ -31,17 +31,6 @@
 
   <div class="topbar-right">
 
-    <button class="icon-button has-badge" type="button" aria-label="알림">
-      <svg class="icon"><use href="#ic-bell" /></svg>
-      <span class="badge">12</span>
-    </button>
-
-    <button class="icon-button" type="button" aria-label="도움말">
-      <svg class="icon"><use href="#ic-help" /></svg>
-    </button>
-
-    <span class="topbar-divider"></span>
-
     <div class="user-menu" id="userMenu">
 <%
     String topbarStoreName = (String) session.getAttribute("storeName");
