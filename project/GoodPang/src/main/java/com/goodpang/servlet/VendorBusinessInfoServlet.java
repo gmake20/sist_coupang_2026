@@ -21,7 +21,9 @@ import jakarta.servlet.http.Part;
 /**
  * 판매자 회원가입(vendor-signup.jsp) 직후 상태인 '입점 대기' 판매자가
  * 사업장주소·통신판매업신고번호·대표카테고리·정산계좌·서류(사업자등록증/통신판매신고증)를
- * 추가로 입력하는 페이지. 제출하면 SELLER.approval_status가 '심사 중'으로 바뀐다.
+ * 추가로 입력하는 페이지이자, 이미 승인된 판매자가 같은 정보를 수정하는 페이지로도 쓰인다.
+ * '입점 대기'/'반려' 상태에서 제출하면 SELLER.approval_status가 '심사 중'으로 바뀌지만,
+ * '승인' 상태에서 수정 제출하는 경우는 재심사로 되돌리지 않는다(SellerDAO.updateBusinessInfo 참고).
  */
 @WebServlet("/vendor/business-info")
 @MultipartConfig(maxFileSize = 5 * 1024 * 1024, maxRequestSize = 15 * 1024 * 1024)

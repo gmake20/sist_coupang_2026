@@ -50,24 +50,6 @@
 
         <article class="stat-card">
           <div class="stat-top">
-            <span class="stat-label">결제 대기</span>
-            <span class="stat-icon stat-icon-orange"><svg class="icon"><use href="#ic-card" /></svg></span>
-          </div>
-          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
-          <p class="stat-compare" style="color:#bbb;">아직 대응하는 주문상태가 없습니다</p>
-        </article>
-
-        <article class="stat-card">
-          <div class="stat-top">
-            <span class="stat-label">상품 준비중</span>
-            <span class="stat-icon stat-icon-violet"><svg class="icon"><use href="#ic-box" /></svg></span>
-          </div>
-          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
-          <p class="stat-compare" style="color:#bbb;">아직 대응하는 주문상태가 없습니다</p>
-        </article>
-
-        <article class="stat-card">
-          <div class="stat-top">
             <span class="stat-label">배송 중</span>
             <span class="stat-icon stat-icon-green"><svg class="icon"><use href="#ic-truck" /></svg></span>
           </div>
@@ -80,15 +62,6 @@
             <span class="stat-icon stat-icon-blue"><svg class="icon"><use href="#ic-check-circle" /></svg></span>
           </div>
           <div class="stat-value">${orderStat.deliveredTodayCount} <small>건</small></div>
-        </article>
-
-        <article class="stat-card">
-          <div class="stat-top">
-            <span class="stat-label">취소/반품/교환</span>
-            <span class="stat-icon stat-icon-red"><svg class="icon"><use href="#ic-return" /></svg></span>
-          </div>
-          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
-          <p class="stat-compare" style="color:#bbb;">아직 취소/반품/교환 기능이 없습니다</p>
         </article>
 
       </section>

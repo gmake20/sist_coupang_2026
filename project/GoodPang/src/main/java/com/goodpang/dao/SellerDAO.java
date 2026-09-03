@@ -246,7 +246,9 @@ public class SellerDAO {
     }
 
     // 사업자 추가정보 입력/수정 (사업장주소·통신판매업신고번호·대표카테고리·정산계좌·서류첨부)
-    // 제출 시 입점심사 상태를 '심사 중'으로 바꾼다.
+    // '입점 대기'/'반려' 상태에서 제출하면 (신규 제출·재제출) 심사 대상이므로 '심사 중'으로 바꾸지만,
+    // 이미 '승인'된 판매자가 계좌번호 등을 단순 수정하는 경우까지 재심사로 되돌리면 안 되므로
+    // 그 외 상태는 건드리지 않는다.
     public int updateBusinessInfo(SellerDTO dto) {
 
         String sql = """
@@ -262,7 +264,7 @@ public class SellerDAO {
                 ACCOUNT_HOLDER = ?,
                 BUSINESS_CERT_URL = ?,
                 MAIL_ORDER_CERT_URL = ?,
-                APPROVAL_STATUS = '심사 중',
+                APPROVAL_STATUS = CASE WHEN APPROVAL_STATUS IN ('입점 대기', '반려') THEN '심사 중' ELSE APPROVAL_STATUS END,
                 UPDATED_DATE = SYSDATE
             WHERE SELLER_NO = ?
             """;
