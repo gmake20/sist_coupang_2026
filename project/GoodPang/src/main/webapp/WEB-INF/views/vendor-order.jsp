@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -181,7 +180,7 @@
         <section class="panel table-panel">
 
           <div class="result-toolbar">
-            <p class="result-count">주문 목록 <strong>${fn:length(orderList)}</strong>건</p>
+            <p class="result-count">주문 목록 <strong>${totalCount}</strong>건</p>
 
             <select class="input select select-sm">
               <option>주문일 최신순</option>
@@ -273,17 +272,51 @@
           </div>
 
           <!-- 페이지네이션 -->
-          <nav class="pagination" aria-label="페이지 이동">
-            <button class="page-arrow" type="button" aria-label="이전 페이지">
-              <svg class="icon"><use href="#ic-chevron-left" /></svg>
-            </button>
+          <c:if test="${totalPages > 1}">
+            <nav class="pagination" aria-label="페이지 이동">
 
-            <button class="page-num active" type="button">1</button>
+              <c:if test="${page > 1}">
+                <c:url var="prevPageUrl" value="/vendor/order">
+                  <c:param name="startDate" value="${searchStartDate}" />
+                  <c:param name="endDate" value="${searchEndDate}" />
+                  <c:param name="orderStatus" value="${searchOrderStatus}" />
+                  <c:param name="deliveryStatus" value="${searchDeliveryStatus}" />
+                  <c:param name="paymentStatus" value="${searchPaymentStatus}" />
+                  <c:param name="page" value="${page - 1}" />
+                </c:url>
+                <a class="page-arrow" href="${prevPageUrl}" aria-label="이전 페이지">
+                  <svg class="icon"><use href="#ic-chevron-left" /></svg>
+                </a>
+              </c:if>
 
-            <button class="page-arrow" type="button" aria-label="다음 페이지">
-              <svg class="icon rotate-180"><use href="#ic-chevron-left" /></svg>
-            </button>
-          </nav>
+              <c:forEach var="p" begin="1" end="${totalPages}">
+                <c:url var="pageUrl" value="/vendor/order">
+                  <c:param name="startDate" value="${searchStartDate}" />
+                  <c:param name="endDate" value="${searchEndDate}" />
+                  <c:param name="orderStatus" value="${searchOrderStatus}" />
+                  <c:param name="deliveryStatus" value="${searchDeliveryStatus}" />
+                  <c:param name="paymentStatus" value="${searchPaymentStatus}" />
+                  <c:param name="page" value="${p}" />
+                </c:url>
+                <a class="page-num ${p == page ? 'active' : ''}" href="${pageUrl}">${p}</a>
+              </c:forEach>
+
+              <c:if test="${page < totalPages}">
+                <c:url var="nextPageUrl" value="/vendor/order">
+                  <c:param name="startDate" value="${searchStartDate}" />
+                  <c:param name="endDate" value="${searchEndDate}" />
+                  <c:param name="orderStatus" value="${searchOrderStatus}" />
+                  <c:param name="deliveryStatus" value="${searchDeliveryStatus}" />
+                  <c:param name="paymentStatus" value="${searchPaymentStatus}" />
+                  <c:param name="page" value="${page + 1}" />
+                </c:url>
+                <a class="page-arrow" href="${nextPageUrl}" aria-label="다음 페이지">
+                  <svg class="icon rotate-180"><use href="#ic-chevron-left" /></svg>
+                </a>
+              </c:if>
+
+            </nav>
+          </c:if>
 
         </section>
 

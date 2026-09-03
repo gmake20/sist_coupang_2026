@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -80,7 +79,7 @@
             <span class="stat-label">전체 상품</span>
             <span class="stat-icon stat-icon-blue"><svg class="icon"><use href="#ic-box" /></svg></span>
           </div>
-          <div class="stat-value">${fn:length(productList)} <small>개</small></div>
+          <div class="stat-value">${totalCount} <small>개</small></div>
           <a href="#" class="stat-link">전체보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
         </article>
 
@@ -91,7 +90,7 @@
           </div>
           <div class="stat-value">${saleCount} <small>개</small></div>
           <span class="stat-rate rate-green">
-            <fmt:formatNumber value="${fn:length(productList) > 0 ? (saleCount * 100.0 / fn:length(productList)) : 0}" pattern="0.0" />%
+            <fmt:formatNumber value="${totalCount > 0 ? (saleCount * 100.0 / totalCount) : 0}" pattern="0.0" />%
           </span>
         </article>
 
@@ -102,7 +101,7 @@
           </div>
           <div class="stat-value">${soldOutCount} <small>개</small></div>
           <span class="stat-rate rate-orange">
-            <fmt:formatNumber value="${fn:length(productList) > 0 ? (soldOutCount * 100.0 / fn:length(productList)) : 0}" pattern="0.0" />%
+            <fmt:formatNumber value="${totalCount > 0 ? (soldOutCount * 100.0 / totalCount) : 0}" pattern="0.0" />%
           </span>
         </article>
 
@@ -113,7 +112,7 @@
           </div>
           <div class="stat-value">${stoppedCount} <small>개</small></div>
           <span class="stat-rate rate-red">
-            <fmt:formatNumber value="${fn:length(productList) > 0 ? (stoppedCount * 100.0 / fn:length(productList)) : 0}" pattern="0.0" />%
+            <fmt:formatNumber value="${totalCount > 0 ? (stoppedCount * 100.0 / totalCount) : 0}" pattern="0.0" />%
           </span>
         </article>
 
@@ -124,7 +123,7 @@
           </div>
           <div class="stat-value">${pendingCount} <small>개</small></div>
           <span class="stat-rate rate-blue">
-            <fmt:formatNumber value="${fn:length(productList) > 0 ? (pendingCount * 100.0 / fn:length(productList)) : 0}" pattern="0.0" />%
+            <fmt:formatNumber value="${totalCount > 0 ? (pendingCount * 100.0 / totalCount) : 0}" pattern="0.0" />%
           </span>
         </article>
 
@@ -229,7 +228,7 @@
 
       <!-- 결과 툴바 -->
       <div class="result-toolbar">
-        <p class="result-count">검색 결과 <strong>${fn:length(productList)}</strong>개</p>
+        <p class="result-count">검색 결과 <strong>${totalCount}</strong>개</p>
 
         <div class="result-controls">
           <select class="input select select-sm">
@@ -391,17 +390,39 @@
         </table>
 
         <!-- 페이지네이션 -->
-        <nav class="pagination" aria-label="페이지 이동">
-          <button class="page-arrow" type="button" aria-label="이전 페이지">
-            <svg class="icon"><use href="#ic-chevron-left" /></svg>
-          </button>
+        <c:if test="${totalPages > 1}">
+          <nav class="pagination" aria-label="페이지 이동">
 
-          <button class="page-num active" type="button">1</button>
+            <c:if test="${page > 1}">
+              <c:url var="prevPageUrl" value="/vendor/product">
+                <c:if test="${hiddenView}"><c:param name="view" value="hidden" /></c:if>
+                <c:param name="page" value="${page - 1}" />
+              </c:url>
+              <a class="page-arrow" href="${prevPageUrl}" aria-label="이전 페이지">
+                <svg class="icon"><use href="#ic-chevron-left" /></svg>
+              </a>
+            </c:if>
 
-          <button class="page-arrow" type="button" aria-label="다음 페이지">
-            <svg class="icon rotate-180"><use href="#ic-chevron-left" /></svg>
-          </button>
-        </nav>
+            <c:forEach var="p" begin="1" end="${totalPages}">
+              <c:url var="pageUrl" value="/vendor/product">
+                <c:if test="${hiddenView}"><c:param name="view" value="hidden" /></c:if>
+                <c:param name="page" value="${p}" />
+              </c:url>
+              <a class="page-num ${p == page ? 'active' : ''}" href="${pageUrl}">${p}</a>
+            </c:forEach>
+
+            <c:if test="${page < totalPages}">
+              <c:url var="nextPageUrl" value="/vendor/product">
+                <c:if test="${hiddenView}"><c:param name="view" value="hidden" /></c:if>
+                <c:param name="page" value="${page + 1}" />
+              </c:url>
+              <a class="page-arrow" href="${nextPageUrl}" aria-label="다음 페이지">
+                <svg class="icon rotate-180"><use href="#ic-chevron-left" /></svg>
+              </a>
+            </c:if>
+
+          </nav>
+        </c:if>
 
       </section>
 
