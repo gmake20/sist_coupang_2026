@@ -253,7 +253,7 @@
 										<a
 											href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
 											<img
-											src="${pageContext.request.contextPath}${item.productImage}"
+											src="${pageContext.request.contextPath}/${item.productImage}"
 											alt="${item.productName}">
 										</a>
 									</c:when>
