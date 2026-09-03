@@ -2,6 +2,7 @@ package com.goodpang.servlet;
 
 import java.io.IOException;
 
+import com.goodpang.dao.AdminActionLogDAO;
 import com.goodpang.dao.NoticeDAO;
 
 import jakarta.servlet.ServletException;
@@ -46,7 +47,11 @@ public class AdminNoticeWriteServlet extends HttpServlet {
 		}
 
 		NoticeDAO dao = new NoticeDAO();
-		dao.insert(title.trim(), content, noticeType, adminNo);
+		int noticeNo = dao.insert(title.trim(), content, noticeType, adminNo);
+
+		if (noticeNo > 0) {
+			new AdminActionLogDAO().log(adminNo, "공지 등록", "NOTICE", noticeNo, null);
+		}
 
 		response.sendRedirect(request.getContextPath() + "/admin/notices");
 	}

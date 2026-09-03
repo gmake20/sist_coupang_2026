@@ -13,6 +13,7 @@
 
   <style>
     body { font-family: Arial, "Malgun Gothic", sans-serif; margin: 24px; color: #111; }
+    .back-link { display: inline-block; margin-bottom: 16px; color: #555; text-decoration: none; }
     h1 { font-size: 20px; margin-bottom: 16px; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { padding: 10px 12px; border-bottom: 1px solid #eee; text-align: left; white-space: nowrap; }
@@ -33,6 +34,8 @@
 </head>
 
 <body>
+
+  <a class="back-link" href="${pageContext.request.contextPath}/admin/dashboard">&larr; 대시보드로</a>
 
   <h1>상품 목록 (${fn:length(productList)}건)</h1>
 

@@ -150,31 +150,44 @@ public class NoticeDAO {
         return null;
     }
 
-    // 등록
-    public boolean insert(String title, String content, String noticeType, int adminNo) {
+    // 등록. 액션 로그(ADMIN_ACTION_LOG)에 target_no로 남길 수 있도록 생성된 notice_no를 돌려준다 - 실패하면 0
+    public int insert(String title, String content, String noticeType, int adminNo) {
 
         String sql = """
             INSERT INTO NOTICE (NOTICE_NO, TITLE, CONTENT, NOTICE_TYPE, ADMIN_NO, CREATED_DATE, UPDATED_DATE)
-            VALUES (SEQ_NOTICE.NEXTVAL, ?, ?, ?, ?, SYSDATE, SYSDATE)
+            VALUES (?, ?, ?, ?, ?, SYSDATE, SYSDATE)
             """;
 
-        try (
-            Connection conn = ConnectionProvider.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = ConnectionProvider.getConnection()) {
 
-            pstmt.setString(1, title);
-            pstmt.setString(2, content);
-            pstmt.setString(3, noticeType);
-            pstmt.setInt(4, adminNo);
+            int noticeNo = nextVal(conn, "SEQ_NOTICE");
 
-            return pstmt.executeUpdate() == 1;
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                pstmt.setInt(1, noticeNo);
+                pstmt.setString(2, title);
+                pstmt.setString(3, content);
+                pstmt.setString(4, noticeType);
+                pstmt.setInt(5, adminNo);
+
+                return pstmt.executeUpdate() == 1 ? noticeNo : 0;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return false;
+        return 0;
+    }
+
+    private int nextVal(Connection conn, String sequenceName) throws Exception {
+        try (
+            PreparedStatement pstmt = conn.prepareStatement("SELECT " + sequenceName + ".NEXTVAL FROM DUAL");
+            ResultSet rs = pstmt.executeQuery()
+        ) {
+            rs.next();
+            return rs.getInt(1);
+        }
     }
 
     // 수정 - 제목/본문/구분
