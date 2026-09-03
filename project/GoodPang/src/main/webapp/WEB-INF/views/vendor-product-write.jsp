@@ -331,9 +331,27 @@
             <div class="block-body" id="shippingBlockBody">
 
               <div class="field-row">
-                <label class="field-label">출고지 <span class="required-dot">•</span></label>
+                <label class="field-label">출고지 우편번호 <span class="required-dot">•</span></label>
                 <div class="field-control">
-                  <button class="address-box" type="button">주소록에서 출고지를 선택해주세요 &gt;</button>
+                  <input class="input" id="shippingZipcodeInput" type="text" placeholder="우편번호"
+                         value="${sessionScope.loginSeller.zipcode}">
+                </div>
+              </div>
+
+              <div class="field-row">
+                <label class="field-label">출고지 주소 <span class="required-dot">•</span></label>
+                <div class="field-control">
+                  <input class="input" id="shippingAddressInput" type="text" placeholder="기본주소"
+                         value="${sessionScope.loginSeller.businessAddress}">
+                </div>
+              </div>
+
+              <div class="field-row">
+                <label class="field-label">출고지 상세주소</label>
+                <div class="field-control">
+                  <input class="input" id="shippingDetailAddressInput" type="text" placeholder="상세주소"
+                         value="${sessionScope.loginSeller.businessDetailAddress}">
+                  <p class="side-note">기본값은 사업자 정보에 등록된 사업장 주소이며, 이 상품만 다른 출고지를 쓰려면 직접 수정해주세요.</p>
                 </div>
               </div>
 
@@ -1312,6 +1330,12 @@
           return false;
         }
 
+        if (!document.getElementById("shippingZipcodeInput").value.trim()
+            || !document.getElementById("shippingAddressInput").value.trim()) {
+          alert("출고지 우편번호와 주소를 입력해주세요.");
+          return false;
+        }
+
         if (optionMode === "on" && optionGroups.some((group) => group.values.length > 0 && !group.name.trim())) {
           alert("옵션명을 입력해주세요.");
           return false;
@@ -1368,6 +1392,9 @@
           });
         }
 
+        formData.append("shippingZipcode", document.getElementById("shippingZipcodeInput").value.trim());
+        formData.append("shippingAddress", document.getElementById("shippingAddressInput").value.trim());
+        formData.append("shippingDetailAddress", document.getElementById("shippingDetailAddressInput").value.trim());
         formData.append("jejuShippingYn", document.querySelector('input[name="jejuShipping"]:checked').value);
         formData.append("courier", document.getElementById("courierSelect").value);
         formData.append("deliveryMethod", document.getElementById("deliveryMethodSelect").value);

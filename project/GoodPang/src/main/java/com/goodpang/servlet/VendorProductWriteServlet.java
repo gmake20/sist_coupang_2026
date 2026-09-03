@@ -61,7 +61,7 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		if (loginSeller.getZipcode() == null || loginSeller.getZipcode().isBlank()
 				|| loginSeller.getBusinessAddress() == null || loginSeller.getBusinessAddress().isBlank()) {
-			writeJson(response, 400, new Result(false, "사업자 정보에 출고지/반품지 주소가 등록되어 있지 않습니다. 판매자센터에서 사업자 정보를 먼저 등록해주세요.", 0));
+			writeJson(response, 400, new Result(false, "사업자 정보에 주소가 등록되어 있지 않습니다. 판매자센터에서 사업자 정보를 먼저 등록해주세요.", 0));
 			return;
 		}
 
@@ -79,6 +79,11 @@ public class VendorProductWriteServlet extends HttpServlet {
 			}
 			if (dto.getProductPrice() <= 0) {
 				writeJson(response, 400, new Result(false, "기본 상품가격을 입력해주세요.", 0));
+				return;
+			}
+			if (dto.getShippingZipcode() == null || dto.getShippingZipcode().isBlank()
+					|| dto.getShippingAddress() == null || dto.getShippingAddress().isBlank()) {
+				writeJson(response, 400, new Result(false, "출고지 우편번호와 주소를 입력해주세요.", 0));
 				return;
 			}
 			if (dto.getOptions().isEmpty()) {
@@ -129,10 +134,14 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		dto.setDetailType(request.getParameter("detailType"));
 
-		// 출고지 주소록 기능이 아직 없어서, 판매자 입점 시 등록한 사업장 주소를 그대로 사용
-		dto.setShippingZipcode(loginSeller.getZipcode());
-		dto.setShippingAddress(loginSeller.getBusinessAddress());
-		dto.setShippingDetailAddress(loginSeller.getBusinessDetailAddress());
+		// 출고지 주소록 기능이 아직 없어서, 등록 폼에서 입력받되 비어 있으면 사업장 주소로 대체
+		String shippingZipcode = blankToNull(request.getParameter("shippingZipcode"));
+		String shippingAddress = blankToNull(request.getParameter("shippingAddress"));
+		String shippingDetailAddress = blankToNull(request.getParameter("shippingDetailAddress"));
+
+		dto.setShippingZipcode(shippingZipcode != null ? shippingZipcode : loginSeller.getZipcode());
+		dto.setShippingAddress(shippingAddress != null ? shippingAddress : loginSeller.getBusinessAddress());
+		dto.setShippingDetailAddress(shippingDetailAddress != null ? shippingDetailAddress : loginSeller.getBusinessDetailAddress());
 
 		dto.setJejuShippingYn(request.getParameter("jejuShippingYn"));
 		dto.setDeliveryServiceCode(request.getParameter("courier"));
