@@ -5,6 +5,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -25,18 +26,17 @@
 		</h1>
 
 		<h1 class="page-title">주문/결제</h1>
-		
+
 		<%-- 재고 부족으로 결제가 취소됐을 때만 보이는 안내.
 		     OrderPaymentServlet 이 주소에 stockFail / stockLeft 를 붙여서 되돌려보냄.
 		     <c:out> 을 쓰는 이유 — 상품명에 <, > 같은 글자가 들어있어도
 		     HTML 태그로 해석되지 않게 막아준다(그냥 ${param.stockFail} 로 찍으면 위험). --%>
 		<c:if test="${not empty param.stockFail}">
 			<div class="stock-alert">
-				<strong><c:out value="${param.stockFail}" /></strong>
-				상품의 재고가 부족합니다.
-				(남은 수량 <c:out value="${param.stockLeft}" />개)
-				<br>
-				수량을 줄이거나 장바구니에서 상품을 빼고 다시 시도해주세요.
+				<strong><c:out value="${param.stockFail}" /></strong> 상품의 재고가
+				부족합니다. (남은 수량
+				<c:out value="${param.stockLeft}" />
+				개) <br> 수량을 줄이거나 장바구니에서 상품을 빼고 다시 시도해주세요.
 			</div>
 		</c:if>
 
@@ -241,31 +241,41 @@
 
 				<!-- 배송 / 상품 정보 -->
 				<div class="delivery-info">
-
-					<h4>배송 1건 중 1</h4>
-
+					<h4>배송 ${fn:length(checkoutItems)}건 중
+						${fn:length(checkoutItems)}건</h4>
 					<c:forEach var="item" items="${checkoutItems}" varStatus="status">
-
 						<div class="product-item">
-							<div class="product-img"></div>
 
+							<div class="product-img">
+								<c:choose>
+
+									<c:when test="${not empty item.productImage}">
+										<a
+											href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
+											<img
+											src="${pageContext.request.contextPath}${item.productImage}"
+											alt="${item.productName}">
+										</a>
+									</c:when>
+
+									<c:otherwise>
+										<span>이미지 없음</span>
+									</c:otherwise>
+
+								</c:choose>
+							</div>
 							<div class="product-info">
 								<div class="product-name">${item.productName}</div>
-
 								<div class="product-option">${item.optionName}</div>
-
 								<div class="product-price">
 									<fmt:formatNumber value="${item.price}" pattern="#,###" />
 									원
 								</div>
-
 								<div class="product-qty">수량 ${item.orderQty}개</div>
 							</div>
 						</div>
-
 					</c:forEach>
 				</div>
-
 			</div>
 
 			<!-- 오른쪽 결제 금액 영역 -->
@@ -340,9 +350,9 @@
 						action="${pageContext.request.contextPath}/order/checkout"
 						method="post" onsubmit="return validatePayment();">
 
-						<input type="hidden" id="checkoutNo" name="checkoutNo" value="${checkoutNo}">
-
-						<input type="hidden" id="selectedAddressNo" name="addressNo"
+						<input type="hidden" id="checkoutNo" name="checkoutNo"
+							value="${checkoutNo}"> <input type="hidden"
+							id="selectedAddressNo" name="addressNo"
 							value="${address.addressNo}">
 
 						<!-- PG 더미 결제 결과 -->
@@ -750,86 +760,87 @@
 			<div class="pg-modal-footer">GoodPay Dummy Payment Gateway</div>
 		</div>
 	</div>
-	
+
 	<!-- 계좌이체 더미 결제 모달 -->
-<div id="bankPayModalOverlay" class="bank-pay-modal-overlay">
-    <div class="bank-pay-modal" onclick="event.stopPropagation();">
-        <div class="bank-pay-header">
-            <div>
-                <strong>GoodPay</strong>
-                <span>계좌이체</span>
-            </div>
-            <button type="button" class="bank-pay-close" onclick="closeBankPayModal()">×</button>
-        </div>
+	<div id="bankPayModalOverlay" class="bank-pay-modal-overlay">
+		<div class="bank-pay-modal" onclick="event.stopPropagation();">
+			<div class="bank-pay-header">
+				<div>
+					<strong>GoodPay</strong> <span>계좌이체</span>
+				</div>
+				<button type="button" class="bank-pay-close"
+					onclick="closeBankPayModal()">×</button>
+			</div>
 
-        <div class="bank-pay-body">
-            <!-- 결제 확인 -->
-            <div id="bankPayConfirmScreen">
-                <h2 class="bank-pay-title">계좌이체 결제</h2>
+			<div class="bank-pay-body">
+				<!-- 결제 확인 -->
+				<div id="bankPayConfirmScreen">
+					<h2 class="bank-pay-title">계좌이체 결제</h2>
 
-                <div class="bank-pay-info">
-                    <div class="bank-pay-row">
-                        <span>가맹점</span>
-                        <strong>GoodPang</strong>
-                    </div>
-                    <div class="bank-pay-row">
-                        <span>상품명</span>
-                        <strong>GoodPang 상품 구매</strong>
-                    </div>
-                    <div class="bank-pay-row">
-                        <span>결제금액</span>
-                        <strong class="bank-pay-price">
-                            <fmt:formatNumber value="${checkout.totalPrice}" pattern="#,###"/>원
-                        </strong>
-                    </div>
-                </div>
+					<div class="bank-pay-info">
+						<div class="bank-pay-row">
+							<span>가맹점</span> <strong>GoodPang</strong>
+						</div>
+						<div class="bank-pay-row">
+							<span>상품명</span> <strong>GoodPang 상품 구매</strong>
+						</div>
+						<div class="bank-pay-row">
+							<span>결제금액</span> <strong class="bank-pay-price"> <fmt:formatNumber
+									value="${checkout.totalPrice}" pattern="#,###" />원
+							</strong>
+						</div>
+					</div>
 
-                <div class="bank-account-area">
-                    <div class="bank-account-label">출금 계좌</div>
-                    <div id="bankPaySelectedAccount" class="bank-selected-account"></div>
-                </div>
+					<div class="bank-account-area">
+						<div class="bank-account-label">출금 계좌</div>
+						<div id="bankPaySelectedAccount" class="bank-selected-account"></div>
+					</div>
 
-                <div class="bank-pay-notice">선택한 계좌에서 결제금액이 즉시 출금됩니다.</div>
+					<div class="bank-pay-notice">선택한 계좌에서 결제금액이 즉시 출금됩니다.</div>
 
-                <label class="bank-pay-agree">
-                    <input type="checkbox" id="bankPayAgree">
-                    <span>결제 내용을 확인하였으며 출금에 동의합니다.</span>
-                </label>
+					<label class="bank-pay-agree"> <input type="checkbox"
+						id="bankPayAgree"> <span>결제 내용을 확인하였으며 출금에 동의합니다.</span>
+					</label>
 
-                <button type="button" class="bank-auth-btn" onclick="startBankAuthentication()">계좌 인증하기</button>
-            </div>
+					<button type="button" class="bank-auth-btn"
+						onclick="startBankAuthentication()">계좌 인증하기</button>
+				</div>
 
-            <!-- 인증 화면 -->
-            <div id="bankAuthScreen" class="bank-pay-screen hidden">
-                <div class="bank-auth-icon">🔒</div>
-                <h3>계좌 인증</h3>
-                <p>인증번호를 입력해주세요.</p>
-                <div class="bank-auth-guide"><strong>123456</strong></div>
-                <input type="text" id="bankAuthNumber" class="bank-auth-input" maxlength="6" inputmode="numeric" placeholder="인증번호 6자리">
-                <button type="button" class="bank-auth-confirm-btn" onclick="confirmBankAuthentication()">인증 확인</button>
-            </div>
+				<!-- 인증 화면 -->
+				<div id="bankAuthScreen" class="bank-pay-screen hidden">
+					<div class="bank-auth-icon">🔒</div>
+					<h3>계좌 인증</h3>
+					<p>인증번호를 입력해주세요.</p>
+					<div class="bank-auth-guide">
+						<strong>123456</strong>
+					</div>
+					<input type="text" id="bankAuthNumber" class="bank-auth-input"
+						maxlength="6" inputmode="numeric" placeholder="인증번호 6자리">
+					<button type="button" class="bank-auth-confirm-btn"
+						onclick="confirmBankAuthentication()">인증 확인</button>
+				</div>
 
-            <!-- 처리중 -->
-            <div id="bankLoadingScreen" class="bank-pay-screen hidden">
-                <div class="bank-pay-spinner"></div>
-                <h3>계좌이체를 진행하고 있습니다.</h3>
-                <p>잠시만 기다려주세요.</p>
-            </div>
+				<!-- 처리중 -->
+				<div id="bankLoadingScreen" class="bank-pay-screen hidden">
+					<div class="bank-pay-spinner"></div>
+					<h3>계좌이체를 진행하고 있습니다.</h3>
+					<p>잠시만 기다려주세요.</p>
+				</div>
 
-            <!-- 성공 -->
-            <div id="bankSuccessScreen" class="bank-pay-screen hidden">
-                <div class="bank-success-icon">✓</div>
-                <h3>결제가 완료되었습니다.</h3>
-                <p>계좌이체가 정상적으로 처리되었습니다.</p>
-                <strong class="bank-success-price">
-                    <fmt:formatNumber value="${checkout.totalPrice}" pattern="#,###"/>원
-                </strong>
-            </div>
-        </div>
+				<!-- 성공 -->
+				<div id="bankSuccessScreen" class="bank-pay-screen hidden">
+					<div class="bank-success-icon">✓</div>
+					<h3>결제가 완료되었습니다.</h3>
+					<p>계좌이체가 정상적으로 처리되었습니다.</p>
+					<strong class="bank-success-price"> <fmt:formatNumber
+							value="${checkout.totalPrice}" pattern="#,###" />원
+					</strong>
+				</div>
+			</div>
 
-        <div class="bank-pay-footer">GoodPay Dummy Bank Transfer</div>
-    </div>
-</div>
+			<div class="bank-pay-footer">GoodPay Dummy Bank Transfer</div>
+		</div>
+	</div>
 
 	<script
 		src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>

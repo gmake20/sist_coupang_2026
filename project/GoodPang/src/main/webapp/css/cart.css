@@ -289,3 +289,29 @@ body {
     object-fit: cover;
     display: block;
 }
+
+.item-img-placeholder {
+    font-family: Arial, "Noto Sans KR", sans-serif;
+    font-size: 14px;
+    color: #555;
+}
+
+.cart-item a,
+.cart-item a:link,
+.cart-item a:visited,
+.cart-item a:hover,
+.cart-item a:active {
+    color: inherit;
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.item-img-placeholder span {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+
+.cart-item-img {
+    display: block;
+}

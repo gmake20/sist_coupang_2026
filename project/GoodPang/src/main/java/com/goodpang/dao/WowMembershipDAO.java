@@ -49,6 +49,29 @@ public class WowMembershipDAO {
         return false;
     }
     
+    public boolean isWithdrawalBlocked(int memberNo) {
+        String sql = """
+            SELECT COUNT(*)
+            FROM WOW_MEMBERSHIP
+            WHERE MEMBER_NO = ?
+              AND STATUS = 'ACTIVE'
+            """;
+
+        try (Connection conn = ConnectionProvider.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, memberNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     public Date nextPaymentDate(int memberNo) {
 
         String sql = """
@@ -82,6 +105,29 @@ public class WowMembershipDAO {
         }
 		return null;
 
+    }
+    
+    public boolean isCancelPending(int memberNo) {
+        String sql = """
+            SELECT COUNT(*)
+            FROM WOW_MEMBERSHIP
+            WHERE MEMBER_NO = ?
+              AND STATUS = 'CANCEL_PENDING'
+            """;
+
+        try (Connection conn = ConnectionProvider.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, memberNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
@@ -176,6 +222,8 @@ public class WowMembershipDAO {
             );
         }
     }
+    
+    
     
     public int insertMembership(
             int memberNo,
