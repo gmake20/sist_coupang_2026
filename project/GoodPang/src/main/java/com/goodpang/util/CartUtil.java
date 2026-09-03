@@ -20,27 +20,16 @@ public class CartUtil {
 		List<CartItemDTO> cartItems =
 				cartDAO.getCartItems(memberNo);
 
-		List<CartItemDTO> cartPreviewItems =
-				cartDAO.getCartItems(memberNo);
-		
-		System.out.println(
-				"memberNo = " + memberNo
-		);
+		int cartCount =
+				cartDAO.getCartCount(memberNo);
 
-		System.out.println(
-				"cartItems size = " + cartItems.size()
-		);
+		HttpSession session =
+				request.getSession();
 
-		request.getSession().setAttribute(
-				"cartPreviewItems",
-				cartPreviewItems
-		);
-
-		request.getSession().setAttribute(
-				"cartCount",
-				cartPreviewItems.size()
-		);
+		session.setAttribute("cartCount", cartCount);
+		session.setAttribute("cartPreviewItems", cartItems);
 	}
+	
 	
 	public static void refreshGuestCartSession(
 			HttpServletRequest request,
@@ -54,6 +43,12 @@ public class CartUtil {
 			return;
 		}
 
+		CartDAO cartDAO = new CartDAO();
+
+		List<CartItemDTO> cartItems =
+				cartDAO.getGuestCartItems(guestCart);
+
 		session.setAttribute("cartCount", guestCart.size());
+		session.setAttribute("cartPreviewItems", cartItems);
 	}
 }

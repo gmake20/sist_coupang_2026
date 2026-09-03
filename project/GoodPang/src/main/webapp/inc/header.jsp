@@ -821,8 +821,8 @@
 											<div class="cart-preview-empty">장바구니에 담은 상품이 없습니다.</div>
 										</c:otherwise>
 									</c:choose> <a href="${pageContext.request.contextPath}/cart"
-									class="cart-btn"> <span> 장바구니 전체보기 <i
-											class="blue-arrow"></i>
+									class="cart-btn"> <span> 장바구니 전체보기 <!-- <i
+											class="blue-arrow"></i> -->
 									</span>
 								</a>
 								</span>

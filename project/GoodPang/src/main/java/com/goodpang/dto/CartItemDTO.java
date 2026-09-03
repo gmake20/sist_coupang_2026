@@ -26,6 +26,8 @@ public class CartItemDTO {
     
     private String imageUrl;
     
+    private int unitPrice;
+    
     public int getTotalPrice() {
         return getUnitPrice() * quantity;
     }

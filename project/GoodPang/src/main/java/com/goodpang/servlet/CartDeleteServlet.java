@@ -112,6 +112,7 @@ public class CartDeleteServlet extends HttpServlet {
 
 			if (guestCart != null) {
 				guestCart.remove(optionId);
+				
 				CartUtil.refreshGuestCartSession(request, guestCart);
 			}
 		}
