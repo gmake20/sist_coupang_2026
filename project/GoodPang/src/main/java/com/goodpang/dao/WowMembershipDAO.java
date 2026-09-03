@@ -3,6 +3,7 @@ package com.goodpang.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Date;
 
 import com.goodpang.dto.WowMembershipDTO;
 import com.goodpang.util.ConnectionProvider;
@@ -47,6 +48,42 @@ public class WowMembershipDAO {
 
         return false;
     }
+    
+    public Date nextPaymentDate(int memberNo) {
+
+        String sql = """
+                SELECT NEXT_PAYMENT_DATE
+                FROM WOW_MEMBERSHIP
+                WHERE MEMBER_NO = ?
+                """;
+
+        try (
+            Connection conn =
+                    ConnectionProvider.getConnection();
+
+            PreparedStatement pstmt =
+                    conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setInt(1, memberNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                if (rs.next()) {
+                    return rs.getDate("NEXT_PAYMENT_DATE");
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "와우 회원 확인 중 오류가 발생했습니다.",
+                    e
+            );
+        }
+		return null;
+
+    }
+
 
     /*
      * 회원의 와우 멤버십 정보 조회

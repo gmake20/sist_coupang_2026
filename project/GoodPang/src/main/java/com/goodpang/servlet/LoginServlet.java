@@ -129,6 +129,12 @@ public class LoginServlet extends HttpServlet {
 
             return;
         }
+        
+        if (member.getStatus() == 0) {
+            request.setAttribute("withdrawnMember", member);
+            request.getRequestDispatcher("/member_withdrawn.jsp").forward(request, response);
+            return;
+        }
 
         HttpSession session = request.getSession();
 
