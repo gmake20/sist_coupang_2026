@@ -152,17 +152,6 @@ CREATE TABLE PRODUCT (
     quantity                     NUMBER(10), /* 옵션 미설정시 재고수량 */
 
     /* 상품 주요 정보 */
-    manufacturer                 VARCHAR2(100), /* 제조사 */
-    composition_type             VARCHAR2(50) NOT NULL, /* 상품구성 */
-    certification_type           VARCHAR2(50) NOT NULL, /* 인증정보 */
-    parallel_import_yn           CHAR(1) NOT NULL, /* 병행수입 여부 */
-    minor_purchase_yn            CHAR(1) NOT NULL, /* 미성년자 구매 가능여부 */
-    max_purchase_yn               CHAR(1) NOT NULL, /* 인당 최대구매수량 설정여부 */
-    max_purchase_qty              NUMBER(6), /* 인당 최대구매수량 */
-    sale_period_yn                 CHAR(1) NOT NULL, /* 판매기간 설정여부 */
-    sale_start_date                DATE, /* 판매 시작일 */
-    sale_end_date                  DATE, /* 판매 종료일 */
-    vat_type                       VARCHAR2(10) NOT NULL, /* 부가세: 과세/면세 */
 
     /* 상세설명 */
     detail_type                 VARCHAR2(30) NOT NULL, /* 이미지 업로드/에디터 작성/HTML 작성 */
@@ -221,27 +210,6 @@ ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_BRAND_REQUIRED
 
 ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_OPTION_YN
     CHECK (option_yn IN ('Y', 'N'));
-
-ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_COMPOSITION_TYPE
-    CHECK (composition_type IN ('동일한 상품으로 구성됨', '다양한 상품이 혼합되어 구성됨'));
-
-ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_CERTIFICATION_TYPE
-    CHECK (certification_type IN ('인증·신고 대상', '상세페이지 별도표기', '인증·신고 대상 아님'));
-
-ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_PARALLEL_IMPORT_YN
-    CHECK (parallel_import_yn IN ('Y', 'N'));
-
-ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_MINOR_PURCHASE_YN
-    CHECK (minor_purchase_yn IN ('Y', 'N'));
-
-ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_MAX_PURCHASE_YN
-    CHECK (max_purchase_yn IN ('Y', 'N'));
-
-ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_SALE_PERIOD_YN
-    CHECK (sale_period_yn IN ('Y', 'N'));
-
-ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_VAT_TYPE
-    CHECK (vat_type IN ('과세', '면세'));
 
 ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_DETAIL_TYPE
     CHECK (detail_type IN ('이미지 업로드', '에디터 작성', 'HTML 작성'));
