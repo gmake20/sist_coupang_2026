@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import com.goodpang.dao.ProductWriteDAO;
+import com.goodpang.dao.VendorActionLogDAO;
 import com.goodpang.dto.ProductOptionWriteDTO;
 import com.goodpang.dto.ProductWriteDTO;
 import com.goodpang.dto.SellerDTO;
@@ -92,6 +93,9 @@ public class VendorProductWriteServlet extends HttpServlet {
 			}
 
 			int productNo = productWriteDAO.insertProduct(dto);
+
+			new VendorActionLogDAO().log(loginSeller.getSellerNo(), "상품 등록", "PRODUCT", productNo, dto.getProductName());
+
 			writeJson(response, 200, new Result(true, null, productNo));
 
 		} catch (IllegalStateException e) {
