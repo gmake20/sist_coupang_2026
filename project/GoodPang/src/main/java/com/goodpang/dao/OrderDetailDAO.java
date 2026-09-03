@@ -13,12 +13,11 @@ import com.goodpang.util.DBConn;
 public class OrderDetailDAO {
 
     /**
-     * 특정 주문번호(ORDER_NO)에 해당하는 주문 상세 정보 조회 (이미지 URL 포함)
+     * 특정 주문번호(ORDER_NO)에 해당하는 주문 상세 정보 조회 (카드사/은행 CASE 변환값 DTO 세팅 포함)
      */
-    public List<OrderDetailDTO> getOrderDetailList(int orderNo , int memberNo) {
+    public List<OrderDetailDTO> getOrderDetailList(int orderNo, int memberNo) {
         List<OrderDetailDTO> list = new ArrayList<>();
 
-        // ORDERS, ORDER_DETAIL, PRODUCT, MEMBER, ORDER_ADDRESS, PAYMENT, PRODUCT_OPTION + PRODUCT_IMAGE 조인
         String sql = """
             SELECT 
                 od.ORDER_DETAIL_NO, 
@@ -33,6 +32,33 @@ public class OrderDetailDAO {
                 od.PRICE AS ITEM_PRICE,
                 o.DELIVERY_FEE, 
                 pay.PAYMENT_METHOD, 
+                
+                /* 카드사 이름 변환 */
+                CASE pm.CARD_COMPANY
+                    WHEN 'BC'      THEN '비씨카드'
+                    WHEN 'SHINHAN' THEN '신한카드'
+                    WHEN 'KB'      THEN 'KB국민카드'
+                    WHEN 'SAMSUNG' THEN '삼성카드'
+                    WHEN 'HYUNDAI' THEN '현대카드'
+                    WHEN 'LOTTE'   THEN '롯데카드'
+                    WHEN 'HANA'    THEN '하나카드'
+                    WHEN 'WOORI'   THEN '우리카드'
+                    WHEN 'NH'      THEN 'NH농협카드'
+                    ELSE pm.CARD_COMPANY
+                END AS CARD_COMPANY_NAME,
+
+                /* 은행 이름 변환 */
+                CASE pm.BANK_CODE
+                    WHEN 'SHINHAN' THEN '신한은행'
+                    WHEN 'KB'      THEN 'KB국민은행'
+                    WHEN 'WOORI'   THEN '우리은행'
+                    WHEN 'NH'      THEN 'NH농협은행'
+                    WHEN 'HANA'    THEN '하나은행'
+                    WHEN 'KAKAO'   THEN '카카오뱅크'
+                    WHEN 'TOSS'    THEN '토스뱅크'
+                    ELSE pm.BANK_CODE
+                END AS BANK_NAME,
+        
                 oa.REQUEST_MSG, 
                 oa.ADDRESS, 
                 oa.DETAIL_ADDRESS, 
@@ -42,16 +68,17 @@ public class OrderDetailDAO {
                 po.OPTION1_VALUE, 
                 po.OPTION2_TYPE, 
                 po.OPTION2_VALUE,
-                img.IMAGE_URL -- ★ 대표 이미지 컬럼 추가
+                img.IMAGE_URL
             FROM ORDERS o 
             JOIN ORDER_DETAIL od ON o.ORDER_NO = od.ORDER_NO 
             JOIN PRODUCT p ON od.PRODUCT_NO = p.PRODUCT_NO 
             JOIN MEMBER m ON o.MEMBER_NO = m.MEMBER_NO 
             LEFT JOIN ORDER_ADDRESS oa ON o.ORDER_ADDRESS_NO = oa.ORDER_ADDRESS_NO 
             LEFT JOIN PAYMENT pay ON o.ORDER_NO = pay.ORDER_NO 
+            LEFT JOIN PAYMENT_METHOD pm 
+                ON pay.PAYMENT_METHOD_NO = pm.PAYMENT_METHOD_NO
             LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID 
             LEFT JOIN (
-                -- ★ 대표 이미지 1건만 안전하게 가져오는 서브쿼리 조인
                 SELECT product_no, image_url 
                 FROM (
                     SELECT product_no, image_url, 
@@ -88,8 +115,12 @@ public class OrderDetailDAO {
                     dto.setItemPrice(rs.getInt("ITEM_PRICE"));
                     dto.setDeliveryFee(rs.getInt("DELIVERY_FEE"));
 
-                    // 결제 및 배송지 정보
+                    // 결제 수단 및 카드사/은행 정보 세팅 (★ 누락되었던 핵심 지점)
                     dto.setPaymentMethod(rs.getString("PAYMENT_METHOD"));
+                    dto.setCardCompanyName(rs.getString("CARD_COMPANY_NAME")); // SQL의 CASE문 변환결과 매핑
+                    dto.setBankName(rs.getString("BANK_NAME"));               // SQL의 CASE문 변환결과 매핑
+
+                    // 배송지 정보
                     dto.setRequestMsg(rs.getString("REQUEST_MSG"));
                     dto.setAddress(rs.getString("ADDRESS"));
                     dto.setDetailAddress(rs.getString("DETAIL_ADDRESS"));
@@ -102,7 +133,7 @@ public class OrderDetailDAO {
                     dto.setOption2Type(rs.getString("OPTION2_TYPE"));
                     dto.setOption2Value(rs.getString("OPTION2_VALUE"));
 
-                    // ★ 대표 이미지 URL 바인딩
+                    // 대표 이미지 URL 바인딩
                     dto.setImageUrl(rs.getString("IMAGE_URL"));
 
                     list.add(dto);
