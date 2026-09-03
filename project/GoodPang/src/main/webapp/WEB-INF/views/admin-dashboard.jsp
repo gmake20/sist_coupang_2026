@@ -80,6 +80,11 @@
       <p>관리자가 수행한 승인/반려/정지/삭제 등의 처리 이력을 확인합니다.</p>
     </a>
 
+    <a class="menu-card" href="${pageContext.request.contextPath}/admin/vendor-action-logs">
+      <h2>판매자 액션 로그</h2>
+      <p>판매자가 상품 등록/노출전환/판매중지/옵션수정/배송처리 등에서 수행한 작업 이력을 확인합니다.</p>
+    </a>
+
   </div>
 
 </body>

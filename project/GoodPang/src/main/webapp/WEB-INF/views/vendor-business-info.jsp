@@ -142,6 +142,32 @@
 
       </form>
 
+      <!-- 회원탈퇴 -->
+      <section class="field-group">
+
+        <h2 class="group-title">회원탈퇴</h2>
+
+        <p class="agreement-all-desc">
+          탈퇴하면 로그인이 즉시 차단되고, 등록하신 모든 상품이 고객 화면에서 사라집니다. 이 작업은 되돌릴 수 없습니다.
+        </p>
+
+        <form method="post" id="withdrawForm"
+          action="${pageContext.request.contextPath}/vendor/withdraw"
+          onsubmit="return confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
+
+          <div class="field">
+            <label class="label" for="withdrawPassword">비밀번호 확인</label>
+            <input class="input" id="withdrawPassword" name="password" type="password" placeholder="비밀번호를 입력해주세요">
+          </div>
+
+          <button class="submit" type="submit" style="background:#c0392b;">
+            탈퇴하기
+          </button>
+
+        </form>
+
+      </section>
+
     </main>
 
   </div>
