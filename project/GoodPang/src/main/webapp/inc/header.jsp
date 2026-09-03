@@ -774,13 +774,13 @@
 						<li class="cart"><a
 							href="${pageContext.request.contextPath}/cart"> <img
 								src="${pageContext.request.contextPath}/images/icons/cart.png"
-								width="44" height="44" alt="장바구니"> <em class="cart-count">
+								width="44" height="44" alt="장바구니"> <em id="cartCount" class="cart-count">
 									${empty sessionScope.cartCount ? 0 : sessionScope.cartCount} </em> <span
 								class="icon-label">장바구니</span>
 						</a>
 
 							<div class="cart-preview">
-								<span class="wrapper"> <i class="arrow"></i> <c:choose>
+								<span class="wrapper" id="cartPreviewWrapper"> <i class="arrow"></i> <c:choose>
 										<c:when test="${not empty sessionScope.cartPreviewItems}">
 											<ul class="cart-preview-list">
 												<c:forEach var="item"
@@ -803,11 +803,11 @@
 															<div class="cart-preview-info">
 																<p class="cart-preview-name">${item.productName}</p>
 
-																<p class="cart-preview-price">
+																<%-- <p class="cart-preview-price">
 																	<fmt:formatNumber value="${item.unitPrice}"
 																		pattern="#,###" />
 																	원
-																</p>
+																</p> --%>
 
 																<p class="cart-preview-quantity">수량
 																	${item.quantity}개</p>

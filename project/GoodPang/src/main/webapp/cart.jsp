@@ -177,14 +177,49 @@
 	
 	<script>
 	const contextPath = "${pageContext.request.contextPath}";
-	
 	const isWowMember = ${isWowMember eq true};
-	
+
 	const checkAll =
 	    document.getElementById("chk-all");
 
 	const itemCheckboxes =
 	    document.querySelectorAll(".item-chk");
+
+	const selectedCount =
+	    document.querySelector(".selected-count");
+
+	const totalCount =
+	    document.querySelector(".total-count");
+
+	const deleteSelectedBtn =
+	    document.getElementById("btn-delete-selected");
+
+
+	function updateSelectedCount() {
+
+	    const checkedItems =
+	        document.querySelectorAll(
+	            ".item-chk:checked"
+	        );
+
+	    if (selectedCount) {
+	        selectedCount.textContent =
+	            checkedItems.length;
+	    }
+
+	    if (totalCount) {
+	        totalCount.textContent =
+	            itemCheckboxes.length;
+	    }
+
+	    if (checkAll) {
+
+	        checkAll.checked =
+	            itemCheckboxes.length > 0
+	            && checkedItems.length ===
+	               itemCheckboxes.length;
+	    }
+	}
 
 	if (checkAll) {
 
@@ -204,9 +239,19 @@
 	        }
 	    );
 	}
-	
-	const deleteSelectedBtn =
-	    document.getElementById("btn-delete-selected");
+
+	itemCheckboxes.forEach(
+	    function(item) {
+
+	        item.addEventListener(
+	            "change",
+	            function() {
+
+	                updateSelectedCount();
+	            }
+	        );
+	    }
+	);
 
 	if (deleteSelectedBtn) {
 
@@ -220,20 +265,27 @@
 	                );
 
 	            if (checkedItems.length === 0) {
-	                alert("삭제할 상품을 선택해주세요.");
+
+	                alert(
+	                    "삭제할 상품을 선택해주세요."
+	                );
+
 	                return;
 	            }
 
 	            if (!confirm(
-	                    "선택한 상품을 삭제하시겠습니까?"
+	                "선택한 상품을 삭제하시겠습니까?"
 	            )) {
 	                return;
 	            }
 
 	            const form =
-	                document.createElement("form");
+	                document.createElement(
+	                    "form"
+	                );
 
 	            form.method = "post";
+
 	            form.action =
 	                contextPath
 	                + "/cart/delete-selected";
@@ -260,7 +312,8 @@
 	        }
 	    );
 	}
-	
+
+	updateSelectedCount();
 </script>
 
 

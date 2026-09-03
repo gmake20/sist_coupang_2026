@@ -836,6 +836,151 @@ function setupDeliveryOption() {
   });
 }
 
+function refreshCartPreview() {
+
+    const preview =
+        document.getElementById(
+            "cartPreviewWrapper"
+        );
+
+    if (!preview) return;
+
+    const productOptionsData =
+        document.getElementById(
+            "productOptionsData"
+        );
+
+    const contextPath =
+        productOptionsData
+            ? productOptionsData.dataset.contextPath
+            : "";
+
+    fetch(contextPath + "/cart/preview", {
+        method: "GET",
+        headers: {
+            "X-Requested-With":
+                "XMLHttpRequest"
+        }
+    })
+    .then(function(response) {
+
+        if (!response.ok) {
+            throw new Error(
+                "장바구니 미리보기를 불러오지 못했습니다."
+            );
+        }
+
+        return response.text();
+    })
+    .then(function(html) {
+
+        preview.innerHTML = html;
+    })
+    .catch(function(error) {
+
+        console.error(error);
+    });
+}
+
+
+function setupCartAdd() {
+
+     const cartAddBtn =
+         document.getElementById("cartAddBtn");
+
+     const cartAddedPopup =
+         document.getElementById("cartAddedPopup");
+
+     const cartPopupClose =
+         document.getElementById("cartPopupClose");
+
+     if (!cartAddBtn) return;
+
+     cartAddBtn.addEventListener("click", function(e) {
+
+         e.preventDefault();
+
+         const form =
+             cartAddBtn.closest("form");
+
+         if (!form) return;
+
+         const formData =
+             new FormData(form);
+
+         const params =
+             new URLSearchParams();
+
+         formData.forEach(function(value, key) {
+             params.append(key, value);
+         });
+
+         cartAddBtn.disabled = true;
+
+         fetch(form.action, {
+             method: "POST",
+             body: params,
+             headers: {
+                 "X-Requested-With": "XMLHttpRequest"
+             }
+         })
+         .then(function(response) {
+
+             if (!response.ok) {
+                 throw new Error(
+                     "장바구니 담기에 실패했습니다."
+                 );
+             }
+
+             return response.json();
+         })
+         .then(function(data) {
+
+             if (!data.success) return;
+
+             // 팝업 표시
+             if (cartAddedPopup) {
+                 cartAddedPopup.classList.add("show");
+             }
+
+             // 헤더 장바구니 개수만 변경
+             const cartCount =
+                 document.getElementById("cartCount");
+
+             if (cartCount && data.cartCount != null) {
+                 cartCount.textContent = data.cartCount;
+             }
+			 
+			 refreshCartPreview();
+         })
+         .catch(function(error) {
+
+             console.error(error);
+
+             alert(
+                 "장바구니 담기 중 오류가 발생했습니다."
+             );
+         })
+         .finally(function() {
+
+             cartAddBtn.disabled = false;
+         });
+     });
+
+     if (cartPopupClose) {
+
+         cartPopupClose.addEventListener(
+             "click",
+             function() {
+
+                 if (cartAddedPopup) {
+                     cartAddedPopup.classList.remove("show");
+                 }
+             }
+         );
+     }
+ }
+
 
 /* ── 7. 품절 상태 ───────────────────────────────
    <body class="page-product is-soldout"> 가 붙으면 화면이 품절 모습으로 바뀜.
@@ -858,6 +1003,7 @@ setupAdSlider();
 setupOptionSelect(quantityControls.setStock, quantityControls.setPrice);
 setupReviewTools();
 setupDeliveryOption();
+setupCartAdd();
 /* ── 9. 리뷰 사진 갤러리 (2단 모달) ────────────────
    2026-08-24 추가. 원본을 Playwright 로 직접 열어서 확인한 흐름 그대로:
      ① 리뷰 사진 썸네일 클릭       → "갤러리" 모달 (사진 전체를 격자로)
@@ -940,100 +1086,7 @@ function setupReviewGallery() {
     lockScroll();
   }
   
-  const cartAddBtn =
-      document.getElementById("cartAddBtn");
-
-  const cartAddedPopup =
-      document.getElementById("cartAddedPopup");
-
-  const cartPopupClose =
-      document.getElementById("cartPopupClose");
-
-  if (cartAddBtn) {
-
-      cartAddBtn.addEventListener("click", function() {
-
-          const form =
-              cartAddBtn.closest("form");
-
-          const formData =
-              new FormData(form);
-
-          const params =
-              new URLSearchParams();
-
-          formData.forEach(function(value, key) {
-              params.append(key, value);
-          });
-
-          console.log(
-              "optionId:",
-              params.get("optionId")
-          );
-
-          console.log(
-              "quantity:",
-              params.get("quantity")
-          );
-
-          cartAddBtn.disabled = true;
-
-          fetch(form.action, {
-              method: "POST",
-              body: params,
-              headers: {
-                  "X-Requested-With":
-                      "XMLHttpRequest"
-              }
-          })
-          .then(function(response) {
-
-              if (!response.ok) {
-                  throw new Error(
-                      "장바구니 담기에 실패했습니다."
-                  );
-              }
-
-              return response.json();
-          })
-          .then(function(data) {
-
-              if (data.success) {
-                  cartAddedPopup.classList.add(
-                      "show"
-                  );
-              }
-
-          })
-          .catch(function(error) {
-
-              console.error(error);
-
-              alert(
-                  "장바구니 담기 중 오류가 발생했습니다."
-              );
-
-          })
-          .finally(function() {
-
-              cartAddBtn.disabled = false;
-          });
-      });
-  }
-
-  if (cartPopupClose) {
-
-      cartPopupClose.addEventListener(
-          "click",
-          function() {
-
-              cartAddedPopup.classList.remove(
-                  "show"
-              );
-          }
-      );
-  }
-
+ 
   /* ── ② 사진 뷰어 ── */
   function openViewer(index) {
     current = index;
