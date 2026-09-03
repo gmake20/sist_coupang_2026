@@ -129,13 +129,10 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		dto.setDetailType(request.getParameter("detailType"));
 
-		// 출고지/반품지 주소록 기능이 아직 없어서, 판매자 입점 시 등록한 사업장 주소를 그대로 사용
+		// 출고지 주소록 기능이 아직 없어서, 판매자 입점 시 등록한 사업장 주소를 그대로 사용
 		dto.setShippingZipcode(loginSeller.getZipcode());
 		dto.setShippingAddress(loginSeller.getBusinessAddress());
 		dto.setShippingDetailAddress(loginSeller.getBusinessDetailAddress());
-		dto.setReturnZipcode(loginSeller.getZipcode());
-		dto.setReturnAddress(loginSeller.getBusinessAddress());
-		dto.setReturnDetailAddress(loginSeller.getBusinessDetailAddress());
 
 		dto.setJejuShippingYn(request.getParameter("jejuShippingYn"));
 		dto.setDeliveryServiceCode(request.getParameter("courier"));
@@ -147,9 +144,6 @@ public class VendorProductWriteServlet extends HttpServlet {
 		dto.setLeadTimeDays(parseIntOrNull(request.getParameter("leadTimeDays")));
 		dto.setSameDayShipYn(request.getParameter("sameDayShipYn"));
 		dto.setSameDayCutoffTime(blankToNull(request.getParameter("cutoffTime")));
-
-		dto.setInitialShippingFee(parseIntOrZero(request.getParameter("initialShippingFee")));
-		dto.setReturnShippingFee(parseIntOrZero(request.getParameter("returnShippingFee")));
 
 		dto.setSaleStatus("승인 대기");
 

@@ -73,8 +73,6 @@ public class ProductWriteDAO {
                 delivery_service_code, delivery_method, bundle_shipping_yn,
                 shipping_fee_type, shipping_fee,
                 lead_time_input_type, lead_time_days, same_day_ship_yn, same_day_cutoff_time,
-                return_zipcode, return_address, return_detail_address,
-                initial_shipping_fee, return_shipping_fee,
                 sale_status, created_date, updated_date
             ) VALUES (
                 ?, ?, ?,
@@ -85,8 +83,6 @@ public class ProductWriteDAO {
                 ?, ?, ?,
                 ?, 0,
                 ?, ?, ?, ?,
-                ?, ?, ?,
-                ?, ?,
                 ?, SYSDATE, SYSDATE
             )
             """;
@@ -128,13 +124,6 @@ public class ProductWriteDAO {
             }
             pstmt.setString(i++, dto.getSameDayShipYn());
             pstmt.setString(i++, dto.getSameDayCutoffTime());
-
-            pstmt.setString(i++, dto.getReturnZipcode());
-            pstmt.setString(i++, dto.getReturnAddress());
-            pstmt.setString(i++, dto.getReturnDetailAddress());
-
-            pstmt.setInt(i++, dto.getInitialShippingFee());
-            pstmt.setInt(i++, dto.getReturnShippingFee());
 
             pstmt.setString(i++, dto.getSaleStatus());
 

@@ -40,12 +40,6 @@ public class ProductWriteDTO {
     private String sameDayShipYn;
     private String sameDayCutoffTime;
 
-    private String returnZipcode;
-    private String returnAddress;
-    private String returnDetailAddress;
-    private int initialShippingFee;
-    private int returnShippingFee;
-
     private String saleStatus;
 
     private List<ProductOptionWriteDTO> options = new ArrayList<>();
