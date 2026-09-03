@@ -51,7 +51,11 @@ function renderCategoryMenu(data) {
 		 return '<li><a href="/category?categoryNo=' + main.categoryNo + '">' + iconHtml + escapeCategoryHtml(main.categoryName) + '</a></li>';
     }
 
-    return '<li><a href="#">' + iconHtml + escapeCategoryHtml(main.categoryName) + '<i class="si"></i></a>'
+    // 2026-09-03: 대분류(레벨1) 페이지가 생겨서 실제 이동이 가능해짐 — 예전엔 미완성 페이지로
+    // 못 가게 일부러 href="#" 로 막아뒀었음(CLAUDE.md 4장 참고). 패널이 열리는 건 CSS :hover
+    // (common.css:1239)라서 href 값과 무관 — 여기 바꿔도 호버 동작엔 영향 없음
+    // return '<li><a href="#">' + iconHtml + escapeCategoryHtml(main.categoryName) + '<i class="si"></i></a>'
+    return '<li><a href="/category?categoryNo=' + main.categoryNo + '">' + iconHtml + escapeCategoryHtml(main.categoryName) + '<i class="si"></i></a>'
       + renderMidPanel(children, subList, main.imgUrl)
       + '</li>';
   }).join('');

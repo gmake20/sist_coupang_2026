@@ -134,13 +134,20 @@
 							     따라해서 disabled 를 걸어놨었음. 이 프로젝트 규칙("체크박스가 있으면 눌렀을 때 체크
 							     표시는 난다", 2026-09-01)에 맞춰 disabled 를 떼고 다른 항목과 똑같이 눌리게 함
 							     (흐린 색(opacity 0.4)은 원본 모습이라 그대로 둠) --%>
+							<%-- 2026-09-03: R.LUX/로켓배송/로켓직구 3개는 색만 입힌 글자였던 걸 원본 로고 이미지로 교체
+							     (coupang.com 에서 직접 받은 실제 로고 파일 — images/category/badge_*.png).
+							     brand-rlux/brand-rocket/brand-jikgu 색상 규칙은 category.css 에서 주석 처리해 둠 --%>
 							<ul class="filter-service-sub">
-								<li><label class="is-dimmed"><input type="checkbox" data-deco-id="top-rlux" data-label="R.LUX 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-rlux">R.LUX</span> 만 보기</label></li>
-								<li><label><input type="checkbox" data-deco-id="top-rocket" data-label="로켓배송 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-rocket">로켓배송</span> 만 보기</label></li>
-								<li><label><input type="checkbox" data-deco-id="top-jikgu" data-label="로켓직구 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-jikgu">로켓직구</span> 만 보기</label></li>
+								<%-- <li><label class="is-dimmed"><input type="checkbox" data-deco-id="top-rlux" data-label="R.LUX 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-rlux">R.LUX</span> 만 보기</label></li> --%>
+								<li><label class="is-dimmed"><input type="checkbox" data-deco-id="top-rlux" data-label="R.LUX 만 보기"><i class="filter-function-bar-asset"></i><span class="service-badge sub is-rlux"><img src="${pageContext.request.contextPath}/images/category/badge_rlux.png" alt="R.LUX"></span>만 보기</label></li>
+								<%-- <li><label><input type="checkbox" data-deco-id="top-rocket" data-label="로켓배송 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-rocket">로켓배송</span> 만 보기</label></li> --%>
+								<li><label><input type="checkbox" data-deco-id="top-rocket" data-label="로켓배송 만 보기"><i class="filter-function-bar-asset"></i><span class="service-badge sub"><img src="${pageContext.request.contextPath}/images/category/badge_rocket.png" alt="로켓배송"></span>만 보기</label></li>
+								<%-- <li><label><input type="checkbox" data-deco-id="top-jikgu" data-label="로켓직구 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-jikgu">로켓직구</span> 만 보기</label></li> --%>
+								<li><label><input type="checkbox" data-deco-id="top-jikgu" data-label="로켓직구 만 보기"><i class="filter-function-bar-asset"></i><span class="service-badge sub"><img src="${pageContext.request.contextPath}/images/category/badge_jikgu.png" alt="로켓직구"></span>만 보기</label></li>
 							</ul>
 						</li>
-						<li><label><input type="checkbox" data-deco-id="top-topbrand" data-label="C.에비뉴"><i class="filter-function-bar-asset"></i><span class="brand-cavenue">C.에비뉴</span></label></li>
+						<%-- <li><label><input type="checkbox" data-deco-id="top-topbrand" data-label="C.에비뉴"><i class="filter-function-bar-asset"></i><span class="brand-cavenue">C.에비뉴</span></label></li> --%>
+						<li><label><input type="checkbox" data-deco-id="top-topbrand" data-label="C.에비뉴"><i class="filter-function-bar-asset"></i><span class="service-badge sub is-cavenue"><img src="${pageContext.request.contextPath}/images/category/badge_cavenue.svg" alt="C.에비뉴"></span></label></li>
 						<li><label><input type="checkbox" data-deco-id="top-free" data-label="무료배송"><i class="filter-function-bar-asset"></i><span>무료배송</span></label></li>
 					</ul>
 				</section>
@@ -339,6 +346,53 @@
 							<a href="#">
 								<img src="${pageContext.request.contextPath}/images/category/banner_promo3.png" alt="기획전 배너">
 							</a>
+						</div>
+
+					</div>
+				</c:if>
+
+				<%-- ==================================================
+				     대분류(레벨1) 페이지에만 나오는 영역 — 2026-09-03 추가.
+				     원본(coupang.com/np/categories/564653, Playwright 실측) 확인 결과 제목 바로 아래에
+				     ① 히어로 배너 캐러셀 ② 브랜드관 배너 캐러셀이 옴. 근데 원본에서 실제 DOM을 뜯어보니
+				     둘 다 접속할 때마다 바뀌는 광고 마켓플레이스 캐러셀(광고주별 링크가 계속 바뀜)이라
+				     전부 못 가져오고, 대표 이미지 몇 장만 정지 배너로 캡처해서 씀
+				     (원본 이미지 그대로 받음 — static.coupangcdn.com/image/bannerunit/...).
+				     중분류/소분류 페이지에서는 isTopCategory 가 false 라 이 블록이 통째로 안 나옴 --%>
+				<c:if test="${isTopCategory}">
+					<div class="top-extra">
+
+						<%-- ① 히어로 배너 — 원본은 1030px 칸 안에 768×324 배너가 겹쳐 있고 캐러셀로 한 장씩 보임.
+						     우리는 캐러셀을 안 만들고 첫 장만 보여줌(나머지 2장은 마크업에 그대로 두고 CSS 로 숨김 —
+						     나중에 캐러셀을 붙이면 마크업은 안 고쳐도 됨). 히어로 아래 여백 30px 도 실측값 --%>
+						<div class="top-hero">
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_hero_1.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_hero_2.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_hero_3.png" alt="기획전 배너"></a>
+						</div>
+
+						<%-- ② 그 아래는 1080px 폭 배너가 세로로 "간격 없이" 쭉 붙어 있음(실측: 446→375→237×9→124→412×4).
+						     원본 순서·크기 그대로 옮김.
+						     ★ 첫 장(l1_tiles)은 원본에서 투명 <a> 10개를 얹은 이미지맵인데, 그 10칸(여성/남성/신발/
+						       C.스트리트/R.LUX …)이 우리 DB 카테고리 6개와 안 맞아서 링크는 안 얹음. 카테고리 이동은
+						       왼쪽 사이드바가 이미 담당함 --%>
+						<div class="top-banners">
+							<img src="${pageContext.request.contextPath}/images/category/l1_tiles.png" alt="카테고리 바로가기">
+							<img src="${pageContext.request.contextPath}/images/category/l1_promo_cards.png" alt="기획전 모음">
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_1.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_2.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_3.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_4.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_5.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_6.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_7.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_8.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_9.png" alt="기획전 배너"></a>
+							<img src="${pageContext.request.contextPath}/images/category/l1_brand_title.png" alt="브랜드관">
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_brand_1.png" alt="브랜드관 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_brand_2.png" alt="브랜드관 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_brand_3.png" alt="브랜드관 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_brand_4.png" alt="브랜드관 배너"></a>
 						</div>
 
 					</div>

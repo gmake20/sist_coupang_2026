@@ -84,6 +84,9 @@ public class CategoryServlet extends HttpServlet {
          */
         CategoryDTO current = dao.findCategory(categoryNo);
         boolean isMidCategory = (current != null && current.getCategoryLevel() == 2);
+        // 2026-09-03 추가 — 대분류(레벨1) 페이지 구분용. 사이드바 "카테고리"를 자식(중분류) 목록으로
+        // 보여줘야 하는 게 중분류뿐 아니라 대분류도 해당돼서 따로 뺌(아래 sidebarCategories 참고)
+        boolean isTopCategory = (current != null && current.getCategoryLevel() == 1);
         List<CategoryDTO> childCategories = dao.findChildCategories(categoryNo);
 
         List<CategoryProductDTO> products =
@@ -119,14 +122,18 @@ public class CategoryServlet extends HttpServlet {
          */
         request.setAttribute("categoryName", current != null ? current.getCategoryName() : "");
         request.setAttribute("isMidCategory", isMidCategory);
+        request.setAttribute("isTopCategory", isTopCategory);   // 2026-09-03 추가
 
         /*
          * 왼쪽 필터 사이드바의 "카테고리" 그룹 —
+         *   대분류 페이지: 자식 목록(여성패션·남성패션 …)      ← 2026-09-03 추가, 원본도 이럼
          *   중분류 페이지: 자식 목록(티셔츠·맨투맨/후드티 …)   ← 원본 쿠팡도 이럼
          *   소분류 페이지: 예전 그대로 형제 목록
-         * 맨 아래 "함께 본 카테고리"는 두 경우 다 형제(siblingCategories)를 계속 쓴다 — 이것도 원본과 같음.
+         * 맨 아래 "함께 본 카테고리"는 세 경우 다 형제(siblingCategories)를 계속 쓴다 — 이것도 원본과 같음.
+         * (대분류는 findSiblingCategories() 를 NULL-세이프하게 고쳐서 "다른 대분류들"이 형제로 잡히게 함)
          */
-        request.setAttribute("sidebarCategories", isMidCategory ? childCategories : siblingCategories);
+        // request.setAttribute("sidebarCategories", isMidCategory ? childCategories : siblingCategories);
+        request.setAttribute("sidebarCategories", (isMidCategory || isTopCategory) ? childCategories : siblingCategories);
 
         /*
          * 제목 아래 원형 타일 그리드에 쓸 목록.

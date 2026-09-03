@@ -407,13 +407,21 @@ public class CategoryProductDAO {
 
         List<CategoryDTO> list = new ArrayList<>();
 
+        // 2026-09-03 추가: 대분류(레벨1)는 PARENT_CATEGORY_NO 가 둘 다 NULL 이라
+        // 원래 조건(NULL = NULL)이 SQL에서 거짓 취급돼 0건이었음(대분류의 "함께 본 카테고리"가
+        // 텅 비던 원인). NULL-세이프 분기를 더해서 대분류일 땐 "다른 대분류들"이 형제로 잡히게 함.
+        // 레벨2/3은 PARENT_CATEGORY_NO 가 NULL이 아니라 OR 뒤쪽은 안 타서 기존 동작 그대로.
         String sql = """
                 SELECT SIB.CATEGORY_NO, SIB.CATEGORY_NAME, SIB.PARENT_CATEGORY_NO, SIB.CATEGORY_LEVEL
                 FROM CATEGORY SELF
-                JOIN CATEGORY SIB ON SIB.PARENT_CATEGORY_NO = SELF.PARENT_CATEGORY_NO
+                JOIN CATEGORY SIB ON (SIB.PARENT_CATEGORY_NO = SELF.PARENT_CATEGORY_NO
+                                       OR (SIB.PARENT_CATEGORY_NO IS NULL AND SELF.PARENT_CATEGORY_NO IS NULL))
                 WHERE SELF.CATEGORY_NO = ?
                 ORDER BY SIB.CATEGORY_NO
                 """;
+                /* 원래 줄(주석 보존):
+                JOIN CATEGORY SIB ON SIB.PARENT_CATEGORY_NO = SELF.PARENT_CATEGORY_NO
+                */
 
         try (
             Connection conn = ConnectionProvider.getConnection();

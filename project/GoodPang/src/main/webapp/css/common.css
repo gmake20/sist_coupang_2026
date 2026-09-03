@@ -1952,22 +1952,30 @@ a.del-button:hover {
   overflow: hidden;         /* 원본 #wa-footer .sns-link a 에 있는 값 */
 }
 
-/* 이미지가 아직 없어서 동그라미로 대체.
-   ::before = "이 요소 안 맨 앞에 가짜 자식 하나 만들기".
-   HTML을 안 고치고도 <img> 자리를 흉내낼 수 있어서 이렇게 함.
-   → 진짜 이미지가 준비되면 <a> 안에 <img width="30" height="30"> 넣고
-     아래 ::before 규칙 3개를 지우면 됨 */
+/* 원본은 <a> 안에 <img width="30" height="30"> 가 들어있는데,
+   footer.jsp 는 팀원 공용이라 HTML 을 안 건드리고 ::before 로 그 자리를 채움.
+   ::before = "이 요소 안 맨 앞에 가짜 자식 하나 만들기" */
 .sns-link a::before {
   content: "";              /* ::before 는 content 가 있어야 화면에 나타남 */
   display: block;
   width: 30px;              /* 원본 <img> 크기 */
   height: 30px;
-  border-radius: 50%;       /* 정사각형이 완전한 원이 됨 */
+  border-radius: 50%;       /* blog 만 정사각형 png 라 여기서 동그래짐.
+                               원본도 blog <img> 에만 fw-rounded-full 을 걸어서 같은 방식 */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;   /* 이미지가 60x60(2배) 라 30x30 칸에 맞춰 줄임 */
 }
 
+/* 2026-09-03: 이미지가 원본과 맞는 걸 확인해서 컬러 동그라미 → 진짜 로고로 교체.
+   이전 코드 (지우지 않고 남겨둠):
 .sns-link .facebook::before  { background: #1877f2; }
 .sns-link .blog::before      { background: var(--coupang-blue); }
 .sns-link .instagram::before { background: #e1306c; }
+*/
+.sns-link .facebook::before  { background-image: url(../images/icons/sns-facebook.png); }
+.sns-link .blog::before      { background-image: url(../images/icons/sns-blog.png); }
+.sns-link .instagram::before { background-image: url(../images/icons/sns-instagram.png); }
 
 
 /* =========================================================
