@@ -2517,7 +2517,7 @@ a.del-button:hover {
 	overflow: visible;
 }
 
-#header .cart-preview {
+/* #header .cart-preview {
 	display: none;
 	position: absolute;
 	top: 60px;
@@ -2529,7 +2529,7 @@ a.del-button:hover {
 	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 	z-index: 99999;
 	box-sizing: border-box;
-}
+} */
 
 #header .cart:hover .cart-preview {
 	display: block;
@@ -2544,7 +2544,7 @@ a.del-button:hover {
 }
 
 /* 화살표 */
-#header .cart-preview .arrow {
+/* #header .cart-preview .arrow {
 	position: absolute;
 	top: -8px;
 	right: 35px;
@@ -2554,6 +2554,10 @@ a.del-button:hover {
 	border-top: 1px solid #aaa;
 	border-left: 1px solid #aaa;
 	transform: rotate(45deg);
+} */
+
+#header .cart-preview .arrow {
+	display: none;
 }
 
 /* 상품 목록 */
@@ -2731,3 +2735,58 @@ a.del-button:hover {
 	border-right: 1px solid #346aff;
 	transform: rotate(45deg);
 }
+
+/* #header .cart-preview {
+	display: none;
+	position: absolute;
+	top: 58px;
+	right: -15px;
+	width: 380px;
+	padding: 0;
+	background: #fff;
+	border: 1px solid #aaa;
+	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+	z-index: 99999;
+	box-sizing: border-box;
+}
+ */
+#header .cart-preview {
+	border: 1px solid #aaa;
+	border-top: none;
+}
+
+#header .cart-preview .wrapper {
+	display: block;
+	width: 100%;
+	padding: 14px 14px 12px;
+	box-sizing: border-box;
+}
+
+#header .cart-preview .wrapper {
+	border-top: none !important;
+}
+
+#header .cart-preview {
+	position: absolute;
+	top: 60px;
+	right: -15px;
+	width: 380px;
+	background: #fff;
+	border: 1px solid #aaa;
+	border-top: none;
+	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+	z-index: 99999;
+	box-sizing: border-box;
+}
+
+/* 팝업 위쪽 정렬선 */
+#header .cart-preview::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 1px;
+	background: #aaa;
+}
+
