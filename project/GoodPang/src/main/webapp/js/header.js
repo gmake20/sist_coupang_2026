@@ -452,15 +452,21 @@ function setupSearchAutocomplete(box) {
   const form = box.closest('form');
   if (form) {
     form.addEventListener('submit', function (e) {
-      e.preventDefault();          // 아직 검색 결과 페이지가 없으므로 이동은 막음
       const word = input.value.trim();
-      if (word && !isHistoryOff()) {
+
+      if (!word) {
+        e.preventDefault();   // 빈 검색어로는 이동하지 않음
+        return;
+      }
+
+      if (!isHistoryOff()) {
         let list = loadHistory();
         list = list.filter(function (w) { return w !== word; });   // 중복 제거
         list.unshift(word);                                        // 맨 앞에 넣기
         saveHistory(list.slice(0, 10));                            // 최대 10개
       }
       close();
+      // preventDefault 하지 않음 — /search?keyword=... 로 실제 이동
     });
   }
 
