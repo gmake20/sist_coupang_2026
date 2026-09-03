@@ -154,3 +154,81 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	});
 });
+
+// ============================================================
+// 대분류(레벨1) 페이지 히어로 배너 — 2026-09-03 추가.
+//
+// 원본(coupang.com/np/categories/564653)은 Swiper 라이브러리를 쓰지만 우리는 라이브러리를 새로
+// 넣지 않고, 메인페이지 배너들(main.js)과 똑같은 방식(setInterval + 클래스 토글)으로 만듦.
+//   왼쪽 큰 배너 : 10장이 겹쳐 있고 4초마다 투명도로 바뀜(fade)
+//   오른쪽 작은 띠: 10장이 세로로 쌓여 있고, 4초마다 한 칸씩 위로 밀림 + 화살표로도 넘길 수 있음
+//
+// 소분류·중분류 페이지엔 이 요소들이 아예 없으므로 아무것도 안 하고 그냥 끝남.
+// ============================================================
+document.addEventListener('DOMContentLoaded', function () {
+	var SLIDE_MS = 4000;   // main.js 의 다른 배너들과 같은 간격(4초)으로 통일
+	var ITEM_H = 59;       // 오른쪽 띠 한 칸 높이(원본 실측)
+	var VISIBLE = 5;       // 324px 칸에 5칸 반이 보임 — 셀 때는 5칸으로
+
+	var heroBox = document.querySelector('.top-hero');
+	if (!heroBox) return;   // 소분류·중분류 페이지엔 이 영역이 없음
+
+	var slides = heroBox.querySelectorAll('.hero-slide');
+	var items = heroBox.querySelectorAll('.hero-side-item');
+	var track = heroBox.querySelector('.hero-side-track');
+	if (slides.length === 0) return;
+
+	var idx = 0;        // 지금 보이는 큰 배너 번호
+	var offset = 0;     // 띠를 몇 칸 밀어놨는지
+	var timer = null;
+
+	/*
+	 * ★ 오른쪽 띠는 큰 배너의 "목차" 다 (원본 확인: 큰배너 활성 index 와 띠 활성 index 가 같았음).
+	 *   그래서 배너가 넘어갈 때마다 같은 번호의 띠 칸을 파랗게(is-active) 바꾸고,
+	 *   그 칸이 화면 밖으로 나가 있으면 보이도록 띠를 굴린다.
+	 */
+	function show(n) {
+		idx = (n + slides.length) % slides.length;
+
+		slides.forEach(function (s, i) { s.classList.toggle('is-active', i === idx); });
+		items.forEach(function (it, i) { it.classList.toggle('is-active', i === idx); });
+
+		// 지금 칸이 보이는 범위(offset ~ offset+4) 밖이면 그 칸이 보이게 띠를 옮김
+		if (idx < offset) offset = idx;
+		else if (idx > offset + VISIBLE - 1) offset = idx - VISIBLE + 1;
+
+		var maxOffset = Math.max(0, items.length - VISIBLE);
+		if (offset > maxOffset) offset = maxOffset;
+		if (offset < 0) offset = 0;
+
+		if (track) track.style.transform = 'translateY(' + (-offset * ITEM_H) + 'px)';
+	}
+
+	function start() {
+		stop();
+		timer = setInterval(function () { show(idx + 1); }, SLIDE_MS);
+	}
+
+	function stop() {
+		clearInterval(timer);
+	}
+
+	// 띠 아래 ∧ ∨ 화살표 — 이전/다음 배너로 넘김
+	var prevBtn = heroBox.querySelector('.hero-side-prev');
+	var nextBtn = heroBox.querySelector('.hero-side-next');
+	if (prevBtn) prevBtn.addEventListener('click', function () { show(idx - 1); start(); });
+	if (nextBtn) nextBtn.addEventListener('click', function () { show(idx + 1); start(); });
+
+	// 띠 칸에 마우스만 올려도 그 배너로 바뀜 — 메인페이지 히어로 썸네일(main.js 59줄)과 같은 방식.
+	// (원본은 이 칸들이 기획전 페이지로 가는 진짜 링크인데 우리는 그 페이지가 없어서 href="#" 임)
+	items.forEach(function (it, i) {
+		it.addEventListener('mouseenter', function () { show(i); });
+	});
+
+	// 배너 위에 마우스를 올려둔 동안은 자동 넘김을 멈춤(보는 중에 바뀌면 불편함 — main.js 와 같은 규칙)
+	heroBox.addEventListener('mouseenter', stop);
+	heroBox.addEventListener('mouseleave', start);
+
+	show(0);
+	start();
+});

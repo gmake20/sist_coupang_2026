@@ -362,22 +362,62 @@
 				<c:if test="${isTopCategory}">
 					<div class="top-extra">
 
-						<%-- ① 히어로 배너 — 원본은 1030px 칸 안에 768×324 배너가 겹쳐 있고 캐러셀로 한 장씩 보임.
-						     우리는 캐러셀을 안 만들고 첫 장만 보여줌(나머지 2장은 마크업에 그대로 두고 CSS 로 숨김 —
-						     나중에 캐러셀을 붙이면 마크업은 안 고쳐도 됨). 히어로 아래 여백 30px 도 실측값 --%>
+						<%-- ① 히어로 영역 — 원본 실측: 1030px 칸 안에 두 덩어리가 나란히 있음.
+						       왼쪽 768×324 : 큰 배너 10장이 4초마다 은은하게 바뀌는 캐러셀(원본은 Swiper 의 fade 모드)
+						       오른쪽 261×324 : 작은 배너(261×59) 10장이 세로로 쌓여 있고 위아래로 넘어감.
+						                        맨 아래 260×29 짜리 옅은 바에 ∧ ∨ 화살표가 가운데 있음
+						     넘기는 동작은 category.js 가 함(라이브러리 안 씀 — main.js 의 배너들과 같은 방식).
+						     히어로 아래 여백 30px 도 실측값 --%>
 						<div class="top-hero">
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_hero_1.png" alt="기획전 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_hero_2.png" alt="기획전 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_hero_3.png" alt="기획전 배너"></a>
+
+							<div class="top-hero-main">
+								<c:forEach var="n" begin="1" end="10">
+									<a href="#" class="hero-slide"><img src="${pageContext.request.contextPath}/images/category/l1_hero_${n}.png" alt="기획전 배너"></a>
+								</c:forEach>
+							</div>
+
+							<%-- 작은 배너 이미지는 522×58 짜리 "2컷 스프라이트" 임 — 왼쪽 절반이 평소 모습,
+							     오른쪽 절반이 강조된 모습(파란 배경). 그래서 칸을 261px 로 잘라놓고
+							     마우스를 올리면 이미지를 왼쪽으로 261px 밀어서 오른쪽 컷이 보이게 함(CSS) --%>
+							<div class="top-hero-side">
+								<div class="hero-side-track">
+									<c:forEach var="n" begin="1" end="10">
+										<a href="#" class="hero-side-item"><img src="${pageContext.request.contextPath}/images/category/l1_side_${n}.png" alt="기획전 배너"></a>
+									</c:forEach>
+								</div>
+								<div class="hero-side-nav">
+									<button type="button" class="hero-side-prev" aria-label="이전 배너"></button>
+									<button type="button" class="hero-side-next" aria-label="다음 배너"></button>
+								</div>
+							</div>
+
 						</div>
 
 						<%-- ② 그 아래는 1080px 폭 배너가 세로로 "간격 없이" 쭉 붙어 있음(실측: 446→375→237×9→124→412×4).
 						     원본 순서·크기 그대로 옮김.
-						     ★ 첫 장(l1_tiles)은 원본에서 투명 <a> 10개를 얹은 이미지맵인데, 그 10칸(여성/남성/신발/
-						       C.스트리트/R.LUX …)이 우리 DB 카테고리 6개와 안 맞아서 링크는 안 얹음. 카테고리 이동은
-						       왼쪽 사이드바가 이미 담당함 --%>
+						     ★ 첫 장(l1_tiles)은 원본처럼 "이미지 1장 + 투명 <a> 10개" 로 만든 이미지맵.
+						       칸 위치는 이미지에서 원을 직접 검출해 잰 값(원 지름 110px, 가로 간격 132px,
+						       시작 x=221, 윗줄 y=59 / 아랫줄 y=237 — 중분류 타일과 같은 규격)을 % 로 바꿔 CSS 에 넣음.
+						       어느 칸을 어느 카테고리로 보낼지는 CategoryServlet 이 이름으로 찾아서 tileSlots 로 내려줌 —
+						       우리 DB 에 없는 칸(C.에비뉴/C.스트리트 등)은 href 없는 빈 칸이라 눌러도 아무 일 안 남 --%>
 						<div class="top-banners">
-							<img src="${pageContext.request.contextPath}/images/category/l1_tiles.png" alt="카테고리 바로가기">
+
+							<div class="top-tiles">
+								<img src="${pageContext.request.contextPath}/images/category/l1_tiles.png" alt="카테고리 바로가기">
+								<div class="tile-hits">
+									<c:forEach var="slot" items="${tileSlots}">
+										<c:choose>
+											<c:when test="${slot.categoryNo > 0}">
+												<a class="tile-hit" href="${pageContext.request.contextPath}/category?categoryNo=${slot.categoryNo}" title="${slot.categoryName}"></a>
+											</c:when>
+											<c:otherwise>
+												<a class="tile-hit is-empty"></a>
+											</c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</div>
+							</div>
+
 							<img src="${pageContext.request.contextPath}/images/category/l1_promo_cards.png" alt="기획전 모음">
 							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_1.png" alt="기획전 배너"></a>
 							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_2.png" alt="기획전 배너"></a>

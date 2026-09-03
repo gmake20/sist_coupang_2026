@@ -146,6 +146,12 @@ public class CategoryServlet extends HttpServlet {
          */
         request.setAttribute("categoryTiles", isMidCategory ? tilesWithImage(childCategories) : null);
 
+        /*
+         * 대분류(레벨1) 제목 아래 "원형 타일" 이미지(l1_tiles.png)의 10칸을 우리 DB 카테고리와 잇는다
+         * (2026-09-03 추가). 중분류 타일과 달리 이건 글자가 이미지에 박혀 있어서 칸 순서가 고정이다.
+         */
+        request.setAttribute("tileSlots", isTopCategory ? buildTileSlots(childCategories) : null);
+
         /* 실제 DB에 속성 컬럼 자체가 없는 필터들 — 화면엔 보여주되(원본과 동일 구성) 동작은 안 함(2026-08-30 확정).
          * 2026-08-31: 원본 실측(Playwright browser_evaluate, ref/category/STRUCTURE.md)한 순서 그대로 맞추려고
          * "색상 앞"/"색상 뒤" 두 그룹으로 나눔 — 원본은 카테고리→브랜드→상품상태→색상→핏→...→별점→가격 순서라
@@ -237,6 +243,54 @@ public class CategoryServlet extends HttpServlet {
      * 그래야 File.exists() 로 파일이 있는지 확인할 수 있다.
      * 파일이 없는 카테고리는 타일에서 빼고, 왼쪽 사이드바 목록에는 그대로 남는다(원본과 같은 동작).
      */
+    /*
+     * 대분류 타일 이미지(l1_tiles.png)의 10칸 순서 — 이미지에 글자가 박혀 있어서 순서를 바꿀 수 없다.
+     *   윗줄  : 여성 / 남성 / 남녀공용 / 속옷·잠옷 / 신발
+     *   아랫줄 : 가방·잡화 / 유아동 / C.에비뉴 / C.스트리트 / R.LUX
+     *
+     * 각 칸에 "우리 DB 카테고리 이름에 이 낱말이 들어 있으면 거기로 연결" 이라는 키워드만 적어둔다.
+     * 카테고리 번호를 여기 직접 적지 않는 이유: 번호는 DB 에 있는 값이라 팀에서 바뀔 수 있고,
+     * 이름으로 찾으면 카테고리가 바뀌어도 코드를 안 고쳐도 되기 때문.
+     * null 인 칸(C.에비뉴/C.스트리트)은 우리한테 해당 카테고리가 없어서 링크를 안 만든다 —
+     * 없는 페이지로 보내면 안 되니까. "신발"/"가방" 도 DB 에 없으면 자동으로 링크가 안 생긴다.
+     */
+    private static final String[] TILE_KEYWORDS = {
+            "여성", "남성", "남녀", "속옷", "신발",
+            "가방", "유아동", null, null, "럭셔리"
+    };
+
+    /*
+     * 타일 10칸 각각에 붙일 카테고리를 찾아준다 (2026-09-03 추가).
+     * 찾은 게 없으면 categoryNo 가 0 이고, JSP 는 0 이면 링크 없는 빈 칸으로 그린다.
+     * (칸 위치는 CSS 가 :nth-child 로 잡으므로 없는 칸도 자리는 그대로 둬야 함)
+     */
+    private List<Map<String, Object>> buildTileSlots(List<CategoryDTO> children) {
+        List<Map<String, Object>> slots = new ArrayList<>();
+
+        for (String keyword : TILE_KEYWORDS) {
+            Map<String, Object> slot = new LinkedHashMap<>();
+            long categoryNo = 0;
+            String categoryName = "";
+
+            if (keyword != null && children != null) {
+                for (CategoryDTO child : children) {
+                    String name = child.getCategoryName();
+                    if (name != null && name.contains(keyword)) {
+                        categoryNo = child.getCategoryNo();
+                        categoryName = name;
+                        break;
+                    }
+                }
+            }
+
+            slot.put("categoryNo", categoryNo);
+            slot.put("categoryName", categoryName);
+            slots.add(slot);
+        }
+
+        return slots;
+    }
+
     private List<CategoryDTO> tilesWithImage(List<CategoryDTO> children) {
         List<CategoryDTO> tiles = new ArrayList<>();
         for (CategoryDTO child : children) {

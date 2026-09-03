@@ -1145,27 +1145,129 @@ label.selected .filter-function-bar-asset::after,
 	margin-bottom: 60px;
 }
 
-/* 히어로 칸 — 원본 실측 폭 1030px. 안의 배너 이미지는 768×324 로 왼쪽에 붙어 있음 */
+/* 히어로 영역 — 원본 실측 1030×324. 왼쪽 큰 배너(768) + 오른쪽 작은 배너 띠(261)가 나란히.
+   768 + 1 + 261 = 1030 이라 오른쪽 띠의 시작 위치가 769px */
 .top-hero {
+	position: relative;
 	width: 1030px;
+	height: 324px;
 	margin-bottom: 30px;
 }
 
-.top-hero a {
+/* ── 왼쪽 큰 배너(캐러셀) ── 원본은 Swiper 의 fade 모드라 슬라이드가 겹쳐 있고 투명도만 바뀜.
+   우리도 10장을 같은 자리에 겹쳐두고 .is-active 인 것만 보이게 함(넘기는 건 category.js) */
+.top-hero-main {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 768px;
+	height: 324px;
+}
+
+.top-hero-main .hero-slide {
+	position: absolute;
+	left: 0;
+	top: 0;
 	display: block;
+	opacity: 0;
+	transition: opacity 0.4s;
 }
 
-/* 원본은 배너 10장이 같은 자리에 겹쳐 있고 캐러셀이 한 장씩 보여주는 구조.
-   우리는 캐러셀을 안 만들었으므로 첫 장만 보이게 함 — 나중에 캐러셀을 붙일 때
-   이 규칙만 지우면 되고 JSP 는 안 고쳐도 됨 */
-.top-hero a:not(:first-child) {
-	display: none;
+.top-hero-main .hero-slide.is-active {
+	opacity: 1;
 }
 
-.top-hero img {
+.top-hero-main img {
 	display: block;
 	width: 768px;
 	height: 324px;
+}
+
+/* ── 오른쪽 작은 배너 띠 ── 261×324 칸에 261×59 짜리가 10장. overflow:hidden 이라 5칸 반만 보이고
+   나머지는 잘림 — 위아래로 밀어서 넘김(category.js 가 .hero-side-track 을 translateY 로 움직임) */
+.top-hero-side {
+	position: absolute;
+	left: 769px;
+	top: 0;
+	width: 261px;
+	height: 324px;
+	overflow: hidden;
+}
+
+.hero-side-track {
+	transition: transform 0.4s;
+}
+
+/* 이미지가 522px(2컷)이라 칸을 261px 로 잘라서 왼쪽 컷만 보이게 함 */
+.hero-side-item {
+	display: block;
+	width: 261px;
+	height: 59px;
+	overflow: hidden;
+}
+
+/* ★ max-width:none 이 꼭 있어야 함 — reset.css 78줄의 전역 `img { max-width: 100% }` 때문에
+   522px 가 부모 폭(261px)으로 줄어들어 두 컷이 다 찌그러져 보였음(실제로 당함) */
+.hero-side-item img {
+	display: block;
+	width: 522px;
+	max-width: none;
+	height: 59px;
+}
+
+/* ★ 오른쪽 띠는 큰 배너의 "목차" 임 — 원본 확인 결과 파랗게 강조된 칸이 지금 보이는 큰 배너와
+   같은 내용이었음(큰배너 활성 index 5 == 띠 활성 index 5 로 실제 확인).
+   그래서 지금 배너에 해당하는 칸만 이미지를 왼쪽으로 261px 밀어 오른쪽 컷(파란 배경)을 보여준다. */
+.hero-side-item.is-active img {
+	margin-left: -261px;
+}
+
+/* 띠 맨 아래 화살표 바 — 원본 실측 260×29, 옅은 바 위에 ∧ ∨ 꺾쇠가 가운데.
+   원본은 스프라이트 이미지(img1a.coupangcdn.com)를 쓰는데 승인 안 된 도메인이라
+   .filter-function-bar-asset 처럼 CSS 로 그림 */
+.hero-side-nav {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 260px;
+	height: 29px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	background: rgba(250, 250, 250, 0.95);
+	border-top: 1px solid #EEEEEE;
+}
+
+.hero-side-nav button {
+	width: 29px;
+	height: 29px;
+	padding: 0;
+	border: 0;
+	background: none;
+	cursor: pointer;
+	position: relative;
+}
+
+/* 꺾쇠는 정사각형의 두 변만 남기고 45도 돌려서 그림 */
+.hero-side-nav button::before {
+	content: "";
+	position: absolute;
+	left: 10px;
+	width: 8px;
+	height: 8px;
+	border-left: 1px solid #AAAAAA;
+	border-top: 1px solid #AAAAAA;
+}
+
+.hero-side-nav .hero-side-prev::before {
+	top: 12px;
+	transform: rotate(45deg);      /* ∧ */
+}
+
+.hero-side-nav .hero-side-next::before {
+	top: 8px;
+	transform: rotate(225deg);     /* ∨ */
 }
 
 /* 1080px 배너들 — 원본처럼 세로로 간격 없이 붙임 */
@@ -1176,4 +1278,40 @@ label.selected .filter-function-bar-asset::after,
 
 .top-banners img {
 	width: 100%;
+}
+
+/* ── 원형 타일 이미지맵 ──
+   이미지(1080×446) 위에 투명한 <a> 10개를 얹는다. 원본도 같은 방식.
+
+   ★ 칸 위치는 지어낸 값이 아니라 l1_tiles.png 를 캔버스에 그려 원(회색 동그라미)이 있는
+     구간을 직접 검출해서 잰 값이다:
+       원 지름 110px / 가로 간격 132px / 첫 원 왼쪽 x=221 / 윗줄 y=59, 아랫줄 y=237
+       (중분류 타일 실측값과 같은 규격 — 쿠팡이 두 페이지에 같은 격자를 씀)
+     누르는 칸은 원본처럼 원보다 조금 넓게(124×171) 잡아서 원 + 글자까지 덮게 했다.
+   ★ % 로 적은 이유: 창을 줄이면 이미지가 같이 줄어드는데, px 로 적으면 칸만 제자리에 남아
+     어긋나기 때문. (1080px 기준 → 124/1080=11.481%, 171/446=38.341% …) */
+.top-tiles {
+	position: relative;
+}
+
+.tile-hit {
+	position: absolute;
+	width: 11.481%;
+	height: 38.341%;
+}
+
+/* 가로 5칸 — 시작 214/1080, 간격 132/1080 */
+.tile-hit:nth-child(5n + 1) { left: 19.815%; }
+.tile-hit:nth-child(5n + 2) { left: 32.037%; }
+.tile-hit:nth-child(5n + 3) { left: 44.259%; }
+.tile-hit:nth-child(5n + 4) { left: 56.481%; }
+.tile-hit:nth-child(5n + 5) { left: 68.704%; }
+
+/* 세로 2줄 — 1~5번이 윗줄, 6~10번이 아랫줄 */
+.tile-hit:nth-child(-n + 5) { top: 11.435%; }
+.tile-hit:nth-child(n + 6)  { top: 51.345%; }
+
+/* 우리 DB 에 없는 칸 — href 가 없어서 이미 안 눌리지만, 손 모양 커서도 안 뜨게 함 */
+.tile-hit.is-empty {
+	cursor: default;
 }

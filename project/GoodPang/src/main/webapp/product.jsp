@@ -704,6 +704,8 @@
 							class="gw-card__price">7,670원</strong> <span
 							class="gw-card__ship">${deliveryDate} 도착 보장</span> <span
 							class="gw-card__rating"><em class="stars">★★★★☆</em>(44)</span>
+							<span class="gw-card__stock"><span class="bar"><i
+									style="width: 94%"></i></span>94 % 남음</span>
 					</a></li>
 					<li class="gw-card"><a href="#"> <span
 							class="gw-card__thumb"><img
@@ -714,6 +716,8 @@
 							class="gw-card__price">9,720원</strong> <span
 							class="gw-card__ship">${deliveryDate} 도착 보장</span> <span
 							class="gw-card__rating"><em class="stars">★★★★☆</em>(26)</span>
+							<span class="gw-card__stock"><span class="bar"><i
+									style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
 					<li class="gw-card"><a href="#"> <span
 							class="gw-card__thumb"><img
@@ -724,6 +728,8 @@
 							class="gw-card__price">6,950원</strong> <span
 							class="gw-card__ship">${deliveryDate} 도착 보장</span> <span
 							class="gw-card__rating"><em class="stars">★★★★☆</em>(14)</span>
+							<span class="gw-card__stock"><span class="bar"><i
+									style="width: 99%"></i></span>99 % 남음</span>
 					</a></li>
 					<li class="gw-card"><a href="#"> <span
 							class="gw-card__thumb"><img
@@ -734,6 +740,8 @@
 							class="gw-card__price">5,770원</strong> <span
 							class="gw-card__ship">${deliveryDate} 도착 보장</span> <span
 							class="gw-card__rating"><em class="stars">★★★★☆</em>(216)</span>
+							<span class="gw-card__stock"><span class="bar"><i
+									style="width: 96%"></i></span>96 % 남음</span>
 					</a></li>
 				</ul>
 			</section>
