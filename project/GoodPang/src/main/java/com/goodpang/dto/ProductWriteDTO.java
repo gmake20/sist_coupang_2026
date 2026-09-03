@@ -25,15 +25,6 @@ public class ProductWriteDTO {
     private int productPrice;
     private String optionYn = "Y";
 
-    private String manufacturer;
-    private String compositionType;
-    private String certificationType;
-    private String parallelImportYn;
-    private String minorPurchaseYn;
-    private String maxPurchaseYn;
-    private String salePeriodYn;
-    private String vatType;
-
     private String detailType;
 
     private String shippingZipcode;

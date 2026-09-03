@@ -29,18 +29,6 @@ public class VendorProductDetailDTO {
     private String internalName;
     private int productPrice;
 
-    private String manufacturer;
-    private String compositionType;
-    private String certificationType;
-    private String parallelImportYn;
-    private String minorPurchaseYn;
-    private String maxPurchaseYn;
-    private Integer maxPurchaseQty;
-    private String salePeriodYn;
-    private Date saleStartDate;
-    private Date saleEndDate;
-    private String vatType;
-
     private String detailType;
     private String productDesc;
 

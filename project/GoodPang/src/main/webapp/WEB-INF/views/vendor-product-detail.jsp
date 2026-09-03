@@ -157,51 +157,6 @@
 
 
       <section class="panel detail-section">
-        <h2>상품 주요 정보</h2>
-        <dl class="detail-grid">
-          <dt>제조사</dt>
-          <dd>${not empty product.manufacturer ? product.manufacturer : '-'}</dd>
-
-          <dt>상품구성</dt>
-          <dd>${product.compositionType}</dd>
-
-          <dt>인증정보</dt>
-          <dd>${product.certificationType}</dd>
-
-          <dt>병행수입</dt>
-          <dd>${product.parallelImportYn == 'Y' ? '해당' : '해당 없음'}</dd>
-
-          <dt>미성년자 구매</dt>
-          <dd>${product.minorPurchaseYn == 'Y' ? '가능' : '불가능'}</dd>
-
-          <dt>인당 최대구매수량</dt>
-          <dd>
-            <c:choose>
-              <c:when test="${product.maxPurchaseYn == 'Y' && not empty product.maxPurchaseQty}">
-                ${product.maxPurchaseQty}개
-              </c:when>
-              <c:otherwise>제한 없음</c:otherwise>
-            </c:choose>
-          </dd>
-
-          <dt>판매기간</dt>
-          <dd>
-            <c:choose>
-              <c:when test="${product.salePeriodYn == 'Y' && not empty product.saleStartDate}">
-                <fmt:formatDate value="${product.saleStartDate}" pattern="yyyy-MM-dd" /> ~
-                <fmt:formatDate value="${product.saleEndDate}" pattern="yyyy-MM-dd" />
-              </c:when>
-              <c:otherwise>상시 판매</c:otherwise>
-            </c:choose>
-          </dd>
-
-          <dt>부가세</dt>
-          <dd>${product.vatType}</dd>
-        </dl>
-      </section>
-
-
-      <section class="panel detail-section">
         <h2>옵션 목록 (${fn:length(product.options)}개)</h2>
 
         <p class="sub">기본 상품가격: <strong><fmt:formatNumber value="${product.productPrice}" pattern="#,##0" />원</strong>

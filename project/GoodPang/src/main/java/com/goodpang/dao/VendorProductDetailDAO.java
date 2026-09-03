@@ -43,9 +43,6 @@ public class VendorProductDetailDAO {
                 C2.CATEGORY_NAME AS MID_CATEGORY_NAME,
                 C3.CATEGORY_NAME AS SUB_CATEGORY_NAME,
                 P.SALE_METHOD, P.BRAND_NAME, P.NO_BRAND_YN, P.PRODUCT_NAME, P.INTERNAL_NAME, P.PRODUCT_PRICE,
-                P.MANUFACTURER, P.COMPOSITION_TYPE, P.CERTIFICATION_TYPE, P.PARALLEL_IMPORT_YN,
-                P.MINOR_PURCHASE_YN, P.MAX_PURCHASE_YN, P.MAX_PURCHASE_QTY,
-                P.SALE_PERIOD_YN, P.SALE_START_DATE, P.SALE_END_DATE, P.VAT_TYPE,
                 P.DETAIL_TYPE, P.PRODUCT_DESC,
                 P.SHIPPING_ZIPCODE, P.SHIPPING_ADDRESS, P.SHIPPING_DETAIL_ADDRESS, P.JEJU_SHIPPING_YN,
                 P.DELIVERY_SERVICE_CODE, P.DELIVERY_METHOD, P.BUNDLE_SHIPPING_YN,
@@ -211,21 +208,6 @@ public class VendorProductDetailDAO {
         dto.setProductName(rs.getString("PRODUCT_NAME"));
         dto.setInternalName(rs.getString("INTERNAL_NAME"));
         dto.setProductPrice(rs.getInt("PRODUCT_PRICE"));
-
-        dto.setManufacturer(rs.getString("MANUFACTURER"));
-        dto.setCompositionType(rs.getString("COMPOSITION_TYPE"));
-        dto.setCertificationType(rs.getString("CERTIFICATION_TYPE"));
-        dto.setParallelImportYn(rs.getString("PARALLEL_IMPORT_YN"));
-        dto.setMinorPurchaseYn(rs.getString("MINOR_PURCHASE_YN"));
-        dto.setMaxPurchaseYn(rs.getString("MAX_PURCHASE_YN"));
-
-        int maxPurchaseQty = rs.getInt("MAX_PURCHASE_QTY");
-        dto.setMaxPurchaseQty(rs.wasNull() ? null : maxPurchaseQty);
-
-        dto.setSalePeriodYn(rs.getString("SALE_PERIOD_YN"));
-        dto.setSaleStartDate(rs.getTimestamp("SALE_START_DATE"));
-        dto.setSaleEndDate(rs.getTimestamp("SALE_END_DATE"));
-        dto.setVatType(rs.getString("VAT_TYPE"));
 
         dto.setDetailType(rs.getString("DETAIL_TYPE"));
         dto.setProductDesc(rs.getString("PRODUCT_DESC"));
