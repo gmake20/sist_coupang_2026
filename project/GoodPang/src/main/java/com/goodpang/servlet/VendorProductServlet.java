@@ -21,6 +21,8 @@ import jakarta.servlet.http.HttpSession;
 public class VendorProductServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	private static final int PAGE_SIZE = 20;
+
 	private final ProductListDAO productListDAO = new ProductListDAO();
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -34,33 +36,43 @@ public class VendorProductServlet extends HttpServlet {
 		}
 
 		boolean hiddenView = "hidden".equals(request.getParameter("view"));
+		int page = parsePage(request.getParameter("page"));
+
+		int sellerNo = loginSeller.getSellerNo();
+		String displayYn = hiddenView ? "N" : "Y";
 
 		List<VendorProductListDTO> productList = hiddenView
-				? productListDAO.findHiddenBySellerNo(loginSeller.getSellerNo())
-				: productListDAO.findBySellerNo(loginSeller.getSellerNo());
+				? productListDAO.findHiddenBySellerNo(sellerNo, page, PAGE_SIZE)
+				: productListDAO.findBySellerNo(sellerNo, page, PAGE_SIZE);
 
-		int saleCount = 0;
-		int soldOutCount = 0;
-		int stoppedCount = 0;
-		int pendingCount = 0;
-
-		for (VendorProductListDTO product : productList) {
-			switch (product.getSaleStatus()) {
-				case "판매 중" -> saleCount++;
-				case "품절" -> soldOutCount++;
-				case "판매 중지" -> stoppedCount++;
-				case "승인 대기" -> pendingCount++;
-			}
-		}
+		// 통계 카드(전체/판매중/품절/판매중지/승인대기)는 현재 페이지가 아니라 이 탭(노출/숨김)
+		// 전체 상품 기준이어야 하므로, 화면에 뿌리는 productList와 별개로 집계 쿼리를 따로 돌린다.
+		int totalCount = productListDAO.countBySellerNo(sellerNo, displayYn, null);
+		int saleCount = productListDAO.countBySellerNo(sellerNo, displayYn, "판매 중");
+		int soldOutCount = productListDAO.countBySellerNo(sellerNo, displayYn, "품절");
+		int stoppedCount = productListDAO.countBySellerNo(sellerNo, displayYn, "판매 중지");
+		int pendingCount = productListDAO.countBySellerNo(sellerNo, displayYn, "승인 대기");
+		int totalPages = Math.max(1, (int) Math.ceil(totalCount / (double) PAGE_SIZE));
 
 		request.setAttribute("productList", productList);
 		request.setAttribute("hiddenView", hiddenView);
+		request.setAttribute("page", page);
+		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("totalCount", totalCount);
 		request.setAttribute("saleCount", saleCount);
 		request.setAttribute("soldOutCount", soldOutCount);
 		request.setAttribute("stoppedCount", stoppedCount);
 		request.setAttribute("pendingCount", pendingCount);
 
 		request.getRequestDispatcher("/WEB-INF/views/vendor-product.jsp").forward(request, response);
+	}
+
+	private int parsePage(String pageParam) {
+		try {
+			return Math.max(1, Integer.parseInt(pageParam));
+		} catch (NumberFormatException e) {
+			return 1;
+		}
 	}
 
 }

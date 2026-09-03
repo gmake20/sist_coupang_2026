@@ -33,7 +33,7 @@ public class VendorOrderListDAO {
      *                   상태라 옵션 자체를 안 둠 - VendorDashboardStatDTO 관련 논의 참고)
      */
     public List<VendorOrderListDTO> findBySellerNo(int sellerNo, LocalDate startDate, LocalDate endDate,
-            String orderStatus, String deliveryStatus, String paymentStatus) {
+            String orderStatus, String deliveryStatus, String paymentStatus, int page, int pageSize) {
 
         List<VendorOrderListDTO> list = new ArrayList<>();
 
@@ -69,6 +69,80 @@ public class VendorOrderListDAO {
         List<Object> params = new ArrayList<>();
         params.add(sellerNo);
 
+        appendFilters(sql, params, startDate, endDate, orderStatus, deliveryStatus, paymentStatus);
+
+        sql.append(" ORDER BY O.ORDER_DATE DESC, O.ORDER_NO DESC");
+        sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        params.add((page - 1) * pageSize);
+        params.add(pageSize);
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString())
+        ) {
+
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // 페이지네이션용 총 개수 - 필터 조건은 findBySellerNo와 반드시 같아야 함(appendFilters 공유)
+    public int countBySellerNo(int sellerNo, LocalDate startDate, LocalDate endDate,
+            String orderStatus, String deliveryStatus, String paymentStatus) {
+
+        StringBuilder sql = new StringBuilder("""
+            SELECT COUNT(*)
+            FROM ORDER_DETAIL OD
+                JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+            WHERE P.SELLER_NO = ?
+            """);
+
+        List<Object> params = new ArrayList<>();
+        params.add(sellerNo);
+
+        appendFilters(sql, params, startDate, endDate, orderStatus, deliveryStatus, paymentStatus);
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString())
+        ) {
+
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    // findBySellerNo/countBySellerNo가 공유하는 검색 필터. orderStatus/deliveryStatus/paymentStatus
+    // 세 필터가 결국 같은 컬럼(ORDER_STATUS)을 다른 관점으로 보여준다는 설명은 findBySellerNo 상단 주석 참고.
+    private void appendFilters(StringBuilder sql, List<Object> params, LocalDate startDate, LocalDate endDate,
+            String orderStatus, String deliveryStatus, String paymentStatus) {
+
         if (startDate != null) {
             sql.append(" AND TRUNC(O.ORDER_DATE) >= ?");
             params.add(Date.valueOf(startDate));
@@ -94,30 +168,6 @@ public class VendorOrderListDAO {
         } else if ("결제취소".equals(paymentStatus)) {
             sql.append(" AND O.ORDER_STATUS = '주문취소'");
         }
-
-        sql.append(" ORDER BY O.ORDER_DATE DESC, O.ORDER_NO DESC");
-
-        try (
-            Connection conn = ConnectionProvider.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql.toString())
-        ) {
-
-            for (int i = 0; i < params.size(); i++) {
-                pstmt.setObject(i + 1, params.get(i));
-            }
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-
-                while (rs.next()) {
-                    list.add(mapRow(rs));
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
     }
 
     /*

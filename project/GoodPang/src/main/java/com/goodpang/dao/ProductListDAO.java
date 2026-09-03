@@ -15,17 +15,17 @@ import com.goodpang.util.ConnectionProvider;
  */
 public class ProductListDAO {
 
-    // 판매자(sellerNo)가 등록한 상품 목록(노출 중) - 최근 등록순
-    public List<VendorProductListDTO> findBySellerNo(int sellerNo) {
-        return findBySellerNoAndDisplayYn(sellerNo, "Y");
+    // 판매자(sellerNo)가 등록한 상품 목록(노출 중) - 최근 등록순. page는 1부터
+    public List<VendorProductListDTO> findBySellerNo(int sellerNo, int page, int pageSize) {
+        return findBySellerNoAndDisplayYn(sellerNo, "Y", page, pageSize);
     }
 
-    // 판매자(sellerNo)가 숨긴 상품 목록 - 최근 등록순
-    public List<VendorProductListDTO> findHiddenBySellerNo(int sellerNo) {
-        return findBySellerNoAndDisplayYn(sellerNo, "N");
+    // 판매자(sellerNo)가 숨긴 상품 목록 - 최근 등록순. page는 1부터
+    public List<VendorProductListDTO> findHiddenBySellerNo(int sellerNo, int page, int pageSize) {
+        return findBySellerNoAndDisplayYn(sellerNo, "N", page, pageSize);
     }
 
-    private List<VendorProductListDTO> findBySellerNoAndDisplayYn(int sellerNo, String displayYn) {
+    private List<VendorProductListDTO> findBySellerNoAndDisplayYn(int sellerNo, String displayYn, int page, int pageSize) {
 
         List<VendorProductListDTO> list = new ArrayList<>();
 
@@ -67,6 +67,7 @@ public class ProductListDAO {
             WHERE P.SELLER_NO = ?
               AND P.DISPLAY_YN = ?
             ORDER BY P.CREATED_DATE DESC
+            OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
             """;
 
         try (
@@ -76,6 +77,8 @@ public class ProductListDAO {
 
             pstmt.setInt(1, sellerNo);
             pstmt.setString(2, displayYn);
+            pstmt.setInt(3, (page - 1) * pageSize);
+            pstmt.setInt(4, pageSize);
 
             try (ResultSet rs = pstmt.executeQuery()) {
 
@@ -89,6 +92,45 @@ public class ProductListDAO {
         }
 
         return list;
+    }
+
+    // 페이지네이션용 총 개수. saleStatus가 null이면 노출여부(displayYn)만으로 세고,
+    // 값이 있으면(판매 중/품절/판매 중지/승인 대기) 통계 카드용 상태별 개수로 쓴다.
+    public int countBySellerNo(int sellerNo, String displayYn, String saleStatus) {
+
+        StringBuilder sql = new StringBuilder("""
+            SELECT COUNT(*)
+            FROM PRODUCT
+            WHERE SELLER_NO = ?
+              AND DISPLAY_YN = ?
+            """);
+
+        if (saleStatus != null) {
+            sql.append(" AND SALE_STATUS = ?");
+        }
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString())
+        ) {
+
+            pstmt.setInt(1, sellerNo);
+            pstmt.setString(2, displayYn);
+            if (saleStatus != null) {
+                pstmt.setString(3, saleStatus);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 
     // 판매자 상품목록 노출여부 변경 (소프트 삭제/복원). seller_no까지 확인해서 다른 판매자 상품은 못 바꾸게 막는다.

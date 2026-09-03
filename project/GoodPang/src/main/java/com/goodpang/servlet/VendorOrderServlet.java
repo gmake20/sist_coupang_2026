@@ -24,6 +24,8 @@ import jakarta.servlet.http.HttpSession;
 public class VendorOrderServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	private static final int PAGE_SIZE = 20;
+
 	private final VendorOrderListDAO orderListDAO = new VendorOrderListDAO();
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -44,13 +46,22 @@ public class VendorOrderServlet extends HttpServlet {
 
 		LocalDate startDate = parseDate(startDateParam);
 		LocalDate endDate = parseDate(endDateParam);
+		int page = parsePage(request.getParameter("page"));
 
 		List<VendorOrderListDTO> orderList = orderListDAO.findBySellerNo(
+				loginSeller.getSellerNo(), startDate, endDate, orderStatus, deliveryStatus, paymentStatus,
+				page, PAGE_SIZE);
+		int totalCount = orderListDAO.countBySellerNo(
 				loginSeller.getSellerNo(), startDate, endDate, orderStatus, deliveryStatus, paymentStatus);
+		int totalPages = Math.max(1, (int) Math.ceil(totalCount / (double) PAGE_SIZE));
+
 		VendorOrderStatSummaryDTO orderStat = orderListDAO.countStats(loginSeller.getSellerNo());
 
 		request.setAttribute("orderList", orderList);
 		request.setAttribute("orderStat", orderStat);
+		request.setAttribute("page", page);
+		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("totalCount", totalCount);
 
 		// 검색폼에 입력값을 그대로 남겨두기 위해 원본 파라미터를 그대로 되돌려준다
 		request.setAttribute("searchStartDate", startDateParam);
@@ -72,6 +83,14 @@ public class VendorOrderServlet extends HttpServlet {
 			return LocalDate.parse(value);
 		} catch (DateTimeParseException e) {
 			return null;
+		}
+	}
+
+	private int parsePage(String pageParam) {
+		try {
+			return Math.max(1, Integer.parseInt(pageParam));
+		} catch (NumberFormatException e) {
+			return 1;
 		}
 	}
 
