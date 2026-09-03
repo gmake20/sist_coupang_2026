@@ -2,6 +2,7 @@ package com.goodpang.servlet;
 
 import java.io.IOException;
 
+import com.goodpang.dao.AdminActionLogDAO;
 import com.goodpang.dao.NoticeDAO;
 import com.goodpang.dto.NoticeDTO;
 
@@ -10,6 +11,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * 공지사항 수정 (관리자용).
@@ -72,7 +74,13 @@ public class AdminNoticeEditServlet extends HttpServlet {
 			return;
 		}
 
-		noticeDAO.update(noticeNo, title.trim(), content, noticeType);
+		if (noticeDAO.update(noticeNo, title.trim(), content, noticeType)) {
+			HttpSession session = request.getSession(false);
+			Integer adminNo = (session != null) ? (Integer) session.getAttribute("adminNo") : null;
+			if (adminNo != null) {
+				new AdminActionLogDAO().log(adminNo, "공지 수정", "NOTICE", noticeNo, null);
+			}
+		}
 
 		response.sendRedirect(request.getContextPath() + "/admin/notices");
 	}

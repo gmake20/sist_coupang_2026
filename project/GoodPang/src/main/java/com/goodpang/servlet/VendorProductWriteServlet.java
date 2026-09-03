@@ -127,15 +127,6 @@ public class VendorProductWriteServlet extends HttpServlet {
 		String optionYn = request.getParameter("optionYn");
 		dto.setOptionYn("N".equals(optionYn) ? "N" : "Y");
 
-		dto.setManufacturer(blankToNull(request.getParameter("manufacturer")));
-		dto.setCompositionType(request.getParameter("compositionType"));
-		dto.setCertificationType(request.getParameter("certificationType"));
-		dto.setParallelImportYn(request.getParameter("parallelImportYn"));
-		dto.setMinorPurchaseYn(request.getParameter("minorPurchaseYn"));
-		dto.setMaxPurchaseYn(request.getParameter("maxPurchaseYn"));
-		dto.setSalePeriodYn(request.getParameter("salePeriodYn"));
-		dto.setVatType(request.getParameter("vatType"));
-
 		dto.setDetailType(request.getParameter("detailType"));
 
 		// 출고지/반품지 주소록 기능이 아직 없어서, 판매자 입점 시 등록한 사업장 주소를 그대로 사용

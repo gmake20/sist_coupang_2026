@@ -271,87 +271,6 @@
           </section>
 
 
-          <!-- 상품 주요 정보 -->
-          <section class="panel form-block">
-            <div class="block-head">
-              <h2>상품 주요 정보 <span class="required-dot">•</span> <a href="#" class="help-link">도움말</a></h2>
-            </div>
-            <div class="block-body">
-
-              <div class="field-row">
-                <label class="field-label">제조사</label>
-                <div class="field-control">
-                  <input class="input" id="manufacturerInput" type="text" placeholder="제조사를 알 수 없는 경우 브랜드명을 입력해주세요.">
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">상품 구성 <span class="required-dot">•</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="productComposition" value="동일한 상품으로 구성됨" checked>동일한 상품으로 구성됨 <span
-                      class="help-q">?</span></label>
-                  <label class="radio-item"><input type="radio" name="productComposition" value="다양한 상품이 혼합되어 구성됨">다양한 상품이 혼합되어 구성됨 <span
-                      class="help-q">?</span></label>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">인증정보 <span class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="certification" value="인증·신고 대상">인증·신고 대상</label>
-                  <label class="radio-item"><input type="radio" name="certification" value="상세페이지 별도표기">상세페이지 별도표기</label>
-                  <label class="radio-item"><input type="radio" name="certification" value="인증·신고 대상 아님" checked>인증·신고 대상 아님</label>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">병행수입 <span class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="parallelImport" value="Y">병행수입</label>
-                  <label class="radio-item"><input type="radio" name="parallelImport" value="N" checked>병행수입 아님</label>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">미성년자 구매 <span class="required-dot">•</span> <span
-                    class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="minorPurchase" value="Y" checked>가능</label>
-                  <label class="radio-item"><input type="radio" name="minorPurchase" value="N">불가능</label>
-                  <p class="warning-text">
-                    ⚠ 상품 등록 후에는 미성년자 구매 '가능'으로 변경할 수 없습니다. 실수로 '불가능'을 선택하신 경우, 상품을 새로 등록해 주세요.
-                  </p>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">인당 최대구매수량 <span class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="maxPurchase" value="Y">설정함</label>
-                  <label class="radio-item"><input type="radio" name="maxPurchase" value="N" checked>설정안함</label>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">판매기간 <span class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="salePeriod" value="Y">설정함</label>
-                  <label class="radio-item"><input type="radio" name="salePeriod" value="N" checked>설정안함</label>
-                </div>
-              </div>
-
-              <div class="field-row">
-                <label class="field-label">부가세 <span class="required-dot">•</span> <span class="help-q">?</span></label>
-                <div class="field-control">
-                  <label class="radio-item"><input type="radio" name="vat" value="과세" checked>과세</label>
-                  <label class="radio-item"><input type="radio" name="vat" value="면세">면세</label>
-                </div>
-              </div>
-
-            </div>
-          </section>
-
-
           <!-- 검색어 -->
           <section class="panel form-block">
             <div class="block-head">
@@ -1613,14 +1532,6 @@
         formData.append("categoryNo", selectedCategoryNo);
         formData.append("productPrice", basePriceInput.value.trim());
 
-        formData.append("manufacturer", document.getElementById("manufacturerInput").value.trim());
-        formData.append("compositionType", document.querySelector('input[name="productComposition"]:checked').value);
-        formData.append("certificationType", document.querySelector('input[name="certification"]:checked').value);
-        formData.append("parallelImportYn", document.querySelector('input[name="parallelImport"]:checked').value);
-        formData.append("minorPurchaseYn", document.querySelector('input[name="minorPurchase"]:checked').value);
-        formData.append("maxPurchaseYn", document.querySelector('input[name="maxPurchase"]:checked').value);
-        formData.append("salePeriodYn", document.querySelector('input[name="salePeriod"]:checked').value);
-        formData.append("vatType", document.querySelector('input[name="vat"]:checked').value);
 
         const detailTypeMap = { image: "이미지 업로드", editor: "에디터 작성", html: "HTML 작성" };
         const activeDescType = document.querySelector("#descTypeTabs .tab-btn.active").dataset.type;
