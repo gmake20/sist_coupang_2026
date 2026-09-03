@@ -271,36 +271,6 @@
           </section>
 
 
-          <!-- 검색어 -->
-          <section class="panel form-block">
-            <div class="block-head">
-              <h2>검색어 <a href="#" class="help-link">도움말</a></h2>
-              <button class="collapse-toggle" type="button" data-target="tagBlockBody">
-                <svg class="icon chevron">
-                  <use href="#ic-chevron-down" />
-                </svg>
-              </button>
-            </div>
-            <div class="block-body" id="tagBlockBody">
-
-              <p class="warning-text">⚠ 이 항목은 아직 서버에 저장되지 않습니다. 입력하셔도 상품 등록 시 반영되지 않으니 참고해주세요.</p>
-
-              <div class="field-row">
-                <label class="field-label">태그</label>
-                <div class="field-control">
-                  <div class="option-add-row">
-                    <input class="input" id="tagInput" type="text" placeholder="쉼표(,)로 구분하여 최대 20개까지 입력 가능">
-                    <button class="btn btn-primary" type="button" id="tagAddButton">추가</button>
-                  </div>
-                  <div class="chip-list" id="tagChipList"></div>
-                  <p class="hint">검색어는 고객이 내 상품을 빠르게 찾을 수 있게 합니다. 상품과 관계없는 검색어는 삭제/변경 될 수 있습니다.</p>
-                </div>
-              </div>
-
-            </div>
-          </section>
-
-
 
           <!-- 구비서류 -->
           <section class="panel form-block collapsed" id="docsBlock">
@@ -1126,30 +1096,6 @@
         document.querySelectorAll("#optionTableBody .col-check input").forEach(
           (checkbox) => (checkbox.checked = this.checked)
         );
-      });
-
-
-      /* =========================================================
-         검색어 태그
-      ========================================================= */
-
-      const tagValues = [];
-
-      function handleTagRemove(index) {
-        tagValues.splice(index, 1);
-        renderChips(document.getElementById("tagChipList"), tagValues, handleTagRemove);
-      }
-
-      document.getElementById("tagAddButton").addEventListener("click", function () {
-        const input = document.getElementById("tagInput");
-        const rawValues = input.value.split(",").map((value) => value.trim()).filter(Boolean);
-
-        rawValues.forEach(function (value) {
-          if (tagValues.length < 20 && !tagValues.includes(value)) tagValues.push(value);
-        });
-
-        input.value = "";
-        renderChips(document.getElementById("tagChipList"), tagValues, handleTagRemove);
       });
 
 
