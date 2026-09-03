@@ -18,6 +18,7 @@ public class CheckoutItemDTO {
 
     // JSP 출력용
     private String productName;
-//    private String productImage;
+    private String productImage;
+
     private String optionName;
 }
