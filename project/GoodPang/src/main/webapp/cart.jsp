@@ -52,7 +52,11 @@
 								checked>
 							<div class="item-img-placeholder">이미지</div>
 							<div class="item-info">
-								<p class="item-title">${item.productName}</p>
+								<p class="item-title">
+								<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
+									${item.productName}
+								</a>
+								</p>
 								<p class="item-option">
 									옵션:
 									<c:if test="${not empty item.option1Value}">
