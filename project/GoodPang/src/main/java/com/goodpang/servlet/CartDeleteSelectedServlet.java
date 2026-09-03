@@ -1,11 +1,11 @@
 package com.goodpang.servlet;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 import com.goodpang.dao.CartDAO;
-import com.goodpang.dto.CartItemDTO;
 import com.goodpang.dto.MemberDTO;
+import com.goodpang.util.CartUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,101 +18,70 @@ import jakarta.servlet.http.HttpSession;
 public class CartDeleteSelectedServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    private final CartDAO cartDAO = new CartDAO();
 
     @Override
-    protected void doPost(
-            HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String[] optionIdParams =
-                request.getParameterValues("optionId");
+        request.setCharacterEncoding("UTF-8");
 
-        if (optionIdParams == null
-                || optionIdParams.length == 0) {
+        String[] optionIdParams = request.getParameterValues("optionId");
 
-            response.sendRedirect(
-                    request.getContextPath() + "/cart"
-            );
+        if (optionIdParams == null || optionIdParams.length == 0) {
+            response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
 
+        HttpSession session = request.getSession();
+        MemberDTO loginMember =
+                (MemberDTO) session.getAttribute("loginMember");
+
         try {
-
-            HttpSession session =
-                    request.getSession();
-
-            MemberDTO loginMember =
-                    (MemberDTO) session.getAttribute(
-                            "loginMember"
-                    );
-
-            /*
-             * 로그인 사용자
-             */
             if (loginMember != null) {
+                int memberNo = loginMember.getMemberNo();
+                int[] optionIds = new int[optionIdParams.length];
 
-                int[] optionIds =
-                        new int[optionIdParams.length];
-
-                for (int i = 0;
-                     i < optionIdParams.length;
-                     i++) {
-
-                    optionIds[i] =
-                            Integer.parseInt(
-                                    optionIdParams[i]
-                            );
+                for (int i = 0; i < optionIdParams.length; i++) {
+                    optionIds[i] = Integer.parseInt(optionIdParams[i]);
                 }
 
-                CartDAO dao = new CartDAO();
+                cartDAO.deleteSelected(memberNo, optionIds);
+                CartUtil.refreshCartSession(request, memberNo);
 
-                dao.deleteSelected(
-                        loginMember.getMemberNo(),
-                        optionIds
-                );
-
-            /*
-             * 비로그인 사용자
-             */
             } else {
+                @SuppressWarnings("unchecked")
+                Map<Integer, Integer> guestCart =
+                        (Map<Integer, Integer>) session.getAttribute("guestCart");
 
-                List<CartItemDTO> cartItems =
-                        (List<CartItemDTO>)
-                        session.getAttribute(
-                                "cartItems"
-                        );
-
-                if (cartItems != null) {
-
-                    for (String optionIdParam
-                            : optionIdParams) {
-
-                        int optionId =
-                                Integer.parseInt(
-                                        optionIdParam
-                                );
-
-                        cartItems.removeIf(
-                                item ->
-                                    item.getOptionId()
-                                    == optionId
-                        );
+                if (guestCart != null) {
+                    for (String optionIdParam : optionIdParams) {
+                        int optionId = Integer.parseInt(optionIdParam);
+                        guestCart.remove(optionId);
                     }
 
-                    session.setAttribute(
-                            "cartItems",
-                            cartItems
-                    );
+                    if (guestCart.isEmpty()) {
+                        session.removeAttribute("guestCart");
+                        session.removeAttribute("cartItems");
+                        session.setAttribute("cartCount", 0);
+                        session.removeAttribute("cartPreviewItems");
+                    } else {
+                        session.setAttribute("guestCart", guestCart);
+                        CartUtil.refreshGuestCartSession(request, guestCart);
+                    }
                 }
             }
 
-            response.sendRedirect(
-                    request.getContextPath() + "/cart"
+            response.sendRedirect(request.getContextPath() + "/cart");
+
+        } catch (NumberFormatException e) {
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "잘못된 상품 번호입니다."
             );
 
         } catch (Exception e) {
-
+            e.printStackTrace();
             throw new ServletException(
                     "선택 상품 삭제 중 오류가 발생했습니다.",
                     e
