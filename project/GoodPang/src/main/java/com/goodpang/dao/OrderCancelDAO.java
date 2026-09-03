@@ -353,33 +353,6 @@ public class OrderCancelDAO {
         return isSuccess;
     }
 
-    /*
-     * 재고 복원 — DB 프로시저 PRC_ORDER_STOCK_IN 을 부른다.
-     *
-     * ★ 이 메서드는 "이미 취소가 확정된 주문"에만 불러야 한다.
-     *   호출하는 자리가 UPDATE ORDERS ... 가 1행을 바꾼 경우 안쪽이라 그 조건이 지켜진다.
-     *   (이미 취소된 주문은 UPDATE 가 0행이 되어 여기까지 오지 않음 → 재고 2배 방지)
-     */
-    private void restoreStock(
-            Connection conn,
-            int orderNo)
-            throws SQLException {
-
-        String sql = "{ call PRC_ORDER_STOCK_IN(?, ?) }";
-
-        try (CallableStatement cstmt = conn.prepareCall(sql)) {
-
-            cstmt.setInt(1, orderNo);
-            cstmt.registerOutParameter(2, Types.NUMERIC);
-
-            cstmt.execute();
-
-            System.out.println(
-                    "[DEBUG OrderCancelDAO] 재고 복원 완료 - orderNo: "
-                    + orderNo + ", 복원 줄 수: " + cstmt.getInt(2));
-        }
-    }
-
 
     /**
      * 취소 상세 페이지 정보 조회 (PAYMENT_METHOD 조인 수정)
