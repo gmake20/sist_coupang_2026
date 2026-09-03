@@ -168,7 +168,7 @@ public class OrderCancelDAO {
 	                pr.request_date,
 	                pr.return_reason,
 	                pr.refund_amount,
-	                pr.expected_cancel_date,
+	                pr.expected_cancel_date
 	                
 	            FROM ORDERS o
 	            JOIN ORDER_DETAIL od ON o.order_no = od.order_no
