@@ -50,7 +50,7 @@
 	<main class="search-page">
 
 		<nav class="search-breadcrumb" aria-label="현재 위치">
-			<a href="${pageContext.request.contextPath}/">홈</a><span class="sep">›</span><a href="index_search.html">검색결과</a><span
+			<a href="${pageContext.request.contextPath}/">홈</a><span class="sep">›</span><a href="${pageContext.request.contextPath}/index_search.jsp">검색결과</a><span
 				class="sep">›</span><span>티셔츠</span>
 		</nav>
 

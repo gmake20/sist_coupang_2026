@@ -62,7 +62,7 @@
                제일 먼저 쓴 판매자 가입이 제일 오른쪽에 붙고,그 다음 것들이 왼쪽으로 하나씩 밀려 들어옴.
                → 화면에는 로그인 · 회원가입 · 고객센터 · 판매자 가입 순으로 보임 -->
 				<ul class="top-bar-right">
-					<li><a href="vendor-signup.html">판매자 가입</a></li>
+					<li><a href="vendor/signup">판매자 가입</a></li>
 
 					<li class="cs-center"><a href="#">고객센터</a>
 						<ul class="cs-menu">
@@ -72,7 +72,7 @@
 							<li><a href="#">취소 / 반품 안내</a></li>
 						</ul></li>
 
-					<li><a href="./signup.html">회원가입</a></li>
+					<li><a href="./signup.jsp">회원가입</a></li>
 					<li><a href="./login.jsp">로그인</a></li>
 				</ul>
 
