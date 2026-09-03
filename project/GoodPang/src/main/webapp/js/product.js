@@ -412,6 +412,12 @@ function setupOptionSelect(setStock, setPrice) {
     if (!picked) return;   // 이론상 항상 찾아져야 함(모든 조합이 다 있다고 가정) — 방어코드
 
     if (optionIdInput) optionIdInput.value = picked.optionId;
+
+    // 2026-09-03 추가 — 맨 아래 "굿팡상품번호: 95 - 395" 줄이 옵션을 바꿔도 안 바뀌던 버그.
+    // 서버(/option)에 다시 물어볼 필요 없이 지금 고른 조합(picked)이 이미 optionId 를 갖고 있으므로 바로 찍음.
+    const goodpangOptionNoEl = document.getElementById('goodpangOptionNo');
+    if (goodpangOptionNoEl) goodpangOptionNoEl.textContent = picked.optionId;
+
     if (colorInput) {
       // 원래 "색상"만 담던 자리인데, 지금은 고른 값들을 다 이어붙여서 담음 (예: "M / Black")
       colorInput.value = controls.map(function (ctl) { return ctl.getValue(); }).join(' / ');

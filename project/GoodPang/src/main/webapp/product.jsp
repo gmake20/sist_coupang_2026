@@ -453,7 +453,9 @@
 					<div class="product-description">
 						<ul>
 							<li></li>
-							<li>굿팡상품번호: ${p.productNo}<c:if test="${not empty mainOption}"> - ${mainOption.optionId}</c:if></li>
+							<!-- 2026-09-03: optionId 에 id 부여 — 옵션 바꿀 때 product.js 가 이 글자만 갱신함
+							     (옵션 변경은 페이지 새로고침 없이 ajax 로만 처리돼서, id 없이는 이 값이 처음 그대로 남아있었음) -->
+							<li>굿팡상품번호: ${p.productNo}<c:if test="${not empty mainOption}"> - <span id="goodpangOptionNo">${mainOption.optionId}</span></c:if></li>
 						</ul>
 					</div>
 
