@@ -69,9 +69,11 @@ public class AdminDeliveryDAO {
     }
 
     /*
-     * 배송완료 처리. DELIVERY와 ORDERS를 함께 갱신한다.
+     * 배송완료 처리. DELIVERY와 ORDERS를 함께 갱신하고, 이 주문에 상품이 포함된
+     * 판매자 번호 목록을 돌려준다(판매자 로그 기록용 - 한 주문에 여러 판매자 상품이
+     * 섞여 있을 수 있어 판매자별로 로그를 남겨야 한다).
      */
-    public boolean completeDelivery(int deliveryNo) {
+    public CompleteResult completeDelivery(int deliveryNo) {
 
         try (Connection conn = ConnectionProvider.getConnection()) {
 
@@ -82,13 +84,14 @@ public class AdminDeliveryDAO {
 
                 if (orderNo == null) {
                     conn.rollback();
-                    return false;
+                    return null;
                 }
 
                 updateOrderDone(conn, orderNo);
+                List<Integer> sellerNos = findSellerNosByOrderNo(conn, orderNo);
 
                 conn.commit();
-                return true;
+                return new CompleteResult(orderNo, sellerNos);
 
             } catch (Exception e) {
                 conn.rollback();
@@ -99,7 +102,50 @@ public class AdminDeliveryDAO {
             e.printStackTrace();
         }
 
-        return false;
+        return null;
+    }
+
+    private List<Integer> findSellerNosByOrderNo(Connection conn, int orderNo) throws Exception {
+
+        List<Integer> sellerNos = new ArrayList<>();
+
+        String sql = """
+            SELECT DISTINCT P.SELLER_NO
+            FROM ORDER_DETAIL OD
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+            WHERE OD.ORDER_NO = ?
+            """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, orderNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    sellerNos.add(rs.getInt("SELLER_NO"));
+                }
+            }
+        }
+
+        return sellerNos;
+    }
+
+    public static class CompleteResult {
+
+        private final int orderNo;
+        private final List<Integer> sellerNos;
+
+        public CompleteResult(int orderNo, List<Integer> sellerNos) {
+            this.orderNo = orderNo;
+            this.sellerNos = sellerNos;
+        }
+
+        public int getOrderNo() {
+            return orderNo;
+        }
+
+        public List<Integer> getSellerNos() {
+            return sellerNos;
+        }
     }
 
     private Integer updateDeliveryDone(Connection conn, int deliveryNo) throws Exception {

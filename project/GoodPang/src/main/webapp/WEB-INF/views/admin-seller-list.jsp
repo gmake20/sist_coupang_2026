@@ -27,6 +27,7 @@
     .badge-approved { background: #e6f7ec; color: #0f7b3c; }
     .badge-rejected { background: #fdecea; color: #c0392b; }
     .badge-suspended { background: #f3f0ff; color: #6c3ce9; }
+    .badge-withdrawn { background: #f2f2f2; color: #666; }
   </style>
 
 </head>
@@ -88,6 +89,9 @@
                   </c:when>
                   <c:when test="${seller.approvalStatus == '정지'}">
                     <span class="badge badge-suspended">정지</span>
+                  </c:when>
+                  <c:when test="${seller.approvalStatus == '탈퇴'}">
+                    <span class="badge badge-withdrawn">탈퇴</span>
                   </c:when>
                   <c:otherwise>
                     ${seller.approvalStatus}

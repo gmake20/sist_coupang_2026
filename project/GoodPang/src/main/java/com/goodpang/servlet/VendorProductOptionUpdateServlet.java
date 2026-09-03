@@ -2,6 +2,7 @@ package com.goodpang.servlet;
 
 import java.io.IOException;
 
+import com.goodpang.dao.VendorActionLogDAO;
 import com.goodpang.dao.VendorProductOptionDAO;
 import com.goodpang.dto.SellerDTO;
 
@@ -47,7 +48,10 @@ public class VendorProductOptionUpdateServlet extends HttpServlet {
 				status = "Y";
 			}
 
-			optionDAO.updateOption(optionId, loginSeller.getSellerNo(), price, normalPrice, quantity, status);
+			if (optionDAO.updateOption(optionId, loginSeller.getSellerNo(), price, normalPrice, quantity, status)) {
+				String detail = "판매가 " + price + "원, 재고 " + quantity + "개, 상태 " + ("Y".equals(status) ? "정상" : "품절");
+				new VendorActionLogDAO().log(loginSeller.getSellerNo(), "옵션 수정", "PRODUCT_OPTION", optionId, detail);
+			}
 
 		} catch (NumberFormatException e) {
 			// 값이 없거나 숫자가 아니면 아무 것도 바꾸지 않고 목록으로 돌려보낸다.

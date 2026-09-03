@@ -271,36 +271,6 @@
           </section>
 
 
-          <!-- 검색어 -->
-          <section class="panel form-block">
-            <div class="block-head">
-              <h2>검색어 <a href="#" class="help-link">도움말</a></h2>
-              <button class="collapse-toggle" type="button" data-target="tagBlockBody">
-                <svg class="icon chevron">
-                  <use href="#ic-chevron-down" />
-                </svg>
-              </button>
-            </div>
-            <div class="block-body" id="tagBlockBody">
-
-              <p class="warning-text">⚠ 이 항목은 아직 서버에 저장되지 않습니다. 입력하셔도 상품 등록 시 반영되지 않으니 참고해주세요.</p>
-
-              <div class="field-row">
-                <label class="field-label">태그</label>
-                <div class="field-control">
-                  <div class="option-add-row">
-                    <input class="input" id="tagInput" type="text" placeholder="쉼표(,)로 구분하여 최대 20개까지 입력 가능">
-                    <button class="btn btn-primary" type="button" id="tagAddButton">추가</button>
-                  </div>
-                  <div class="chip-list" id="tagChipList"></div>
-                  <p class="hint">검색어는 고객이 내 상품을 빠르게 찾을 수 있게 합니다. 상품과 관계없는 검색어는 삭제/변경 될 수 있습니다.</p>
-                </div>
-              </div>
-
-            </div>
-          </section>
-
-
 
           <!-- 구비서류 -->
           <section class="panel form-block collapsed" id="docsBlock">
@@ -331,9 +301,27 @@
             <div class="block-body" id="shippingBlockBody">
 
               <div class="field-row">
-                <label class="field-label">출고지 <span class="required-dot">•</span></label>
+                <label class="field-label">출고지 우편번호 <span class="required-dot">•</span></label>
                 <div class="field-control">
-                  <button class="address-box" type="button">주소록에서 출고지를 선택해주세요 &gt;</button>
+                  <input class="input" id="shippingZipcodeInput" type="text" placeholder="우편번호"
+                         value="${sessionScope.loginSeller.zipcode}">
+                </div>
+              </div>
+
+              <div class="field-row">
+                <label class="field-label">출고지 주소 <span class="required-dot">•</span></label>
+                <div class="field-control">
+                  <input class="input" id="shippingAddressInput" type="text" placeholder="기본주소"
+                         value="${sessionScope.loginSeller.businessAddress}">
+                </div>
+              </div>
+
+              <div class="field-row">
+                <label class="field-label">출고지 상세주소</label>
+                <div class="field-control">
+                  <input class="input" id="shippingDetailAddressInput" type="text" placeholder="상세주소"
+                         value="${sessionScope.loginSeller.businessDetailAddress}">
+                  <p class="side-note">기본값은 사업자 정보에 등록된 사업장 주소이며, 이 상품만 다른 출고지를 쓰려면 직접 수정해주세요.</p>
                 </div>
               </div>
 
@@ -1112,30 +1100,6 @@
 
 
       /* =========================================================
-         검색어 태그
-      ========================================================= */
-
-      const tagValues = [];
-
-      function handleTagRemove(index) {
-        tagValues.splice(index, 1);
-        renderChips(document.getElementById("tagChipList"), tagValues, handleTagRemove);
-      }
-
-      document.getElementById("tagAddButton").addEventListener("click", function () {
-        const input = document.getElementById("tagInput");
-        const rawValues = input.value.split(",").map((value) => value.trim()).filter(Boolean);
-
-        rawValues.forEach(function (value) {
-          if (tagValues.length < 20 && !tagValues.includes(value)) tagValues.push(value);
-        });
-
-        input.value = "";
-        renderChips(document.getElementById("tagChipList"), tagValues, handleTagRemove);
-      });
-
-
-      /* =========================================================
          배송 — 출고 소요일 / 당일출고
       ========================================================= */
 
@@ -1312,6 +1276,12 @@
           return false;
         }
 
+        if (!document.getElementById("shippingZipcodeInput").value.trim()
+            || !document.getElementById("shippingAddressInput").value.trim()) {
+          alert("출고지 우편번호와 주소를 입력해주세요.");
+          return false;
+        }
+
         if (optionMode === "on" && optionGroups.some((group) => group.values.length > 0 && !group.name.trim())) {
           alert("옵션명을 입력해주세요.");
           return false;
@@ -1368,6 +1338,9 @@
           });
         }
 
+        formData.append("shippingZipcode", document.getElementById("shippingZipcodeInput").value.trim());
+        formData.append("shippingAddress", document.getElementById("shippingAddressInput").value.trim());
+        formData.append("shippingDetailAddress", document.getElementById("shippingDetailAddressInput").value.trim());
         formData.append("jejuShippingYn", document.querySelector('input[name="jejuShipping"]:checked').value);
         formData.append("courier", document.getElementById("courierSelect").value);
         formData.append("deliveryMethod", document.getElementById("deliveryMethodSelect").value);

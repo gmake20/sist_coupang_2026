@@ -197,7 +197,8 @@ public class MemberDAO {
 	                MEMBER_NAME,
 	                PHONE,
 	                EMAIL,
-	                RANK
+	                RANK,
+	                STATUS
 	            FROM MEMBER
 	            WHERE EMAIL = ?
 	            """;
@@ -242,6 +243,10 @@ public class MemberDAO {
 	                dto.setRank(
 	                    rs.getString("RANK")
 	                );
+	                
+	                dto.setStatus(
+	                	rs.getInt("STATUS")
+	                	);
 	            }
 	        }
 
@@ -413,6 +418,66 @@ public class MemberDAO {
 	        );
 
 	        return pstmt.executeUpdate();
+	    }
+	}
+	
+	public MemberDTO findByMemberNo(int memberNo) {
+
+	    String sql = """
+	            SELECT MEMBER_NO, MEMBER_ID, MEMBER_PW, MEMBER_NAME, PHONE, EMAIL, RANK
+	            FROM MEMBER
+	            WHERE MEMBER_NO = ?
+	            """;
+
+	    try (
+	        Connection conn = ConnectionProvider.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, memberNo);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+
+	            if (rs.next()) {
+	                MemberDTO member = new MemberDTO();
+
+	                member.setMemberNo(rs.getInt("MEMBER_NO"));
+	                member.setMemberId(rs.getString("MEMBER_ID"));
+	                member.setMemberPw(rs.getString("MEMBER_PW"));
+	                member.setMemberName(rs.getString("MEMBER_NAME"));
+	                member.setPhone(rs.getString("PHONE"));
+	                member.setEmail(rs.getString("EMAIL"));
+	                member.setRank(rs.getString("RANK"));
+
+	                return member;
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("회원 조회 중 오류", e);
+	    }
+
+	    return null;
+	}
+	
+	public boolean withdrawMember(int memberNo) {
+
+	    String sql = """
+	            UPDATE MEMBER
+	            SET STATUS = 0
+	            WHERE MEMBER_NO = ?
+	            AND STATUS = 1
+	            """;
+
+	    try (
+	        Connection conn = ConnectionProvider.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, memberNo);
+
+	        return pstmt.executeUpdate() > 0;
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("회원 탈퇴 처리 중 오류", e);
 	    }
 	}
 }

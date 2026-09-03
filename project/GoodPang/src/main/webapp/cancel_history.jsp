@@ -697,9 +697,10 @@ footer {
                                 </p>
 
                                 <!-- 이동 이벤트 핸들러 추가 -->
-                                <button type="button" class="detail-btn" onclick="alert('주문번호: ${checkList.orderNo} 의 취소 상세 정보입니다.');">
-                                    취소상세
-                                </button>
+                            <button type="button" class="detail-btn" 
+							    onclick="location.href='${pageContext.request.contextPath}/order/cancel_detail?orderNo=${checkList.orderNo}';">
+							    취소상세
+							</button>
 
                             </div>
 

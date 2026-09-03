@@ -268,9 +268,36 @@ ORDER BY P.CREATED_DATE DESC
 - `PRODUCT_IMAGE`에서 `IMAGE_PURPOSE='대표'`인 이미지 중 `ROW_NUMBER()`로 1건만 썸네일로 사용
 - 판매중/품절/판매중지/승인대기 건수는 이 쿼리 결과가 아니라 `VendorProductServlet`에서 `SALE_STATUS` 값을 순회하며 자바 코드로 집계
 
+## 참고: 노출여부/판매상태 변경 (2026-09-05 추가)
+
+목록 화면이 아니라 별도 URL 2개(`VendorProductVisibilityServlet`, `VendorProductSaleStatusServlet`)에서 처리하는 UPDATE. 둘 다 `ProductListDAO`(project/GoodPang/src/main/java/com/goodpang/dao/ProductListDAO.java)를 쓰고, `SELLER_NO`까지 WHERE에 걸어서 다른 판매자 상품은 못 바꾸게 막음. 성공 시(영향받은 행 1건) `VENDOR_ACTION_LOG`에도 기록됨.
+
+- 노출 켜기/끄기 (`/vendor/product/visibility`, `updateDisplayYn`):
+```sql
+UPDATE PRODUCT
+SET DISPLAY_YN = ?,     -- 'Y'=노출, 'N'=숨김
+    UPDATED_DATE = SYSDATE
+WHERE PRODUCT_NO = ?
+  AND SELLER_NO = ?
+```
+- 판매중지/재개 (`/vendor/product/status`, `updateSaleStatus`) — 현재 상태가 `'판매 중'`/`'판매 중지'`일 때만 바뀜(승인 대기·품절은 이 토글 대상이 아님):
+```sql
+UPDATE PRODUCT
+SET SALE_STATUS = ?,    -- '판매 중' 또는 '판매 중지'
+    UPDATED_DATE = SYSDATE
+WHERE PRODUCT_NO = ?
+  AND SELLER_NO = ?
+  AND SALE_STATUS IN ('판매 중', '판매 중지')
+```
+- 둘 다 성공하면 바로 이어서 액션 로그가 남음(`action_type`은 `'상품 노출'`/`'상품 숨김'`/`'판매 재개'`/`'판매 중지'`) — 자세한 내용은 이 문서 맨 아래 "판매자 액션 로그" 절 참고
+
 # 판매자 상품 등록 - VendorProductWriteServlet Query
 
 INSERT는 POST에서 `ProductWriteDAO.insertProduct(dto)` (project/GoodPang/src/main/java/com/goodpang/dao/ProductWriteDAO.java) 가 트랜잭션(`setAutoCommit(false)`) 안에서 실행. 상품 1건 등록 시 시퀀스 번호 + PRODUCT/PRODUCT_OPTION/PRODUCT_IMAGE 3개 테이블 INSERT가 한 트랜잭션으로 커밋되고, 하나라도 실패하면 전체 롤백됨.
+
+⚠ **2026-09-05 갱신**: `PRODUCT`의 "상품 주요 정보"(제조사/상품구성/인증정보/병행수입/미성년자구매/최대구매수량/판매기간/부가세) 11개 컬럼과
+"반품/교환"(반품지 주소·초도배송비·반품배송비) 5개 컬럼을 전부 제거해서, 아래 INSERT에서도 빠졌다 (등록 폼에 저장 안 되는 죽은 UI였음 — `vendor-product-write.jsp`의 "상품 주요 정보"/"반품/교환" 섹션 자체도 함께 삭제됨).
+"출고지"는 더 이상 사업장 주소를 무조건 그대로 복사하지 않고, 등록 폼에 실제 입력 필드(우편번호/주소/상세주소, 기본값은 사업장 주소)가 생겨서 상품마다 다른 출고지를 쓸 수 있음.
 
 ## 1. 시퀀스 번호 (`nextVal`, ProductWriteDAO.java:56-62)
 상품당 1회(`SEQ_PRODUCT`), 옵션마다 1회(`SEQ_OPTION`), 이미지마다 1회(`SEQ_PRODUCT_IMAGE`)에 재사용
@@ -278,44 +305,34 @@ INSERT는 POST에서 `ProductWriteDAO.insertProduct(dto)` (project/GoodPang/src/
 SELECT SEQ_PRODUCT.NEXTVAL FROM DUAL
 ```
 
-## 2. 상품 등록 (`insertProductRow`, ProductWriteDAO.java:64-160)
+## 2. 상품 등록 (`insertProductRow`, ProductWriteDAO.java:64-132)
 ```sql
 INSERT INTO PRODUCT (
     product_no, seller_no, sub_category_no,
     sale_method, brand_name, no_brand_yn, product_name, internal_name,
     option_yn, product_price, quantity,
-    manufacturer, composition_type, certification_type, parallel_import_yn,
-    minor_purchase_yn, max_purchase_yn, max_purchase_qty,
-    sale_period_yn, sale_start_date, sale_end_date, vat_type,
     detail_type, product_desc,
     shipping_zipcode, shipping_address, shipping_detail_address, jeju_shipping_yn,
     delivery_service_code, delivery_method, bundle_shipping_yn,
     shipping_fee_type, shipping_fee,
     lead_time_input_type, lead_time_days, same_day_ship_yn, same_day_cutoff_time,
-    return_zipcode, return_address, return_detail_address,
-    initial_shipping_fee, return_shipping_fee,
     sale_status, created_date, updated_date
 ) VALUES (
     ?, ?, ?,
     ?, ?, ?, ?, ?,
     ?, ?, 0,
-    ?, ?, ?, ?,
-    ?, ?, NULL,
-    ?, NULL, NULL, ?,
     ?, NULL,
     ?, ?, ?, ?,
     ?, ?, ?,
     ?, 0,
     ?, ?, ?, ?,
-    ?, ?, ?,
-    ?, ?,
     ?, SYSDATE, SYSDATE
 )
 ```
 - `quantity`는 항상 0, `sale_status`는 항상 `'승인 대기'`로 고정(등록 즉시 노출되지 않음)
-- 출고지/반품지 주소는 주소록 기능이 없어 판매자 사업장 주소(`SellerDTO`)를 그대로 복사해서 넣음
+- `shipping_zipcode`/`shipping_address`/`shipping_detail_address`는 등록 폼의 입력값을 그대로 쓰되, 폼이 비어있으면(기본값 삭제 등) 판매자 사업장 주소(`SellerDTO`)로 대체
 
-## 3. 옵션 등록 (옵션마다 반복) (`insertOptionRow`, ProductWriteDAO.java:162-207)
+## 3. 옵션 등록 (옵션마다 반복) (`insertOptionRow`, ProductWriteDAO.java:134-179)
 ```sql
 INSERT INTO PRODUCT_OPTION (
     OPTION_ID, product_no,
@@ -331,7 +348,7 @@ INSERT INTO PRODUCT_OPTION (
 ```
 - `STATUS`는 `quantity > 0`이면 `'Y'`, 아니면 `'N'`으로 자바 코드가 계산해서 채움
 
-## 4. 이미지 등록 (옵션 대표/추가 이미지 + 상세설명 이미지마다 반복) (`insertImageRow`, ProductWriteDAO.java:209-235)
+## 4. 이미지 등록 (옵션 대표/추가 이미지 + 상세설명 이미지마다 반복) (`insertImageRow`, ProductWriteDAO.java:181-207)
 ```sql
 INSERT INTO PRODUCT_IMAGE (
     image_no, product_no, OPTION_ID, image_purpose, image_order, image_url, created_date
@@ -339,8 +356,18 @@ INSERT INTO PRODUCT_IMAGE (
 ```
 - `image_purpose`: 옵션 대표 이미지=`'대표'`, 옵션 추가 이미지=`'추가'`, 상품 상세설명 이미지=`'상세설명'`(이 경우 `OPTION_ID`는 NULL)
 
+## 5. 액션 로그 (`VendorProductWriteServlet.java`, insertProduct 성공 직후)
+```sql
+INSERT INTO VENDOR_ACTION_LOG (
+    ACTION_LOG_NO, SELLER_NO, ACTION_TYPE, TARGET_TYPE, TARGET_NO, DETAIL, ACTION_DATE
+) VALUES (
+    SEQ_VENDOR_ACTION_LOG.NEXTVAL, ?, '상품 등록', 'PRODUCT', ?, ?, SYSDATE
+)
+```
+- `DETAIL`에는 방금 등록한 상품명이 들어감. 자세한 내용은 이 문서 맨 아래 "판매자 액션 로그" 절 참고
+
 ## 사용 방법
-- 실제 실행 순서: 상품 INSERT 1회 → (옵션 INSERT → 대표/추가 이미지 INSERT) × 옵션 수 → 상세설명 이미지 INSERT × 이미지 수 → COMMIT
+- 실제 실행 순서: 상품 INSERT 1회 → (옵션 INSERT → 대표/추가 이미지 INSERT) × 옵션 수 → 상세설명 이미지 INSERT × 이미지 수 → COMMIT → 액션 로그 INSERT
 - 직접 Query로 데이터를 확인할 때는 방금 등록한 `product_no`(또는 `SELECT SEQ_PRODUCT.CURRVAL FROM DUAL`)로 PRODUCT/PRODUCT_OPTION/PRODUCT_IMAGE를 조회하면 됨
 
 # 판매자 상품 옵션 관리 - /vendor/product/options Query
@@ -400,6 +427,7 @@ WHERE OPTION_ID = ?
           AND P.SELLER_NO = ?
   )
 ```
+- (2026-09-05 추가) 성공하면 `VENDOR_ACTION_LOG`에 `action_type='옵션 수정'`, `target_type='PRODUCT_OPTION'`으로 기록되고, `detail`엔 변경된 판매가/재고/상태 요약이 들어감 — 자세한 내용은 이 문서 맨 아래 "판매자 액션 로그" 절 참고
 
 # 판매자 주문/배송 관리 - /vendor/order Query
 
@@ -449,6 +477,50 @@ ORDER BY O.ORDER_DATE DESC, O.ORDER_NO DESC
 - `P.SELLER_NO` : 확인하고 싶은 판매자 번호로 교체
 - orderStatus/deliveryStatus/paymentStatus 세 필터는 전부 같은 컬럼 `O.ORDER_STATUS`를 서로 다른 관점(주문상태/배송진행도/결제여부)으로 매핑한 것이라, 서로 모순되는 값을 동시에 걸면 0건이 나올 수 있음(정상 동작)
 - 상단 통계 카드/배송현황 도넛은 이 문서의 "판매자 대시보드 - 주문/배송 현황 패널 Query" 항목과 동일한 `countStats` 쿼리를 그대로 씀
+
+## 참고: 배송 처리(운송장 등록) (`/vendor/order/ship`, `shipOrder`, VendorOrderListDAO.java:186-227)
+
+`결제완료` → `배송중` 전환 + `DELIVERY` 행 생성을 하나의 트랜잭션으로 처리. `ORDERS`엔 `SELLER_NO`가 없어서 `ORDER_DETAIL`/`PRODUCT`로 이 판매자 상품이 실제 포함됐는지 확인한 뒤에만 처리.
+
+1. 대표 택배사 코드 조회:
+```sql
+SELECT P.DELIVERY_SERVICE_CODE
+FROM ORDER_DETAIL OD
+    JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+WHERE OD.ORDER_NO = ?
+  AND P.SELLER_NO = ?
+  AND ROWNUM = 1
+```
+2. 같은 택배사에 이미 쓰인 송장번호인지 확인(중복이면 `INVOICE_DUPLICATE`로 중단):
+```sql
+SELECT 1 FROM DELIVERY
+WHERE DELIVERY_SERVICE_CODE = ? AND INVOICE_NO = ? AND ROWNUM = 1
+```
+3. 배송 이력 생성:
+```sql
+INSERT INTO DELIVERY (
+    DELIVERY_NO, ORDER_NO, DELIVERY_SERVICE_CODE, INVOICE_NO,
+    DELIVERY_STATUS, DELIVERY_START_DATE, DELIVERY_END_DATE,
+    CREATED_DATE, UPDATED_DATE
+) VALUES (
+    SEQ_DELIVERY.NEXTVAL, ?, ?, ?,
+    '배송중', SYSDATE, NULL,
+    SYSDATE, SYSDATE
+)
+```
+4. 주문 상태 전환:
+```sql
+UPDATE ORDERS
+SET ORDER_STATUS = '배송중'
+WHERE ORDER_NO = ?
+  AND ORDER_STATUS = '결제완료'
+  AND EXISTS (
+        SELECT 1 FROM ORDER_DETAIL OD
+            JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+        WHERE OD.ORDER_NO = ORDERS.ORDER_NO AND P.SELLER_NO = ?
+  )
+```
+- 4번까지 전부 성공(`SUCCESS`)하면 `VENDOR_ACTION_LOG`에 `action_type='배송 처리'`, `target_type='ORDERS'`, `detail`엔 송장번호가 기록됨 — 자세한 내용은 이 문서 맨 아래 "판매자 액션 로그" 절 참고
 
 # 판매자 배송 관리 - /vendor/delivery Query
 
@@ -590,3 +662,106 @@ ORDER BY PR.REQUEST_DATE DESC
 - `P.SELLER_NO` : 확인하고 싶은 판매자 번호로 교체
 - `RETURN_TYPE`은 저장된 컬럼이 아니라 `RETURN_STATUS` 값을 조회 시점에 분류한 계산 컬럼 — 나중에 반품/교환 신청을 추가할 때 `RETURN_STATUS`를 `'반품...'`/`'교환...'`으로 시작하게만 넣으면 이 쿼리가 자동으로 분류함
 - 화면 상단 취소/반품/교환 건수 통계는 이 쿼리 결과를 자바(`VendorReturnServlet`)에서 `RETURN_TYPE` 기준으로 세어서 계산
+
+# 판매자 공지사항 - /vendor/notice Query (2026-09-05 추가)
+
+`VendorNoticeListServlet`/`VendorNoticeDetailServlet` (GET) 이 `NoticeDAO` (project/GoodPang/src/main/java/com/goodpang/dao/NoticeDAO.java) 를 사용. 등록/수정/삭제는 관리자 전용(`/admin/notice/*`)이고, 판매자는 조회만 가능 — 판매자 화면에는 등록/수정/삭제 버튼 자체가 없고, URL을 직접 쳐도 `/admin/*`는 `AdminAuthFilter`로 막힘.
+
+## 1. 목록 (`findAll`, NoticeDAO.java:19-50) — page는 1부터, `'공지'`가 항상 `'안내'`보다 위, 그 안에서는 최신순
+바인드 변수(`?`) 순서: `(page-1)*pageSize`, `pageSize`
+```sql
+SELECT N.NOTICE_NO, N.TITLE, N.NOTICE_TYPE, N.ADMIN_NO, A.ADMIN_NAME, N.CREATED_DATE, N.UPDATED_DATE
+FROM NOTICE N
+    JOIN ADMIN A ON N.ADMIN_NO = A.ADMIN_NO
+ORDER BY CASE WHEN N.NOTICE_TYPE = '공지' THEN 0 ELSE 1 END, N.NOTICE_NO DESC
+OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY
+```
+- 총 건수는 `SELECT COUNT(*) FROM NOTICE`(`countAll`)로 별도 조회
+- 대시보드 위젯(최신 5건)은 같은 정렬로 `FETCH FIRST 5 ROWS ONLY`만 쓰는 `findRecent(5)`를 씀
+
+## 2. 상세 (`findByNoticeNo`, NoticeDAO.java:121-151)
+바인드 변수(`?`) 순서: `noticeNo`
+```sql
+SELECT N.NOTICE_NO, N.TITLE, N.CONTENT, N.NOTICE_TYPE, N.ADMIN_NO, A.ADMIN_NAME, N.CREATED_DATE, N.UPDATED_DATE
+FROM NOTICE N
+    JOIN ADMIN A ON N.ADMIN_NO = A.ADMIN_NO
+WHERE N.NOTICE_NO = 1        -- 확인할 noticeNo로 교체
+```
+
+## 사용 방법
+- `NOTICE_TYPE`은 `'공지'` 또는 `'안내'` 둘 중 하나 — `'공지'`가 관리자 대시보드/판매자 목록/판매자 대시보드 위젯 어디서든 항상 상단 고정
+- 본문(`CONTENT`)은 목록에서는 안 가져오고 상세 조회할 때만 가져옴
+
+# 판매자 회원탈퇴 - /vendor/withdraw Query (2026-09-05 추가)
+
+`VendorWithdrawServlet` (POST) 이 비밀번호 재확인 후 3개 DAO를 순서대로 호출. 승인 대기 중인 주문이나 정산 미지급 여부는 확인하지 않음(2026-09-05 확정 — 지금 단계에서는 막지 않기로 함). 완료 즉시 `session.invalidate()`로 로그아웃 처리.
+
+## 1. 탈퇴 상태로 전환 (`SellerDAO.updateApprovalStatus`)
+바인드 변수(`?`) 순서: `'탈퇴'`, `NULL`, `sellerNo`
+```sql
+UPDATE SELLER
+SET APPROVAL_STATUS = '탈퇴',
+    REJECT_REASON = NULL,
+    UPDATED_DATE = SYSDATE
+WHERE SELLER_NO = 1        -- 확인할 sellerNo로 교체
+```
+
+## 2. 이 판매자 상품 전부 숨김 (`ProductListDAO.hideAllBySeller`)
+바인드 변수(`?`) 순서: `sellerNo`
+```sql
+UPDATE PRODUCT
+SET DISPLAY_YN = 'N',
+    UPDATED_DATE = SYSDATE
+WHERE SELLER_NO = 1        -- 확인할 sellerNo로 교체
+  AND DISPLAY_YN = 'Y'
+```
+- 카테고리/검색 목록 쿼리(`CategoryProductDAO`/`SearchDAO`)가 전부 `DISPLAY_YN='Y'`만 보여주기 때문에, 이 UPDATE 한 번으로 판매 상태와 무관하게 고객 화면에서 즉시 사라짐
+
+## 3. 액션 로그
+```sql
+INSERT INTO VENDOR_ACTION_LOG (
+    ACTION_LOG_NO, SELLER_NO, ACTION_TYPE, TARGET_TYPE, TARGET_NO, DETAIL, ACTION_DATE
+) VALUES (
+    SEQ_VENDOR_ACTION_LOG.NEXTVAL, ?, '판매자 탈퇴', 'SELLER', ?, NULL, SYSDATE
+)
+```
+
+## 사용 방법
+- `SELLER.APPROVAL_STATUS='탈퇴'`인 계정은 `VendorLoginServlet`이 로그인 자체를 막음("탈퇴한 계정입니다")
+- DB 컬럼은 `SELLER.approval_status` CHECK 제약에 `'탈퇴'`가 추가돼 있어야 함 — `docs/판매자.md` 참고
+
+# 판매자 액션 로그 (VENDOR_ACTION_LOG) (2026-09-05 추가)
+
+판매자가 판매자센터에서 수행한 주요 액션은 전부 `VendorActionLogDAO.log()`(project/GoodPang/src/main/java/com/goodpang/dao/VendorActionLogDAO.java)로 `VENDOR_ACTION_LOG`에 기록됨(성공한 경우에만). 판매자는 이 로그를 볼 수 없고, 관리자만 `/admin/vendor-action-logs`에서 조회 가능.
+
+| 화면/URL | action_type | target_type |
+|---|---|---|
+| 상품 등록 (`/vendor/product/write`) | `상품 등록` | `PRODUCT` |
+| 상품 노출/숨김 (`/vendor/product/visibility`) | `상품 노출` / `상품 숨김` | `PRODUCT` |
+| 판매중지/재개 (`/vendor/product/status`) | `판매 중지` / `판매 재개` | `PRODUCT` |
+| 옵션 수정 (`/vendor/product/option/update`) | `옵션 수정` | `PRODUCT_OPTION` |
+| 배송 처리 (`/vendor/order/ship`) | `배송 처리` | `ORDERS` |
+| 회원탈퇴 (`/vendor/withdraw`) | `판매자 탈퇴` | `SELLER` |
+
+기록 쿼리(공통):
+```sql
+INSERT INTO VENDOR_ACTION_LOG (
+    ACTION_LOG_NO, SELLER_NO, ACTION_TYPE, TARGET_TYPE, TARGET_NO, DETAIL, ACTION_DATE
+) VALUES (
+    SEQ_VENDOR_ACTION_LOG.NEXTVAL, ?, ?, ?, ?, ?, SYSDATE
+)
+```
+
+특정 판매자의 로그만 직접 확인하고 싶을 때(관리자 화면과 동일한 쿼리, `AdminVendorActionLogListServlet` → `VendorActionLogDAO.findAll`):
+```sql
+SELECT L.ACTION_LOG_NO, L.SELLER_NO, S.STORE_NAME,
+       L.ACTION_TYPE, L.TARGET_TYPE, L.TARGET_NO, L.DETAIL, L.ACTION_DATE
+FROM VENDOR_ACTION_LOG L
+    JOIN SELLER S ON L.SELLER_NO = S.SELLER_NO
+WHERE L.SELLER_NO = 1        -- 확인할 sellerNo로 교체 (전체 조회하려면 이 줄 제거)
+ORDER BY L.ACTION_LOG_NO DESC
+```
+
+## 사용 방법
+- `target_no`는 `target_type`이 가리키는 테이블의 PK 값 — FK가 없는 폴리모픽 연관이라, 대상이 나중에 삭제돼도 로그는 남음
+- 원본 DDL은 [`docs/vendor_action_log_table_create.sql`](vendor_action_log_table_create.sql), 필드 설명은 [`docs/table.md`](table.md)의 "VENDOR_ACTION_LOG 테이블 필드 설명" 참고
