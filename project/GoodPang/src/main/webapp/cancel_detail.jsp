@@ -389,7 +389,7 @@ a {
 </c:forEach>
 
 <!-- 배송비 (null이 들어오면 기본값 0 적용) -->
-<c:set var="actualDeliveryFee" value="${not empty cancelInfo.deliveryFee ? cancelInfo.deliveryFee : 0}" />
+<c:set var="actualDeliveryFee" value="${not empty cancelInfo2.deliveryFee ? cancelInfo2.deliveryFee : 0}" />
 
 <!-- D. 최종 환불 완료 금액 (누적 총 상품금액 + DB 전달 배송비) -->
 <c:set var="finalRefundTotal" value="${sumItemTotal + actualDeliveryFee}" />
