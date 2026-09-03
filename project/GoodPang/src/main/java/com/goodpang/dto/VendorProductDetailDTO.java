@@ -46,12 +46,6 @@ public class VendorProductDetailDTO {
     private String sameDayShipYn;
     private String sameDayCutoffTime;
 
-    private String returnZipcode;
-    private String returnAddress;
-    private String returnDetailAddress;
-    private int initialShippingFee;
-    private int returnShippingFee;
-
     private String saleStatus;
     private String displayYn;
     private Date createdDate;

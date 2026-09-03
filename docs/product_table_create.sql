@@ -172,13 +172,6 @@ CREATE TABLE PRODUCT (
     same_day_ship_yn                CHAR(1) NOT NULL, /* 당일출고 여부 */
     same_day_cutoff_time            VARCHAR2(5), /* 당일출고 마감시각 (예: 12:00) */
 
-    /* 반품/교환 */
-    return_zipcode               VARCHAR2(10) NOT NULL, /* 반품/교환지 우편번호 */
-    return_address               VARCHAR2(200) NOT NULL, /* 반품/교환지 기본주소 */
-    return_detail_address        VARCHAR2(200), /* 반품/교환지 상세주소 */
-    initial_shipping_fee         NUMBER(10) NOT NULL, /* 초도배송비(편도) */
-    return_shipping_fee          NUMBER(10) NOT NULL, /* 반품배송비(편도) */
-
     /* 상태/메타 */
     sale_status                 VARCHAR2(30) NOT NULL, /* 판매중/품절/판매중지/승인대기 */
     created_date                 DATE NOT NULL, /* 등록일 */

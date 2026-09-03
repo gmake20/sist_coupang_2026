@@ -48,8 +48,6 @@ public class VendorProductDetailDAO {
                 P.DELIVERY_SERVICE_CODE, P.DELIVERY_METHOD, P.BUNDLE_SHIPPING_YN,
                 P.SHIPPING_FEE_TYPE, P.SHIPPING_FEE,
                 P.LEAD_TIME_INPUT_TYPE, P.LEAD_TIME_DAYS, P.SAME_DAY_SHIP_YN, P.SAME_DAY_CUTOFF_TIME,
-                P.RETURN_ZIPCODE, P.RETURN_ADDRESS, P.RETURN_DETAIL_ADDRESS,
-                P.INITIAL_SHIPPING_FEE, P.RETURN_SHIPPING_FEE,
                 P.SALE_STATUS, P.DISPLAY_YN, P.CREATED_DATE, P.UPDATED_DATE
             FROM PRODUCT P
                 JOIN CATEGORY C3 ON P.SUB_CATEGORY_NO = C3.CATEGORY_NO
@@ -228,12 +226,6 @@ public class VendorProductDetailDAO {
 
         dto.setSameDayShipYn(rs.getString("SAME_DAY_SHIP_YN"));
         dto.setSameDayCutoffTime(rs.getString("SAME_DAY_CUTOFF_TIME"));
-
-        dto.setReturnZipcode(rs.getString("RETURN_ZIPCODE"));
-        dto.setReturnAddress(rs.getString("RETURN_ADDRESS"));
-        dto.setReturnDetailAddress(rs.getString("RETURN_DETAIL_ADDRESS"));
-        dto.setInitialShippingFee(rs.getInt("INITIAL_SHIPPING_FEE"));
-        dto.setReturnShippingFee(rs.getInt("RETURN_SHIPPING_FEE"));
 
         dto.setSaleStatus(rs.getString("SALE_STATUS"));
         dto.setDisplayYn(rs.getString("DISPLAY_YN"));
