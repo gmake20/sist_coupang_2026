@@ -3,6 +3,7 @@ package com.goodpang.servlet;
 import java.io.IOException;
 
 import com.goodpang.dao.MemberDAO;
+import com.goodpang.dao.WowMembershipDAO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.util.LoginUtil;
 
@@ -17,8 +18,8 @@ import jakarta.servlet.http.HttpSession;
 public class MemberWithdrawCompleteServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-
     private final MemberDAO memberDAO = new MemberDAO();
+    private final WowMembershipDAO wowDao = new WowMembershipDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -27,10 +28,7 @@ public class MemberWithdrawCompleteServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         MemberDTO loginMember = LoginUtil.requireLogin(request, response);
-
-        if (loginMember == null) {
-            return;
-        }
+        if (loginMember == null) return;
 
         HttpSession session = request.getSession(false);
 
@@ -41,17 +39,22 @@ public class MemberWithdrawCompleteServlet extends HttpServlet {
 
         int memberNo = loginMember.getMemberNo();
 
-        try {
-            boolean deleted = memberDAO.withdrawMember(memberNo);
+        if (wowDao.isWithdrawalBlocked(memberNo)) {
+            request.setAttribute("withdrawError", "와우 멤버십 해지 신청 후 회원 탈퇴가 가능합니다.");
+            request.getRequestDispatcher("/member_withdraw_check.jsp").forward(request, response);
+            return;
+        }
 
-            if (!deleted) {
+        try {
+            boolean withdrawn = memberDAO.withdrawMember(memberNo);
+
+            if (!withdrawn) {
                 request.setAttribute("withdrawError", "회원 탈퇴 처리에 실패했습니다.");
                 request.getRequestDispatcher("/member_withdraw_check.jsp").forward(request, response);
                 return;
             }
 
             session.invalidate();
-
             request.getRequestDispatcher("/member_withdraw_complete.jsp").forward(request, response);
 
         } catch (Exception e) {

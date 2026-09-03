@@ -41,16 +41,22 @@ public class MemberWithdrawCheckServlet extends HttpServlet {
             return;
         }
         
+        int memberNo = loginMember.getMemberNo();
         WowMembershipDAO wowDao = new WowMembershipDAO();
         
-        boolean wowActive = wowDao.isWowMember(loginMember.getMemberNo());
-        Date nextPaymentDate = wowDao.nextPaymentDate(loginMember.getMemberNo());
+        boolean wowActive = wowDao.isWowMember(memberNo);
+        Date nextPaymentDate = wowDao.nextPaymentDate(memberNo);
         
 
         /*
          * 우선 화면 확인용 데이터
          * 이후 DAO 조회 결과로 변경
          */
+        
+        boolean wowCancelPending = wowDao.isCancelPending(memberNo);
+
+        request.setAttribute("wowActive", wowActive);
+        request.setAttribute("wowCancelPending", wowCancelPending);
         request.setAttribute("activeOrders", Collections.emptyList());
         request.setAttribute("refundList", Collections.emptyList());
 
