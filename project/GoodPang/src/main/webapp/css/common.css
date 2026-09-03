@@ -2041,8 +2041,16 @@ a.del-button:hover {
     width: auto;
   }
 
+  /* ★ 2026-09-03 수정 — width:100% 가 부모와 서로를 물고 도는 상태였음.
+     부모 ul(.promotion-banner)은 flex 자식이라 폭이 "내용만큼"으로 잡히는데,
+     그 내용물인 이 상자가 다시 부모를 기준(100%)으로 삼아서 브라우저가
+     61px 이라는 엉뚱한 값을 냈음 → 배너 이미지가 background-size:cover 라
+     좌우 40% 가 잘려서 글자가 통째로 날아갔음(실측 60.73px).
+     부모 .side-banner 가 이 구간에서 95px 이므로 같은 값을 직접 박아 순환을 끊음.
+     (기본값 쪽 1441줄도 원래 102px 고정이라 방식이 일관됨) */
+  /* width: 100%; */
   .wing-placeholder {
-    width: 100%;
+    width: 95px;
   }
 }
 
