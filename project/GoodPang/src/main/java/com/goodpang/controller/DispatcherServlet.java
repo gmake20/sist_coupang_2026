@@ -65,6 +65,9 @@ public class DispatcherServlet extends HttpServlet {
                         .newInstance();
 
                 commandHandlerMap.put(url, handler);
+
+                // 개발용 로그 — properties 를 실제로 읽어서 Handler 를 만들었는지 확인용
+                System.out.println("[Dispatcher] 매핑 등록: " + url + " -> " + fullName);
             } catch (Exception e) {
                 throw new ServletException("핸들러 등록 실패 (" + fullName + ")", e);
             }
@@ -96,6 +99,10 @@ public class DispatcherServlet extends HttpServlet {
         if (handler == null) {
             handler = new NullHandler();
         }
+
+        // 개발용 로그 — 어떤 URL 이 어떤 Handler 로 갔는지 톰캣 콘솔에서 눈으로 확인하려고 넣음.
+        // (커맨드 패턴이 실제로 타는지 확인하는 용도. 필요 없어지면 이 줄만 지우면 됨)
+        System.out.println("[Dispatcher] " + path + " -> " + handler.getClass().getSimpleName());
 
         // 3. 핸들러 실행
         String viewName = null;
