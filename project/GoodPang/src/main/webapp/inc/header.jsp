@@ -1198,7 +1198,12 @@ function escapeHtml(value) {
         .replaceAll("'", '&#039;');
 }
 
-document.addEventListener('DOMContentLoaded', refreshCart);
-window.addEventListener('focus', refreshCart);
-setInterval(refreshCart, 3000);
 </script>
+
+<c:if test="${not empty sessionScope.loginMember}">
+    <script>
+        document.addEventListener('DOMContentLoaded', refreshCart);
+        window.addEventListener('focus', refreshCart);
+        setInterval(refreshCart, 3000);
+    </script>
+</c:if>
