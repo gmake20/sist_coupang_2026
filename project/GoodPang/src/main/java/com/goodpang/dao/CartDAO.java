@@ -437,60 +437,6 @@ public class CartDAO {
 	    }
 	    return deletedCount;
 	}
-
-	/*
-	 * public List<CartItemDTO> getGuestCartItems(Map<Integer, Integer> guestCart) {
-	 * 
-	 * List<CartItemDTO> list = new ArrayList<>();
-	 * 
-	 * if (guestCart == null || guestCart.isEmpty()) { return list; }
-	 * 
-	 * String sql = """ SELECT po.OPTION_ID, p.PRODUCT_NO, p.PRODUCT_NAME,
-	 * p.PRODUCT_PRICE + NVL(po.PRICE, 0) AS UNIT_PRICE, po.OPTION1_TYPE,
-	 * po.OPTION1_VALUE, po.OPTION2_TYPE, po.OPTION2_VALUE, po.OPTION3_TYPE,
-	 * po.OPTION3_VALUE, ( SELECT pi.IMAGE_URL FROM PRODUCT_IMAGE pi WHERE
-	 * pi.OPTION_ID = po.OPTION_ID ORDER BY CASE WHEN pi.IMAGE_PURPOSE = '대표' THEN 0
-	 * ELSE 1 END FETCH FIRST 1 ROW ONLY ) AS IMAGE_URL FROM PRODUCT_OPTION po JOIN
-	 * PRODUCT p ON p.PRODUCT_NO = po.PRODUCT_NO WHERE po.OPTION_ID = ? """;
-	 * 
-	 * try (Connection conn = ConnectionProvider.getConnection(); PreparedStatement
-	 * pstmt = conn.prepareStatement(sql)) {
-	 * 
-	 * for (Map.Entry<Integer, Integer> entry : guestCart.entrySet()) {
-	 * 
-	 * int optionId = entry.getKey(); int quantity = entry.getValue();
-	 * 
-	 * pstmt.setInt(1, optionId);
-	 * 
-	 * try (ResultSet rs = pstmt.executeQuery()) {
-	 * 
-	 * if (rs.next()) { CartItemDTO item = new CartItemDTO();
-	 * 
-	 * item.setOptionId(rs.getInt("OPTION_ID"));
-	 * item.setProductNo(rs.getInt("PRODUCT_NO"));
-	 * item.setProductName(rs.getString("PRODUCT_NAME"));
-	 * item.setUnitPrice(rs.getInt("UNIT_PRICE")); item.setQuantity(quantity);
-	 * 
-	 * item.setOption1Type(rs.getString("OPTION1_TYPE"));
-	 * item.setOption1Value(rs.getString("OPTION1_VALUE"));
-	 * item.setOption2Type(rs.getString("OPTION2_TYPE"));
-	 * item.setOption2Value(rs.getString("OPTION2_VALUE"));
-	 * item.setOption3Type(rs.getString("OPTION3_TYPE"));
-	 * item.setOption3Value(rs.getString("OPTION3_VALUE"));
-	 * 
-	 * String imageUrl = rs.getString("IMAGE_URL");
-	 * 
-	 * if (imageUrl != null && !imageUrl.startsWith("/")) { imageUrl = "/" +
-	 * imageUrl; }
-	 * 
-	 * item.setImageUrl(imageUrl);
-	 * 
-	 * list.add(item); } } }
-	 * 
-	 * } catch (Exception e) { e.printStackTrace(); }
-	 * 
-	 * return list; }
-	 */
 	
 	public List<CartItemDTO> getGuestCartItems(Map<Integer, Integer> guestCart) {
 
@@ -518,9 +464,11 @@ public class CartDAO {
 	                    WHERE pi.PRODUCT_NO = p.PRODUCT_NO
 	                    ORDER BY
 	                        CASE
-	                            WHEN pi.OPTION_ID = po.OPTION_ID THEN 0
-	                            WHEN pi.IMAGE_PURPOSE = '대표' THEN 1
-	                            ELSE 2
+	                            WHEN pi.OPTION_ID = po.OPTION_ID
+	                                 AND pi.IMAGE_PURPOSE = '대표' THEN 0
+	                            WHEN pi.OPTION_ID = po.OPTION_ID THEN 1
+	                            WHEN pi.IMAGE_PURPOSE = '대표' THEN 2
+	                            ELSE 3
 	                        END
 	                    FETCH FIRST 1 ROW ONLY
 	                ) AS IMAGE_URL
@@ -535,6 +483,7 @@ public class CartDAO {
 	        PreparedStatement pstmt = conn.prepareStatement(sql)
 	    ) {
 	        for (Map.Entry<Integer, Integer> entry : guestCart.entrySet()) {
+
 	            int optionId = entry.getKey();
 	            int quantity = entry.getValue();
 
@@ -542,6 +491,7 @@ public class CartDAO {
 
 	            try (ResultSet rs = pstmt.executeQuery()) {
 	                if (rs.next()) {
+
 	                    CartItemDTO item = new CartItemDTO();
 
 	                    item.setOptionId(rs.getInt("OPTION_ID"));
@@ -549,12 +499,14 @@ public class CartDAO {
 	                    item.setProductName(rs.getString("PRODUCT_NAME"));
 	                    item.setUnitPrice(rs.getInt("UNIT_PRICE"));
 	                    item.setQuantity(quantity);
+
 	                    item.setOption1Type(rs.getString("OPTION1_TYPE"));
 	                    item.setOption1Value(rs.getString("OPTION1_VALUE"));
 	                    item.setOption2Type(rs.getString("OPTION2_TYPE"));
 	                    item.setOption2Value(rs.getString("OPTION2_VALUE"));
 	                    item.setOption3Type(rs.getString("OPTION3_TYPE"));
 	                    item.setOption3Value(rs.getString("OPTION3_VALUE"));
+
 	                    item.setImageUrl(rs.getString("IMAGE_URL"));
 
 	                    list.add(item);

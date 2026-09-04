@@ -931,3 +931,27 @@ textarea {
     background: #f5f8ff;
     box-shadow: 0 0 0 1px #346aff inset;
 }
+.mypang-layout {
+    width: 1025px;
+    margin: 30px auto 60px;
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr) 130px;
+    gap: 0px;
+    align-items: start;
+    box-sizing: border-box;
+}
+
+.mypang-sidebar {
+    width: 160px;
+}
+
+.mypang-layout > .review-page {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+.review-right-banner {
+    width: 130px;
+    margin-left: 30px;
+}
