@@ -37,9 +37,16 @@ public class VendorProductWriteServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		HttpSession session = request.getSession(false);
+		SellerDTO loginSeller = (session != null) ? (SellerDTO) session.getAttribute("loginSeller") : null;
 
-		if (session == null || session.getAttribute("loginSeller") == null) {
+		if (loginSeller == null) {
 			response.sendRedirect(request.getContextPath() + "/vendor/login");
+			return;
+		}
+
+		if (!"승인".equals(loginSeller.getApprovalStatus())) {
+			request.setAttribute("sellerApprovalStatus", loginSeller.getApprovalStatus());
+			request.getRequestDispatcher("/WEB-INF/views/vendor-product-write-locked.jsp").forward(request, response);
 			return;
 		}
 
@@ -57,6 +64,11 @@ public class VendorProductWriteServlet extends HttpServlet {
 
 		if (loginSeller == null) {
 			writeJson(response, 401, new Result(false, "로그인이 필요합니다.", 0));
+			return;
+		}
+
+		if (!"승인".equals(loginSeller.getApprovalStatus())) {
+			writeJson(response, 403, new Result(false, "입점 승인이 완료된 판매자만 상품을 등록할 수 있습니다.", 0));
 			return;
 		}
 
