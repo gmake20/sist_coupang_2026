@@ -2798,3 +2798,23 @@ a.del-button:hover {
 	background: #aaa;
 }
 
+.cart {
+    position: relative;
+}
+
+.cart-preview {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    padding-top: 8px;
+    z-index: 9999;
+}
+
+.cart:hover .cart-preview {
+    display: block;
+}
+
+.cart-preview .wrapper {
+    display: block;
+}
