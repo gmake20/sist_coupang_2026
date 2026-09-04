@@ -1103,3 +1103,102 @@
 	</div>
 
 </header>
+
+<script>
+const contextPath = '${pageContext.request.contextPath}';
+
+async function refreshCart() {
+    try {
+        const response = await fetch(contextPath + '/cart/status', {
+            method: 'GET',
+            cache: 'no-store',
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+
+        const cartCount = document.getElementById('cartCount');
+
+        if (cartCount) {
+            cartCount.textContent = data.count ?? 0;
+        }
+
+        const wrapper = document.getElementById('cartPreviewWrapper');
+
+        if (!wrapper) {
+            return;
+        }
+
+        let html = '<i class="arrow"></i>';
+
+        if (!data.items || data.items.length === 0) {
+            html += '<div class="cart-preview-empty">'
+                  + '장바구니에 담은 상품이 없습니다.'
+                  + '</div>';
+        } else {
+            html += '<ul class="cart-preview-list">';
+
+            data.items.forEach(function(item) {
+                let imageHtml = '<span>이미지</span>';
+
+                if (item.imageUrl) {
+                    imageHtml =
+                        '<img src="' + contextPath + '/' + item.imageUrl + '"'
+                        + ' alt="' + escapeHtml(item.productName) + '">';
+                }
+
+                html +=
+                    '<li class="cart-preview-item">'
+                    + '<a href="' + contextPath
+                    + '/product?productNo=' + item.productNo + '">'
+                    + '<div class="cart-preview-image">'
+                    + imageHtml
+                    + '</div>'
+                    + '<div class="cart-preview-info">'
+                    + '<p class="cart-preview-name">'
+                    + escapeHtml(item.productName)
+                    + '</p>'
+                    + '<p class="cart-preview-quantity">'
+                    + '수량 ' + item.quantity + '개'
+                    + '</p>'
+                    + '</div>'
+                    + '</a>'
+                    + '</li>';
+            });
+
+            html += '</ul>';
+        }
+
+        html +=
+            '<a href="' + contextPath + '/cart" class="cart-btn">'
+            + '<span>장바구니 전체보기</span>'
+            + '</a>';
+
+        wrapper.innerHTML = html;
+
+    } catch (error) {
+        console.error('장바구니 갱신 실패', error);
+    }
+}
+
+function escapeHtml(value) {
+    if (!value) {
+        return '';
+    }
+
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
+document.addEventListener('DOMContentLoaded', refreshCart);
+window.addEventListener('focus', refreshCart);
+setInterval(refreshCart, 3000);
+</script>

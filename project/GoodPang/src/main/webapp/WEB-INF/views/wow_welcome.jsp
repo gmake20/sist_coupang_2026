@@ -5,6 +5,11 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <!-- 파비콘 설정 -->
+    <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
+
+</head>
+<head>
 <meta charset="UTF-8">
 <title>와우 멤버십 가입 완료</title>
 <link rel="stylesheet"
