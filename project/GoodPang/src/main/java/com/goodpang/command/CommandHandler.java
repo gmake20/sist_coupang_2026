@@ -1,4 +1,4 @@
-package com.goodpang.servlet;
+package com.goodpang.command;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
