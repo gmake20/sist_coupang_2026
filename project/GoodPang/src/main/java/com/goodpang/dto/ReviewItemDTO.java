@@ -13,4 +13,6 @@ public class ReviewItemDTO {
     private String productName;
     private String productImage;
     private String optionName;
+    
+    
 }
