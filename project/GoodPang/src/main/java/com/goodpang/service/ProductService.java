@@ -16,7 +16,11 @@ import com.goodpang.dto.ProductImageDTO;
 import com.goodpang.dto.ProductOptionDTO;
 import com.goodpang.dto.ReviewDTO;
 import com.goodpang.dto.ReviewRatingSummaryDTO;
+import com.goodpang.util.ImageUrl;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 /**
  * 상품 상세페이지의 업무 로직 담당 (Service 계층).
@@ -209,8 +213,22 @@ public class ProductService {
      * 옵션 드롭박스/색상칩은 js 가 그림(js/product.js 의 setupOptionSelect).
      * JSP 에서 JSON 을 손으로 조립하면 값에 따옴표 같은 게 들어갈 때 깨져서 Gson 으로 안전하게 만듦
      * (Gson 이 &lt;, &gt; 도 이스케이프해줘서 &lt;/script&gt; 사고도 없음).
+     *
+     * ★ 사진 주소 변환 — 원 작성자 scym(feature/scm, 2026-09-04). 기능은 그대로 옮겨 담음.
+     *   이미지 경로는 DB에 "upload/5/xxx.jpg"처럼 저장돼 있어서 img:url(ImageUrl.resolve)과
+     *   같은 규칙으로 미리 절대/상대 경로로 바꿔서 내려준다 — options(및 그 안의 이미지 DTO)는
+     *   mainOption 으로도 쓰이고 있어서(JSP 가 img:url() 로 따로 변환), 원본을 그대로 바꾸면
+     *   이중 변환되므로 JSON 트리만 복제해서 그 안의 imageUrl 만 고친다.
      */
     public String toOptionsJson(List<ProductOptionDTO> options) {
-        return gson.toJson(options);
+        JsonElement optionsTree = gson.toJsonTree(options);
+        for (JsonElement optionEl : optionsTree.getAsJsonArray()) {
+            JsonArray optionImages = optionEl.getAsJsonObject().getAsJsonArray("images");
+            for (JsonElement imageEl : optionImages) {
+                JsonObject imageObj = imageEl.getAsJsonObject();
+                imageObj.addProperty("imageUrl", ImageUrl.resolve(imageObj.get("imageUrl").getAsString()));
+            }
+        }
+        return gson.toJson(optionsTree);
     }
 }

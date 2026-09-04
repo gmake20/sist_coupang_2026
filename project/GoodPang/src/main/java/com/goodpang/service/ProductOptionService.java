@@ -6,6 +6,7 @@ import com.goodpang.dao.ProductImageDAO;
 import com.goodpang.dao.ProductOptionDAO;
 import com.goodpang.dto.ProductImageDTO;
 import com.goodpang.dto.ProductOptionDTO;
+import com.goodpang.util.ImageUrl;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -46,6 +47,11 @@ public class ProductOptionService {
     /**
      * product.js 가 받아갈 JSON 문자열로 조립.
      * 키 이름(price/normalPrice/quantity/status/imageUrls)은 product.js 와의 약속이라 바꾸면 안 됨.
+     *
+     * ★ 사진 주소는 ImageUrl.resolve() 로 완성해서 내려줌 — 원 작성자 scym(feature/scm, 2026-09-04).
+     *   DB 의 IMAGE_URL 은 "upload/5/xxx.jpg" 처럼 앞부분이 없는데, 예전에는 product.js 가
+     *   contextPath 를 붙였고 지금은 서버가 img:url 과 같은 규칙으로 변환해서 내려줌
+     *   (그래서 product.js 는 받은 값을 그대로 씀). 여기를 되돌리면 이미지가 깨짐.
      */
     public String buildOptionJson(ProductOptionDTO option, List<ProductImageDTO> images) {
         JsonObject result = new JsonObject();
@@ -56,7 +62,7 @@ public class ProductOptionService {
 
         JsonArray imageUrls = new JsonArray();
         for (ProductImageDTO img : images) {
-            imageUrls.add(img.getImageUrl());
+            imageUrls.add(ImageUrl.resolve(img.getImageUrl()));
         }
         result.add("imageUrls", imageUrls);
 
