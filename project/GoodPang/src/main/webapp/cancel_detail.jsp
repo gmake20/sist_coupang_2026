@@ -4,6 +4,12 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+
+    <!-- 파비콘 설정 -->
+    <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
+
+</head>
+<head>
 <meta charset="UTF-8">
 <title>취소/반품/교환/환불내역 상세 - GoodPang</title>
 
@@ -275,6 +281,7 @@ a {
 <header>
     <jsp:include page="/inc/header.jsp" />
 </header>
+<script src="${pageContext.request.contextPath}/js/header.js"></script>
 
 <div class="page-wrap">
 
