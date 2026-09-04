@@ -50,12 +50,30 @@
 							data-price="${item.unitPrice}">
 							<input type="checkbox" class="item-chk" value="${item.optionId}"
 								checked>
-							<div class="item-img-placeholder">이미지</div>
+
+
+							<div class="item-img-placeholder">
+								<c:choose>
+									<c:when test="${not empty item.imageUrl}">
+										<a
+											href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
+											<img src="${pageContext.request.contextPath}${item.imageUrl}"
+											alt="${item.productName}" class="cart-item-img">
+										</a>
+									</c:when>
+
+									<c:otherwise>
+										<span>이미지 없음</span>
+									</c:otherwise>
+								</c:choose>
+							</div>
+
+
 							<div class="item-info">
 								<p class="item-title">
-								<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
-									${item.productName}
-								</a>
+									<a
+										href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
+										${item.productName} </a>
 								</p>
 								<p class="item-option">
 									옵션:
@@ -105,10 +123,10 @@
 							전체 선택 ( <span class="selected-count"> ${cartCount} </span> / <span
 							class="total-count"> ${cartCount} </span> )
 						</label>
-						
+
 						<button type="button" class="btn-action" id="btn-delete-selected">
 							선택삭제</button>
-							
+
 					</div>
 				</c:if>
 			</section>
@@ -130,51 +148,121 @@
 								value="${totalPrice}" pattern="#,###" />원
 						</span>
 					</div>
-					<button type="button"
-						class="btn-order"
-						id="btn-order"
-						${empty cartItems ? 'disabled' : ''}>
-						구매하기
-						</button>
+					<button type="button" class="btn-order" id="btn-order"
+						${empty cartItems ? 'disabled' : ''}>구매하기</button>
 				</div>
 			</aside>
 		</div>
+<!-- ==========================================================================
+     [장바구니 하단] 의류(티셔츠) 관련 추천 상품 영역 (실존 외부 이미지 링크 적용)
+     ========================================================================== -->
+<section class="personalized-gw" style="margin-top: 40px; border-top: 2px solid #333; padding-top: 20px;">
+    
+    <div class="ad-carousel">
+        <div class="ad-carousel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="font-size: 18px; font-weight: bold; color: #111;">이런 의류 상품은 어떠신가요?</h2>
+            <span class="ad-label" style="font-size: 11px; color: #888; border: 1px solid #ccc; padding: 2px 6px; border-radius: 2px;">추천</span>
+        </div>
 
-		<section class="recommend-section">
-			<h3>같이 보면 좋은 상품</h3>
-			<div class="product-grid">
-				<div class="product-card">
-					<div class="card-img">상품이미지</div>
-					<p class="card-title">자동 우산 UV차단 초경량 양산</p>
-					<p class="card-price">13,700원</p>
-				</div>
-				<div class="product-card">
-					<div class="card-img">상품이미지</div>
-					<p class="card-title">3단 자동 우양산 겸용 자외선 차단</p>
-					<p class="card-price">9,900원</p>
-				</div>
-				<div class="product-card">
-					<div class="card-img">상품이미지</div>
-					<p class="card-title">디시엘로 3단 자동 우산</p>
-					<p class="card-price">12,800원</p>
-				</div>
-				<div class="product-card">
-					<div class="card-img">상품이미지</div>
-					<p class="card-title">초경량 5단 접이식 미니 우산</p>
-					<p class="card-price">9,900원</p>
-				</div>
-			</div>
-			<h3>결제하려 했던 상품</h3>
-			<div class="product-grid">
-				<div class="product-card">
-					<div class="card-img">상품이미지</div>
-					<p class="card-title">순면 자루형 베개커버 2장</p>
-					<p class="card-price">12,800원</p>
-				</div>
-			</div>
-		</section>
+        <div class="ad-carousel-body">
+            <ul class="ad-list" style="display: flex; gap: 16px; list-style: none; padding: 0; margin: 0; overflow-x: auto;">
+                
+                <!-- 상품 1: 오버핏 반팔 티셔츠 -->
+                <li class="ad-card" style="width: 180px; flex-shrink: 0; border: 1px solid #eee; border-radius: 6px; padding: 10px; background: #fff;">
+                    <a href="${pageContext.request.contextPath}/product/detail?productNo=38" style="text-decoration: none; color: inherit; display: block;">
+                        <div class="ad-thumb" style="width: 100%; height: 180px; overflow: hidden; border-radius: 4px; background: #f9f9f9; margin-bottom: 8px;">
+                            <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300&auto=format&fit=crop" 
+                                 alt="데일리 오버핏 피그먼트 반팔 티셔츠" 
+                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                        </div>
+                        <span class="ad-name" style="font-size: 13px; color: #333; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; line-height: 1.4; margin-bottom: 6px;">
+                            데일리 오버핏 피그먼트 반팔 티셔츠 (5color)
+                        </span>
+                        <span class="ad-tag ad-tag--free" style="font-size: 10px; color: #0073e9; background: #f0f7ff; padding: 2px 4px; border-radius: 2px; font-weight: bold;">무료배송</span>
+                        <div class="ad-price" style="margin-top: 6px; font-size: 15px; font-weight: bold; color: #111;">
+                            <strong>14,900원</strong>
+                        </div>
+                        <div class="ad-rating" style="font-size: 11px; color: #888; margin-top: 4px;">
+                            <span class="stars" style="color: #ffa500;">★★★★★</span>
+                            <span class="count">(1,240)</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- 상품 2: 순면 무지 티셔츠 -->
+                <li class="ad-card" style="width: 180px; flex-shrink: 0; border: 1px solid #eee; border-radius: 6px; padding: 10px; background: #fff;">
+                    <a href="${pageContext.request.contextPath}/product/detail?productNo=38" style="text-decoration: none; color: inherit; display: block;">
+                        <div class="ad-thumb" style="width: 100%; height: 180px; overflow: hidden; border-radius: 4px; background: #f9f9f9; margin-bottom: 8px;">
+                            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=300&auto=format&fit=crop" 
+                                 alt="100% 프리미엄 순면 라운드 반팔 티셔츠" 
+                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                        </div>
+                        <span class="ad-name" style="font-size: 13px; color: #333; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; line-height: 1.4; margin-bottom: 6px;">
+                            [1+1] 100% 프리미엄 순면 라운드 반팔 티셔츠 3팩
+                        </span>
+                        <span class="ad-tag ad-tag--free" style="font-size: 10px; color: #00891a; background: #f0fdf4; padding: 2px 4px; border-radius: 2px; font-weight: bold;">🚀 로켓배송</span>
+                        <div class="ad-price" style="margin-top: 6px; font-size: 15px; font-weight: bold; color: #e61328;">
+                            <span style="font-size: 12px; color: #999; text-decoration: line-through; font-weight: normal; margin-right: 4px;">25,000원</span>
+                            <strong>18,900원</strong>
+                        </div>
+                        <div class="ad-rating" style="font-size: 11px; color: #888; margin-top: 4px;">
+                            <span class="stars" style="color: #ffa500;">★★★★☆</span>
+                            <span class="count">(852)</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- 상품 3: 프린팅 그래픽 티셔츠 -->
+                <li class="ad-card" style="width: 180px; flex-shrink: 0; border: 1px solid #eee; border-radius: 6px; padding: 10px; background: #fff;">
+                    <a href="${pageContext.request.contextPath}/product/detail?productNo=38" style="text-decoration: none; color: inherit; display: block;">
+                        <div class="ad-thumb" style="width: 100%; height: 180px; overflow: hidden; border-radius: 4px; background: #f9f9f9; margin-bottom: 8px;">
+                            <img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=300&auto=format&fit=crop" 
+                                 alt="빈티지 그래픽 프린팅 드롭숄더 티셔츠" 
+                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                        </div>
+                        <span class="ad-name" style="font-size: 13px; color: #333; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; line-height: 1.4; margin-bottom: 6px;">
+                            빈티지 스트릿 그래픽 프린팅 드롭숄더 반팔티
+                        </span>
+                        <span class="ad-tag ad-tag--free" style="font-size: 10px; color: #0073e9; background: #f0f7ff; padding: 2px 4px; border-radius: 2px; font-weight: bold;">무료배송</span>
+                        <div class="ad-price" style="margin-top: 6px; font-size: 15px; font-weight: bold; color: #111;">
+                            <strong>19,800원</strong>
+                        </div>
+                        <div class="ad-rating" style="font-size: 11px; color: #888; margin-top: 4px;">
+                            <span class="stars" style="color: #ffa500;">★★★★★</span>
+                            <span class="count">(2,104)</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- 상품 4: 베이직 컬렉션 티셔츠 -->
+                <li class="ad-card" style="width: 180px; flex-shrink: 0; border: 1px solid #eee; border-radius: 6px; padding: 10px; background: #fff;">
+                    <a href="${pageContext.request.contextPath}/product/detail?productNo=38" style="text-decoration: none; color: inherit; display: block;">
+                        <div class="ad-thumb" style="width: 100%; height: 180px; overflow: hidden; border-radius: 4px; background: #f9f9f9; margin-bottom: 8px;">
+                            <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=300&auto=format&fit=crop" 
+                                 alt="베이직 코튼 머슬핏 반팔티" 
+                                 style="width: 100%; height: 100%; object-fit: cover;" />
+                        </div>
+                        <span class="ad-name" style="font-size: 13px; color: #333; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; line-height: 1.4; margin-bottom: 6px;">
+                            [쿨링] 초경량 드라이핏 스포츠 기능성 머슬핏 반팔티
+                        </span>
+                        <span class="ad-tag ad-tag--free" style="font-size: 10px; color: #00891a; background: #f0fdf4; padding: 2px 4px; border-radius: 2px; font-weight: bold;">🚀 로켓배송</span>
+                        <div class="ad-price" style="margin-top: 6px; font-size: 15px; font-weight: bold; color: #111;">
+                            <strong>12,500원</strong>
+                        </div>
+                        <div class="ad-rating" style="font-size: 11px; color: #888; margin-top: 4px;">
+                            <span class="stars" style="color: #ffa500;">★★★★☆</span>
+                            <span class="count">(430)</span>
+                        </div>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+</section>
 	</main>
-	
+
 	<script>
 	const contextPath = "${pageContext.request.contextPath}";
 	const isWowMember = ${isWowMember eq true};

@@ -95,9 +95,9 @@ public class OrderServlet extends HttpServlet {
 
 
 		List<CheckoutItemDTO> checkoutItems =
-				checkoutDAO.getCheckoutItems(
-						checkoutNo
-						);
+		        checkoutDAO.getCheckoutItemsPRODUCT(
+		                checkoutNo
+		        );
 
 		AddressDTO address =
 				orderDAO.getAddress(

@@ -32,23 +32,28 @@ public class CartUtil {
 	
 	
 	public static void refreshGuestCartSession(
-			HttpServletRequest request,
-			Map<Integer, Integer> guestCart) {
+            HttpServletRequest request,
+            Map<Integer, Integer> guestCart) {
 
-		HttpSession session = request.getSession();
+        HttpSession session = request.getSession();
 
-		if (guestCart == null || guestCart.isEmpty()) {
-			session.setAttribute("cartCount", 0);
-			session.removeAttribute("cartPreviewItems");
-			return;
-		}
+        if (guestCart == null || guestCart.isEmpty()) {
+            session.setAttribute("cartCount", 0);
+            session.removeAttribute("cartItems");
+            session.removeAttribute("cartPreviewItems");
+            return;
+        }
 
-		CartDAO cartDAO = new CartDAO();
+        CartDAO cartDAO = new CartDAO();
+        List<CartItemDTO> cartItems = cartDAO.getGuestCartItems(guestCart);
 
-		List<CartItemDTO> cartItems =
-				cartDAO.getGuestCartItems(guestCart);
+        int cartCount = guestCart.values()
+                .stream()
+                .mapToInt(Integer::intValue)
+                .sum();
 
-		session.setAttribute("cartCount", guestCart.size());
-		session.setAttribute("cartPreviewItems", cartItems);
-	}
+        session.setAttribute("cartCount", cartCount);
+        session.setAttribute("cartItems", cartItems);
+        session.setAttribute("cartPreviewItems", cartItems);
+    }
 }

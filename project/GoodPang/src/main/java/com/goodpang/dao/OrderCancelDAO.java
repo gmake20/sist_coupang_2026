@@ -353,16 +353,19 @@ public class OrderCancelDAO {
         return isSuccess;
     }
 
-
+   
     /**
      * 취소 상세 페이지 정보 조회 (PAYMENT_METHOD 조인 수정)
      */
     public List<OrderDetailDTO> getCancelDetailList(int orderNo) {
         List<OrderDetailDTO> list = new ArrayList<>();
-
+        
+        
+   
         String sql = """
             SELECT 
                 o.ORDER_NO,
+                o.TOTAL_PRICE,
                 o.ORDER_DATE,
                 o.ORDER_STATUS,
                 o.DELIVERY_FEE,
@@ -439,7 +442,7 @@ public class OrderCancelDAO {
                     dto.setOrderNo(rs.getInt("ORDER_NO"));
                     dto.setOrderDate(rs.getTimestamp("ORDER_DATE"));
                     dto.setOrderStatus(rs.getString("ORDER_STATUS"));
-                    dto.setDeliveryFee(rs.getInt("DELIVERY_FEE"));
+                 
 
                     // 상품 및 옵션 정보
                     dto.setProductNo(rs.getLong("PRODUCT_NO"));
@@ -466,6 +469,9 @@ public class OrderCancelDAO {
                     dto.setBankName(rs.getString("BANK_NAME"));
                     
                     dto.setImageUrl(rs.getString("IMAGE_URL"));
+                    
+                    dto.setTotalPrice(rs.getInt("TOTAL_PRICE"));
+                    dto.setDeliveryFee(rs.getInt("DELIVERY_FEE"));
 
                     list.add(dto);
                 }
@@ -480,6 +486,11 @@ public class OrderCancelDAO {
         return list;
     }
 
+
+private boolean isWowMember(int memberNo) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 /*
  * 재고 복원 — DB 프로시저 PRC_ORDER_STOCK_IN 을 부른다.

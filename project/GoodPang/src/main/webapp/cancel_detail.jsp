@@ -374,50 +374,87 @@ a {
         <table class="info-grid-table">
             <tr>
                 <th>취소 사유</th>
-                <td>${not empty cancelInfo22.returnReason ? cancelInfo2.returnReason : '품절로 인해 자동취소 되었습니다.'}</td>
+                <td>${not empty cancelInfo2.returnReason ? cancelInfo2.returnReason : '품절로 인해 자동취소 되었습니다.'}</td>
             </tr>
         </table>
+<!-- =========================================================
+     1. JSTL을 활용한 주문건 전체 상품금액 및 최종 환불금액 누적합
+     ========================================================= -->
+<!-- A. 전체 상품 금액 누적용 변수 초기화 -->
+<c:set var="sumItemTotal" value="0" />
 
-        <!-- 환불 안내 -->
-        <div class="section-title">환불안내</div>
-        <div class="refund-wrap">
-            <div class="refund-left">
-                <div class="refund-row">
-                    <span>상품금액</span>
-                    <strong><fmt:formatNumber value="${cancelInfo2.itemPrice * cancelInfo2.quantity}" pattern="#,###" />원</strong>
-                </div>
-                <div class="refund-row">
-                    <span>배송비</span>
-                    <strong>+<fmt:formatNumber value="${cancelInfo2.deliveryFee}" pattern="#,###" />원</strong>
-                </div>
-                <div class="refund-row">
-                    <span>반품비</span>
-                    <strong>0원</strong>
-                </div>
-            </div>
-            <div class="refund-right">
-                <div class="refund-row">
-                    <span>환불 수단</span>
-                    <strong>
-                        <c:choose>
-                            <c:when test="${not empty cancelInfo2.cardCompanyName}">
-                                ${cancelInfo2.cardCompanyName} / 일시불
-                            </c:when>
-                            <c:when test="${not empty cancelInfo2.bankName}">
-                                ${cancelInfo2.bankName} / 계좌이체
-                            </c:when>
-                            <c:otherwise>
-                                ${cancelInfo2.paymentMethod}
-                            </c:otherwise>
-                        </c:choose>
-                    </strong>
-                </div>
-                <div class="refund-row total">
-                    <span>환불 완료</span>
-                    <strong><fmt:formatNumber value="${cancelInfo2.refundAmount > 0 ? cancelInfo2.refundAmount : (cancelInfo2.itemPrice * cancelInfo2.quantity + cancelInfo2.deliveryFee)}" pattern="#,###" />원</strong>
-                </div>
-            </div>
+<!-- B. 취소 상세 상품 목록을 돌면서 각 상품의 (단가 * 수량)을 누적합 -->
+<c:forEach var="item" items="${cancelDetailList}">
+    <c:set var="sumItemTotal" value="${sumItemTotal + (item.itemPrice * item.quantity)}" />
+</c:forEach>
+
+<!-- 배송비 (null이 들어오면 기본값 0 적용) -->
+<c:set var="actualDeliveryFee" value="${not empty cancelInfo2.deliveryFee ? cancelInfo2.deliveryFee : 0}" />
+
+<!-- D. 최종 환불 완료 금액 (누적 총 상품금액 + DB 전달 배송비) -->
+<c:set var="finalRefundTotal" value="${sumItemTotal + actualDeliveryFee}" />
+
+
+<!-- =========================================================
+     2. 환불 안내 UI 영역 출력
+     ========================================================= -->
+<div class="section-title">환불안내</div>
+<div class="refund-wrap">
+    <div class="refund-left">
+        <!-- 상품금액 -->
+        <div class="refund-row">
+            <span>상품금액</span>
+            <strong><fmt:formatNumber value="${sumItemTotal}" pattern="#,###" />원</strong>
         </div>
+        
+        <!-- 배송비 (DB에서 전달된 deliveryFee 그대로 출력) -->
+        <div class="refund-row">
+            <span>배송비</span>
+            <strong>
+                <c:choose>
+                    <c:when test="${actualDeliveryFee == 0}">
+                        0원
+                    </c:when>
+                    <c:otherwise>
+                        +<fmt:formatNumber value="${actualDeliveryFee}" pattern="#,###" />원
+                    </c:otherwise>
+                </c:choose>
+            </strong>
+        </div>
+        
+        <!-- 반품비 -->
+        <div class="refund-row">
+            <span>반품비</span>
+            <strong>0원</strong>
+        </div>
+    </div>
+    
+    <div class="refund-right">
+        <!-- 환불 수단 -->
+        <div class="refund-row">
+            <span>환불 수단</span>
+            <strong>
+                <c:choose>
+                    <c:when test="${not empty cancelInfo.cardCompanyName}">
+                        ${cancelInfo.cardCompanyName} / 일시불
+                    </c:when>
+                    <c:when test="${not empty cancelInfo.bankName}">
+                        ${cancelInfo.bankName} / 계좌이체
+                    </c:when>
+                    <c:otherwise>
+                        ${cancelInfo.paymentMethod}
+                    </c:otherwise>
+                </c:choose>
+            </strong>
+        </div>
+        
+        <!-- 환불 완료 총액 -->
+        <div class="refund-row total">
+            <span>환불 완료</span>
+            <strong><fmt:formatNumber value="${finalRefundTotal}" pattern="#,###" />원</strong>
+        </div>
+    </div>
+</div>
 
         <div class="notice-text">
             ❶ 카드사로 결제 취소 요청이 전달된 후 환불까지 평일 기준 3~7일이 소요됩니다.
