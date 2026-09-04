@@ -7,7 +7,11 @@
 <head>
 <meta charset="UTF-8">
 <title>이미 완료된 주문입니다</title>
+<head>
+    <!-- 파비콘 설정 -->
+    <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
 
+</head>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/order_already_completed.css">
 

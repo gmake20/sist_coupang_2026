@@ -7,7 +7,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>공지사항 등록 - 관리자</title>
+<head>
+    <!-- 파비콘 설정 -->
+    <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
 
+</head>
   <style>
     body { font-family: Arial, "Malgun Gothic", sans-serif; margin: 24px; color: #111; }
     .back-link { display: inline-block; margin-bottom: 16px; color: #555; text-decoration: none; }

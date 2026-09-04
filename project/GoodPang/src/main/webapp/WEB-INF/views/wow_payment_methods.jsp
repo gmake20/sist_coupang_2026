@@ -1,6 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<head>
+    <!-- 파비콘 설정 -->
+    <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
 
+</head>
 <c:choose>
     <c:when test="${empty paymentMethods}">
         <div class="wow-payment-empty">등록된 결제수단이 없습니다.</div>
