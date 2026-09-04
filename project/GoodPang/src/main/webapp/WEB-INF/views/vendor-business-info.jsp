@@ -70,8 +70,11 @@
 
             <div class="field">
               <label class="label" for="zipcode">우편번호</label>
-              <input class="input" id="zipcode" name="zipcode" type="text" placeholder="우편번호"
-                value="<%= loginSeller.getZipcode() != null ? loginSeller.getZipcode() : "" %>">
+              <div class="inline-row">
+                <input class="input" id="zipcode" name="zipcode" type="text" placeholder="우편번호"
+                  value="<%= loginSeller.getZipcode() != null ? loginSeller.getZipcode() : "" %>">
+                <button class="check-button" id="zipcodeButton" type="button">우편번호 찾기</button>
+              </div>
             </div>
 
             <div class="field">
@@ -199,7 +202,24 @@
 
 
   <script src="${pageContext.request.contextPath}/js/vendor-common.js"></script>
+  <script src="//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
   <script>
+
+    document.getElementById("zipcodeButton").addEventListener("click", function () {
+
+      new kakao.Postcode({
+
+        oncomplete: function (data) {
+
+          const addr = (data.userSelectedType === "R") ? data.roadAddress : data.jibunAddress;
+
+          document.getElementById("zipcode").value = data.zonecode;
+          document.getElementById("businessAddress").value = addr;
+          document.getElementById("businessDetailAddress").focus();
+        }
+
+      }).open();
+    });
 
     (function loadCategories() {
 

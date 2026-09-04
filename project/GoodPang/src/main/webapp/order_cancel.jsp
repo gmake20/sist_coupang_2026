@@ -57,7 +57,7 @@
 		</c:if>
                 <p class="product-count">수량 : ${cancelInfo.quantity}개</p>
                 <strong class="product-price">
-                    <fmt:formatNumber value="${cancelInfo.totalPrice}" pattern="#,###" />원
+                    <fmt:formatNumber value="${cancelInfo.totalPrice-cancelInfo.deliveryFee}" pattern="#,###" />원
                 </strong>
             </div>
         </div>
@@ -82,7 +82,7 @@
         <div class="refund-box">
             <div class="refund-row">
                 <span>상품 금액</span>
-                <strong><fmt:formatNumber value="${cancelInfo.totalPrice}" pattern="#,###" />원</strong>
+                <strong><fmt:formatNumber value="${cancelInfo.totalPrice-cancelInfo.deliveryFee}" pattern="#,###" />원</strong>
             </div>
             <div class="refund-row">
                 <span>배송비</span>

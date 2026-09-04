@@ -180,6 +180,54 @@ public class CheckoutDAO {
 		return list;
 	}
 
+	/*
+	 * public List<CheckoutItemDTO> getCheckoutItemsPRODUCT( int checkoutNo) {
+	 * 
+	 * List<CheckoutItemDTO> list = new ArrayList<>();
+	 * 
+	 * String sql = """ SELECT ci.CHECKOUT_ITEM_NO, ci.CHECKOUT_NO, ci.PRODUCT_NO,
+	 * ci.OPTION_ID, ci.ORDER_QTY, ci.PRICE, p.PRODUCT_NAME, p.PRODUCT_IMAGE FROM
+	 * CHECKOUT_ITEM ci JOIN PRODUCT p ON ci.PRODUCT_NO = p.PRODUCT_NO WHERE
+	 * ci.CHECKOUT_NO = ? ORDER BY ci.CHECKOUT_ITEM_NO """;
+	 * 
+	 * try ( Connection conn = ConnectionProvider.getConnection();
+	 * 
+	 * PreparedStatement pstmt = conn.prepareStatement(sql); ) {
+	 * 
+	 * pstmt.setInt( 1, checkoutNo );
+	 * 
+	 * try (ResultSet rs = pstmt.executeQuery()) {
+	 * 
+	 * while (rs.next()) {
+	 * 
+	 * CheckoutItemDTO dto = new CheckoutItemDTO();
+	 * 
+	 * dto.setCheckoutItemNo( rs.getInt( "CHECKOUT_ITEM_NO" ) );
+	 * 
+	 * dto.setCheckoutNo( rs.getInt( "CHECKOUT_NO" ) );
+	 * 
+	 * dto.setProductNo( rs.getInt( "PRODUCT_NO" ) );
+	 * 
+	 * int optionId = rs.getInt( "OPTION_ID" );
+	 * 
+	 * if (!rs.wasNull()) { dto.setOptionId( optionId ); }
+	 * 
+	 * dto.setOrderQty( rs.getInt( "ORDER_QTY" ) );
+	 * 
+	 * dto.setPrice( rs.getInt( "PRICE" ) );
+	 * 
+	 * dto.setProductName( rs.getString( "PRODUCT_NAME" ) );
+	 * 
+	 * dto.setProductImage( rs.getString( "PRODUCT_IMAGE" ) );
+	 * 
+	 * 
+	 * list.add(dto); } }
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); }
+	 * 
+	 * return list; }
+	 */
+	
 	public List<CheckoutItemDTO> getCheckoutItemsPRODUCT(
 			int checkoutNo) {
 
@@ -187,22 +235,43 @@ public class CheckoutDAO {
 				new ArrayList<>();
 
 		String sql = """
-				SELECT
-				    ci.CHECKOUT_ITEM_NO,
-				    ci.CHECKOUT_NO,
-				    ci.PRODUCT_NO,
-				    ci.OPTION_ID,
-				    ci.ORDER_QTY,
-				    ci.PRICE,
-				    p.PRODUCT_NAME,
-				    p.PRODUCT_IMAGE
-				FROM CHECKOUT_ITEM ci
-				JOIN PRODUCT p
-				  ON ci.PRODUCT_NO = p.PRODUCT_NO
-				WHERE ci.CHECKOUT_NO = ?
-				ORDER BY ci.CHECKOUT_ITEM_NO
-				""";
+		        SELECT
+		            ci.CHECKOUT_ITEM_NO,
+		            ci.CHECKOUT_NO,
+		            ci.PRODUCT_NO,
+		            ci.OPTION_ID,
+		            ci.ORDER_QTY,
+		            ci.PRICE,
+		            p.PRODUCT_NAME,
+		            pi.IMAGE_URL,
+		            po.OPTION1_TYPE,
+		            po.OPTION1_VALUE,
+		            po.OPTION2_TYPE,
+		            po.OPTION2_VALUE,
+		            po.OPTION3_TYPE,
+		            po.OPTION3_VALUE
+		        FROM CHECKOUT_ITEM ci
 
+		        JOIN PRODUCT p
+		          ON ci.PRODUCT_NO = p.PRODUCT_NO
+
+		        LEFT JOIN PRODUCT_OPTION po
+		          ON ci.OPTION_ID = po.OPTION_ID
+
+		        LEFT JOIN (
+		            SELECT
+		                PRODUCT_NO,
+		                MIN(IMAGE_URL) AS IMAGE_URL
+		            FROM PRODUCT_IMAGE
+		            WHERE IMAGE_PURPOSE = '대표'
+		            GROUP BY PRODUCT_NO
+		        ) pi
+		          ON p.PRODUCT_NO = pi.PRODUCT_NO
+
+		        WHERE ci.CHECKOUT_NO = ?
+
+		        ORDER BY ci.CHECKOUT_ITEM_NO
+		        """;
 		try (
 				Connection conn =
 				ConnectionProvider.getConnection();
@@ -271,9 +340,8 @@ public class CheckoutDAO {
 									)
 							);
 
-					/*
-					 * dto.setProductImage( rs.getString( "PRODUCT_IMAGE" ) );
-					 */
+					dto.setProductImage( rs.getString( "IMAGE_URL" ) );
+					 
 
 					list.add(dto);
 				}
@@ -742,8 +810,8 @@ public class CheckoutDAO {
 	                            SELECT 1
 	                            FROM WOW_MEMBERSHIP wm
 	                            WHERE wm.MEMBER_NO = c.MEMBER_NO
-	                              AND wm.STATUS = 'ACTIVE'
-	                              OR wm.STATUS = 'CANCEL_PENDING'
+	                            AND wm.STATUS IN ('ACTIVE', 'CANCEL_PENDING')
+	                            AND wm.END_DATE >= TRUNC(SYSDATE)
 	                        )
 	                        THEN 0
 	                        -- 일반 회원은 19,800원 이상 무료배송
@@ -776,8 +844,8 @@ public class CheckoutDAO {
 	                                SELECT 1
 	                                FROM WOW_MEMBERSHIP wm
 	                                WHERE wm.MEMBER_NO = c.MEMBER_NO
-	                                  AND wm.STATUS = 'ACTIVE'
-	                                  OR wm.STATUS = 'CANCEL_PENDING'
+	                                AND wm.STATUS IN ('ACTIVE','CANCEL_PENDING')
+	    							AND wm.END_DATE >= TRUNC(SYSDATE)
 	                            )
 	                            THEN 0
 	                            -- 일반 회원 19,800원 이상

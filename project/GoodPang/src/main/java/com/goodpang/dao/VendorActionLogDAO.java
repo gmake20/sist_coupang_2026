@@ -1,12 +1,14 @@
 package com.goodpang.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.goodpang.dto.VendorActionLogDTO;
+import com.goodpang.dto.VendorActionLogSearchDTO;
 import com.goodpang.util.ConnectionProvider;
 
 /*
@@ -44,27 +46,36 @@ public class VendorActionLogDAO {
         }
     }
 
-    // 전체 판매자의 작업 로그 - 최신순. page는 1부터. 조회는 관리자 전용(판매자센터에는 노출 안 함)
-    public List<VendorActionLogDTO> findAll(int page, int pageSize) {
+    /*
+     * 전체 판매자의 작업 로그 - 최신순. page는 1부터. 조회는 관리자 전용(판매자센터에는 노출 안 함).
+     * search가 null이거나 필드가 비어있으면 그 조건은 안 붙는다.
+     */
+    public List<VendorActionLogDTO> findAll(int page, int pageSize, VendorActionLogSearchDTO search) {
 
         List<VendorActionLogDTO> list = new ArrayList<>();
 
-        String sql = """
+        StringBuilder sql = new StringBuilder("""
             SELECT L.ACTION_LOG_NO, L.SELLER_NO, S.STORE_NAME,
                    L.ACTION_TYPE, L.TARGET_TYPE, L.TARGET_NO, L.DETAIL, L.ACTION_DATE
             FROM VENDOR_ACTION_LOG L
                 JOIN SELLER S ON L.SELLER_NO = S.SELLER_NO
-            ORDER BY L.ACTION_LOG_NO DESC
-            OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
-            """;
+            """);
+
+        List<Object> params = new ArrayList<>();
+        appendSearchCondition(sql, params, search);
+
+        sql.append(" ORDER BY L.ACTION_LOG_NO DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        params.add((page - 1) * pageSize);
+        params.add(pageSize);
 
         try (
             Connection conn = ConnectionProvider.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString())
         ) {
 
-            pstmt.setInt(1, (page - 1) * pageSize);
-            pstmt.setInt(2, pageSize);
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -79,19 +90,31 @@ public class VendorActionLogDAO {
         return list;
     }
 
-    // 페이지네이션용 총 개수
-    public int countAll() {
+    // 페이지네이션용 총 개수 (findAll()과 같은 검색조건 적용)
+    public int countAll(VendorActionLogSearchDTO search) {
 
-        String sql = "SELECT COUNT(*) FROM VENDOR_ACTION_LOG";
+        StringBuilder sql = new StringBuilder("""
+            SELECT COUNT(*)
+            FROM VENDOR_ACTION_LOG L
+                JOIN SELLER S ON L.SELLER_NO = S.SELLER_NO
+            """);
+
+        List<Object> params = new ArrayList<>();
+        appendSearchCondition(sql, params, search);
 
         try (
             Connection conn = ConnectionProvider.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery()
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString())
         ) {
 
-            if (rs.next()) {
-                return rs.getInt(1);
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
 
         } catch (Exception e) {
@@ -99,6 +122,44 @@ public class VendorActionLogDAO {
         }
 
         return 0;
+    }
+
+    private void appendSearchCondition(StringBuilder sql, List<Object> params, VendorActionLogSearchDTO search) {
+
+        if (search == null) {
+            return;
+        }
+
+        List<String> conditions = new ArrayList<>();
+
+        if (search.getStoreName() != null && !search.getStoreName().isBlank()) {
+            conditions.add("S.STORE_NAME LIKE ?");
+            params.add("%" + search.getStoreName().trim() + "%");
+        }
+
+        if (search.getActionType() != null && !search.getActionType().isBlank()) {
+            conditions.add("L.ACTION_TYPE = ?");
+            params.add(search.getActionType());
+        }
+
+        if (search.getTargetType() != null && !search.getTargetType().isBlank()) {
+            conditions.add("L.TARGET_TYPE = ?");
+            params.add(search.getTargetType());
+        }
+
+        if (search.getStartDate() != null) {
+            conditions.add("TRUNC(L.ACTION_DATE) >= ?");
+            params.add(Date.valueOf(search.getStartDate()));
+        }
+
+        if (search.getEndDate() != null) {
+            conditions.add("TRUNC(L.ACTION_DATE) <= ?");
+            params.add(Date.valueOf(search.getEndDate()));
+        }
+
+        if (!conditions.isEmpty()) {
+            sql.append(" WHERE ").append(String.join(" AND ", conditions));
+        }
     }
 
     private VendorActionLogDTO mapRow(ResultSet rs) throws java.sql.SQLException {

@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -51,24 +50,6 @@
 
         <article class="stat-card">
           <div class="stat-top">
-            <span class="stat-label">결제 대기</span>
-            <span class="stat-icon stat-icon-orange"><svg class="icon"><use href="#ic-card" /></svg></span>
-          </div>
-          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
-          <p class="stat-compare" style="color:#bbb;">아직 대응하는 주문상태가 없습니다</p>
-        </article>
-
-        <article class="stat-card">
-          <div class="stat-top">
-            <span class="stat-label">상품 준비중</span>
-            <span class="stat-icon stat-icon-violet"><svg class="icon"><use href="#ic-box" /></svg></span>
-          </div>
-          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
-          <p class="stat-compare" style="color:#bbb;">아직 대응하는 주문상태가 없습니다</p>
-        </article>
-
-        <article class="stat-card">
-          <div class="stat-top">
             <span class="stat-label">배송 중</span>
             <span class="stat-icon stat-icon-green"><svg class="icon"><use href="#ic-truck" /></svg></span>
           </div>
@@ -81,15 +62,6 @@
             <span class="stat-icon stat-icon-blue"><svg class="icon"><use href="#ic-check-circle" /></svg></span>
           </div>
           <div class="stat-value">${orderStat.deliveredTodayCount} <small>건</small></div>
-        </article>
-
-        <article class="stat-card">
-          <div class="stat-top">
-            <span class="stat-label">취소/반품/교환</span>
-            <span class="stat-icon stat-icon-red"><svg class="icon"><use href="#ic-return" /></svg></span>
-          </div>
-          <div class="stat-value" style="color:#bbb; font-size:16px;">준비 중</div>
-          <p class="stat-compare" style="color:#bbb;">아직 취소/반품/교환 기능이 없습니다</p>
         </article>
 
       </section>
@@ -181,7 +153,7 @@
         <section class="panel table-panel">
 
           <div class="result-toolbar">
-            <p class="result-count">주문 목록 <strong>${fn:length(orderList)}</strong>건</p>
+            <p class="result-count">주문 목록 <strong>${totalCount}</strong>건</p>
 
             <select class="input select select-sm">
               <option>주문일 최신순</option>
@@ -273,17 +245,51 @@
           </div>
 
           <!-- 페이지네이션 -->
-          <nav class="pagination" aria-label="페이지 이동">
-            <button class="page-arrow" type="button" aria-label="이전 페이지">
-              <svg class="icon"><use href="#ic-chevron-left" /></svg>
-            </button>
+          <c:if test="${totalPages > 1}">
+            <nav class="pagination" aria-label="페이지 이동">
 
-            <button class="page-num active" type="button">1</button>
+              <c:if test="${page > 1}">
+                <c:url var="prevPageUrl" value="/vendor/order">
+                  <c:param name="startDate" value="${searchStartDate}" />
+                  <c:param name="endDate" value="${searchEndDate}" />
+                  <c:param name="orderStatus" value="${searchOrderStatus}" />
+                  <c:param name="deliveryStatus" value="${searchDeliveryStatus}" />
+                  <c:param name="paymentStatus" value="${searchPaymentStatus}" />
+                  <c:param name="page" value="${page - 1}" />
+                </c:url>
+                <a class="page-arrow" href="${prevPageUrl}" aria-label="이전 페이지">
+                  <svg class="icon"><use href="#ic-chevron-left" /></svg>
+                </a>
+              </c:if>
 
-            <button class="page-arrow" type="button" aria-label="다음 페이지">
-              <svg class="icon rotate-180"><use href="#ic-chevron-left" /></svg>
-            </button>
-          </nav>
+              <c:forEach var="p" begin="1" end="${totalPages}">
+                <c:url var="pageUrl" value="/vendor/order">
+                  <c:param name="startDate" value="${searchStartDate}" />
+                  <c:param name="endDate" value="${searchEndDate}" />
+                  <c:param name="orderStatus" value="${searchOrderStatus}" />
+                  <c:param name="deliveryStatus" value="${searchDeliveryStatus}" />
+                  <c:param name="paymentStatus" value="${searchPaymentStatus}" />
+                  <c:param name="page" value="${p}" />
+                </c:url>
+                <a class="page-num ${p == page ? 'active' : ''}" href="${pageUrl}">${p}</a>
+              </c:forEach>
+
+              <c:if test="${page < totalPages}">
+                <c:url var="nextPageUrl" value="/vendor/order">
+                  <c:param name="startDate" value="${searchStartDate}" />
+                  <c:param name="endDate" value="${searchEndDate}" />
+                  <c:param name="orderStatus" value="${searchOrderStatus}" />
+                  <c:param name="deliveryStatus" value="${searchDeliveryStatus}" />
+                  <c:param name="paymentStatus" value="${searchPaymentStatus}" />
+                  <c:param name="page" value="${page + 1}" />
+                </c:url>
+                <a class="page-arrow" href="${nextPageUrl}" aria-label="다음 페이지">
+                  <svg class="icon rotate-180"><use href="#ic-chevron-left" /></svg>
+                </a>
+              </c:if>
+
+            </nav>
+          </c:if>
 
         </section>
 

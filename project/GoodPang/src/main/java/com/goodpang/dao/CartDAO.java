@@ -12,75 +12,6 @@ import com.goodpang.util.ConnectionProvider;
 
 public class CartDAO {
 
-	/*
-	 * public List<CartItemDTO> getCartItems(int memberNo) {
-	 * 
-	 * List<CartItemDTO> list = new ArrayList<>();
-	 * 
-	 * String sql = """ SELECT c.MEMBER_NO, c.OPTION_ID, c.QUANTITY,
-	 * 
-	 * p.PRODUCT_NO, p.PRODUCT_NAME, p.PRODUCT_PRICE,
-	 * 
-	 * po.OPTION1_TYPE, po.OPTION1_VALUE, po.OPTION2_TYPE, po.OPTION2_VALUE,
-	 * po.OPTION3_TYPE, po.OPTION3_VALUE,
-	 * 
-	 * NVL(po.PRICE, 0) AS OPTION_PRICE
-	 * 
-	 * FROM CART c
-	 * 
-	 * JOIN PRODUCT_OPTION po ON c.OPTION_ID = po.OPTION_ID
-	 * 
-	 * JOIN PRODUCT p ON po.PRODUCT_NO = p.PRODUCT_NO
-	 * 
-	 * WHERE c.MEMBER_NO = ?
-	 * 
-	 * ORDER BY p.PRODUCT_NO DESC """;
-	 * 
-	 * try ( Connection conn = ConnectionProvider.getConnection();
-	 * 
-	 * PreparedStatement pstmt = conn.prepareStatement(sql); ) {
-	 * 
-	 * pstmt.setInt(1, memberNo);
-	 * 
-	 * try (ResultSet rs = pstmt.executeQuery()) {
-	 * 
-	 * while (rs.next()) {
-	 * 
-	 * CartItemDTO dto = new CartItemDTO();
-	 * 
-	 * dto.setMemberNo( rs.getInt("MEMBER_NO") );
-	 * 
-	 * dto.setOptionId( rs.getInt("OPTION_ID") );
-	 * 
-	 * dto.setQuantity( rs.getInt("QUANTITY") );
-	 * 
-	 * dto.setProductNo( rs.getInt("PRODUCT_NO") );
-	 * 
-	 * dto.setProductName( rs.getString("PRODUCT_NAME") );
-	 * 
-	 * dto.setProductPrice( rs.getInt("PRODUCT_PRICE") );
-	 * 
-	 * dto.setOptionPrice( rs.getInt("OPTION_PRICE") );
-	 * 
-	 * dto.setOption1Type( rs.getString("OPTION1_TYPE") );
-	 * 
-	 * dto.setOption1Value( rs.getString("OPTION1_VALUE") );
-	 * 
-	 * dto.setOption2Type( rs.getString("OPTION2_TYPE") );
-	 * 
-	 * dto.setOption2Value( rs.getString("OPTION2_VALUE") );
-	 * 
-	 * dto.setOption3Type( rs.getString("OPTION3_TYPE") );
-	 * 
-	 * dto.setOption3Value( rs.getString("OPTION3_VALUE") );
-	 * 
-	 * list.add(dto); } }
-	 * 
-	 * } catch (Exception e) { e.printStackTrace(); throw new RuntimeException(
-	 * "장바구니 조회 실패", e ); }
-	 * 
-	 * return list; }
-	 */
 	
 	public List<CartItemDTO> getCartItems(int memberNo) {
 
@@ -479,84 +410,113 @@ public class CartDAO {
 	    }
 	    return deletedCount;
 	}
-	
+
 	public List<CartItemDTO> getGuestCartItems(Map<Integer, Integer> guestCart) {
 
-		List<CartItemDTO> list = new ArrayList<>();
+	    List<CartItemDTO> list = new ArrayList<>();
 
-		if (guestCart == null || guestCart.isEmpty()) {
-			return list;
-		}
+	    if (guestCart == null || guestCart.isEmpty()) {
+	        return list;
+	    }
 
-		String placeholders = String.join(
-				",",
-				java.util.Collections.nCopies(
-						guestCart.size(),
-						"?"
-				)
-		);
+	    String sql = """
+	        SELECT
+	            po.OPTION_ID,
+	            p.PRODUCT_NO,
+	            p.PRODUCT_NAME,
+	            p.PRODUCT_PRICE + NVL(po.PRICE, 0) AS UNIT_PRICE,
+	            po.OPTION1_TYPE,
+	            po.OPTION1_VALUE,
+	            po.OPTION2_TYPE,
+	            po.OPTION2_VALUE,
+	            po.OPTION3_TYPE,
+	            po.OPTION3_VALUE,
+	            (
+	                SELECT pi.IMAGE_URL
+	                FROM PRODUCT_IMAGE pi
+	                WHERE pi.OPTION_ID = po.OPTION_ID
+	                ORDER BY
+	                    CASE
+	                        WHEN pi.IMAGE_PURPOSE = '대표' THEN 0
+	                        ELSE 1
+	                    END
+	                FETCH FIRST 1 ROW ONLY
+	            ) AS IMAGE_URL
+	        FROM PRODUCT_OPTION po
+	        JOIN PRODUCT p
+	          ON p.PRODUCT_NO = po.PRODUCT_NO
+	        WHERE po.OPTION_ID = ?
+	        """;
 
-		String sql = """
-				SELECT
-				    po.OPTION_ID,
-				    p.PRODUCT_NO,
-				    p.PRODUCT_NAME,
-				    p.PRODUCT_PRICE,
-				    po.OPTION1_TYPE,
-				    po.OPTION1_VALUE,
-				    po.OPTION2_TYPE,
-				    po.OPTION2_VALUE,
-				    po.OPTION3_TYPE,
-				    po.OPTION3_VALUE,
-				    NVL(po.PRICE, 0) AS OPTION_PRICE
-				FROM PRODUCT_OPTION po
-				JOIN PRODUCT p
-				    ON po.PRODUCT_NO = p.PRODUCT_NO
-				WHERE po.OPTION_ID IN (%s)
-				ORDER BY p.PRODUCT_NO DESC
-				""".formatted(placeholders);
+	    try (Connection conn = ConnectionProvider.getConnection();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-		try (
-			Connection conn = ConnectionProvider.getConnection();
-			PreparedStatement pstmt = conn.prepareStatement(sql)
-		) {
-			int index = 1;
+	        for (Map.Entry<Integer, Integer> entry : guestCart.entrySet()) {
 
-			for (Integer optionId : guestCart.keySet()) {
-				pstmt.setInt(index++, optionId);
-			}
+	            int optionId = entry.getKey();
+	            int quantity = entry.getValue();
 
-			try (ResultSet rs = pstmt.executeQuery()) {
-				while (rs.next()) {
-					int optionId = rs.getInt("OPTION_ID");
-					int productPrice = rs.getInt("PRODUCT_PRICE");
-					int optionPrice = rs.getInt("OPTION_PRICE");
+	            pstmt.setInt(1, optionId);
 
-					CartItemDTO dto = new CartItemDTO();
+	            try (ResultSet rs = pstmt.executeQuery()) {
 
-					dto.setOptionId(optionId);
-					dto.setQuantity(guestCart.get(optionId));
-					dto.setProductNo(rs.getInt("PRODUCT_NO"));
-					dto.setProductName(rs.getString("PRODUCT_NAME"));
-					dto.setProductPrice(productPrice);
-					dto.setOptionPrice(optionPrice);
-					dto.setUnitPrice(productPrice + optionPrice);
-					dto.setOption1Type(rs.getString("OPTION1_TYPE"));
-					dto.setOption1Value(rs.getString("OPTION1_VALUE"));
-					dto.setOption2Type(rs.getString("OPTION2_TYPE"));
-					dto.setOption2Value(rs.getString("OPTION2_VALUE"));
-					dto.setOption3Type(rs.getString("OPTION3_TYPE"));
-					dto.setOption3Value(rs.getString("OPTION3_VALUE"));
+	                if (rs.next()) {
+	                    CartItemDTO item = new CartItemDTO();
 
-					list.add(dto);
-				}
-			}
+	                    item.setOptionId(rs.getInt("OPTION_ID"));
+	                    item.setProductNo(rs.getInt("PRODUCT_NO"));
+	                    item.setProductName(rs.getString("PRODUCT_NAME"));
+	                    item.setUnitPrice(rs.getInt("UNIT_PRICE"));
+	                    item.setQuantity(quantity);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("비회원 장바구니 조회 실패", e);
-		}
+	                    item.setOption1Type(rs.getString("OPTION1_TYPE"));
+	                    item.setOption1Value(rs.getString("OPTION1_VALUE"));
+	                    item.setOption2Type(rs.getString("OPTION2_TYPE"));
+	                    item.setOption2Value(rs.getString("OPTION2_VALUE"));
+	                    item.setOption3Type(rs.getString("OPTION3_TYPE"));
+	                    item.setOption3Value(rs.getString("OPTION3_VALUE"));
 
-		return list;
+	                    String imageUrl = rs.getString("IMAGE_URL");
+
+	                    if (imageUrl != null && !imageUrl.startsWith("/")) {
+	                        imageUrl = "/" + imageUrl;
+	                    }
+
+	                    item.setImageUrl(imageUrl);
+
+	                    list.add(item);
+	                }
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return list;
+	}
+	
+	public int clearCart(
+	        Connection conn,
+	        int memberNo)
+	        throws Exception {
+
+	    String sql = """
+	            DELETE FROM CART
+	            WHERE MEMBER_NO = ?
+	            """;
+
+	    try (
+	        PreparedStatement pstmt =
+	                conn.prepareStatement(sql)
+	    ) {
+
+	        pstmt.setInt(
+	                1,
+	                memberNo
+	        );
+
+	        return pstmt.executeUpdate();
+	    }
 	}
 }

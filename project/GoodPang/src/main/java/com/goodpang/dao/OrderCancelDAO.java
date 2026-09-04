@@ -471,6 +471,7 @@ public class OrderCancelDAO {
                     dto.setImageUrl(rs.getString("IMAGE_URL"));
                     
                     dto.setTotalPrice(rs.getInt("TOTAL_PRICE"));
+                    dto.setDeliveryFee(rs.getInt("DELIVERY_FEE"));
 
                     list.add(dto);
                 }

@@ -55,12 +55,30 @@
 							data-price="${item.unitPrice}">
 							<input type="checkbox" class="item-chk" value="${item.optionId}"
 								checked>
-							<div class="item-img-placeholder">이미지</div>
+
+
+							<div class="item-img-placeholder">
+								<c:choose>
+									<c:when test="${not empty item.imageUrl}">
+										<a
+											href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
+											<img src="${pageContext.request.contextPath}${item.imageUrl}"
+											alt="${item.productName}" class="cart-item-img">
+										</a>
+									</c:when>
+
+									<c:otherwise>
+										<span>이미지 없음</span>
+									</c:otherwise>
+								</c:choose>
+							</div>
+
+
 							<div class="item-info">
 								<p class="item-title">
-								<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
-									${item.productName}
-								</a>
+									<a
+										href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
+										${item.productName} </a>
 								</p>
 								<p class="item-option">
 									옵션:
@@ -110,10 +128,10 @@
 							전체 선택 ( <span class="selected-count"> ${cartCount} </span> / <span
 							class="total-count"> ${cartCount} </span> )
 						</label>
-						
+
 						<button type="button" class="btn-action" id="btn-delete-selected">
 							선택삭제</button>
-							
+
 					</div>
 				</c:if>
 			</section>
@@ -135,12 +153,8 @@
 								value="${totalPrice}" pattern="#,###" />원
 						</span>
 					</div>
-					<button type="button"
-						class="btn-order"
-						id="btn-order"
-						${empty cartItems ? 'disabled' : ''}>
-						구매하기
-						</button>
+					<button type="button" class="btn-order" id="btn-order"
+						${empty cartItems ? 'disabled' : ''}>구매하기</button>
 				</div>
 			</aside>
 		</div>
@@ -253,7 +267,7 @@
 
 </section>
 	</main>
-	
+
 	<script>
 	const contextPath = "${pageContext.request.contextPath}";
 	const isWowMember = ${isWowMember eq true};

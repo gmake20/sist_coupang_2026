@@ -687,7 +687,7 @@ footer {
 
                                 <span>${checkList.quantity}개</span>
 
-                                <strong><fmt:formatNumber value="${checkList.totalPrice}" pattern="#,###" />원</strong>
+                                <strong><fmt:formatNumber value="${checkList.totalPrice*checkList.quantity}" pattern="#,###" />원</strong>
 
                             </div>
 

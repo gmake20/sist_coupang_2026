@@ -253,18 +253,12 @@
 			</div>
 			<div class="product-price"
 				style="font-size: 13px; color: #333; margin-bottom: 4px;">
-				<c:choose>
-					<c:when test="${not empty item.totalPrice}">
+				
+					
 						<fmt:formatNumber
-							value="${item.itemPrice * item.quantity + item.deliveryFee}"
+							value="${item.itemPrice * item.quantity }"
 							pattern="#,###" />원
-															</c:when>
-					<c:otherwise>
-						<fmt:formatNumber
-							value="${item.itemPrice * item.quantity+ item.deliveryFee}"
-							pattern="#,###" />원
-															</c:otherwise>
-				</c:choose>
+														
 				<span>·</span> ${item.quantity}개
 			</div>
 			<c:if

@@ -67,6 +67,13 @@ public class CartCheckoutServlet extends HttpServlet {
 					checkoutDAO.createCheckout(
 							memberNo
 							);
+			
+			// 장바구니에서 만든 checkout이라는 표시
+			request.getSession()
+		       .setAttribute(
+		               "cartCheckoutNo",
+		               checkoutNo
+		       );
 
 			int itemCount = 0;
 

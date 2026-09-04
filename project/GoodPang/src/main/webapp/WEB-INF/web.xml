@@ -13,8 +13,16 @@
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
-    
-    
+
+    <!-- fmt:formatDate가 서버 JVM 기본 타임존(환경에 따라 UTC일 수 있음) 대신
+         한국 시간을 쓰도록 지정. 이게 없으면 DB(SYSDATE)는 한국시간인데
+         화면에는 UTC로 보이는 문제가 생긴다 -->
+    <context-param>
+        <param-name>jakarta.servlet.jsp.jstl.fmt.timeZone</param-name>
+        <param-value>Asia/Seoul</param-value>
+    </context-param>
+
+
     <!-- 세션 유지 시간 -->
     <session-config>
     <session-timeout>30</session-timeout>
