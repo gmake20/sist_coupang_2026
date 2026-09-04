@@ -884,53 +884,46 @@
     line-height: 1.4;
 }
 
-
-/* 하단 버튼 영역 */
+/* 하단 버튼 그룹 (Grid 대신 Flex로 변경하여 자율 균등 배치) */
 .delivery-buttons {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-
+    display: flex !important;
     gap: 8px !important;
-
     width: 100%;
-
-    margin-top: 18px !important;
-    padding-top: 14px !important;
-
+    margin-top: 15px !important;
+    padding-top: 12px !important;
     border-top: 1px solid #f0f0f0 !important;
-
     box-sizing: border-box;
 }
 
-
-/* 버튼 크기 통일 */
+/* 버튼 통합 및 크기 자동 확보 */
 .delivery-buttons .delivery-btn {
-    width: 100%;
-    height: 38px;
-
-    padding: 0 10px !important;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
+    flex: 1 !important;              /* 남은 공간을 균등하게 나눔 */
+    min-width: 0 !important;         /* flex 자식 요소의 텍스트 잘림 방지 */
+    min-height: 40px !important;     /* 기존 38px/8px보다 살짝 높여 클릭감 향상 */
+    padding: 0 8px !important;       /* 좌우 여백 확보 */
+    
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
     border: 1px solid #ccc !important;
     border-radius: 4px !important;
-
     background: #fff !important;
-    color: #333;
-
-    font-size: 13px;
-    white-space: nowrap;
-
+    color: #333 !important;
+    
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;  /* 줄바꿈 금지 */
+    word-break: keep-all !important; /* 단어 단위 보존 */
     cursor: pointer;
-
-    box-sizing: border-box;
+    box-sizing: border-box !important;
 }
 
+/* 강조 버튼 (배송 조회) */
 .delivery-buttons .delivery-btn.primary {
     border-color: #0073e9 !important;
     color: #0073e9 !important;
+    font-weight: bold !important;
 }
 
 
