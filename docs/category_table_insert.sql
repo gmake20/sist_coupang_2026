@@ -68,6 +68,9 @@ INSERT INTO CATEGORY VALUES (10501, '베이비',     105, 3, SYSDATE, 1);
 INSERT INTO CATEGORY VALUES (10502, '여아/주니어', 105, 3, SYSDATE, 1);
 INSERT INTO CATEGORY VALUES (10503, '남아/주니어', 105, 3, SYSDATE, 1);
 
+-- 럭셔리패션(106) 하위 — 원래 소분류가 하나도 없었음(금반지 같은 주얼리가 들어갈 리프가 없어서 추가)
+INSERT INTO CATEGORY VALUES (10601, '주얼리', 106, 3, SYSDATE, 1);
+
 
 -- =========================================================
 -- 4단계 (세분류) — 가방/잡화 하위의 '가방'
