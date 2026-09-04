@@ -2,6 +2,7 @@
 <%@ taglib uri="jakarta.tags.core" prefix="c"%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -543,7 +544,7 @@
 									<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
 										<figure>
 											<c:if test="${not empty item.thumbnailUrl}">
-												<img src="${pageContext.request.contextPath}/${item.thumbnailUrl}" alt="${item.productName}">
+												<img src="${img:url(item.thumbnailUrl)}" alt="${item.productName}">
 											</c:if>
 										</figure>
 										<%-- 무료배송 뱃지 — 2026-09-02 추가, 2026-09-05 조건 추가(사용자 지시).

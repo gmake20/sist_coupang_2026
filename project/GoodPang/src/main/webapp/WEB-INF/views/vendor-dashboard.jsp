@@ -234,16 +234,6 @@
               <span class="status-value"><fmt:formatNumber value="${orderStat.waitingCount}" pattern="#,##0" /> <small>건</small></span>
             </li>
             <li>
-              <span class="status-icon status-icon-orange"><svg class="icon"><use href="#ic-clock" /></svg></span>
-              <span class="status-label">결제 대기</span>
-              <span class="status-value" style="color:#bbb; font-size:13px; font-weight:400;">준비 중</span>
-            </li>
-            <li>
-              <span class="status-icon status-icon-blue"><svg class="icon"><use href="#ic-clipboard-check" /></svg></span>
-              <span class="status-label">상품 준비중</span>
-              <span class="status-value" style="color:#bbb; font-size:13px; font-weight:400;">준비 중</span>
-            </li>
-            <li>
               <span class="status-icon status-icon-teal"><svg class="icon"><use href="#ic-truck" /></svg></span>
               <span class="status-label">배송 중</span>
               <span class="status-value"><fmt:formatNumber value="${orderStat.shippingCount}" pattern="#,##0" /> <small>건</small></span>
@@ -252,11 +242,6 @@
               <span class="status-icon status-icon-green"><svg class="icon"><use href="#ic-truck" /></svg></span>
               <span class="status-label">배송 완료</span>
               <span class="status-value"><fmt:formatNumber value="${orderStat.deliveredCount}" pattern="#,##0" /> <small>건</small></span>
-            </li>
-            <li>
-              <span class="status-icon status-icon-red"><svg class="icon"><use href="#ic-return" /></svg></span>
-              <span class="status-label">취소/반품/교환</span>
-              <span class="status-value" style="color:#bbb; font-size:13px; font-weight:400;">준비 중</span>
             </li>
           </ul>
 
