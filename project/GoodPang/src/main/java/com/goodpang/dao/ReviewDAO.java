@@ -1076,124 +1076,73 @@ public class ReviewDAO {
         return rowCount;
     }
     
-    public List<ReviewItemDTO> selectAvailableReviewsByMemberNo(
-            int memberNo) {
-
-        String sql = """
-            SELECT
-                od.ORDER_DETAIL_NO,
-                od.PRODUCT_NO,
-                p.PRODUCT_NAME,
-                po.OPTION1_TYPE,
-                po.OPTION1_VALUE,
-                po.OPTION2_TYPE,
-                po.OPTION2_VALUE
-            FROM ORDER_DETAIL od
-            JOIN ORDERS o
-              ON od.ORDER_NO = o.ORDER_NO
-            JOIN PRODUCT p
-              ON od.PRODUCT_NO = p.PRODUCT_NO
-            LEFT JOIN PRODUCT_OPTION po
-              ON od.OPTION_ID = po.OPTION_ID
-            LEFT JOIN REVIEW r
-              ON od.ORDER_DETAIL_NO = r.ORDER_DETAIL_NO
-            WHERE o.MEMBER_NO = ?
-              AND r.REVIEW_NO IS NULL
-            ORDER BY o.ORDER_DATE DESC,
-                     od.ORDER_DETAIL_NO DESC
-            """;
-
-        List<ReviewItemDTO> list =
-            new ArrayList<>();
-
-        try (
-            Connection conn =
-                ConnectionProvider.getConnection();
-
-            PreparedStatement pstmt =
-                conn.prepareStatement(sql)
-        ) {
-
-            pstmt.setInt(1, memberNo);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-
-                while (rs.next()) {
-
-                    ReviewItemDTO dto =
-                        new ReviewItemDTO();
-
-                    dto.setOrderDetailNo(
-                        rs.getInt("ORDER_DETAIL_NO")
-                    );
-
-                    dto.setProductNo(
-                        rs.getInt("PRODUCT_NO")
-                    );
-
-                    dto.setProductName(
-                        rs.getString("PRODUCT_NAME")
-                    );
-
-                    String option1Type =
-                        rs.getString("OPTION1_TYPE");
-
-                    String option1Value =
-                        rs.getString("OPTION1_VALUE");
-
-                    String option2Type =
-                        rs.getString("OPTION2_TYPE");
-
-                    String option2Value =
-                        rs.getString("OPTION2_VALUE");
-
-                    StringBuilder option =
-                        new StringBuilder();
-
-                    if (option1Value != null
-                            && !option1Value.isBlank()) {
-
-                        if (option1Type != null
-                                && !option1Type.isBlank()) {
-
-                            option.append(option1Type)
-                                  .append(" ");
-                        }
-
-                        option.append(option1Value);
-                    }
-
-                    if (option2Value != null
-                            && !option2Value.isBlank()) {
-
-                        if (option.length() > 0) {
-                            option.append(", ");
-                        }
-
-                        if (option2Type != null
-                                && !option2Type.isBlank()) {
-
-                            option.append(option2Type)
-                                  .append(" ");
-                        }
-
-                        option.append(option2Value);
-                    }
-
-                    dto.setOptionName(
-                        option.toString()
-                    );
-
-                    list.add(dto);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
+	/*
+	 * public List<ReviewItemDTO> selectAvailableReviewsByMemberNo( int memberNo) {
+	 * 
+	 * String sql = """ SELECT od.ORDER_DETAIL_NO, od.PRODUCT_NO, p.PRODUCT_NAME,
+	 * po.OPTION1_TYPE, po.OPTION1_VALUE, po.OPTION2_TYPE, po.OPTION2_VALUE FROM
+	 * ORDER_DETAIL od JOIN ORDERS o ON od.ORDER_NO = o.ORDER_NO JOIN PRODUCT p ON
+	 * od.PRODUCT_NO = p.PRODUCT_NO LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID =
+	 * po.OPTION_ID LEFT JOIN REVIEW r ON od.ORDER_DETAIL_NO = r.ORDER_DETAIL_NO
+	 * WHERE o.MEMBER_NO = ? AND r.REVIEW_NO IS NULL ORDER BY o.ORDER_DATE DESC,
+	 * od.ORDER_DETAIL_NO DESC """;
+	 * 
+	 * List<ReviewItemDTO> list = new ArrayList<>();
+	 * 
+	 * try ( Connection conn = ConnectionProvider.getConnection();
+	 * 
+	 * PreparedStatement pstmt = conn.prepareStatement(sql) ) {
+	 * 
+	 * pstmt.setInt(1, memberNo);
+	 * 
+	 * try (ResultSet rs = pstmt.executeQuery()) {
+	 * 
+	 * while (rs.next()) {
+	 * 
+	 * ReviewItemDTO dto = new ReviewItemDTO();
+	 * 
+	 * dto.setOrderDetailNo( rs.getInt("ORDER_DETAIL_NO") );
+	 * 
+	 * dto.setProductNo( rs.getInt("PRODUCT_NO") );
+	 * 
+	 * dto.setProductName( rs.getString("PRODUCT_NAME") );
+	 * 
+	 * String option1Type = rs.getString("OPTION1_TYPE");
+	 * 
+	 * String option1Value = rs.getString("OPTION1_VALUE");
+	 * 
+	 * String option2Type = rs.getString("OPTION2_TYPE");
+	 * 
+	 * String option2Value = rs.getString("OPTION2_VALUE");
+	 * 
+	 * StringBuilder option = new StringBuilder();
+	 * 
+	 * if (option1Value != null && !option1Value.isBlank()) {
+	 * 
+	 * if (option1Type != null && !option1Type.isBlank()) {
+	 * 
+	 * option.append(option1Type) .append(" "); }
+	 * 
+	 * option.append(option1Value); }
+	 * 
+	 * if (option2Value != null && !option2Value.isBlank()) {
+	 * 
+	 * if (option.length() > 0) { option.append(", "); }
+	 * 
+	 * if (option2Type != null && !option2Type.isBlank()) {
+	 * 
+	 * option.append(option2Type) .append(" "); }
+	 * 
+	 * option.append(option2Value); }
+	 * 
+	 * dto.setOptionName( option.toString() );
+	 * 
+	 * list.add(dto); } }
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); }
+	 * 
+	 * return list; }
+	 */
     
 	/*
 	 * public List<ReviewAvailableDTO> getReviewStatus(int memberNo) {
@@ -1723,28 +1672,260 @@ public class ReviewDAO {
 
         return list;
     }
-    public List<ReviewItemDTO> selectAvailableReviewsByMemberNo(int memberNo, int offset, int pageSize) {
+	/*
+	 * public List<ReviewItemDTO> selectAvailableReviewsByMemberNo(int memberNo, int
+	 * offset, int pageSize) {
+	 * 
+	 * String sql = """ SELECT od.ORDER_DETAIL_NO, od.PRODUCT_NO, p.PRODUCT_NAME,
+	 * po.OPTION1_TYPE, po.OPTION1_VALUE, po.OPTION2_TYPE, po.OPTION2_VALUE FROM
+	 * ORDER_DETAIL od JOIN ORDERS o ON od.ORDER_NO = o.ORDER_NO JOIN PRODUCT p ON
+	 * od.PRODUCT_NO = p.PRODUCT_NO LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID =
+	 * po.OPTION_ID LEFT JOIN REVIEW r ON od.ORDER_DETAIL_NO = r.ORDER_DETAIL_NO
+	 * WHERE o.MEMBER_NO = ? AND r.REVIEW_NO IS NULL ORDER BY o.ORDER_DATE DESC,
+	 * od.ORDER_DETAIL_NO DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY """;
+	 * 
+	 * List<ReviewItemDTO> list = new ArrayList<>();
+	 * 
+	 * try ( Connection conn = ConnectionProvider.getConnection(); PreparedStatement
+	 * pstmt = conn.prepareStatement(sql) ) { pstmt.setInt(1, memberNo);
+	 * pstmt.setInt(2, offset); pstmt.setInt(3, pageSize);
+	 * 
+	 * try (ResultSet rs = pstmt.executeQuery()) { while (rs.next()) { ReviewItemDTO
+	 * dto = new ReviewItemDTO();
+	 * 
+	 * dto.setOrderDetailNo(rs.getInt("ORDER_DETAIL_NO"));
+	 * dto.setProductNo(rs.getInt("PRODUCT_NO"));
+	 * dto.setProductName(rs.getString("PRODUCT_NAME"));
+	 * 
+	 * String option1Type = rs.getString("OPTION1_TYPE"); String option1Value =
+	 * rs.getString("OPTION1_VALUE"); String option2Type =
+	 * rs.getString("OPTION2_TYPE"); String option2Value =
+	 * rs.getString("OPTION2_VALUE");
+	 * 
+	 * StringBuilder option = new StringBuilder();
+	 * 
+	 * if (option1Value != null && !option1Value.isBlank()) { if (option1Type !=
+	 * null && !option1Type.isBlank()) { option.append(option1Type).append(" "); }
+	 * option.append(option1Value); }
+	 * 
+	 * if (option2Value != null && !option2Value.isBlank()) { if (option.length() >
+	 * 0) { option.append(", "); }
+	 * 
+	 * if (option2Type != null && !option2Type.isBlank()) {
+	 * option.append(option2Type).append(" "); }
+	 * 
+	 * option.append(option2Value); }
+	 * 
+	 * dto.setOptionName(option.toString()); list.add(dto); } } } catch (Exception
+	 * e) { e.printStackTrace(); }
+	 * 
+	 * return list; }
+	 */
+    
+    public List<ReviewItemDTO> selectAvailableReviewsByMemberNo(
+            int memberNo) {
 
         String sql = """
-            SELECT
-                od.ORDER_DETAIL_NO,
-                od.PRODUCT_NO,
-                p.PRODUCT_NAME,
-                po.OPTION1_TYPE,
-                po.OPTION1_VALUE,
-                po.OPTION2_TYPE,
-                po.OPTION2_VALUE
-            FROM ORDER_DETAIL od
-            JOIN ORDERS o ON od.ORDER_NO = o.ORDER_NO
-            JOIN PRODUCT p ON od.PRODUCT_NO = p.PRODUCT_NO
-            LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID
-            LEFT JOIN REVIEW r ON od.ORDER_DETAIL_NO = r.ORDER_DETAIL_NO
-            WHERE o.MEMBER_NO = ?
-              AND r.REVIEW_NO IS NULL
-            ORDER BY o.ORDER_DATE DESC, od.ORDER_DETAIL_NO DESC
-            OFFSET ? ROWS
-            FETCH NEXT ? ROWS ONLY
-            """;
+                SELECT
+                    od.ORDER_DETAIL_NO,
+                    od.PRODUCT_NO,
+                    p.PRODUCT_NAME,
+
+                    po.OPTION1_TYPE,
+                    po.OPTION1_VALUE,
+                    po.OPTION2_TYPE,
+                    po.OPTION2_VALUE,
+
+                    pi.IMAGE_URL AS PRODUCT_IMAGE
+
+                FROM ORDER_DETAIL od
+
+                JOIN ORDERS o
+                  ON od.ORDER_NO = o.ORDER_NO
+
+                JOIN PRODUCT p
+                  ON od.PRODUCT_NO = p.PRODUCT_NO
+
+                LEFT JOIN PRODUCT_OPTION po
+                  ON od.OPTION_ID = po.OPTION_ID
+
+                LEFT JOIN (
+                    SELECT
+                        PRODUCT_NO,
+                        MIN(IMAGE_URL) AS IMAGE_URL
+                    FROM PRODUCT_IMAGE
+                    WHERE IMAGE_PURPOSE = '대표'
+                    GROUP BY PRODUCT_NO
+                ) pi
+                  ON od.PRODUCT_NO = pi.PRODUCT_NO
+
+                LEFT JOIN REVIEW r
+                  ON od.ORDER_DETAIL_NO = r.ORDER_DETAIL_NO
+
+                WHERE o.MEMBER_NO = ?
+                  AND r.REVIEW_NO IS NULL
+
+                ORDER BY
+                    o.ORDER_DATE DESC,
+                    od.ORDER_DETAIL_NO DESC
+                """;
+
+        List<ReviewItemDTO> list =
+                new ArrayList<>();
+
+        try (
+            Connection conn =
+                    ConnectionProvider.getConnection();
+
+            PreparedStatement pstmt =
+                    conn.prepareStatement(sql)
+        ) {
+
+            pstmt.setInt(1, memberNo);
+
+            try (ResultSet rs =
+                    pstmt.executeQuery()) {
+
+                while (rs.next()) {
+
+                    ReviewItemDTO dto =
+                            new ReviewItemDTO();
+
+                    dto.setOrderDetailNo(
+                            rs.getInt(
+                                    "ORDER_DETAIL_NO"
+                            )
+                    );
+
+                    dto.setProductNo(
+                            rs.getInt(
+                                    "PRODUCT_NO"
+                            )
+                    );
+
+                    dto.setProductName(
+                            rs.getString(
+                                    "PRODUCT_NAME"
+                            )
+                    );
+
+                    dto.setProductImage(
+                            rs.getString(
+                                    "PRODUCT_IMAGE"
+                            )
+                    );
+
+                    String option1Type =
+                            rs.getString(
+                                    "OPTION1_TYPE"
+                            );
+
+                    String option1Value =
+                            rs.getString(
+                                    "OPTION1_VALUE"
+                            );
+
+                    String option2Type =
+                            rs.getString(
+                                    "OPTION2_TYPE"
+                            );
+
+                    String option2Value =
+                            rs.getString(
+                                    "OPTION2_VALUE"
+                            );
+
+                    StringBuilder option =
+                            new StringBuilder();
+
+                    if (option1Value != null
+                            && !option1Value.isBlank()) {
+
+                        if (option1Type != null
+                                && !option1Type.isBlank()) {
+
+                            option.append(option1Type)
+                                  .append(" ");
+                        }
+
+                        option.append(
+                                option1Value
+                        );
+                    }
+
+                    if (option2Value != null
+                            && !option2Value.isBlank()) {
+
+                        if (option.length() > 0) {
+                            option.append(" / ");
+                        }
+
+                        if (option2Type != null
+                                && !option2Type.isBlank()) {
+
+                            option.append(option2Type)
+                                  .append(" ");
+                        }
+
+                        option.append(
+                                option2Value
+                        );
+                    }
+
+                    dto.setOptionName(
+                            option.toString()
+                    );
+
+                    list.add(dto);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    
+    public List<ReviewItemDTO> selectAvailableReviewsByMemberNo(
+            int memberNo, int offset, int pageSize) {
+
+        String sql = """
+                SELECT
+                    od.ORDER_DETAIL_NO,
+                    od.PRODUCT_NO,
+                    p.PRODUCT_NAME,
+                    po.OPTION1_TYPE,
+                    po.OPTION1_VALUE,
+                    po.OPTION2_TYPE,
+                    po.OPTION2_VALUE,
+                    pi.IMAGE_URL AS PRODUCT_IMAGE
+                FROM ORDER_DETAIL od
+                JOIN ORDERS o
+                  ON od.ORDER_NO = o.ORDER_NO
+                JOIN PRODUCT p
+                  ON od.PRODUCT_NO = p.PRODUCT_NO
+                LEFT JOIN PRODUCT_OPTION po
+                  ON od.OPTION_ID = po.OPTION_ID
+                LEFT JOIN (
+                    SELECT
+                        PRODUCT_NO,
+                        MIN(IMAGE_URL) AS IMAGE_URL
+                    FROM PRODUCT_IMAGE
+                    WHERE IMAGE_PURPOSE = '대표'
+                    GROUP BY PRODUCT_NO
+                ) pi
+                  ON od.PRODUCT_NO = pi.PRODUCT_NO
+                LEFT JOIN REVIEW r
+                  ON od.ORDER_DETAIL_NO = r.ORDER_DETAIL_NO
+                WHERE o.MEMBER_NO = ?
+                  AND r.REVIEW_NO IS NULL
+                ORDER BY o.ORDER_DATE DESC,
+                         od.ORDER_DETAIL_NO DESC
+                OFFSET ? ROWS
+                FETCH NEXT ? ROWS ONLY
+                """;
 
         List<ReviewItemDTO> list = new ArrayList<>();
 
@@ -1763,6 +1944,7 @@ public class ReviewDAO {
                     dto.setOrderDetailNo(rs.getInt("ORDER_DETAIL_NO"));
                     dto.setProductNo(rs.getInt("PRODUCT_NO"));
                     dto.setProductName(rs.getString("PRODUCT_NAME"));
+                    dto.setProductImage(rs.getString("PRODUCT_IMAGE"));
 
                     String option1Type = rs.getString("OPTION1_TYPE");
                     String option1Value = rs.getString("OPTION1_VALUE");
@@ -1780,7 +1962,7 @@ public class ReviewDAO {
 
                     if (option2Value != null && !option2Value.isBlank()) {
                         if (option.length() > 0) {
-                            option.append(", ");
+                            option.append(" / ");
                         }
 
                         if (option2Type != null && !option2Type.isBlank()) {
@@ -1794,13 +1976,17 @@ public class ReviewDAO {
                     list.add(dto);
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(
+                    "작성 가능한 리뷰 목록 조회 중 오류가 발생했습니다.",
+                    e
+            );
         }
 
         return list;
     }
-    
     public int countAvailableReviewsByMemberNo(int memberNo) {
 
         String sql = """
