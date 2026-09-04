@@ -220,103 +220,130 @@ public class CartDAO {
 		}
 	}
 
+	/*
+	 * public CartItemDTO getCartItemByOptionId(int optionId) {
+	 * 
+	 * CartItemDTO dto = null;
+	 * 
+	 * String sql = """ SELECT p.PRODUCT_NO, p.PRODUCT_NAME, p.PRODUCT_PRICE,
+	 * 
+	 * po.OPTION_ID, po.OPTION1_TYPE, po.OPTION1_VALUE, po.OPTION2_TYPE,
+	 * po.OPTION2_VALUE, po.OPTION3_TYPE, po.OPTION3_VALUE,
+	 * 
+	 * NVL(po.PRICE, 0) AS OPTION_PRICE
+	 * 
+	 * FROM PRODUCT_OPTION po JOIN PRODUCT p ON po.PRODUCT_NO = p.PRODUCT_NO
+	 * 
+	 * WHERE po.OPTION_ID = ? """;
+	 * 
+	 * try ( Connection conn = ConnectionProvider.getConnection(); PreparedStatement
+	 * pstmt = conn.prepareStatement(sql); ) {
+	 * 
+	 * pstmt.setInt(1, optionId);
+	 * 
+	 * try (ResultSet rs = pstmt.executeQuery()) {
+	 * 
+	 * if (rs.next()) {
+	 * 
+	 * dto = new CartItemDTO();
+	 * 
+	 * dto.setOptionId( rs.getInt("OPTION_ID") );
+	 * 
+	 * dto.setProductNo( rs.getInt("PRODUCT_NO") );
+	 * 
+	 * dto.setProductName( rs.getString("PRODUCT_NAME") );
+	 * 
+	 * dto.setProductPrice( rs.getInt("PRODUCT_PRICE") );
+	 * 
+	 * dto.setOptionPrice( rs.getInt("OPTION_PRICE") );
+	 * 
+	 * dto.setOption1Type( rs.getString("OPTION1_TYPE") );
+	 * 
+	 * dto.setOption1Value( rs.getString("OPTION1_VALUE") );
+	 * 
+	 * dto.setOption2Type( rs.getString("OPTION2_TYPE") );
+	 * 
+	 * dto.setOption2Value( rs.getString("OPTION2_VALUE") );
+	 * 
+	 * dto.setOption3Type( rs.getString("OPTION3_TYPE") );
+	 * 
+	 * dto.setOption3Value( rs.getString("OPTION3_VALUE") ); } }
+	 * 
+	 * } catch (Exception e) {
+	 * 
+	 * e.printStackTrace();
+	 * 
+	 * throw new RuntimeException( "장바구니 상품 조회 실패", e ); }
+	 * 
+	 * return dto; }
+	 */
 	public CartItemDTO getCartItemByOptionId(int optionId) {
 
-		CartItemDTO dto = null;
+	    CartItemDTO dto = null;
 
-		String sql = """
-				SELECT
-				    p.PRODUCT_NO,
-				    p.PRODUCT_NAME,
-				    p.PRODUCT_PRICE,
+	    String sql = """
+	            SELECT
+	                p.PRODUCT_NO,
+	                p.PRODUCT_NAME,
+	                p.PRODUCT_PRICE,
+	                po.OPTION_ID,
+	                po.OPTION1_TYPE,
+	                po.OPTION1_VALUE,
+	                po.OPTION2_TYPE,
+	                po.OPTION2_VALUE,
+	                po.OPTION3_TYPE,
+	                po.OPTION3_VALUE,
+	                NVL(po.PRICE, 0) AS OPTION_PRICE,
+	                pi.IMAGE_URL
+	            FROM PRODUCT_OPTION po
+	            JOIN PRODUCT p
+	              ON po.PRODUCT_NO = p.PRODUCT_NO
+	            LEFT JOIN (
+	                SELECT PRODUCT_NO, MIN(IMAGE_URL) AS IMAGE_URL
+	                FROM PRODUCT_IMAGE
+	                WHERE IMAGE_PURPOSE = '대표'
+	                GROUP BY PRODUCT_NO
+	            ) pi
+	              ON p.PRODUCT_NO = pi.PRODUCT_NO
+	            WHERE po.OPTION_ID = ?
+	            """;
 
-				    po.OPTION_ID,
-				    po.OPTION1_TYPE,
-				    po.OPTION1_VALUE,
-				    po.OPTION2_TYPE,
-				    po.OPTION2_VALUE,
-				    po.OPTION3_TYPE,
-				    po.OPTION3_VALUE,
+	    try (
+	        Connection conn = ConnectionProvider.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, optionId);
 
-				    NVL(po.PRICE, 0) AS OPTION_PRICE
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                dto = new CartItemDTO();
 
-				FROM PRODUCT_OPTION po
-				JOIN PRODUCT p
-				    ON po.PRODUCT_NO = p.PRODUCT_NO
+	                dto.setOptionId(rs.getInt("OPTION_ID"));
+	                dto.setProductNo(rs.getInt("PRODUCT_NO"));
+	                dto.setProductName(rs.getString("PRODUCT_NAME"));
+	                dto.setProductPrice(rs.getInt("PRODUCT_PRICE"));
+	                dto.setOptionPrice(rs.getInt("OPTION_PRICE"));
 
-				WHERE po.OPTION_ID = ?
-				""";
+	                dto.setOption1Type(rs.getString("OPTION1_TYPE"));
+	                dto.setOption1Value(rs.getString("OPTION1_VALUE"));
+	                dto.setOption2Type(rs.getString("OPTION2_TYPE"));
+	                dto.setOption2Value(rs.getString("OPTION2_VALUE"));
+	                dto.setOption3Type(rs.getString("OPTION3_TYPE"));
+	                dto.setOption3Value(rs.getString("OPTION3_VALUE"));
 
-		try (
-				Connection conn = ConnectionProvider.getConnection();
-				PreparedStatement pstmt = conn.prepareStatement(sql);
-				) {
+	                dto.setImageUrl(rs.getString("IMAGE_URL"));
+	            }
+	        }
 
-			pstmt.setInt(1, optionId);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException(
+	                "장바구니 상품 조회 실패",
+	                e
+	        );
+	    }
 
-			try (ResultSet rs = pstmt.executeQuery()) {
-
-				if (rs.next()) {
-
-					dto = new CartItemDTO();
-
-					dto.setOptionId(
-							rs.getInt("OPTION_ID")
-							);
-
-					dto.setProductNo(
-							rs.getInt("PRODUCT_NO")
-							);
-
-					dto.setProductName(
-							rs.getString("PRODUCT_NAME")
-							);
-
-					dto.setProductPrice(
-							rs.getInt("PRODUCT_PRICE")
-							);
-
-					dto.setOptionPrice(
-							rs.getInt("OPTION_PRICE")
-							);
-
-					dto.setOption1Type(
-							rs.getString("OPTION1_TYPE")
-							);
-
-					dto.setOption1Value(
-							rs.getString("OPTION1_VALUE")
-							);
-
-					dto.setOption2Type(
-							rs.getString("OPTION2_TYPE")
-							);
-
-					dto.setOption2Value(
-							rs.getString("OPTION2_VALUE")
-							);
-
-					dto.setOption3Type(
-							rs.getString("OPTION3_TYPE")
-							);
-
-					dto.setOption3Value(
-							rs.getString("OPTION3_VALUE")
-							);
-				}
-			}
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-
-			throw new RuntimeException(
-					"장바구니 상품 조회 실패",
-					e
-					);
-		}
-
-		return dto;
+	    return dto;
 	}
 
 	public int getCartCount(int memberNo) {

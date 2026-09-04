@@ -116,7 +116,7 @@
 
 									<div class="available-product-info">
 										<a
-											href="${pageContext.request.contextPath}/product/detail?productNo=${review.productNo}"
+											href="${pageContext.request.contextPath}/product?productNo=${review.productNo}"
 											class="available-product-name">${review.productName}</a>
 
 										<c:if test="${not empty review.optionName}">
@@ -156,7 +156,7 @@
 								<article class="written-review-item">
 									<div class="written-product">
 										<a
-											href="${pageContext.request.contextPath}/product/detail?productNo=${review.productNo}"
+											href="${pageContext.request.contextPath}/product?productNo=${review.productNo}"
 											class="written-product-name">${review.productName}</a>
 
 										<c:if test="${not empty review.optionText}">

@@ -62,7 +62,7 @@
 									<c:when test="${not empty item.imageUrl}">
 										<a
 											href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
-											<img src="${pageContext.request.contextPath}${item.imageUrl}"
+											<img src="${pageContext.request.contextPath}/${item.imageUrl}"
 											alt="${item.productName}" class="cart-item-img">
 										</a>
 									</c:when>

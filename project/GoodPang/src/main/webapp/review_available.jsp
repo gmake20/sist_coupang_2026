@@ -139,7 +139,7 @@
 							</div>
 
 							<div class="product-info">
-								<a href="${pageContext.request.contextPath}/product/detail?productNo=${review.productNo}"
+								<a href="${pageContext.request.contextPath}/product?productNo=${review.productNo}"
 									class="product-name">${review.productName}</a>
 
 								<c:if test="${not empty review.optionText}">
@@ -193,7 +193,7 @@
 							</div>
 
 							<div class="product-info">
-								<a href="${pageContext.request.contextPath}/product/detail?productNo=${review.productNo}"
+								<a href="${pageContext.request.contextPath}/product?productNo=${review.productNo}"
 									class="product-name">${review.productName}</a>
 
 								<c:if test="${not empty review.optionText}">
