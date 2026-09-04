@@ -844,7 +844,7 @@ public class CheckoutDAO {
 	                                SELECT 1
 	                                FROM WOW_MEMBERSHIP wm
 	                                WHERE wm.MEMBER_NO = c.MEMBER_NO
-	                                AND wm.STATUS IN ('ACTIVE', 'CANCEL_PENDING')
+	                                AND wm.STATUS IN ('ACTIVE','CANCEL_PENDING')
 	    							AND wm.END_DATE >= TRUNC(SYSDATE)
 	                            )
 	                            THEN 0
