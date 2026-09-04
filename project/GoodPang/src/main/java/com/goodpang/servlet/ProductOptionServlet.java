@@ -35,7 +35,11 @@ import com.goodpang.util.ImageUrl;
  *   여기서 돌려주는 price/normalPrice 는 "옵션의 추가금"만이고, 기본가(PRODUCT_PRICE)를 더하는 건
  *   product.js 의 setPrice() 가 함(원래도 그렇게 하던 걸 그대로 둠).
  */
-@WebServlet("/option")
+// 2026-09-04 (flicker1016) — /option 은 이제 커맨드 패턴으로 처리함
+// (web.xml -> controller.DispatcherServlet -> command.ProductOptionHandler -> service.ProductOptionService).
+// 같은 URL 에 서블릿이 둘이면 톰캣 배포가 실패해서 이 줄만 주석처리함.
+// 코드는 비교용으로 남겨둠 — 되돌리려면 아래 주석을 풀고 web.xml 의 dispatcher 매핑을 지우면 됨.
+// @WebServlet("/option")
 public class ProductOptionServlet extends HttpServlet {
 
     private static final Gson gson = new Gson();

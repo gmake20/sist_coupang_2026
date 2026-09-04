@@ -21,7 +21,11 @@ import com.goodpang.dao.CategoryProductDAO.Sort;
 import com.goodpang.dto.CategoryDTO;
 import com.goodpang.dto.CategoryProductDTO;
 
-@WebServlet("/category")
+// 2026-09-04 (flicker1016) — /category 는 이제 커맨드 패턴으로 처리함
+// (web.xml -> controller.DispatcherServlet -> command.CategoryHandler -> service.CategoryService).
+// 같은 URL 에 서블릿이 둘이면 톰캣 배포가 실패해서 이 줄만 주석처리함.
+// 코드는 비교용으로 남겨둠 — 되돌리려면 아래 주석을 풀고 web.xml 의 dispatcher 매핑을 지우면 됨.
+// @WebServlet("/category")
 public class CategoryServlet extends HttpServlet {
 
     private static final int DEFAULT_PAGE_SIZE = 60;

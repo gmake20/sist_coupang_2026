@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <web-app
     xmlns="https://jakarta.ee/xml/ns/jakartaee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -21,6 +20,34 @@
         <param-name>jakarta.servlet.jsp.jstl.fmt.timeZone</param-name>
         <param-value>Asia/Seoul</param-value>
     </context-param>
+
+
+    <!-- ★ 2026-09-04 추가 (flicker1016) — 상세/카테고리/옵션 3개 페이지만 커맨드 패턴으로 정리함.
+         이 3개 URL 은 DispatcherServlet -> XxxHandler -> XxxService -> DAO 순서로 처리됨.
+         나머지 페이지는 전부 예전처럼 각자 @WebServlet 을 그대로 씀 — 팀원 코드에 영향 없음.
+
+         ※ 같은 URL 에 서블릿이 둘이면 톰캣 배포가 실패하므로, 예전 서블릿 3개
+           (ProductServlet/CategoryServlet/ProductOptionServlet)의 @WebServlet 은 주석처리해둠.
+           되돌리려면 그 주석 3줄을 풀고 이 <servlet>/<servlet-mapping> 블록을 지우면 됨.
+
+         load-on-startup 을 일부러 안 넣음 — 넣으면 톰캣 시작할 때 init() 이 돌아서
+         properties 에 오타가 있으면 앱 전체가 안 뜸. 빼두면 해당 URL 을 처음 부를 때만 init 이 돌아서
+         문제가 생겨도 그 주소만 에러 나고 나머지 사이트는 멀쩡함 -->
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>com.goodpang.controller.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>mappingPath</param-name>
+            <param-value>/WEB-INF/commandHandler.properties</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/product</url-pattern>
+        <url-pattern>/category</url-pattern>
+        <url-pattern>/option</url-pattern>
+    </servlet-mapping>
 
 
     <!-- 세션 유지 시간 -->
