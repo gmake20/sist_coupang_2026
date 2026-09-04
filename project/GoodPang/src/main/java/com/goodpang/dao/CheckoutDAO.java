@@ -180,53 +180,6 @@ public class CheckoutDAO {
 		return list;
 	}
 
-	/*
-	 * public List<CheckoutItemDTO> getCheckoutItemsPRODUCT( int checkoutNo) {
-	 * 
-	 * List<CheckoutItemDTO> list = new ArrayList<>();
-	 * 
-	 * String sql = """ SELECT ci.CHECKOUT_ITEM_NO, ci.CHECKOUT_NO, ci.PRODUCT_NO,
-	 * ci.OPTION_ID, ci.ORDER_QTY, ci.PRICE, p.PRODUCT_NAME, p.PRODUCT_IMAGE FROM
-	 * CHECKOUT_ITEM ci JOIN PRODUCT p ON ci.PRODUCT_NO = p.PRODUCT_NO WHERE
-	 * ci.CHECKOUT_NO = ? ORDER BY ci.CHECKOUT_ITEM_NO """;
-	 * 
-	 * try ( Connection conn = ConnectionProvider.getConnection();
-	 * 
-	 * PreparedStatement pstmt = conn.prepareStatement(sql); ) {
-	 * 
-	 * pstmt.setInt( 1, checkoutNo );
-	 * 
-	 * try (ResultSet rs = pstmt.executeQuery()) {
-	 * 
-	 * while (rs.next()) {
-	 * 
-	 * CheckoutItemDTO dto = new CheckoutItemDTO();
-	 * 
-	 * dto.setCheckoutItemNo( rs.getInt( "CHECKOUT_ITEM_NO" ) );
-	 * 
-	 * dto.setCheckoutNo( rs.getInt( "CHECKOUT_NO" ) );
-	 * 
-	 * dto.setProductNo( rs.getInt( "PRODUCT_NO" ) );
-	 * 
-	 * int optionId = rs.getInt( "OPTION_ID" );
-	 * 
-	 * if (!rs.wasNull()) { dto.setOptionId( optionId ); }
-	 * 
-	 * dto.setOrderQty( rs.getInt( "ORDER_QTY" ) );
-	 * 
-	 * dto.setPrice( rs.getInt( "PRICE" ) );
-	 * 
-	 * dto.setProductName( rs.getString( "PRODUCT_NAME" ) );
-	 * 
-	 * dto.setProductImage( rs.getString( "PRODUCT_IMAGE" ) );
-	 * 
-	 * 
-	 * list.add(dto); } }
-	 * 
-	 * } catch (Exception e) { e.printStackTrace(); }
-	 * 
-	 * return list; }
-	 */
 	
 	public List<CheckoutItemDTO> getCheckoutItemsPRODUCT(
 			int checkoutNo) {
@@ -339,6 +292,48 @@ public class CheckoutDAO {
 									"PRODUCT_NAME"
 									)
 							);
+					
+					String option1Type = rs.getString("OPTION1_TYPE");
+					String option1Value = rs.getString("OPTION1_VALUE");
+					String option2Type = rs.getString("OPTION2_TYPE");
+					String option2Value = rs.getString("OPTION2_VALUE");
+					String option3Type = rs.getString("OPTION3_TYPE");
+					String option3Value = rs.getString("OPTION3_VALUE");
+
+					StringBuilder option = new StringBuilder();
+
+					if (option1Value != null && !option1Value.isBlank()) {
+					    if (option1Type != null && !option1Type.isBlank()) {
+					        option.append(option1Type).append(" : ");
+					    }
+					    option.append(option1Value);
+					}
+
+					if (option2Value != null && !option2Value.isBlank()) {
+					    if (option.length() > 0) {
+					        option.append(" / ");
+					    }
+
+					    if (option2Type != null && !option2Type.isBlank()) {
+					        option.append(option2Type).append(" : ");
+					    }
+
+					    option.append(option2Value);
+					}
+
+					if (option3Value != null && !option3Value.isBlank()) {
+					    if (option.length() > 0) {
+					        option.append(" / ");
+					    }
+
+					    if (option3Type != null && !option3Type.isBlank()) {
+					        option.append(option3Type).append(" : ");
+					    }
+
+					    option.append(option3Value);
+					}
+
+					dto.setOptionName(option.toString());
 
 					dto.setProductImage( rs.getString( "IMAGE_URL" ) );
 					 
