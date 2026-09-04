@@ -29,6 +29,23 @@
 
 						<div class="cart-preview-info">
 							<p class="cart-preview-name">${item.productName}</p>
+							<c:if
+								test="${not empty item.option1Value or not empty item.option2Value or not empty item.option3Value}">
+								<p class="cart-preview-option">
+									<c:if test="${not empty item.option1Value}">
+                                        ${item.option1Type}: ${item.option1Value}
+                                    </c:if>
+									<c:if test="${not empty item.option2Value}">
+										<c:if test="${not empty item.option1Value}"> / </c:if>
+                                        ${item.option2Type}: ${item.option2Value}
+                                    </c:if>
+									<c:if test="${not empty item.option3Value}">
+										<c:if
+											test="${not empty item.option1Value or not empty item.option2Value}"> / </c:if>
+                                        ${item.option3Type}: ${item.option3Value}
+                                    </c:if>
+								</p>
+							</c:if>
 							<p class="cart-preview-quantity">수량 ${item.quantity}개</p>
 						</div>
 				</a></li>

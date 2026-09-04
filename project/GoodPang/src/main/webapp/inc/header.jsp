@@ -1149,6 +1149,36 @@
                             '<img src="' + getCartImageUrl(item.imageUrl) + '"'
                             + ' alt="' + escapeHtml(item.productName) + '">';
                     }
+                    
+                    let optionText = '';
+
+                    if (item.option1Value) {
+                        optionText += (item.option1Type ? item.option1Type + ': ' : '')
+                                   + item.option1Value;
+                    }
+
+                    if (item.option2Value) {
+                        if (optionText) optionText += ' / ';
+
+                        optionText += (item.option2Type ? item.option2Type + ': ' : '')
+                                   + item.option2Value;
+                    }
+
+                    if (item.option3Value) {
+                        if (optionText) optionText += ' / ';
+
+                        optionText += (item.option3Type ? item.option3Type + ': ' : '')
+                                   + item.option3Value;
+                    }
+
+                    let optionHtml = '';
+
+                    if (optionText) {
+                        optionHtml =
+                            '<p class="cart-preview-option">'
+                            + escapeHtml(optionText)
+                            + '</p>';
+                    }
 
                     html +=
                         '<li class="cart-preview-item">'
@@ -1156,6 +1186,7 @@
                         + '<div class="cart-preview-image">' + imageHtml + '</div>'
                         + '<div class="cart-preview-info">'
                         + '<p class="cart-preview-name">' + escapeHtml(item.productName) + '</p>'
+                        + optionHtml
                         + '<p class="cart-preview-quantity">수량 ' + item.quantity + '개</p>'
                         + '</div>'
                         + '</a>'
