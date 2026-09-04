@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="jakarta.tags.core" prefix="c"%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -109,7 +110,7 @@
 								<c:forEach items="${mainOption.images}" var="img"
 									varStatus="loop">
 									<li class="${loop.first ? 'is-on' : ''}"><a href="#"><img
-											src="${pageContext.request.contextPath}/${img.imageUrl}"
+											src="${img:url(img.imageUrl)}"
 											alt=""></a></li>
 								</c:forEach>
 							</c:when>
@@ -121,12 +122,13 @@
 						</c:choose>
 					</ul>
 
+
 					<!-- 큰 이미지 (정사각형) — 썸네일 첫 번째와 같은 사진으로 시작 -->
 					<div class="product-image__main">
 						<c:choose>
 							<c:when test="${not empty mainOption.images}">
 								<img
-									src="${pageContext.request.contextPath}/${mainOption.images[0].imageUrl}"
+									src="${img:url(mainOption.images[0].imageUrl)}"
 									alt="${p.productName}">
 							</c:when>
 							<c:otherwise>
@@ -334,8 +336,8 @@
                  JSON 은 ProductServlet 에서 Gson 으로 만들어 optionsJson 에 담아 보내줌
                  (JSP 에서 손으로 조립하면 값에 따옴표가 들어갈 때 깨져서).
                  type="application/json" 이라 브라우저가 스크립트로 실행하지 않고 텍스트로만 취급함.
-                 data-context-path: 사진 주소가 DB엔 "upload/5/..." 처럼 앞부분 없이 저장돼 있어서
-                 js 가 앞에 붙일 수 있게 같이 넘겨줌 -->
+                 data-context-path: 사진 주소는 optionsJson 에 이미 img:url 규칙으로 변환되어 들어있어서
+                 안 씀 - 옵션 바꿀 때 /option 을 다시 호출하는 fetch URL 조립에만 씀(product.js 참고) -->
 						<script id="productOptionsData" type="application/json"
 							data-context-path="${pageContext.request.contextPath}">${optionsJson}</script>
 					</c:if>
@@ -833,7 +835,7 @@
 					<c:when test="${not empty detailImages}">
 						<c:forEach items="${detailImages}" var="img">
 							<div class="detail-image">
-								<img src="${pageContext.request.contextPath}/${img.imageUrl}"
+								<img src="${img:url(img.imageUrl)}"
 									alt="">
 							</div>
 						</c:forEach>
@@ -1065,7 +1067,7 @@
 
 														<%-- <img src="${pageContext.request.contextPath}${imageUrl}"
 															alt="리뷰 이미지" class="review-photo-img"> --%>
-														<img src="${pageContext.request.contextPath}${imageUrl}"
+														<img src="${img:url(imageUrl)}"
 															alt="리뷰 이미지" class="review-photo-img"
 															onclick="openReviewImage(this.src)">
 													</div>

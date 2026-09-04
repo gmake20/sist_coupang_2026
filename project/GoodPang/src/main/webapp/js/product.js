@@ -345,12 +345,12 @@ function setupOptionSelect(setStock, setPrice) {
   const combos = JSON.parse(dataEl.textContent);
   if (!combos.length) return;
 
-  /* DB 의 IMAGE_URL 은 "upload/5/xxx.jpg" 처럼 앞부분이 없어서 톰캣 주소(contextPath)를 붙여야 함.
-     여기서 한 번에 "바로 쓸 수 있는 주소 배열"로 바꿔두면 아래 코드가 단순해짐 */
+  // optionsJson을 만들 때(ProductServlet) 이미지 경로를 img:url과 같은 규칙으로 미리
+  // 절대/상대 경로로 바꿔서 내려주므로, 여기서는 그대로 꺼내 쓰기만 하면 됨
   const contextPath = dataEl.dataset.contextPath || '';
   combos.forEach(function (c) {
     c.imageUrls = (c.images || []).map(function (img) {
-      return contextPath + '/' + img.imageUrl;
+      return img.imageUrl;
     });
   });
 
@@ -461,9 +461,8 @@ function setupOptionSelect(setStock, setPrice) {
         if (setStock) setStock(data.quantity);
         if (setPrice) setPrice(data.price, data.normalPrice);
 
-        const imageUrls = (data.imageUrls || []).map(function (url) {
-          return contextPath + '/' + url;
-        });
+        // /option 서블릿도 이미지 경로를 이미 img:url과 같은 규칙으로 변환해서 내려줌
+        const imageUrls = data.imageUrls || [];
         if (!imageUrls.length || !thumbBox || !mainImg) return;
 
         thumbBox.innerHTML = imageUrls.map(function (url, i) {
