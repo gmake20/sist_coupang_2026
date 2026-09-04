@@ -140,6 +140,7 @@ public class BuyServlet extends HttpServlet {
 
             if (isWowMember) {
             	deliveryFee = 0;
+            	
             } else {
             	deliveryFee = 
                         productAmount >= 19800
@@ -154,6 +155,7 @@ public class BuyServlet extends HttpServlet {
                     - cashUsed
                     + deliveryFee;
 
+            System.out.println("deliveryFee = " + deliveryFee);
             int checkoutNo =
                     dao.insertCheckout(
                             conn,
