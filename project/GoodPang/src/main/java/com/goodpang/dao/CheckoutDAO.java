@@ -810,8 +810,8 @@ public class CheckoutDAO {
 	                            SELECT 1
 	                            FROM WOW_MEMBERSHIP wm
 	                            WHERE wm.MEMBER_NO = c.MEMBER_NO
-	                              AND wm.STATUS = 'ACTIVE'
-	                              OR wm.STATUS = 'CANCEL_PENDING'
+	                            AND wm.STATUS IN ('ACTIVE', 'CANCEL_PENDING')
+	                            AND wm.END_DATE >= TRUNC(SYSDATE)
 	                        )
 	                        THEN 0
 	                        -- 일반 회원은 19,800원 이상 무료배송
@@ -844,8 +844,8 @@ public class CheckoutDAO {
 	                                SELECT 1
 	                                FROM WOW_MEMBERSHIP wm
 	                                WHERE wm.MEMBER_NO = c.MEMBER_NO
-	                                  AND wm.STATUS = 'ACTIVE'
-	                                  OR wm.STATUS = 'CANCEL_PENDING'
+	                                AND wm.STATUS IN ('ACTIVE', 'CANCEL_PENDING')
+	    							AND wm.END_DATE >= TRUNC(SYSDATE)
 	                            )
 	                            THEN 0
 	                            -- 일반 회원 19,800원 이상
