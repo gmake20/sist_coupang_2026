@@ -1105,11 +1105,11 @@
 </header>
 
 <script>
-const contextPath = '${pageContext.request.contextPath}';
+const cartContextPath = '${pageContext.request.contextPath}';
 
 async function refreshCart() {
     try {
-        const response = await fetch(contextPath + '/cart/status', {
+        const response = await fetch(cartContextPath + '/cart/status', {
             method: 'GET',
             cache: 'no-store',
             credentials: 'same-origin'
@@ -1147,13 +1147,13 @@ async function refreshCart() {
 
                 if (item.imageUrl) {
                     imageHtml =
-                        '<img src="' + contextPath + '/' + item.imageUrl + '"'
+                        '<img src="' + cartContextPath + '/' + item.imageUrl + '"'
                         + ' alt="' + escapeHtml(item.productName) + '">';
                 }
 
                 html +=
                     '<li class="cart-preview-item">'
-                    + '<a href="' + contextPath
+                    + '<a href="' + cartContextPath
                     + '/product?productNo=' + item.productNo + '">'
                     + '<div class="cart-preview-image">'
                     + imageHtml
@@ -1174,7 +1174,7 @@ async function refreshCart() {
         }
 
         html +=
-            '<a href="' + contextPath + '/cart" class="cart-btn">'
+            '<a href="' + cartContextPath + '/cart" class="cart-btn">'
             + '<span>장바구니 전체보기</span>'
             + '</a>';
 
