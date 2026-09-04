@@ -102,7 +102,8 @@ public class CartServlet extends HttpServlet {
         for (CartItemDTO item : cartItems) {
             totalPrice += item.getTotalPrice();
         }
-
+        
+        
         request.setAttribute(
                 "cartItems",
                 cartItems

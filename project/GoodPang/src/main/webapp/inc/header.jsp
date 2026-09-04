@@ -670,7 +670,8 @@
 
 					<!-- 검색 -->
 
-					<form class="search-form" action="${pageContext.request.contextPath}/search" method="get">
+					<form class="search-form"
+						action="${pageContext.request.contextPath}/search" method="get">
 
 						<div class="select--category">
 
@@ -684,11 +685,9 @@
 						<div class="header-search">
 
 							<label for="search-keyword" class="blind"> 상품 검색 </label> <input
-
-								type="text" id="search-keyword" name="keyword" class="search-keyword"
-
-								placeholder="찾고 싶은 상품을 검색해보세요!" maxlength="150"
-								autocomplete="off">
+								type="text" id="search-keyword" name="keyword"
+								class="search-keyword" placeholder="찾고 싶은 상품을 검색해보세요!"
+								maxlength="150" autocomplete="off">
 
 
 
@@ -772,13 +771,14 @@
 						<li class="cart"><a
 							href="${pageContext.request.contextPath}/cart"> <img
 								src="${pageContext.request.contextPath}/images/icons/cart.png"
-								width="44" height="44" alt="장바구니"> <em id="cartCount" class="cart-count">
-									${empty sessionScope.cartCount ? 0 : sessionScope.cartCount} </em> <span
-								class="icon-label">장바구니</span>
+								width="44" height="44" alt="장바구니"> <em id="cartCount"
+								class="cart-count"> ${empty sessionScope.cartCount ? 0 : sessionScope.cartCount}
+							</em> <span class="icon-label">장바구니</span>
 						</a>
 
 							<div class="cart-preview">
-								<span class="wrapper" id="cartPreviewWrapper"> <i class="arrow"></i> <c:choose>
+								<span class="wrapper" id="cartPreviewWrapper"> <i
+									class="arrow"></i> <c:choose>
 										<c:when test="${not empty sessionScope.cartPreviewItems}">
 											<ul class="cart-preview-list">
 												<c:forEach var="item"
@@ -840,7 +840,8 @@
 
 				<div class="search-row">
 
-					<form class="search-form" action="${pageContext.request.contextPath}/search" method="get">
+					<form class="search-form"
+						action="${pageContext.request.contextPath}/search" method="get">
 
 
 
@@ -858,7 +859,6 @@
 							<label for="search-keyword-tablet" class="blind"> 상품 검색 </label>
 
 							<input type="text" id="search-keyword-tablet" name="keyword"
-
 								class="search-keyword" placeholder="찾고 싶은 상품을 검색해보세요!"
 								maxlength="150" autocomplete="off">
 
@@ -1105,100 +1105,133 @@
 </header>
 
 <script>
-const contextPath = '${pageContext.request.contextPath}';
+(function() {
+    const cartContextPath = '${pageContext.request.contextPath}';
+    const isLoggedIn = ${not empty sessionScope.loginMember ? 'true' : 'false'};
 
-async function refreshCart() {
-    try {
-        const response = await fetch(contextPath + '/cart/status', {
-            method: 'GET',
-            cache: 'no-store',
-            credentials: 'same-origin'
-        });
+    async function refreshCart() {
+        if (!isLoggedIn) return;
 
-        if (!response.ok) {
-            return;
-        }
-
-        const data = await response.json();
-
-        const cartCount = document.getElementById('cartCount');
-
-        if (cartCount) {
-            cartCount.textContent = data.count ?? 0;
-        }
-
-        const wrapper = document.getElementById('cartPreviewWrapper');
-
-        if (!wrapper) {
-            return;
-        }
-
-        let html = '<i class="arrow"></i>';
-
-        if (!data.items || data.items.length === 0) {
-            html += '<div class="cart-preview-empty">'
-                  + '장바구니에 담은 상품이 없습니다.'
-                  + '</div>';
-        } else {
-            html += '<ul class="cart-preview-list">';
-
-            data.items.forEach(function(item) {
-                let imageHtml = '<span>이미지</span>';
-
-                if (item.imageUrl) {
-                    imageHtml =
-                        '<img src="' + contextPath + '/' + item.imageUrl + '"'
-                        + ' alt="' + escapeHtml(item.productName) + '">';
-                }
-
-                html +=
-                    '<li class="cart-preview-item">'
-                    + '<a href="' + contextPath
-                    + '/product?productNo=' + item.productNo + '">'
-                    + '<div class="cart-preview-image">'
-                    + imageHtml
-                    + '</div>'
-                    + '<div class="cart-preview-info">'
-                    + '<p class="cart-preview-name">'
-                    + escapeHtml(item.productName)
-                    + '</p>'
-                    + '<p class="cart-preview-quantity">'
-                    + '수량 ' + item.quantity + '개'
-                    + '</p>'
-                    + '</div>'
-                    + '</a>'
-                    + '</li>';
+        try {
+            const response = await fetch(cartContextPath + '/cart/status', {
+                method: 'GET',
+                cache: 'no-store',
+                credentials: 'same-origin'
             });
 
-            html += '</ul>';
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const cartCount = document.getElementById('cartCount');
+
+            if (cartCount) {
+                cartCount.textContent = data.count ?? 0;
+            }
+
+            const wrapper = document.getElementById('cartPreviewWrapper');
+
+            if (!wrapper) return;
+
+            let html = '<i class="arrow"></i>';
+
+            if (!data.items || data.items.length === 0) {
+                html += '<div class="cart-preview-empty">'
+                      + '장바구니에 담은 상품이 없습니다.'
+                      + '</div>';
+            } else {
+                html += '<ul class="cart-preview-list">';
+
+                data.items.forEach(function(item) {
+                    let imageHtml = '<span>이미지</span>';
+
+                    if (item.imageUrl) {
+                        imageHtml =
+                            '<img src="' + getCartImageUrl(item.imageUrl) + '"'
+                            + ' alt="' + escapeHtml(item.productName) + '">';
+                    }
+                    
+                    let optionText = '';
+
+                    if (item.option1Value) {
+                        optionText += (item.option1Type ? item.option1Type + ': ' : '')
+                                   + item.option1Value;
+                    }
+
+                    if (item.option2Value) {
+                        if (optionText) optionText += ' / ';
+
+                        optionText += (item.option2Type ? item.option2Type + ': ' : '')
+                                   + item.option2Value;
+                    }
+
+                    if (item.option3Value) {
+                        if (optionText) optionText += ' / ';
+
+                        optionText += (item.option3Type ? item.option3Type + ': ' : '')
+                                   + item.option3Value;
+                    }
+
+                    let optionHtml = '';
+
+                    if (optionText) {
+                        optionHtml =
+                            '<p class="cart-preview-option">'
+                            + escapeHtml(optionText)
+                            + '</p>';
+                    }
+
+                    html +=
+                        '<li class="cart-preview-item">'
+                        + '<a href="' + cartContextPath + '/product?productNo=' + item.productNo + '">'
+                        + '<div class="cart-preview-image">' + imageHtml + '</div>'
+                        + '<div class="cart-preview-info">'
+                        + '<p class="cart-preview-name">' + escapeHtml(item.productName) + '</p>'
+                        + optionHtml
+                        + '<p class="cart-preview-quantity">수량 ' + item.quantity + '개</p>'
+                        + '</div>'
+                        + '</a>'
+                        + '</li>';
+                });
+
+                html += '</ul>';
+            }
+
+            html += '<a href="' + cartContextPath + '/cart" class="cart-btn">'
+                  + '<span>장바구니 전체보기</span>'
+                  + '</a>';
+
+            wrapper.innerHTML = html;
+
+        } catch (error) {
+            console.error('장바구니 갱신 실패', error);
         }
-
-        html +=
-            '<a href="' + contextPath + '/cart" class="cart-btn">'
-            + '<span>장바구니 전체보기</span>'
-            + '</a>';
-
-        wrapper.innerHTML = html;
-
-    } catch (error) {
-        console.error('장바구니 갱신 실패', error);
-    }
-}
-
-function escapeHtml(value) {
-    if (!value) {
-        return '';
     }
 
-    return String(value)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-}
+    function getCartImageUrl(imageUrl) {
+        if (!imageUrl) return '';
 
-document.addEventListener('DOMContentLoaded', refreshCart);
-window.addEventListener('focus', refreshCart);
-setInterval(refreshCart, 3000);
+        imageUrl = String(imageUrl).replace(/^\/+/, '');
+
+        return window.location.origin + cartContextPath + '/' + imageUrl;
+    }
+
+    function escapeHtml(value) {
+        if (!value) return '';
+
+        return String(value)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+    
+    
+
+    if (isLoggedIn) {
+        document.addEventListener('DOMContentLoaded', refreshCart);
+        window.addEventListener('focus', refreshCart);
+        setInterval(refreshCart, 3000);
+    }
+})();
 </script>

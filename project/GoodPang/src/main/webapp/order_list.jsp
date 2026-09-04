@@ -1,40 +1,29 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <!-- 파비콘 설정 -->
-    <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
-
-</head>
-<head>
 <meta charset="UTF-8">
 <title>주문목록/배송조회 - GoodPang</title>
 
+<!-- 파비콘 설정 -->
+<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
+
 <!-- 기본 초기화 CSS -->
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/reset.css">
 <!-- 공통 CSS -->
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
 <!-- 주문상세/리스트 전용 CSS -->
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/order_list.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/order_list.css">
 
 <!-- jQuery -->
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <!-- JSP → JS 로 contextPath 전달 -->
 <script>
 	var contextPath = "${pageContext.request.contextPath}";
 </script>
-
 </head>
 
 <body>
@@ -48,7 +37,7 @@
     ========================== -->
 	<div class="mypage-container">
 
-			<!-- 주문목록 메뉴 파란색 활성화 -->
+		<!-- 주문목록 메뉴 파란색 활성화 -->
 		<jsp:include page="/inc/left_banner.jsp">
 		    <jsp:param name="activeMenu" value="order_list" />
 		</jsp:include>
@@ -105,321 +94,338 @@
 
 						<c:forEach var="item" items="${orderList}" varStatus="status">
 
-							<%-- 1. 새로운 주문번호가 시작될 때 이전 주문 카드 박스 및 하단 3개 버튼 닫기 --%>
-							<c:if
-								test="${not empty prevOrderNo and prevOrderNo ne item.orderNo}">
-			</div>
-			<!-- // .product-list-wrap 닫기 -->
+							<%-- 1. 새로운 주문번호가 시작될 때 이전 주문 카드 박스 닫기 및 버튼 출력 --%>
+							<c:if test="${not empty prevOrderNo and prevOrderNo ne item.orderNo}">
+										</div>
+										<!-- // .product-list-wrap 닫기 -->
 
+										<!-- 하단 액션 버튼 그룹 (주문 상태별 정확한 분기) -->
+										<c:choose>
+											<%-- [1] 주문 취소 관련 상태 -> [취소 내역 조회] 단일 넓은 버튼만 출력 --%>
+											<c:when test="${prevItem.orderStatus eq '취소처리' or prevItem.orderStatus eq '주문취소' or prevItem.orderStatus eq '취소완료'}">
+												<div class="delivery-buttons">
+													<button type="button" class="delivery-btn btn-action"
+														onclick="location.href='${pageContext.request.contextPath}/order/cancel_history'">
+														취소 내역 조회
+													</button>
+												</div>
+											</c:when>
 
+											<%-- [2] 결제 완료 상태 -> [배송 조회] | [주문 취소] 2개 버튼만 출력 --%>
+											<c:when test="${prevItem.orderStatus eq '결제완료' or prevItem.orderStatus eq '결제 완료'}">
+												<div class="delivery-buttons">
+													<button type="button" class="delivery-btn btn-action primary"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'">
+														배송 조회
+													</button>
+													<button type="button" class="delivery-btn btn-action"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'">
+														주문 취소
+													</button>
+												</div>
+											</c:when>
 
-<!-- 하단 액션 버튼 그룹 (주문 상태별 분기) -->
-			<c:choose>
-				<%-- 1. 취소 관련 상태일 때: 배송조회/리뷰 버튼 제외, [취소 내역 조회] 단일 버튼만 출하 --%>
-				<c:when test="${prevItem.orderStatus eq '취소처리' or prevItem.orderStatus eq '주문취소' or prevItem.orderStatus eq '취소완료'}">
-					<div class="delivery-buttons"
-						style="display: flex; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
-						<button type="button" class="delivery-btn btn-action"
-							onclick="location.href='${pageContext.request.contextPath}/order/cancel_history'"
-							style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-							취소 내역 조회
-						</button>
-					</div>
-				</c:when>
+											<%-- [3] 배송중 상태 -> [배송 조회] | [교환, 반품 신청] 2개 버튼만 출력 --%>
+											<c:when test="${prevItem.orderStatus eq '배송중' or prevItem.orderStatus eq '배송 중' or prevItem.orderStatus eq '배송시작'}">
+												<div class="delivery-buttons">
+													<button type="button" class="delivery-btn btn-action primary"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'">
+														배송 조회
+													</button>
+													<button type="button" class="delivery-btn btn-action"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'">
+														교환, 반품 신청
+													</button>
+												</div>
+											</c:when>
 
-				<%-- 2. 일반 주문 상태일 때: 가로 3종 버튼 출력 --%>
-				<c:otherwise>
-					<div class="delivery-buttons"
-						style="display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
+											<%-- [4] 배송완료 등 기타 상태 -> [배송 조회] | [교환, 반품 신청] | [리뷰 작성/보기] 3개 버튼 모두 출력 --%>
+											<c:otherwise>
+												<div class="delivery-buttons">
+													<button type="button" class="delivery-btn btn-action primary"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'">
+														배송 조회
+													</button>
 
-						<!-- [1] 배송조회 버튼 -->
-						<button type="button" class="delivery-btn btn-action primary"
-							onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'"
-							style="flex: 1; padding: 8px; border: 1px solid #0073e9; color: #0073e9; background: #fff; border-radius: 4px; cursor: pointer;">
-							배송 조회
-						</button>
+													<button type="button" class="delivery-btn btn-action"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'">
+														교환, 반품 신청
+													</button>
 
-						<!-- [2] 결제완료 / 기타 상태별 버튼 -->
-						<c:choose>
-							<c:when test="${prevItem.orderStatus eq '결제완료' or prevItem.orderStatus eq '결제 완료'}">
-								<button type="button" class="delivery-btn btn-action"
-									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'"
-									style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-									주문 취소
-								</button>
-							</c:when>
-							<c:otherwise>
-								<button type="button" class="delivery-btn btn-action"
-									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'"
-									style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-									교환, 반품 신청
-								</button>
-							</c:otherwise>
-						</c:choose>
+													<c:set var="isReviewWritten" value="false" />
+													<c:forEach var="review" items="${reviewList}">
+														<c:if test="${review.orderDetailNo eq prevItem.orderDetailNo and review.reviewWritten}">
+															<c:set var="isReviewWritten" value="true" />
+														</c:if>
+													</c:forEach>
 
-						<!-- [3] 리뷰 작성 / 작성한 리뷰 보기 버튼 -->
-						<c:set var="isReviewWritten" value="false" />
-						<c:forEach var="review" items="${reviewList}">
-							<c:if test="${review.orderDetailNo eq prevItem.orderDetailNo and review.reviewWritten}">
-								<c:set var="isReviewWritten" value="true" />
+													<c:choose>
+														<c:when test="${isReviewWritten}">
+															<button type="button" class="delivery-btn btn-action"
+																onclick="location.href='${pageContext.request.contextPath}/review/available'">
+																작성한 리뷰 보기
+															</button>
+														</c:when>
+														<c:otherwise>
+															<button type="button" class="delivery-btn btn-action"
+																onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${prevItem.orderDetailNo}&productNo=${prevItem.productNo}'">
+																리뷰 작성하기
+															</button>
+														</c:otherwise>
+													</c:choose>
+												</div>
+											</c:otherwise>
+										</c:choose>
+										<!-- // .delivery-buttons 닫기 -->
+
+									</div>
+									<!-- // .delivery-main 닫기 -->
+								</section>
+								<!-- // .delivery-box 닫기 -->
 							</c:if>
+
+							<%-- 2. 새로운 주문번호일 때만 신규 카드 상자(box)와 헤더 출력 --%>
+							<c:if test="${prevOrderNo ne item.orderNo}">
+								<section class="delivery-box"
+									style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 20px; background: #fff;">
+
+									<!-- 상단 헤더: 주문 날짜 및 상세보기 -->
+									<div class="card-header"
+										style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+										<div class="order-info"
+											style="font-size: 14px; font-weight: bold; color: #333;">
+											<span><fmt:formatDate value="${item.orderDate}" pattern="yyyy.MM.dd" /> 주문</span> 
+											<span style="color: #ccc; margin: 0 8px;">|</span> 
+											<span>주문번호 <strong class="order-number">${item.orderNo}</strong></span>
+										</div>
+										<a href="${pageContext.request.contextPath}/order/order_detail?orderNo=${item.orderNo}"
+											class="link-detail"
+											style="color: #0073e9; text-decoration: none; font-size: 12px; font-weight: bold;">
+											주문 상세보기 &gt;
+										</a>
+									</div>
+
+									<!-- 카드 본문 -->
+									<div class="delivery-main">
+										<div class="delivery-status"
+											style="font-size: 16px; font-weight: bold; color: #00891a; margin-bottom: 12px;">
+											${item.orderStatus}
+										</div>
+
+										<!-- 동일 주문 상품 목록 감싸기 -->
+										<div class="product-list-wrap">
+							</c:if>
+
+							<!-- 동일한 주문번호면 이 product-row 영역만 누적 반복 출력됨 -->
+							<div class="product-row"
+								style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #f0f0f0;">
+
+								<!-- 상품 이미지 영역 -->
+								<div class="product-image" style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 6px; overflow: hidden; margin-right: 15px; flex-shrink: 0;">
+								    <c:choose>
+								        <c:when test="${not empty item.imageUrl}">
+								            <img src="${pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 100%; height: 100%; object-fit: cover;" />
+								        </c:when>
+								    </c:choose>
+								</div>
+
+								<!-- 의류 상품 정보 명세 -->
+								<div class="product-info" style="flex: 1;">
+									<div class="product-name" style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">
+										<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}" style="color: #333; text-decoration: none;"> 
+											<span class="rocket" style="color: #0073e9;">🚀 로켓배송</span> ${item.productName}
+										</a>
+									</div>
+									<div class="product-price" style="font-size: 13px; color: #333; margin-bottom: 4px;">
+										<fmt:formatNumber value="${item.itemPrice * item.quantity}" pattern="#,###" />원
+										<span>·</span> ${item.quantity}개
+									</div>
+									<c:if test="${not empty item.option1Value or not empty item.option2Value}">
+										<div class="product-option" style="font-size: 12px; color: #666; margin-top: 4px;">
+											<span>옵션: </span>
+											<c:if test="${not empty item.option1Value}">
+												<c:if test="${not empty item.option1Type}">${item.option1Type}: </c:if>${item.option1Value}
+											</c:if>
+											<c:if test="${not empty item.option1Value and not empty item.option2Value}"> / </c:if>
+											<c:if test="${not empty item.option2Value}">
+												<c:if test="${not empty item.option2Type}">${item.option2Type}: </c:if>${item.option2Value}
+											</c:if>
+										</div>
+									</c:if>
+								</div>
+
+							</div>
+							<!-- // .product-row 닫기 -->
+
+							<%-- 현재 주문번호 및 아이템 정보 업데이트 --%>
+							<c:set var="prevOrderNo" value="${item.orderNo}" />
+							<c:set var="prevItem" value="${item}" />
+
+							<%-- 3. 전체 목록의 맨 마지막 상품일 때 마지막 카드 상자 닫기 및 버튼 출력 --%>
+							<c:if test="${status.last}">
+										</div>
+										<!-- // .product-list-wrap 닫기 -->
+
+										<!-- 하단 액션 버튼 그룹 (마지막 주문건) -->
+										<c:choose>
+											<%-- [1] 주문 취소 관련 상태 -> [취소 내역 조회] 단일 넓은 버튼만 출력 --%>
+											<c:when test="${prevItem.orderStatus eq '취소처리' or prevItem.orderStatus eq '주문취소' or prevItem.orderStatus eq '취소완료'}">
+												<div class="delivery-buttons">
+													<button type="button" class="delivery-btn btn-action"
+														onclick="location.href='${pageContext.request.contextPath}/order/cancel_history'">
+														취소 내역 조회
+													</button>
+												</div>
+											</c:when>
+
+											<%-- [2] 결제 완료 상태 -> [배송 조회] | [주문 취소] 2개 버튼만 출력 --%>
+											<c:when test="${prevItem.orderStatus eq '결제완료' or prevItem.orderStatus eq '결제 완료'}">
+												<div class="delivery-buttons">
+													<button type="button" class="delivery-btn btn-action primary"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'">
+														배송 조회
+													</button>
+													<button type="button" class="delivery-btn btn-action"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'">
+														주문 취소
+													</button>
+												</div>
+											</c:when>
+
+											<%-- [3] 배송중 상태 -> [배송 조회] | [교환, 반품 신청] 2개 버튼만 출력 --%>
+											<c:when test="${prevItem.orderStatus eq '배송중' or prevItem.orderStatus eq '배송 중' or prevItem.orderStatus eq '배송시작'}">
+												<div class="delivery-buttons">
+													<button type="button" class="delivery-btn btn-action primary"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'">
+														배송 조회
+													</button>
+													<button type="button" class="delivery-btn btn-action"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'">
+														교환, 반품 신청
+													</button>
+												</div>
+											</c:when>
+
+											<%-- [4] 배송완료 등 기타 상태 -> [배송 조회] | [교환, 반품 신청] | [리뷰 작성/보기] 3개 버튼 모두 출력 --%>
+											<c:otherwise>
+												<div class="delivery-buttons">
+													<button type="button" class="delivery-btn btn-action primary"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'">
+														배송 조회
+													</button>
+
+													<button type="button" class="delivery-btn btn-action"
+														onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${prevOrderNo}'">
+														교환, 반품 신청
+													</button>
+
+													<c:set var="isReviewWritten" value="false" />
+													<c:forEach var="review" items="${reviewList}">
+														<c:if test="${review.orderDetailNo eq prevItem.orderDetailNo and review.reviewWritten}">
+															<c:set var="isReviewWritten" value="true" />
+														</c:if>
+													</c:forEach>
+
+													<c:choose>
+														<c:when test="${isReviewWritten}">
+															<button type="button" class="delivery-btn btn-action"
+																onclick="location.href='${pageContext.request.contextPath}/review/available'">
+																작성한 리뷰 보기
+															</button>
+														</c:when>
+														<c:otherwise>
+															<button type="button" class="delivery-btn btn-action"
+																onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${prevItem.orderDetailNo}&productNo=${prevItem.productNo}'">
+																리뷰 작성하기
+															</button>
+														</c:otherwise>
+													</c:choose>
+												</div>
+											</c:otherwise>
+										</c:choose>
+										<!-- // .delivery-buttons 닫기 -->
+
+									</div>
+									<!-- // .delivery-main 닫기 -->
+								</section>
+								<!-- // .delivery-box 닫기 -->
+							</c:if>
+
 						</c:forEach>
+					</c:when>
 
-						<c:choose>
-							<c:when test="${isReviewWritten}">
-								<button type="button" class="delivery-btn btn-action"
-									onclick="location.href='${pageContext.request.contextPath}/review/available'"
-									style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-									작성한 리뷰 보기
-								</button>
-							</c:when>
-							<c:otherwise>
-								<button type="button" class="delivery-btn btn-action"
-									onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${prevItem.orderDetailNo}&productNo=${prevItem.productNo}'"
-									style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-									리뷰 작성하기
-								</button>
-							</c:otherwise>
-						</c:choose>
+					<c:otherwise>
+						<div class="empty-order-container" style="text-align: center; padding: 60px 0;">
+							<div class="empty-icon" style="font-size: 40px; margin-bottom: 10px;">!</div>
+							<h3>최근 주문 내역이 없습니다.</h3>
+						</div>
+					</c:otherwise>
+				</c:choose>
+			</div>
 
+			<!-- 페이지 이동 버튼 -->
+			<div class="pager-box">
+				<button type="button" id="btn-page-prev" class="btn-pager">&lt; 이전</button>
+				<button type="button" id="btn-page-next" class="btn-pager">다음 &gt;</button>
+			</div>
+
+			<!-- 배송상품 주문상태 안내 -->
+			<div class="delivery-step-box">
+				<div class="step-head">
+					<span>배송상품 주문상태 안내</span>
+					<a href="#" class="link-more">자세한 내용 더보기 &gt;</a>
+				</div>
+				<div class="step-flow">
+					<div class="step-item">
+						<div class="icon-circle">💳</div>
+						<strong>결제완료</strong>
+						<p>주문·결제 확인이 완료되었습니다.</p>
 					</div>
-				</c:otherwise>
-			</c:choose>
-			<!-- // .delivery-buttons 닫기 -->
-	</div>
-	<!-- // .delivery-main 닫기 -->
-	</section>
-	<!-- // .delivery-box 닫기 -->
-	</c:if>
-
-	<%-- 2. 새로운 주문번호일 때만 신규 카드 상자(box)와 헤더 출력 --%>
-	<c:if test="${prevOrderNo ne item.orderNo}">
-		<section class="delivery-box"
-			style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 20px; background: #fff;">
-
-			<!-- 상단 헤더: 주문 날짜 및 상세보기 -->
-			<div class="card-header"
-				style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
-				<div class="order-info"
-					style="font-size: 14px; font-weight: bold; color: #333;">
-					<span><fmt:formatDate value="${item.orderDate}"
-							pattern="yyyy.MM.dd" /> 주문</span> <span
-						style="color: #ccc; margin: 0 8px;">|</span> <span>주문번호 <strong
-						class="order-number">${item.orderNo}</strong>
-					</span>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">📦</div>
+						<strong>상품준비중</strong>
+						<p>판매자가 발송할 상품을 준비중입니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">🚚</div>
+						<strong>배송시작</strong>
+						<p>상품준비가 완료되어 곧 배송될 예정입니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">🚛</div>
+						<strong>배송중</strong>
+						<p>상품이 고객님께 배송중입니다.</p>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<div class="icon-circle">🎁</div>
+						<strong>배송완료</strong>
+						<p>상품이 주문자에게 전달완료되었습니다.</p>
+					</div>
 				</div>
-				<a
-					href="${pageContext.request.contextPath}/order/order_detail?orderNo=${item.orderNo}"
-					class="link-detail"
-					style="color: #0073e9; text-decoration: none; font-size: 12px; font-weight: bold;">
-					주문 상세보기 &gt; </a>
 			</div>
 
-			<!-- 카드 본문 -->
-			<div class="delivery-main">
-				<div class="delivery-status"
-					style="font-size: 16px; font-weight: bold; color: #00891a; margin-bottom: 12px;">
-					${item.orderStatus}</div>
+			<!-- 취소/반품/교환 안내 -->
+			<div class="notice-info-box">
+				<p class="notice-title">⚠ 취소/반품/교환 신청전 확인해주세요!</p>
 
-				<!-- 동일 주문 상품 목록 감싸기 -->
-				<div class="product-list-wrap">
-	</c:if>
-
-	<!-- 동일한 주문번호면 이 product-row 영역만 누적 반복 출력됨 -->
-	<div class="product-row"
-		style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #f0f0f0;">
-
-		<!-- 상품 이미지 영역 -->
-<div class="product-image" style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 6px; overflow: hidden; margin-right: 15px; flex-shrink: 0;">
-    <c:choose>
-        <%-- DB에 저장된 이미지 경로가 있는 경우 --%>
-        <c:when test="${not empty item.imageUrl}">
-            <%-- 외부 이미지 서버 URL 경로이거나 풀 경로인 경우 그대로 출력 --%>
-            <img src="${pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 100%; height: 100%; object-fit: cover;" />
-        </c:when>
-       
-    </c:choose>
-</div>
-
-		<!-- 의류 상품 정보 명세 -->
-		<div class="product-info" style="flex: 1;">
-			<div class="product-name"
-				style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">
-				<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}"
-					style="color: #333; text-decoration: none;"> <span
-					class="rocket" style="color: #0073e9;">🚀 로켓배송</span>
-					${item.productName}
-				</a>
-			</div>
-			<div class="product-price"
-				style="font-size: 13px; color: #333; margin-bottom: 4px;">
-				
-					
-						<fmt:formatNumber
-							value="${item.itemPrice * item.quantity }"
-							pattern="#,###" />원
-														
-				<span>·</span> ${item.quantity}개
-			</div>
-			<c:if
-				test="${not empty item.option1Value or not empty item.option2Value}">
-				<div class="product-option"
-					style="font-size: 12px; color: #666; margin-top: 4px;">
-					<span>옵션: </span>
-					<c:if test="${not empty item.option1Value}">
-						<c:if test="${not empty item.option1Type}">${item.option1Type}: </c:if>${item.option1Value}
-															</c:if>
-					<c:if
-						test="${not empty item.option1Value and not empty item.option2Value}"> / </c:if>
-					<c:if test="${not empty item.option2Value}">
-						<c:if test="${not empty item.option2Type}">${item.option2Type}: </c:if>${item.option2Value}
-															</c:if>
+				<div class="notice-sec">
+					<h4>취소</h4>
+					<ul>
+						<li>여행/레저/숙박 상품은 취소 시 수수료가 발생할 수 있으며,</li>
+						<li>취소수수료를 확인하여 2일 이내(주말,공휴일 제외 처리결과)를 문자로 안내드립니다.(당일 접수 기준, 마감시간 오후 4시)</li>
+						<li>문화 상품은 사용 전날 24시까지 취소 신청 시 취소수수료가 발생되지 않습니다.</li>
+					</ul>
 				</div>
-			</c:if>
-		</div>
-
-	</div>
-	<!-- // .product-row 닫기 -->
-
-	<%-- 현재 주문번호 및 아이템 정보 업데이트 --%>
-	<c:set var="prevOrderNo" value="${item.orderNo}" />
-	<c:set var="prevItem" value="${item}" />
-
-	<%-- 3. 전체 목록의 맨 마지막 상품일 때 마지막 카드 상자 닫기 및 하단 3개 버튼 출력 --%>
-	<c:if test="${status.last}">
-		</div>
-		<!-- // .product-list-wrap 닫기 -->
-
-		<!-- 3종 하단 액션 버튼 그룹 (마지막 주문건) -->
-		<div class="delivery-buttons"
-			style="display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid #f0f0f0; padding-top: 12px;">
-
-			<!-- [1] 배송조회 -->
-			<button type="button" class="delivery-btn btn-action primary"
-				onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${item.orderNo}'"
-				style="flex: 1; padding: 8px; border: 1px solid #0073e9; color: #0073e9; background: #fff; border-radius: 4px; cursor: pointer;">
-				배송 조회</button>
-
-			<!-- [2] 교환, 반품 신청 -->
-			<button type="button" class="delivery-btn btn-action"
-				onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${item.orderNo}'"
-				style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-				교환, 반품 신청</button>
-
-			<!-- [3] 리뷰 작성 / 작성한 리뷰 보기 -->
-			<!-- [3] 리뷰 작성 / 내 리뷰 보기 -->
-			<c:set var="isReviewWritten" value="false" />
-
-			<c:forEach var="review" items="${reviewList}">
-				<c:if
-					test="${review.orderDetailNo eq item.orderDetailNo and review.reviewWritten}">
-					<c:set var="isReviewWritten" value="true" />
-				</c:if>
-			</c:forEach>
-
-			<c:choose>
-				<c:when test="${isReviewWritten}">
-					<button type="button" class="delivery-btn btn-action"
-						onclick="location.href='${pageContext.request.contextPath}/review/list?tab=written'"
-						style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-						내 리뷰 보기</button>
-				</c:when>
-
-				<c:otherwise>
-					<button type="button" class="delivery-btn btn-action"
-						onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${item.orderDetailNo}&productNo=${item.productNo}'"
-						style="flex: 1; padding: 8px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer;">
-						리뷰 작성하기</button>
-				</c:otherwise>
-			</c:choose>
-
-		</div>
-		<!-- // .delivery-buttons 닫기 -->
-		</div>
-		<!-- // .delivery-main 닫기 -->
-		</section>
-		<!-- // .delivery-box 닫기 -->
-	</c:if>
-
-	</c:forEach>
-	</c:when>
-
-	<c:otherwise>
-		<div class="empty-order-container"
-			style="text-align: center; padding: 60px 0;">
-			<div class="empty-icon" style="font-size: 40px; margin-bottom: 10px;">!</div>
-			<h3>최근 주문 내역이 없습니다.</h3>
-		</div>
-	</c:otherwise>
-	</c:choose>
-	</div>
-
-	<!-- 페이지 이동 버튼 -->
-	<div class="pager-box">
-		<button type="button" id="btn-page-prev" class="btn-pager">&lt;
-			이전</button>
-		<button type="button" id="btn-page-next" class="btn-pager">다음
-			&gt;</button>
-	</div>
-
-	<!-- 배송상품 주문상태 안내 -->
-	<div class="delivery-step-box">
-		<div class="step-head">
-			<span>배송상품 주문상태 안내</span> <a href="#" class="link-more">자세한 내용
-				더보기 &gt;</a>
-		</div>
-		<div class="step-flow">
-			<div class="step-item">
-				<div class="icon-circle">💳</div>
-				<strong>결제완료</strong>
-				<p>주문·결제 확인이 완료되었습니다.</p>
 			</div>
-			<span class="step-arrow">&gt;</span>
-			<div class="step-item">
-				<div class="icon-circle">📦</div>
-				<strong>상품준비중</strong>
-				<p>판매자가 발송할 상품을 준비중입니다.</p>
-			</div>
-			<span class="step-arrow">&gt;</span>
-			<div class="step-item">
-				<div class="icon-circle">🚚</div>
-				<strong>배송시작</strong>
-				<p>상품준비가 완료되어 곧 배송될 예정입니다.</p>
-			</div>
-			<span class="step-arrow">&gt;</span>
-			<div class="step-item">
-				<div class="icon-circle">🚛</div>
-				<strong>배송중</strong>
-				<p>상품이 고객님께 배송중입니다.</p>
-			</div>
-			<span class="step-arrow">&gt;</span>
-			<div class="step-item">
-				<div class="icon-circle">🎁</div>
-				<strong>배송완료</strong>
-				<p>상품이 주문자에게 전달완료되었습니다.</p>
-			</div>
-		</div>
-	</div>
 
-	<!-- 취소/반품/교환 안내 -->
-	<div class="notice-info-box">
-		<p class="notice-title">⚠ 취소/반품/교환 신청전 확인해주세요!</p>
+		</main>
 
-		<div class="notice-sec">
-			<h4>취소</h4>
-			<ul>
-				<li>여행/레저/숙박 상품은 취소 시 수수료가 발생할 수 있으며,</li>
-				<li>취소수수료를 확인하여 2일 이내(주말,공휴일 제외 처리결과)를 문자로 안내드립니다.(당일 접수 기준,
-					마감시간 오후 4시)</li>
-				<li>문화 상품은 사용 전날 24시까지 취소 신청 시 취소수수료가 발생되지 않습니다.</li>
-			</ul>
-		</div>
-	</div>
-
-	</main>
-
-	<!-- 우측 날개 배너 모듈 include -->
-	<jsp:include page="/inc/right_banner.jsp" />
+		<!-- 우측 날개 배너 모듈 include -->
+		<jsp:include page="/inc/right_banner.jsp" />
 
 	</div>
 	<!-- //.mypage-container -->
@@ -428,55 +434,32 @@
 
 	<!-- 연도 선택 및 페이징 이벤트 스크립트 -->
 	<script>
-		$(document)
-				.ready(
-						function() {
-							var currentYear = "${empty yearFilter ? 'recent' : yearFilter}";
-							var currentPage = parseInt("${empty curPage ? 1 : curPage}");
-							var totalPages = parseInt("${empty totalPages ? 1 : totalPages}");
+		$(document).ready(function() {
+			var currentYear = "${empty yearFilter ? 'recent' : yearFilter}";
+			var currentPage = parseInt("${empty curPage ? 1 : curPage}");
+			var totalPages = parseInt("${empty totalPages ? 1 : totalPages}");
 
-							// 년도 필터 클릭 이벤트 (클릭 시 1페이지로 이동)
-							$('.btn-period')
-									.on(
-											'click',
-											function() {
-												var selectedYear = $(this)
-														.data('year');
-												location.href = contextPath
-														+ "/order/order_list?year="
-														+ selectedYear
-														+ "&page=1";
-											});
+			$('.btn-period').on('click', function() {
+				var selectedYear = $(this).data('year');
+				location.href = contextPath + "/order/order_list?year=" + selectedYear + "&page=1";
+			});
 
-							// 페이징 이전 버튼 클릭
-							$('#btn-page-prev').on(
-									'click',
-									function() {
-										if (currentPage > 1) {
-											location.href = contextPath
-													+ "/order/order_list?year="
-													+ currentYear + "&page="
-													+ (currentPage - 1);
-										} else {
-											alert("첫 번째 페이지입니다.");
-										}
-									});
+			$('#btn-page-prev').on('click', function() {
+				if (currentPage > 1) {
+					location.href = contextPath + "/order/order_list?year=" + currentYear + "&page=" + (currentPage - 1);
+				} else {
+					alert("첫 번째 페이지입니다.");
+				}
+			});
 
-							// 페이징 다음 버튼 클릭
-							$('#btn-page-next').on(
-									'click',
-									function() {
-										if (currentPage < totalPages) {
-											location.href = contextPath
-													+ "/order/order_list?year="
-													+ currentYear + "&page="
-													+ (currentPage + 1);
-										} else {
-											alert("마지막 페이지입니다.");
-										}
-									});
-						});
+			$('#btn-page-next').on('click', function() {
+				if (currentPage < totalPages) {
+					location.href = contextPath + "/order/order_list?year=" + currentYear + "&page=" + (currentPage + 1);
+				} else {
+					alert("마지막 페이지입니다.");
+				}
+			});
+		});
 	</script>
-
 </body>
 </html>

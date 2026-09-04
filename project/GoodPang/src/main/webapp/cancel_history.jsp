@@ -577,10 +577,8 @@ footer {
      HEADER
      ========================= -->
 
-<header>
-   <jsp:include page="/inc/header.jsp" />
-</header>
-
+<jsp:include page="/inc/header.jsp" />
+	<script src="${pageContext.request.contextPath}/js/header.js"></script>
 
 <!-- =========================
      본문

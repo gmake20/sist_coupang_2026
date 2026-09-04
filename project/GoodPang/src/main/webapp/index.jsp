@@ -34,6 +34,13 @@
 
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/wow_modal.css">
+	
+<head>
+
+   <!-- 파비콘 설정 -->
+   <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
+
+</head>
 </head>
 
 <body>
