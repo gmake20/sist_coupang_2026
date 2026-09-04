@@ -174,6 +174,7 @@ CREATE TABLE PRODUCT (
 
     /* 상태/메타 */
     sale_status                 VARCHAR2(30) NOT NULL, /* 판매중/품절/판매중지/승인대기 */
+    display_yn                  CHAR(1) DEFAULT 'Y' NOT NULL, /* 판매자 상품목록 노출 여부 - 소프트 삭제(N이면 숨김) */
     created_date                 DATE NOT NULL, /* 등록일 */
     updated_date                 DATE NOT NULL  /* 수정일 */
 );
@@ -231,6 +232,9 @@ ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_SAME_DAY_SHIP_YN
 
 ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_SALE_STATUS
     CHECK (sale_status IN ('판매 중', '품절', '판매 중지', '승인 대기'));
+
+ALTER TABLE PRODUCT ADD CONSTRAINT CK_PRODUCT_DISPLAY_YN
+    CHECK (display_yn IN ('Y', 'N'));
 
 
 -- =========================================================

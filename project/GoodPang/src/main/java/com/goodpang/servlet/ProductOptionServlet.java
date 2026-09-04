@@ -17,6 +17,7 @@ import com.goodpang.dao.ProductImageDAO;
 import com.goodpang.dao.ProductOptionDAO;
 import com.goodpang.dto.ProductImageDTO;
 import com.goodpang.dto.ProductOptionDTO;
+import com.goodpang.util.ImageUrl;
 
 /*
  * ★ 2026-08-31 추가 — 옵션(사이즈/색상 등)을 바꿀 때마다 product.js 가 여기로 ajax(GET)를 보내서
@@ -71,7 +72,7 @@ public class ProductOptionServlet extends HttpServlet {
 
             JsonArray imageUrls = new JsonArray();
             for (ProductImageDTO img : images) {
-                imageUrls.add(img.getImageUrl());
+                imageUrls.add(ImageUrl.resolve(img.getImageUrl()));
             }
             result.add("imageUrls", imageUrls);
 
