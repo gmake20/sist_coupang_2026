@@ -1225,6 +1225,8 @@
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
     }
+    
+    
 
     if (isLoggedIn) {
         document.addEventListener('DOMContentLoaded', refreshCart);
