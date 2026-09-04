@@ -8,7 +8,10 @@
 
 <meta charset="UTF-8">
 
-<title>주문상세</title>
+<title>주문상세 - GoodPang</title>
+
+<!-- 파비콘 설정 -->
+<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
 
 <!-- 기본 초기화 CSS -->
 <link rel="stylesheet"
@@ -34,13 +37,18 @@
 <body>
 	<jsp:include page="/inc/header.jsp" />
 	<script src="${pageContext.request.contextPath}/js/header.js"></script>
+	
 	<div class="order-detail-wrap">
 
+		<!-- =========================
+         [1열] 왼쪽 MY쿠팡 메뉴
+    ========================== -->
 		<jsp:include page="/inc/left_banner.jsp">
 		    <jsp:param name="activeMenu" value="order_list" />
 		</jsp:include>
+
 		<!-- =========================
-         가운데 본문
+         [2열] 가운데 본문
     ========================== -->
 		<main class="order-content">
 
@@ -57,49 +65,47 @@
 
 			</section>
 
-<!-- =========================
-     배송 상품 리스트 (JSTL 반복문)
-========================== -->
+			<!-- =========================
+			     배송 상품 리스트 (JSTL 반복문)
+			========================== -->
 			<c:forEach var="item" items="${detailList}">
-				<section class="delivery-box">
+				<section class="delivery-box" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 20px; background: #fff;">
 
 					<div class="delivery-main">
 
-						<!-- 하드코딩 문구 제거 및 주문 상태값만 깔끔하게 출력 -->
-						<div class="delivery-title">
+						<div class="delivery-title" style="font-size: 16px; font-weight: bold; color: #00891a; margin-bottom: 12px;">
 							<strong>${item.orderStatus}</strong>
 						</div>
 
-						<div class="product-row">
+						<div class="product-row" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
 
 							<!-- 상품 이미지 영역 -->
-						<div class="product-image">
-						    <c:choose>
-						        <c:when test="${not empty item.imageUrl}">
-						        
-						            <img src="${pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 6px;" />
-						        </c:when>
-						      
-						    </c:choose>
-						</div>
+							<div class="product-image" style="width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 6px; overflow: hidden; margin-right: 15px; flex-shrink: 0;">
+							    <c:choose>
+							        <c:when test="${not empty item.imageUrl}">
+							            <img src="${pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 100%; height: 100%; object-fit: cover;" />
+							        </c:when>
+							    </c:choose>
+							</div>
 
 							<!-- 상품 정보 -->
-							<div class="product-info">
+							<div class="product-info" style="flex: 1;">
 
-								<div class="product-name">
-									<span class="rocket">🚀 로켓배송</span> 
-									<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
-									${item.productName}</a>
+								<div class="product-name" style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">
+									<span class="rocket" style="color: #0073e9;">🚀 로켓배송</span> 
+									<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}" style="color: #333; text-decoration: none;">
+										${item.productName}
+									</a>
 								</div>
 
-								<div class="product-price">
-									<fmt:formatNumber value="${item.itemPrice * item.quantity}" pattern="#,###" />
-									원 <span>·</span> ${item.quantity}개
+								<div class="product-price" style="font-size: 13px; color: #333; margin-bottom: 4px;">
+									<fmt:formatNumber value="${item.itemPrice * item.quantity}" pattern="#,###" />원 
+									<span>·</span> ${item.quantity}개
 								</div>
 
 								<!-- 옵션 정보 동적 출력 -->
 								<c:if test="${not empty item.option1Value or not empty item.option2Value}">
-									<div class="product-option">
+									<div class="product-option" style="font-size: 12px; color: #666; margin-top: 4px;">
 										<span>옵션: </span>
 										<c:if test="${not empty item.option1Value}">
 											<c:if test="${not empty item.option1Type}">${item.option1Type}: </c:if>${item.option1Value}
@@ -113,68 +119,105 @@
 
 							</div>
 
-							<button type="button" class="cart-btn"
-								onclick="addCart('${item.productNo}')">장바구니 담기</button>
+							<button type="button" class="cart-btn" onclick="addCart('${item.productNo}')"
+								style="padding: 8px 12px; border: 1px solid #ccc; background: #fff; border-radius: 4px; font-size: 12px; cursor: pointer;">
+								장바구니 담기
+							</button>
 
 						</div>
 
 					</div>
 
-
-					<!-- 기존 delivery-buttons 클래스 및 스타일 100% 유지 -->
-					<div class="delivery-buttons">
-
-						<c:choose>
-							<%-- 1. 취소 관련 상태일 때: 배송조회/리뷰 버튼 제거, [취소 내역 조회] 버튼 1개만 출력 --%>
-							<c:when test="${item.orderStatus eq '취소처리' or item.orderStatus eq '주문취소' or item.orderStatus eq '취소완료'}">
-								<button type="button" class="delivery-btn" id="cancelHistoryBtn" style="width: 100%;"
+					<!-- =========================================================
+					     하단 액션 버튼 그룹 (주문 상태별 정확한 분기 - order_list와 동일)
+					     ========================================================= -->
+					<c:choose>
+						<%-- [1] 주문 취소 관련 상태 -> [취소 내역 조회] 단일 넓은 버튼만 출력 --%>
+						<c:when test="${item.orderStatus eq '취소처리' or item.orderStatus eq '주문취소' or item.orderStatus eq '취소완료'}">
+							<div class="delivery-buttons">
+								<button type="button" class="delivery-btn btn-action"
 									onclick="location.href='${pageContext.request.contextPath}/order/cancel_history'">
 									취소 내역 조회
 								</button>
-							</c:when>
+							</div>
+						</c:when>
 
-							<%-- 2. 결제 완료 상태일 때: [배송 조회] | [주문 취소] | [리뷰 작성하기] 출력 --%>
-							<c:when test="${item.orderStatus eq '결제완료' or item.orderStatus eq '결제 완료'}">
-								<button type="button" class="delivery-btn primary" id="deliveryBtn"
-									onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${item.orderNo}'">
+						<%-- [2] 결제 완료 상태 -> [배송 조회] | [주문 취소] 2개 버튼만 출력 --%>
+						<c:when test="${item.orderStatus eq '결제완료' or item.orderStatus eq '결제 완료'}">
+							<div class="delivery-buttons">
+								<button type="button" class="delivery-btn btn-action primary"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${orderInfo.orderNo}'">
 									배송 조회
 								</button>
-								<button type="button" class="delivery-btn" id="cancelBtn"
-									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${item.orderNo}'">
+								<button type="button" class="delivery-btn btn-action"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${orderInfo.orderNo}'">
 									주문 취소
 								</button>
-								<button type="button" class="delivery-btn" id="reviewBtn"
-									onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${item.orderDetailNo}&productNo=${item.productNo}'">
-									리뷰 작성하기
-								</button>
-							</c:when>
+							</div>
+						</c:when>
 
-							<%-- 3. 배송중/배송완료 등 일반 상태일 때: [배송 조회] | [교환, 반품 신청] | [리뷰 작성하기] 출력 --%>
-							<c:otherwise>
-								<button type="button" class="delivery-btn primary" id="deliveryBtn"
-									onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${item.orderNo}'">
+						<%-- [3] 배송중 상태 -> [배송 조회] | [교환, 반품 신청] 2개 버튼만 출력 --%>
+						<c:when test="${item.orderStatus eq '배송중' or item.orderStatus eq '배송 중' or item.orderStatus eq '배송시작'}">
+							<div class="delivery-buttons">
+								<button type="button" class="delivery-btn btn-action primary"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${orderInfo.orderNo}'">
 									배송 조회
 								</button>
-								<button type="button" class="delivery-btn" id="exchangeBtn" 
-									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${item.orderNo}'">
+								<button type="button" class="delivery-btn btn-action"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${orderInfo.orderNo}'">
 									교환, 반품 신청
 								</button>
-								<button type="button" class="delivery-btn" id="reviewBtn"
-									onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${item.orderDetailNo}&productNo=${item.productNo}'">
-									리뷰 작성하기
-								</button>
-							</c:otherwise>
-						</c:choose>
+							</div>
+						</c:when>
 
-					</div>
+						<%-- [4] 배송완료 등 기타 상태 -> [배송 조회] | [교환, 반품 신청] | [리뷰 작성/보기] 3개 버튼 모두 출력 --%>
+						<c:otherwise>
+							<div class="delivery-buttons">
+								<!-- [1] 배송조회 버튼 -->
+								<button type="button" class="delivery-btn btn-action primary"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${orderInfo.orderNo}'">
+									배송 조회
+								</button>
+
+								<!-- [2] 교환, 반품 신청 버튼 -->
+								<button type="button" class="delivery-btn btn-action"
+									onclick="location.href='${pageContext.request.contextPath}/order/order_cancel?orderNo=${orderInfo.orderNo}'">
+									교환, 반품 신청
+								</button>
+
+								<!-- [3] 리뷰 작성 / 작성한 리뷰 보기 버튼 (배송완료건만 노출) -->
+								<c:set var="isReviewWritten" value="false" />
+								<c:forEach var="review" items="${reviewList}">
+									<c:if test="${review.orderDetailNo eq item.orderDetailNo and review.reviewWritten}">
+										<c:set var="isReviewWritten" value="true" />
+									</c:if>
+								</c:forEach>
+
+								<c:choose>
+									<c:when test="${isReviewWritten}">
+										<button type="button" class="delivery-btn btn-action"
+											onclick="location.href='${pageContext.request.contextPath}/review/available'">
+											작성한 리뷰 보기
+										</button>
+									</c:when>
+									<c:otherwise>
+										<button type="button" class="delivery-btn btn-action"
+											onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${item.orderDetailNo}&productNo=${item.productNo}'">
+											리뷰 작성하기
+										</button>
+									</c:otherwise>
+								</c:choose>
+							</div>
+						</c:otherwise>
+					</c:choose>
+					<!-- // .delivery-buttons 닫기 -->
 
 				</section>
 			</c:forEach>
 
-
 			<!-- =========================
-             받는사람 정보
-        ========================== -->
+			     받는사람 정보
+			========================== -->
 			<section class="detail-section">
 
 				<h2>받는사람 정보</h2>
@@ -207,80 +250,80 @@
 
 			</section>
 
-
-<!-- =========================
-     결제 정보
-========================== -->
-<section class="detail-section payment-section">
-	<h2>결제 정보</h2>
-	<div class="section-line"></div>
-
-	<div class="payment-box">
-
-		<div class="payment-method">
-			<c:choose>
-				<%-- 1. 카드 결제 시: 카드사명 / 일시불 (예: 우리카드 / 일시불) --%>
-				<c:when test="${not empty orderInfo.cardCompanyName}">
-					${orderInfo.cardCompanyName} / 일시불
-				</c:when>
-				
-				<%-- 2. 계좌이체 결제 시: 은행명 / 계좌이체 (예: 우리은행 / 계좌이체) --%>
-				<c:when test="${not empty orderInfo.bankName}">
-					${orderInfo.bankName} / 계좌이체
-				</c:when>
-				
-				<%-- 3. 그 외 결제 방식 --%>
-				<c:otherwise>
-					${orderInfo.paymentMethod}
-				</c:otherwise>
-			</c:choose>
-		</div>
-
-		<div class="payment-price">
-			<div class="price-row">
-				<span>총 상품가격</span> 
-				<strong> 
-					<fmt:formatNumber value="${orderInfo.totalPrice-orderInfo.deliveryFee}" pattern="#,###" /> 원
-				</strong>
-			</div>
-			<div class="price-row">
-				<span>배송비</span> 
-				<strong> 
-					<fmt:formatNumber value="${orderInfo.deliveryFee}" pattern="#,###" /> 원
-				</strong>
-			</div>
-		</div>
-
-	</div>
-
-	<div class="payment-total">
-		<div>
-			<c:choose>
-				<c:when test="${not empty orderInfo.cardCompanyName}">
-					${orderInfo.cardCompanyName} / 일시불
-				</c:when>
-				<c:when test="${not empty orderInfo.bankName}">
-					${orderInfo.bankName} / 계좌이체
-				</c:when>
-				<c:otherwise>
-					${orderInfo.paymentMethod}
-				</c:otherwise>
-			</c:choose>
-		</div>
-
-		<div>
-			<span>총 결제금액</span> 
-			<strong> 
-				<fmt:formatNumber value="${orderInfo.totalPrice}" pattern="#,###" /> 원
-			</strong>
-		</div>
-
-	</div>
-
-</section>
 			<!-- =========================
-             결제영수증 정보
-        ========================== -->
+			     결제 정보
+			========================== -->
+			<section class="detail-section payment-section">
+				<h2>결제 정보</h2>
+				<div class="section-line"></div>
+
+				<div class="payment-box">
+
+					<div class="payment-method">
+						<c:choose>
+							<%-- 1. 카드 결제 시: 카드사명 / 일시불 --%>
+							<c:when test="${not empty orderInfo.cardCompanyName}">
+								${orderInfo.cardCompanyName} / 일시불
+							</c:when>
+							
+							<%-- 2. 계좌이체 결제 시: 은행명 / 계좌이체 --%>
+							<c:when test="${not empty orderInfo.bankName}">
+								${orderInfo.bankName} / 계좌이체
+							</c:when>
+							
+							<%-- 3. 그 외 결제 방식 --%>
+							<c:otherwise>
+								${orderInfo.paymentMethod}
+							</c:otherwise>
+						</c:choose>
+					</div>
+
+					<div class="payment-price">
+						<div class="price-row">
+							<span>총 상품가격</span> 
+							<strong> 
+								<fmt:formatNumber value="${orderInfo.totalPrice - orderInfo.deliveryFee}" pattern="#,###" /> 원
+							</strong>
+						</div>
+						<div class="price-row">
+							<span>배송비</span> 
+							<strong> 
+								<fmt:formatNumber value="${orderInfo.deliveryFee}" pattern="#,###" /> 원
+							</strong>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="payment-total">
+					<div>
+						<c:choose>
+							<c:when test="${not empty orderInfo.cardCompanyName}">
+								${orderInfo.cardCompanyName} / 일시불
+							</c:when>
+							<c:when test="${not empty orderInfo.bankName}">
+								${orderInfo.bankName} / 계좌이체
+							</c:when>
+							<c:otherwise>
+								${orderInfo.paymentMethod}
+							</c:otherwise>
+						</c:choose>
+					</div>
+
+					<div>
+						<span>총 결제금액</span> 
+						<strong> 
+							<fmt:formatNumber value="${orderInfo.totalPrice}" pattern="#,###" /> 원
+						</strong>
+					</div>
+
+				</div>
+
+			</section>
+
+			<!-- =========================
+			     결제영수증 정보
+			========================== -->
 			<section class="detail-section receipt-section">
 
 				<h2>결제영수증 정보</h2>
@@ -298,7 +341,6 @@
 				</div>
 
 			</section>
-
 
 			<!-- 배송상품 주문상태 안내 -->
 			<div class="delivery-step-box">
@@ -355,8 +397,11 @@
 
 		</main>
 
+		<!-- 우측 날개 배너 모듈 include -->
 		<jsp:include page="/inc/right_banner.jsp" />
 	</div>
+	<!-- //.order-detail-wrap -->
+
 	<jsp:include page="/inc/footer.jsp" />
 
 </body>
