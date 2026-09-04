@@ -5,6 +5,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <!-- 파비콘 설정 -->
+    <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
+
+</head>
+<head>
 <meta charset="UTF-8">
 <title>주문목록/배송조회 - GoodPang</title>
 
@@ -239,8 +245,7 @@
 		<div class="product-info" style="flex: 1;">
 			<div class="product-name"
 				style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">
-				<a
-					href="${pageContext.request.contextPath}/product/detail?productNo=${item.productNo}"
+				<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}"
 					style="color: #333; text-decoration: none;"> <span
 					class="rocket" style="color: #0073e9;">🚀 로켓배송</span>
 					${item.productName}
