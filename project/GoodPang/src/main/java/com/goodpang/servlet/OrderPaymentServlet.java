@@ -2,7 +2,9 @@ package com.goodpang.servlet;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.Collections;
 
+import com.goodpang.dao.CartDAO;
 import com.goodpang.dao.OrderDAO;
 import com.goodpang.dto.MemberDTO;
 import com.goodpang.util.ConnectionProvider;
@@ -13,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/order/checkout")
 public class OrderPaymentServlet extends HttpServlet {
@@ -287,7 +290,50 @@ public class OrderPaymentServlet extends HttpServlet {
 					checkoutNo,
 					memberNo
 					);
+			
+			
+			HttpSession session =
+			        request.getSession();
+
+			Integer cartCheckoutNo =
+			        (Integer) session.getAttribute(
+			                "cartCheckoutNo"
+			        );
+			
+			boolean cartOrder =
+			        cartCheckoutNo != null
+			        && cartCheckoutNo.intValue()
+			                == checkoutNo;
+
+			if (cartOrder) {
+
+			    CartDAO cartDAO =
+			            new CartDAO();
+
+			    cartDAO.clearCart(
+			            conn,
+			            memberNo
+			    );
+			}
+
 			conn.commit();
+			
+			if (cartOrder) {
+
+				session.setAttribute(
+				        "cartPreviewItems",
+				        Collections.emptyList()
+				);
+			    
+			    session.setAttribute(
+			            "cartCount",
+			            0
+			    );
+
+			    session.removeAttribute(
+			            "cartCheckoutNo"
+			    );
+			}
 			response.sendRedirect(
 					request.getContextPath()
 					+ "/order/complete?orderNo="

@@ -5,6 +5,12 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+
+    <!-- 파비콘 설정 -->
+    <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
+
+</head>
+<head>
 <meta charset="UTF-8">
 <title>리뷰관리</title>
 <link rel="stylesheet"
@@ -55,9 +61,6 @@
 				</div>
 			</div>
 
-<%-- 			<c:set var="activeTab"
-				value="${param.tab eq 'available' ? 'available' : 'written'}" />
- --%>
 			<div class="review-tabs">
 				<a
 					href="${pageContext.request.contextPath}/review/list?tab=available"
@@ -85,12 +88,31 @@
 						<c:otherwise>
 							<c:forEach var="review" items="${availableReviewList}">
 								<article class="available-review-item">
+
+
 									<div class="available-product-image">
-										<img
-											src="${pageContext.request.contextPath}/images/product/default-product.png"
-											alt="${review.productName}"
-											onerror="this.style.display='none';">
+										<c:choose>
+
+											<c:when test="${not empty review.productImage}">
+												<a
+													href="${pageContext.request.contextPath}/product?productNo=${review.productNo}">
+													<img
+													src="${pageContext.request.contextPath}/${review.productImage}"
+													alt="${review.productName}"
+													onerror="this.style.display='none';">
+												</a>
+											</c:when>
+
+											<c:otherwise>
+												<img
+													src="${pageContext.request.contextPath}/images/product/default-product.png"
+													alt="${review.productName}">
+											</c:otherwise>
+
+										</c:choose>
 									</div>
+
+
 
 									<div class="available-product-info">
 										<a

@@ -76,6 +76,7 @@
 						<div class="product-image">
 						    <c:choose>
 						        <c:when test="${not empty item.imageUrl}">
+						        
 						            <img src="${pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 6px;" />
 						        </c:when>
 						      
@@ -86,7 +87,9 @@
 							<div class="product-info">
 
 								<div class="product-name">
-									<span class="rocket">🚀 로켓배송</span> ${item.productName}
+									<span class="rocket">🚀 로켓배송</span> 
+									<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
+									${item.productName}</a>
 								</div>
 
 								<div class="product-price">
