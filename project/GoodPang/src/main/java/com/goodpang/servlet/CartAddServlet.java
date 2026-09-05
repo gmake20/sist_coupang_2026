@@ -74,6 +74,12 @@ public class CartAddServlet extends HttpServlet {
 			}
 
 			guestCart.merge(optionId, quantity, Integer::sum);
+			
+
+		    session.setAttribute(
+		            "guestCart",
+		            guestCart
+		    );
 
 			CartUtil.refreshGuestCartSession(
 					request,
