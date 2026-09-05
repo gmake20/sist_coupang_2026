@@ -1110,7 +1110,7 @@
     const isLoggedIn = ${not empty sessionScope.loginMember ? 'true' : 'false'};
 
     async function refreshCart() {
-        if (!isLoggedIn) return;
+        /* if (!isLoggedIn) return; */
 
         try {
             const response = await fetch(cartContextPath + '/cart/status', {
@@ -1228,10 +1228,10 @@
     
     
 
-    if (isLoggedIn) {
+    /* if (isLoggedIn) { */
         document.addEventListener('DOMContentLoaded', refreshCart);
         window.addEventListener('focus', refreshCart);
-        setInterval(refreshCart, 3000);
-    }
+    /*     setInterval(refreshCart, 3000);
+    } */
 })();
 </script>

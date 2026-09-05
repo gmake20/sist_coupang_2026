@@ -451,7 +451,8 @@ public class CartDAO {
 	                po.OPTION_ID,
 	                p.PRODUCT_NO,
 	                p.PRODUCT_NAME,
-	                p.PRODUCT_PRICE + NVL(po.PRICE, 0) AS UNIT_PRICE,
+	                p.PRODUCT_PRICE,
+	                NVL(po.PRICE, 0) AS OPTION_PRICE,
 	                po.OPTION1_TYPE,
 	                po.OPTION1_VALUE,
 	                po.OPTION2_TYPE,
@@ -482,6 +483,7 @@ public class CartDAO {
 	        Connection conn = ConnectionProvider.getConnection();
 	        PreparedStatement pstmt = conn.prepareStatement(sql)
 	    ) {
+
 	        for (Map.Entry<Integer, Integer> entry : guestCart.entrySet()) {
 
 	            int optionId = entry.getKey();
@@ -490,6 +492,7 @@ public class CartDAO {
 	            pstmt.setInt(1, optionId);
 
 	            try (ResultSet rs = pstmt.executeQuery()) {
+
 	                if (rs.next()) {
 
 	                    CartItemDTO item = new CartItemDTO();
@@ -497,7 +500,10 @@ public class CartDAO {
 	                    item.setOptionId(rs.getInt("OPTION_ID"));
 	                    item.setProductNo(rs.getInt("PRODUCT_NO"));
 	                    item.setProductName(rs.getString("PRODUCT_NAME"));
-	                    item.setUnitPrice(rs.getInt("UNIT_PRICE"));
+
+	                    item.setProductPrice(rs.getInt("PRODUCT_PRICE"));
+	                    item.setOptionPrice(rs.getInt("OPTION_PRICE"));
+
 	                    item.setQuantity(quantity);
 
 	                    item.setOption1Type(rs.getString("OPTION1_TYPE"));
