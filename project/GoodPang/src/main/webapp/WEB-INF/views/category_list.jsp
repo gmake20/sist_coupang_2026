@@ -546,7 +546,14 @@
 						<ul class="product-grid">
 							<c:forEach var="item" items="${products}">
 								<li class="product-card">
-									<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
+									<%-- 카드 링크 — 2026-09-06 optionId 추가.
+									     원본 쿠팡도 목록 카드가 상품이 아니라 "그 색상 옵션 하나"를 가리킴(실측: 같은 상품인데
+									     블랙/화이트에서 링크의 itemId 가 다름). 그래서 카드가 고른 대표 옵션을 그대로 넘겨서
+									     상세페이지가 같은 옵션을 선택된 상태로 열게 함 — 상세 쪽은 이미 optionId 를 읽고 있어서
+									     (ProductHandler) 자바는 안 고쳐도 됨.
+									     optionId 가 0 이면(옵션이 없는 상품) 안 붙임 = 예전과 똑같이 동작 --%>
+									<%-- 옛 버전: <a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}"> --%>
+									<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}<c:if test="${item.optionId > 0}">&amp;optionId=${item.optionId}</c:if>">
 										<figure>
 											<c:if test="${not empty item.thumbnailUrl}">
 												<img src="${img:url(item.thumbnailUrl)}" alt="${item.productName}">

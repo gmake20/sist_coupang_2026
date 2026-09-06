@@ -456,7 +456,15 @@ function setupOptionSelect(setStock, setPrice) {
 
         /* 재고/품절 — 옵션마다 재고가 다르므로 고를 때마다 다시 판단.
            STATUS 가 'N'(판매중지)이거나 재고가 0이면 품절로 봄 */
-        const soldout = (data.quantity <= 0) || (data.status === 'N');
+        // 옛 버전(2026-09-06 이전):
+        //   const soldout = (data.quantity <= 0) || (data.status === 'N');
+        //   document.body.classList.toggle('is-soldout', soldout);
+        /* ★ 2026-09-06 — 상품 전체가 '판매 중지'면 어떤 옵션을 골라도 계속 품절 상태여야 함.
+           이 줄이 옵션을 바꿀 때마다 is-soldout 을 다시 계산해서 덮어쓰기 때문에, 여기서도
+           상품 단위 상태(body 의 data-sale-status, product.jsp 에서 심음)를 같이 봐야 함.
+           안 그러면 판매중지 상품에서 옵션을 한 번만 바꿔도 구매 버튼이 되살아남 */
+        const saleStopped = document.body.dataset.saleStatus === '판매 중지';
+        const soldout = saleStopped || (data.quantity <= 0) || (data.status === 'N');
         document.body.classList.toggle('is-soldout', soldout);
         if (setStock) setStock(data.quantity);
         if (setPrice) setPrice(data.price, data.normalPrice);

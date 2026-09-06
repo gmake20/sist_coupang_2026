@@ -28,6 +28,7 @@ public class ProductDAO {
 			        S.PHONE,
 			        S.MAIL_ORDER_NO,
 			        S.BUSINESS_NO,
+			        P.SALE_STATUS,
 			        P.SUB_CATEGORY_NO,
 			        SC.CATEGORY_NAME    AS SUB_CATEGORY_NAME,
 			        MC.CATEGORY_NO      AS MID_CATEGORY_NO,
@@ -66,6 +67,10 @@ public class ProductDAO {
                     dto.setProductDesc(rs.getString("PRODUCT_DESC"));
                     dto.setProductPrice(rs.getInt("PRODUCT_PRICE"));
                     dto.setQuantity(rs.getInt("QUANTITY"));
+
+                    // 2026-09-06 추가 — 판매중지 상품을 화면에서 품절과 같은 모습으로 막기 위해 내려줌.
+                    // 값은 '판매 중' / '품절' / '판매 중지' ('승인 대기' 는 위 WHERE 에서 이미 걸러짐)
+                    dto.setSaleStatus(rs.getString("SALE_STATUS"));
 
                     dto.setSellerNo(rs.getInt("SELLER_NO"));
                     dto.setStoreName(rs.getString("STORE_NAME"));

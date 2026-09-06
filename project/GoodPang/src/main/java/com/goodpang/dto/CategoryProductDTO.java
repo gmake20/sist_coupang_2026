@@ -20,6 +20,14 @@ public class CategoryProductDTO {
     private String productName;
     private String thumbnailUrl;       // PRODUCT_IMAGE.IMAGE_URL — contextPath 는 JSP 에서 붙임. null 이면 사진 없음
 
+    /*
+     * 이 카드가 가리키는 대표 옵션(2026-09-06 추가).
+     * 색상 필터를 걸면 "그 색상 옵션 중 첫 번째", 안 걸면 예전처럼 "상품의 첫 옵션".
+     * 카드 링크에 붙여서 상세페이지가 같은 옵션을 선택된 상태로 열게 함(원본 쿠팡도 itemId 를 이렇게 넘김).
+     * 옵션이 하나도 없는 상품이면 0 → JSP 에서 링크에 안 붙임.
+     */
+    private int optionId;
+
     private int salePrice;             // PRODUCT_PRICE + 최저가 옵션의 PRICE
     private Integer normalPrice;       // PRODUCT_PRICE + 최저가 옵션의 NORMAL_PRICE. 정상가가 판매가보다 클 때만 값이 들어감(그 외 null)
     private int discountRate;          // normalPrice 가 있을 때만 0보다 큼
