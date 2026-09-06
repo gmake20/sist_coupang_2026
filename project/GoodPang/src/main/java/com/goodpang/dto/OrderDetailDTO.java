@@ -59,6 +59,6 @@ public class OrderDetailDTO {
     
     private String receiveLocation; // 수령방법 (ORDER_ADDRESS.RECEIVE_LOCATION)
     
-    
+    private int optionId;
     
 }

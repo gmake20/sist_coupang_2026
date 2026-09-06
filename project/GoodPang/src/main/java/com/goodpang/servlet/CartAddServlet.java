@@ -33,6 +33,9 @@ public class CartAddServlet extends HttpServlet {
 		try {
 			optionId = Integer.parseInt(request.getParameter("optionId"));
 			quantity = Integer.parseInt(request.getParameter("quantity"));
+			
+			System.out.println("optionId = " + optionId);
+			System.out.println("quantity = " + quantity);
 		} catch (Exception e) {
 			response.sendError(
 					HttpServletResponse.SC_BAD_REQUEST,

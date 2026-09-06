@@ -111,3 +111,52 @@ $(function () {
     });
 
 });
+
+
+function addCart(optionId, quantity) {
+    if (!optionId) {
+        alert("상품 옵션 정보를 찾을 수 없습니다.");
+        return;
+    }
+
+    var params = new URLSearchParams();
+    params.append("optionId", optionId);
+    params.append("quantity", quantity || 1);
+
+    fetch(contextPath + "/cart/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: params.toString()
+    })
+    .then(function(response) {
+        if (!response.ok) {
+            throw new Error("장바구니 담기에 실패했습니다.");
+        }
+
+        return response.json();
+    })
+    .then(function(data) {
+        if (!data.success) {
+            throw new Error("장바구니 담기에 실패했습니다.");
+        }
+
+        var cartCount =
+            document.getElementById("cartCount");
+
+        if (cartCount) {
+            cartCount.textContent =
+                data.cartCount != null
+                    ? data.cartCount
+                    : 0;
+        }
+
+        alert("상품이 장바구니에 담겼습니다.");
+    })
+    .catch(function(error) {
+        console.error(error);
+        alert(error.message);
+    });
+}
