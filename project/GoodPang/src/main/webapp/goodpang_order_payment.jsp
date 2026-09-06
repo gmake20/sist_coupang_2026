@@ -4,7 +4,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
-
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -259,7 +259,7 @@
 										<a
 											href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
 											<img
-											src="${pageContext.request.contextPath}/${item.productImage}"
+											src="${img:url(item.productImage)}"
 											alt="${item.productName}">
 										</a>
 									</c:when>
