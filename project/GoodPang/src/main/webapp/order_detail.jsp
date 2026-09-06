@@ -28,7 +28,9 @@
 <!-- jQuery -->
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
+<script>
+    const contextPath = '${pageContext.request.contextPath}';
+</script>
 <!-- 주문상세 전용 JS -->
 <script src="${pageContext.request.contextPath}/js/order_detail.js"></script>
 
@@ -119,9 +121,10 @@
 
 							</div>
 
-							<button type="button" class="cart-btn" onclick="addCart('${item.productNo}')"
-								style="padding: 8px 12px; border: 1px solid #ccc; background: #fff; border-radius: 4px; font-size: 12px; cursor: pointer;">
-								장바구니 담기
+							<button type="button" class="cart-btn"
+							    onclick="addCart('${item.optionId}', '${item.quantity}')"
+							    style="padding: 8px 12px; border: 1px solid #ccc; background: #fff; border-radius: 4px; font-size: 12px; cursor: pointer;">
+							    장바구니 담기
 							</button>
 
 						</div>

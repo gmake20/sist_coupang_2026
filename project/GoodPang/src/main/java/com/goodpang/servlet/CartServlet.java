@@ -26,101 +26,65 @@ public class CartServlet extends HttpServlet {
     private final WowMembershipDAO wowDAO = new WowMembershipDAO();
 
     @Override
-    protected void doGet(
-            HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session =
-                request.getSession();
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
 
-        MemberDTO loginMember =
-                (MemberDTO) session.getAttribute("loginMember");
+        HttpSession session = request.getSession();
+        MemberDTO loginMember = (MemberDTO) session.getAttribute("loginMember");
 
         List<CartItemDTO> cartItems;
 
-        // 로그인 사용자
         if (loginMember != null) {
 
-            cartItems =
-                    cartDAO.getCartItems(
-                            loginMember.getMemberNo()
-                    );
+            int memberNo = loginMember.getMemberNo();
+
+            cartItems = cartDAO.getCartItems(memberNo);
+
+            boolean isWowMember = wowDAO.isWowMember(memberNo);
+
+            request.setAttribute("isWowMember", isWowMember);
+            session.setAttribute("cartPreviewItems", cartItems);
 
         } else {
 
-            // 비로그인 사용자
-            cartItems = new ArrayList<>();
-
             @SuppressWarnings("unchecked")
             Map<Integer, Integer> guestCart =
-                    (Map<Integer, Integer>)
-                            session.getAttribute("guestCart");
+                    (Map<Integer, Integer>) session.getAttribute("guestCart");
 
-            if (guestCart != null) {
+            if (guestCart == null || guestCart.isEmpty()) {
 
-                for (Map.Entry<Integer, Integer> entry
-                        : guestCart.entrySet()) {
+                cartItems = new ArrayList<>();
 
-                    int optionId =
-                            entry.getKey();
+                session.setAttribute("cartCount", 0);
+                session.removeAttribute("cartPreviewItems");
 
-                    int quantity =
-                            entry.getValue();
+            } else {
 
-                    CartItemDTO item =
-                            cartDAO.getCartItemByOptionId(
-                                    optionId
-                            );
+                cartItems = cartDAO.getGuestCartItems(guestCart);
 
-                    if (item != null) {
+                int guestCartCount = guestCart.size();
 
-                        item.setQuantity(quantity);
-
-                        cartItems.add(item);
-                    }
-                }
+                session.setAttribute("cartCount", guestCartCount);
+                session.setAttribute("cartPreviewItems", cartItems);
             }
+
+            request.setAttribute("isWowMember", false);
         }
-        
-        if (loginMember != null) {
-	        boolean isWowMember =
-	                wowDAO.isWowMember(
-	                        loginMember.getMemberNo()
-	                );
-	
-	        request.setAttribute(
-	                "isWowMember",
-	                isWowMember
-	        );
-        
-        }
-        
 
         int totalPrice = 0;
 
         for (CartItemDTO item : cartItems) {
             totalPrice += item.getTotalPrice();
         }
-        
-        
-        request.setAttribute(
-                "cartItems",
-                cartItems
-        );
 
-        request.setAttribute(
-                "cartCount",
-                cartItems.size()
-        );
+        request.setAttribute("cartItems", cartItems);
+        request.setAttribute("cartCount", cartItems.size());
+        request.setAttribute("totalPrice", totalPrice);
 
-        request.setAttribute(
-                "totalPrice",
-                totalPrice
-        );
-
-        request.getRequestDispatcher(
-                "/cart.jsp"
-        ).forward(request, response);
+        request.getRequestDispatcher("/cart.jsp").forward(request, response);
     }
 }

@@ -1010,18 +1010,6 @@ a.del-button:hover {
    삼각형을 직접 그린 게 아니라, 네모의 "위·오른쪽 테두리만" 남기고
    45도 돌려서 만든 것 (▲ 모양이 됨). 배경색이 흰색이라 상자와 이어져 보임 */
 .my-coupang-menu .arrow,
-.cart-preview .arrow {
-  display: block;
-  position: absolute;
-  top: -6px;
-  width: 13px;
-  height: 13px;
-  background-color: #fff;
-  border-color: #ddd;
-  border-width: 1px 1px 0 0;
-  border-style: solid;
-  transform: rotate(315deg);
-}
 
 .my-coupang-menu .arrow { left: 39px; }
 .cart-preview .arrow { right: 15px; }
@@ -2819,3 +2807,184 @@ a.del-button:hover {
     display: block;
 }
 
+.icon-menus .cart {
+    position: relative;
+}
+
+.icon-menus .cart .cart-preview {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: -15px;
+    z-index: 1000;
+    display: none;
+    overflow: visible;
+}
+
+.icon-menus .cart:hover .cart-preview {
+    display: block;
+}
+
+/* 장바구니에서 미리보기까지 마우스가 끊기지 않는 영역 */
+.icon-menus .cart .cart-preview::before {
+    content: "";
+    position: absolute;
+    top: -18px;
+    right: 0;
+    width: 90px;
+    height: 18px;
+    background: transparent;
+}
+.icon-menus .cart {
+    position: relative;
+}
+
+.icon-menus .cart .cart-preview {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: -15px;
+    z-index: 1000;
+    display: none;
+    overflow: visible;
+}
+
+.icon-menus .cart:hover .cart-preview {
+    display: block;
+}
+
+/* 마우스가 끊기지 않는 투명 통로 */
+.icon-menus .cart .cart-preview::before {
+    content: "";
+    position: absolute;
+    top: -18px;
+    right: 0;
+    width: 90px;
+    height: 18px;
+    background: transparent;
+}
+
+/* 말풍선 꼬리 - 바깥 테두리 */
+.icon-menus .cart .cart-preview::after {
+    content: "";
+    position: absolute;
+    top: -11px;
+    right: 29px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 11px solid #aaa;
+    z-index: 3;
+}
+
+.icon-menus .cart .cart-preview .wrapper {
+    position: relative;
+    display: block;
+    width: 380px;
+    background: #fff;
+    border: 1px solid #aaa;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* 말풍선 꼬리 - 안쪽 흰색 */
+.icon-menus .cart .cart-preview .wrapper::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    right: 30px;
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 10px solid #fff;
+    z-index: 4;
+}
+.icon-menus .cart .cart-preview .wrapper {
+    position: relative;
+    display: block;
+    width: 380px;
+    background: #fff;
+    border: 1px solid #aaa;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* 말풍선 꼬리 바깥선 */
+.icon-menus .cart .cart-preview::after {
+    content: "";
+    position: absolute;
+    top: -11px;
+    right: 29px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 11px solid #bdbdbd;
+    z-index: 3;
+}
+
+/* 안쪽 흰색 */
+.icon-menus .cart .cart-preview .wrapper::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    right: 30px;
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 10px solid #fff;
+    z-index: 4;
+}
+
+.icon-menus .cart .cart-preview .wrapper {
+    background: #fff;
+    border: 1px solid #d5d5d5;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+}
+
+/* 기존 화살표 제거 */
+.icon-menus .cart .cart-preview .arrow,
+.icon-menus .cart .cart-preview .cart-preview-arrow {
+    display: none !important;
+}
+
+/* 기존 wrapper 화살표 제거 */
+.icon-menus .cart .cart-preview .wrapper::before,
+.icon-menus .cart .cart-preview .wrapper::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* 장바구니 → 미리보기 hover 통로 */
+.icon-menus .cart .cart-preview::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -18px !important;
+    right: 0 !important;
+    width: 90px !important;
+    height: 18px !important;
+    background: transparent !important;
+    border: 0 !important;
+}
+
+/* 흰색 말풍선 화살표 */
+.icon-menus .cart .cart-preview::after {
+    content: "" !important;
+    position: absolute !important;
+    top: -10px !important;
+    right: 29px !important;
+    width: 20px !important;
+    height: 11px !important;
+
+    background: #fff !important;
+    border: 0 !important;
+    box-shadow: none !important;
+
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    z-index: 1002 !important;
+}
+
+/* 미리보기 */
+.icon-menus .cart .cart-preview .wrapper {
+    position: relative;
+    background: #fff !important;
+}

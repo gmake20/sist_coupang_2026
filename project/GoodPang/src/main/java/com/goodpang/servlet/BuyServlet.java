@@ -155,7 +155,6 @@ public class BuyServlet extends HttpServlet {
                     - cashUsed
                     + deliveryFee;
 
-            System.out.println("deliveryFee = " + deliveryFee);
             int checkoutNo =
                     dao.insertCheckout(
                             conn,

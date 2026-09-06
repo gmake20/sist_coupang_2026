@@ -30,6 +30,7 @@ public class OrderDetailDAO {
                 o.TOTAL_PRICE, 
                 p.PRODUCT_NO, 
                 p.PRODUCT_NAME, 
+                od.OPTION_ID,
                 od.ORDER_QTY AS QUANTITY, 
                 od.PRICE AS ITEM_PRICE,
                 o.DELIVERY_FEE, 
@@ -131,6 +132,7 @@ public class OrderDetailDAO {
                     dto.setMemberName(rs.getString("MEMBER_NAME"));
                     dto.setPhone(rs.getString("PHONE"));
 
+                    dto.setOptionId(rs.getInt("OPTION_ID"));
                     // 옵션 정보
                     dto.setOption1Type(rs.getString("OPTION1_TYPE"));
                     dto.setOption1Value(rs.getString("OPTION1_VALUE"));
