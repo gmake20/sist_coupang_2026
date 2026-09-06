@@ -338,7 +338,10 @@
 						</c:if>
 
 						<%-- 배너 4장 — 원본에서 받아온 이미지 그대로. 아직 연결할 기획전 페이지가 없어서 링크는 비워둠
-						     (href="#" 이라 눌러도 아무 데도 안 감). 나중에 기획전이 생기면 여기만 바꾸면 됨 --%>
+						     (href="#" 이라 눌러도 아무 데도 안 감). 나중에 기획전이 생기면 여기만 바꾸면 됨.
+						     2026-09-06: 이 4장은 패션 페이지에서 캡처한 그림이라 패션(대분류 1) 밑의 중분류에서만 나옴.
+						     뷰티 밑 중분류(스킨케어 등)에선 hasMidBanners 가 false 라 이 블록이 통째로 빠짐 --%>
+						<c:if test="${hasMidBanners}">
 						<div class="mid-banners">
 							<a href="#" class="banner-quicklinks">
 								<img src="${pageContext.request.contextPath}/images/category/banner_quicklinks.png" alt="쿠팡 추천 모음">
@@ -353,6 +356,7 @@
 								<img src="${pageContext.request.contextPath}/images/category/banner_promo3.png" alt="기획전 배너">
 							</a>
 						</div>
+						</c:if>
 
 					</div>
 				</c:if>
@@ -364,8 +368,12 @@
 				     둘 다 접속할 때마다 바뀌는 광고 마켓플레이스 캐러셀(광고주별 링크가 계속 바뀜)이라
 				     전부 못 가져오고, 대표 이미지 몇 장만 정지 배너로 캡처해서 씀
 				     (원본 이미지 그대로 받음 — static.coupangcdn.com/image/bannerunit/...).
-				     중분류/소분류 페이지에서는 isTopCategory 가 false 라 이 블록이 통째로 안 나옴 --%>
-				<c:if test="${isTopCategory}">
+				     ★ 2026-09-06: 이 배너들은 전부 "패션의류/잡화" 페이지에서 캡처한 그림이라(l1_tiles.png 는
+				       칸 이름까지 그림에 박혀 있음) 뷰티·식품 같은 다른 대분류에 쓰면 엉뚱한 화면이 됨.
+				       그래서 조건을 isTopCategory(레벨1이기만 하면) → hasTopBanners(배너 자료가 있는 대분류)로 바꿈.
+				       자료가 없는 대분류는 제목 + 정렬바 + 상품 목록만 나온다.
+				     중분류/소분류와 배너 자료가 없는 대분류에서는 이 블록이 통째로 안 나옴 --%>
+				<c:if test="${hasTopBanners}">
 					<div class="top-extra">
 
 						<%-- ① 히어로 영역 — 원본 실측: 1030px 칸 안에 두 덩어리가 나란히 있음.

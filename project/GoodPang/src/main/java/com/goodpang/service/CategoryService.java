@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import com.goodpang.dao.CategoryProductDAO;
 import com.goodpang.dao.CategoryProductDAO.Sort;
@@ -81,6 +82,30 @@ public class CategoryService {
     /** 대분류(레벨1) 페이지인지 — 사이드바 "카테고리"를 자식 목록으로 보여줘야 함 */
     public boolean isTopCategory(CategoryDTO current) {
         return current != null && current.getCategoryLevel() == 1;
+    }
+
+    /*
+     * 배너/타일 이미지를 실제로 준비해둔 카테고리인지 (2026-09-06 추가).
+     *
+     * 대분류 배너(l1_hero_*, l1_tiles, l1_band_*, l1_brand_*)와 중분류 배너(banner_promo*)는
+     * 전부 쿠팡 "패션의류/잡화" 페이지에서 캡처한 그림임. 특히 l1_tiles.png 는
+     * "여성/남성/속옷·잠옷…" 글자가 그림 안에 박혀 있어서 다른 카테고리에 쓸 수가 없음.
+     * 그런데 레벨로만 갈라서(isTopCategory) 뷰티·식품 대분류에도 패션 배너가 그대로 나오고 있었음
+     * → 자료가 있는 카테고리에서만 그리게 막음. 다른 대분류 배너를 만들면 여기 번호만 추가하면 됨.
+     */
+    private static final Set<Long> BANNER_READY_TOP_CATEGORIES = Set.of(1L);   // 1 = 패션의류/잡화
+
+    /** 대분류(레벨1) 중 배너 자료가 있는 것인지 — 없으면 제목+상품목록만 나온다 */
+    public boolean hasTopBanners(CategoryDTO current) {
+        return isTopCategory(current)
+                && BANNER_READY_TOP_CATEGORIES.contains(current.getCategoryNo());
+    }
+
+    /** 중분류(레벨2) 배너 4장 — 패션 밑 중분류에서만 (원형 타일은 파일 유무로 이미 걸러짐) */
+    public boolean hasMidBanners(CategoryDTO current) {
+        return isMidCategory(current)
+                && current.getParentCategoryNo() != null
+                && BANNER_READY_TOP_CATEGORIES.contains(current.getParentCategoryNo());
     }
 
     /**
