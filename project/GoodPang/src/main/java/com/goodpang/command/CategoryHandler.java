@@ -31,7 +31,24 @@ public class CategoryHandler implements CommandHandler {
     @Override
     public String process(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        int categoryNo = parseIntOrDefault(request.getParameter("categoryNo"), 10301);
+        // int categoryNo = parseIntOrDefault(request.getParameter("categoryNo"), 10301);  // ← 2026-09-06 아래로 교체
+
+        // 카테고리 번호도 주소 두 형태를 다 받음 (ProductHandler 와 같은 방식)
+        //  ① /category/10301        ② /category?categoryNo=10301 (옛 주소, 팀원 링크 15곳)
+        // 정렬/페이징/필터(sort, page, listSize, minPrice, color ...)는 그대로 쿼리스트링으로 둠 —
+        // 쿠팡도 /np/categories/194276?sorter=... 처럼 "무엇을 보는가"만 경로로 씀
+        String categoryNoParam = request.getParameter("categoryNo");
+
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null && pathInfo.length() > 1) {
+            categoryNoParam = pathInfo.substring(1);
+            int slash = categoryNoParam.indexOf('/');
+            if (slash > -1) {
+                categoryNoParam = categoryNoParam.substring(0, slash);
+            }
+        }
+
+        int categoryNo = parseIntOrDefault(categoryNoParam, 10301);
         Sort sort = parseSortOrDefault(request.getParameter("sort"));
         int page = Math.max(1, parseIntOrDefault(request.getParameter("page"), 1));
 

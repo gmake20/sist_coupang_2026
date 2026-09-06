@@ -28,7 +28,20 @@ public class ProductHandler implements CommandHandler {
     @Override
     public String process(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+        // 상품번호는 주소 두 형태를 다 받음 (2026-09-06)
+        //  ① /product/131          -> getPathInfo() 가 "/131" 을 돌려줌 (쿠팡식, 새 주소)
+        //  ② /product?productNo=131 -> 팀원 화면 16곳이 아직 이 주소를 써서 같이 살려둠
+        // ① 이 있으면 ① 을 우선함
         String productNoParam = request.getParameter("productNo");
+
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null && pathInfo.length() > 1) {
+            productNoParam = pathInfo.substring(1);          // 맨 앞 "/" 떼기 -> "131"
+            int slash = productNoParam.indexOf('/');         // "/131/뭐시기" 처럼 더 붙어도 앞부분만
+            if (slash > -1) {
+                productNoParam = productNoParam.substring(0, slash);
+            }
+        }
 
         try {
             if (productNoParam != null && !productNoParam.isEmpty()) {

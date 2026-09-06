@@ -553,7 +553,13 @@
 									     (ProductHandler) 자바는 안 고쳐도 됨.
 									     optionId 가 0 이면(옵션이 없는 상품) 안 붙임 = 예전과 똑같이 동작 --%>
 									<%-- 옛 버전: <a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}"> --%>
-									<a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}<c:if test="${item.optionId > 0}">&amp;optionId=${item.optionId}</c:if>">
+									<%-- 옛 버전2: <a href="${pageContext.request.contextPath}/product?productNo=${item.productNo}<c:if test="${item.optionId > 0}">&amp;optionId=${item.optionId}</c:if>"> --%>
+									<%-- 2026-09-06: 상품번호를 쿼리스트링이 아니라 경로로 넘김 → /product/132?optionId=538
+									     (쿠팡도 /vp/products/6056289614?itemId=... 처럼 상품번호만 경로에 둠)
+									     web.xml 에 "/product/*" 매핑을 추가하고 ProductHandler 가 getPathInfo() 로 읽게 해둠.
+									     optionId 가 첫 파라미터가 되므로 "&amp;" 가 아니라 "?" 로 시작함.
+									     ※ 옛 주소(?productNo=)도 그대로 살아있어서 팀원 화면 15곳은 안 고쳐도 됨 --%>
+									<a href="${pageContext.request.contextPath}/product/${item.productNo}<c:if test="${item.optionId > 0}">?optionId=${item.optionId}</c:if>">
 										<figure>
 											<c:if test="${not empty item.thumbnailUrl}">
 												<img src="${img:url(item.thumbnailUrl)}" alt="${item.productName}">
