@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.Gson;
 import com.goodpang.dao.CartDAO;
 import com.goodpang.dto.CartItemDTO;
 import com.goodpang.dto.MemberDTO;
+import com.google.gson.Gson;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -25,64 +25,53 @@ public class CartStatusServlet extends HttpServlet {
     private final Gson gson = new Gson();
 
     @Override
-    protected void doGet(
-            HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        response.setContentType(
-                "application/json; charset=UTF-8"
-        );
+        response.setContentType("application/json; charset=UTF-8");
 
-        HttpSession session =
-                request.getSession(false);
+        HttpSession session = request.getSession();
 
-        if (session == null) {
-            response.getWriter().write(
-                    "{\"count\":0,\"items\":[]}"
-            );
-            return;
+        MemberDTO loginMember =
+                (MemberDTO) session.getAttribute("loginMember");
+
+        List<CartItemDTO> cartItems;
+
+        // 회원
+        if (loginMember != null) {
+
+            cartItems =
+                    cartDAO.getCartItems(
+                            loginMember.getMemberNo()
+                    );
+
+        // 비회원
+        } else {
+
+            @SuppressWarnings("unchecked")
+            Map<Integer, Integer> guestCart =
+                    (Map<Integer, Integer>)
+                            session.getAttribute("guestCart");
+
+            cartItems =
+                    cartDAO.getGuestCartItems(guestCart);
         }
-
-        MemberDTO member =
-                (MemberDTO) session.getAttribute(
-                        "loginMember"
-                );
-
-        if (member == null) {
-            response.getWriter().write(
-                    "{\"count\":0,\"items\":[]}"
-            );
-            return;
-        }
-
-        int memberNo =
-                member.getMemberNo();
-
-        List<CartItemDTO> cartItems =
-                cartDAO.getCartItems(
-                        memberNo
-                );
-
-        int count =
-                cartItems.size();
-
-        session.setAttribute(
-                "cartCount",
-                count
-        );
 
         session.setAttribute(
                 "cartPreviewItems",
                 cartItems
         );
 
-        Map<String, Object> result =
-                new HashMap<>();
+        session.setAttribute(
+                "cartCount",
+                cartItems.size()
+        );
+
+        Map<String, Object> result = new HashMap<>();
 
         result.put(
                 "count",
-                count
+                cartItems.size()
         );
 
         result.put(

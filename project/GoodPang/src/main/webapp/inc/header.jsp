@@ -1225,13 +1225,20 @@
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
     }
-    
-    
 
-    if (isLoggedIn) {
+  
         document.addEventListener('DOMContentLoaded', refreshCart);
         window.addEventListener('focus', refreshCart);
+        
+        window.addEventListener('pageshow', function() {
+            refreshCart();
+        });
+        
+        if (isLoggedIn) {
+        	
         setInterval(refreshCart, 3000);
-    }
+        
+        }
+        
 })();
 </script>

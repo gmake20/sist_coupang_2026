@@ -94,4 +94,34 @@ public class ProductDAO {
 
         return null;
     }
+    
+    public Integer getDefaultOptionId(int productNo) {
+
+        String sql = """
+                SELECT OPTION_ID
+                FROM PRODUCT_OPTION
+                WHERE PRODUCT_NO = ?
+                ORDER BY OPTION_ID
+                FETCH FIRST 1 ROW ONLY
+                """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setInt(1, productNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("OPTION_ID");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("기본 옵션 조회 실패", e);
+        }
+
+        return null;
+    }
 }
