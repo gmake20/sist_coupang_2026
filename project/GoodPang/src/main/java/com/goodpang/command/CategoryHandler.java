@@ -31,7 +31,24 @@ public class CategoryHandler implements CommandHandler {
     @Override
     public String process(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        int categoryNo = parseIntOrDefault(request.getParameter("categoryNo"), 10301);
+        // int categoryNo = parseIntOrDefault(request.getParameter("categoryNo"), 10301);  // ← 2026-09-06 아래로 교체
+
+        // 카테고리 번호도 주소 두 형태를 다 받음 (ProductHandler 와 같은 방식)
+        //  ① /category/10301        ② /category?categoryNo=10301 (옛 주소, 팀원 링크 15곳)
+        // 정렬/페이징/필터(sort, page, listSize, minPrice, color ...)는 그대로 쿼리스트링으로 둠 —
+        // 쿠팡도 /np/categories/194276?sorter=... 처럼 "무엇을 보는가"만 경로로 씀
+        String categoryNoParam = request.getParameter("categoryNo");
+
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null && pathInfo.length() > 1) {
+            categoryNoParam = pathInfo.substring(1);
+            int slash = categoryNoParam.indexOf('/');
+            if (slash > -1) {
+                categoryNoParam = categoryNoParam.substring(0, slash);
+            }
+        }
+
+        int categoryNo = parseIntOrDefault(categoryNoParam, 10301);
         Sort sort = parseSortOrDefault(request.getParameter("sort"));
         int page = Math.max(1, parseIntOrDefault(request.getParameter("page"), 1));
 
@@ -65,6 +82,9 @@ public class CategoryHandler implements CommandHandler {
         CategoryDTO current = service.findCategory(categoryNo);
         boolean isMidCategory = service.isMidCategory(current);
         boolean isTopCategory = service.isTopCategory(current);
+        // 2026-09-06: 배너 이미지가 패션 전용 캡처라 "레벨"과 "배너 자료 유무"를 따로 판정
+        boolean hasTopBanners = service.hasTopBanners(current);
+        boolean hasMidBanners = service.hasMidBanners(current);
         List<CategoryDTO> childCategories = service.findChildCategories(categoryNo);
 
         List<CategoryProductDTO> products =
@@ -95,6 +115,8 @@ public class CategoryHandler implements CommandHandler {
         request.setAttribute("categoryName", current != null ? current.getCategoryName() : "");
         request.setAttribute("isMidCategory", isMidCategory);
         request.setAttribute("isTopCategory", isTopCategory);
+        request.setAttribute("hasTopBanners", hasTopBanners);
+        request.setAttribute("hasMidBanners", hasMidBanners);
 
         /*
          * 왼쪽 필터 사이드바의 "카테고리" 그룹 —
@@ -110,9 +132,10 @@ public class CategoryHandler implements CommandHandler {
         request.setAttribute("categoryTiles",
                 isMidCategory ? service.tilesWithImage(childCategories, request.getServletContext()) : null);
 
-        // 대분류 제목 아래 원형 타일(l1_tiles.png)의 10칸 — 이미지에 글자가 박혀 있어 순서 고정
+        // 대분류 제목 아래 원형 타일(l1_tiles.png)의 10칸 — 이미지에 글자가 박혀 있어 순서 고정.
+        // 타일 좌표는 그 배너 이미지에 딸린 것이라 배너를 안 그리는 대분류에서는 만들 필요도 없음(2026-09-06)
         request.setAttribute("tileSlots",
-                isTopCategory ? service.buildTileSlots(childCategories) : null);
+                hasTopBanners ? service.buildTileSlots(childCategories) : null);
 
         // 실제 DB에 속성 컬럼이 없는 장식용 필터 그룹들 (화면엔 보여주되 동작은 안 함)
         request.setAttribute("beforeColorGroups", service.buildBeforeColorGroups());

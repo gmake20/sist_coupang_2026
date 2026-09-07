@@ -37,7 +37,14 @@
 <!-- 4. 상세페이지 전용 -->
 </head>
 
-<body class="page-product">
+<%-- 2026-09-06 — 판매중지 상품 처리.
+     ① is-soldout : 품절과 같은 CSS 를 그대로 재사용(구매 버튼이 품절 버튼으로 바뀜, product.css 9장).
+        옵션마다 다른 품절과 달리 판매중지는 상품 전체라, 처음부터 여기서 붙여둠.
+     ② data-sale-status : product.js 가 옵션을 바꿀 때마다 is-soldout 을 다시 계산해서 덮어쓰기 때문에
+        (product.js:460) 자바스크립트도 이 값을 보고 판매중지면 계속 품절 상태를 유지하게 함.
+     옛 버전: <body class="page-product"> --%>
+<body class="page-product ${p.saleStatus eq '판매 중지' ? 'is-soldout' : ''}"
+      data-sale-status="${p.saleStatus}">
 	<!-- ==================================================
        HEADER — 페이지 맨 위. 로고 / 검색 / 메뉴
        ================================================== -->
@@ -236,8 +243,16 @@
 						</div>
 
 						<!-- 품절일 때만 보이는 줄. 평소엔 CSS 가 감춤 (body 에 .is-soldout 이 붙어야 나옴)
-						     원본 실측: 14px / 700 / rgb(170,181,192) -->
-						<p class="soldout-text">품절</p>
+						     원본 실측: 14px / 700 / rgb(170,181,192)
+						     2026-09-06 — 같은 자리에 판매중지도 표시. 재고가 없어서 못 사는 것과
+						     판매자가 내려서 못 사는 것은 이유가 다르니 글자를 갈라줌
+						     옛 버전: <p class="soldout-text">품절</p> -->
+						<p class="soldout-text">
+							<c:choose>
+								<c:when test="${p.saleStatus eq '판매 중지'}">판매 중지된 상품입니다</c:when>
+								<c:otherwise>품절</c:otherwise>
+							</c:choose>
+						</p>
 
 						<!-- 와우회원 전용 배지 — 2026-08-31 추가.
 						     sessionScope.wowMember 는 로그인할 때(LoginServlet) WOW_MEMBERSHIP 테이블 기준으로
@@ -449,9 +464,14 @@
 								</button>
 							</c:otherwise>
 						</c:choose>
-						<!-- 품절 -->
+						<!-- 품절 (2026-09-06 — 판매중지도 이 버튼을 같이 씀. 글자만 갈라줌)
+						     옛 버전: <button type="button" class="prod-soldout-btn" disabled>품절</button> -->
 						<button type="button" class="prod-soldout-btn" disabled>
-							품절</button>
+							<c:choose>
+								<c:when test="${p.saleStatus eq '판매 중지'}">판매 중지</c:when>
+								<c:otherwise>품절</c:otherwise>
+							</c:choose>
+						</button>
 
 					</form>
 

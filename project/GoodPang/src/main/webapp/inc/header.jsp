@@ -777,8 +777,11 @@
 						</a>
 
 							<div class="cart-preview">
+								<!-- <span class="wrapper" id="cartPreviewWrapper"> <i
+									class="arrow"></i> -->
 								<span class="wrapper" id="cartPreviewWrapper"> <i
-									class="arrow"></i> <c:choose>
+									class="cart-preview-arrow"></i>
+								<c:choose>
 										<c:when test="${not empty sessionScope.cartPreviewItems}">
 											<ul class="cart-preview-list">
 												<c:forEach var="item"
@@ -1110,7 +1113,7 @@
     const isLoggedIn = ${not empty sessionScope.loginMember ? 'true' : 'false'};
 
     async function refreshCart() {
-        if (!isLoggedIn) return;
+        /* if (!isLoggedIn) return; */
 
         try {
             const response = await fetch(cartContextPath + '/cart/status', {
@@ -1226,6 +1229,7 @@
             .replaceAll("'", '&#039;');
     }
 
+<<<<<<< HEAD
   
         document.addEventListener('DOMContentLoaded', refreshCart);
         window.addEventListener('focus', refreshCart);
@@ -1240,5 +1244,12 @@
         
         }
         
+=======
+    /* if (isLoggedIn) { */
+        document.addEventListener('DOMContentLoaded', refreshCart);
+        window.addEventListener('focus', refreshCart);
+    /*     setInterval(refreshCart, 3000);
+    } */
+>>>>>>> 87c98c6efadb49f0d585b9d2bccf8154f20d36c3
 })();
 </script>

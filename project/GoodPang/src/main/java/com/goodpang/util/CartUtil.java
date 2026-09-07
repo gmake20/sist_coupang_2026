@@ -47,11 +47,9 @@ public class CartUtil {
         CartDAO cartDAO = new CartDAO();
         List<CartItemDTO> cartItems = cartDAO.getGuestCartItems(guestCart);
 
-        int cartCount = guestCart.values()
-                .stream()
-                .mapToInt(Integer::intValue)
-                .sum();
-
+        int cartCount = guestCart.size();
+        
+        session.setAttribute("guestCart", guestCart);
         session.setAttribute("cartCount", cartCount);
         session.setAttribute("cartItems", cartItems);
         session.setAttribute("cartPreviewItems", cartItems);

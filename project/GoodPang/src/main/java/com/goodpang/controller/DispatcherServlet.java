@@ -90,9 +90,17 @@ public class DispatcherServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // 1. 학원 방식 URL 분석 (컨텍스트 패스 절삭) - 예: "/product", "/category", "/option"
-        String requestURI = request.getRequestURI();
+        // String requestURI = request.getRequestURI();
         String contextPath = request.getContextPath();
-        String path = requestURI.substring(contextPath.length());
+        // String path = requestURI.substring(contextPath.length());   // ← 2026-09-06 아래 줄로 교체
+
+        // ★ 2026-09-06 — getServletPath() 로 바꾼 이유:
+        //    옛 방식은 주소 전체에서 컨텍스트만 뗐기 때문에 /product/131 이 들어오면 path 가
+        //    "/product/131" 이 되어 Map 에서 핸들러를 못 찾고 NullHandler 로 빠졌음.
+        //    getServletPath() 는 web.xml 의 <url-pattern> 에 걸린 부분("/product")까지만 돌려주고,
+        //    뒤에 붙은 "/131" 은 request.getPathInfo() 로 따로 꺼낼 수 있음.
+        //    옛 주소(/product?productNo=131)일 때도 "/product" 라서 둘 다 그대로 동작함
+        String path = request.getServletPath();
 
         // 2. Map 에서 핸들러 탐색 (없으면 NullHandler 대체 - 학원 방식)
         CommandHandler handler = this.commandHandlerMap.get(path);
