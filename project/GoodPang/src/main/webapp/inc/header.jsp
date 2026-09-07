@@ -1229,27 +1229,8 @@
             .replaceAll("'", '&#039;');
     }
 
-<<<<<<< HEAD
-  
         document.addEventListener('DOMContentLoaded', refreshCart);
         window.addEventListener('focus', refreshCart);
-        
-        window.addEventListener('pageshow', function() {
-            refreshCart();
-        });
-        
-        if (isLoggedIn) {
-        	
-        setInterval(refreshCart, 3000);
-        
-        }
-        
-=======
-    /* if (isLoggedIn) { */
-        document.addEventListener('DOMContentLoaded', refreshCart);
-        window.addEventListener('focus', refreshCart);
-    /*     setInterval(refreshCart, 3000);
-    } */
->>>>>>> 87c98c6efadb49f0d585b9d2bccf8154f20d36c3
+    
 })();
 </script>
