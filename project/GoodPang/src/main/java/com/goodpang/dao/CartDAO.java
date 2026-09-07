@@ -15,85 +15,136 @@ public class CartDAO {
 	
 	public List<CartItemDTO> getCartItems(int memberNo) {
 
-		List<CartItemDTO> list = new ArrayList<>();
+	    List<CartItemDTO> list = new ArrayList<>();
 
-		 String sql = """
-		            SELECT
-		                c.MEMBER_NO,
-		                c.OPTION_ID,
-		                c.QUANTITY,
-		                p.PRODUCT_NO,
-		                p.PRODUCT_NAME,
-		                p.PRODUCT_PRICE,
-		                po.OPTION1_TYPE,
-		                po.OPTION1_VALUE,
-		                po.OPTION2_TYPE,
-		                po.OPTION2_VALUE,
-		                po.OPTION3_TYPE,
-		                po.OPTION3_VALUE,
-		                NVL(po.PRICE, 0) AS OPTION_PRICE,
-		                (
-		                    SELECT pi.IMAGE_URL
-		                    FROM PRODUCT_IMAGE pi
-		                    WHERE pi.PRODUCT_NO = p.PRODUCT_NO
-		                    ORDER BY
-		                        CASE
-		                            WHEN pi.OPTION_ID = po.OPTION_ID
-		                                 AND pi.IMAGE_PURPOSE = '대표' THEN 0
-		                            WHEN pi.OPTION_ID = po.OPTION_ID THEN 1
-		                            WHEN pi.IMAGE_PURPOSE = '대표' THEN 2
-		                            ELSE 3
-		                        END
-		                    FETCH FIRST 1 ROW ONLY
-		                ) AS IMAGE_URL
-		            FROM CART c
-		            JOIN PRODUCT_OPTION po
-		              ON c.OPTION_ID = po.OPTION_ID
-		            JOIN PRODUCT p
-		              ON po.PRODUCT_NO = p.PRODUCT_NO
-		            WHERE c.MEMBER_NO = ?
-		            ORDER BY p.PRODUCT_NO DESC
-		            """;
+	    String sql = """
+	            SELECT
+	                c.MEMBER_NO,
+	                c.OPTION_ID,
+	                c.QUANTITY,
+	                p.PRODUCT_NO,
+	                p.PRODUCT_NAME,
+	                p.PRODUCT_PRICE,
+	                po.OPTION1_TYPE,
+	                po.OPTION1_VALUE,
+	                po.OPTION2_TYPE,
+	                po.OPTION2_VALUE,
+	                po.OPTION3_TYPE,
+	                po.OPTION3_VALUE,
+	                NVL(po.PRICE, 0) AS OPTION_PRICE,
+	                (
+	                    SELECT pi.IMAGE_URL
+	                    FROM PRODUCT_IMAGE pi
+	                    WHERE pi.PRODUCT_NO = p.PRODUCT_NO
+	                    ORDER BY
+	                        CASE
+	                            WHEN pi.OPTION_ID = po.OPTION_ID
+	                                 AND pi.IMAGE_PURPOSE = '대표' THEN 0
+	                            WHEN pi.OPTION_ID = po.OPTION_ID THEN 1
+	                            WHEN pi.IMAGE_PURPOSE = '대표' THEN 2
+	                            ELSE 3
+	                        END
+	                    FETCH FIRST 1 ROW ONLY
+	                ) AS IMAGE_URL
+	            FROM CART c
+	            JOIN PRODUCT_OPTION po
+	              ON c.OPTION_ID = po.OPTION_ID
+	            JOIN PRODUCT p
+	              ON po.PRODUCT_NO = p.PRODUCT_NO
+	            WHERE c.MEMBER_NO = ?
+	            ORDER BY p.PRODUCT_NO DESC
+	            """;
 
-		try (
-			Connection conn = ConnectionProvider.getConnection();
-			PreparedStatement pstmt = conn.prepareStatement(sql)
-		) {
-			pstmt.setInt(1, memberNo);
+	    try (
+	        Connection conn = ConnectionProvider.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql)
+	    ) {
+	        pstmt.setInt(1, memberNo);
 
-			try (ResultSet rs = pstmt.executeQuery()) {
-				while (rs.next()) {
-					CartItemDTO dto = new CartItemDTO();
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            while (rs.next()) {
 
-					int productPrice = rs.getInt("PRODUCT_PRICE");
-					int optionPrice = rs.getInt("OPTION_PRICE");
+	                CartItemDTO dto = new CartItemDTO();
 
-					dto.setMemberNo(rs.getInt("MEMBER_NO"));
-					dto.setOptionId(rs.getInt("OPTION_ID"));
-					dto.setQuantity(rs.getInt("QUANTITY"));
-					dto.setProductNo(rs.getInt("PRODUCT_NO"));
-					dto.setProductName(rs.getString("PRODUCT_NAME"));
-					dto.setProductPrice(productPrice);
-					dto.setOptionPrice(optionPrice);
-					dto.setUnitPrice(productPrice + optionPrice);
-					dto.setImageUrl(rs.getString("IMAGE_URL"));
-					dto.setOption1Type(rs.getString("OPTION1_TYPE"));
-					dto.setOption1Value(rs.getString("OPTION1_VALUE"));
-					dto.setOption2Type(rs.getString("OPTION2_TYPE"));
-					dto.setOption2Value(rs.getString("OPTION2_VALUE"));
-					dto.setOption3Type(rs.getString("OPTION3_TYPE"));
-					dto.setOption3Value(rs.getString("OPTION3_VALUE"));
+	                int productPrice =
+	                        rs.getInt("PRODUCT_PRICE");
 
-					list.add(dto);
-				}
-			}
+	                int optionPrice =
+	                        rs.getInt("OPTION_PRICE");
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("장바구니 조회 실패", e);
-		}
+	                dto.setMemberNo(
+	                        rs.getInt("MEMBER_NO")
+	                );
 
-		return list;
+	                dto.setOptionId(
+	                        rs.getInt("OPTION_ID")
+	                );
+
+	                dto.setQuantity(
+	                        rs.getInt("QUANTITY")
+	                );
+
+	                dto.setProductNo(
+	                        rs.getInt("PRODUCT_NO")
+	                );
+
+	                dto.setProductName(
+	                        rs.getString("PRODUCT_NAME")
+	                );
+
+	                dto.setProductPrice(
+	                        productPrice
+	                );
+
+	                dto.setOptionPrice(
+	                        optionPrice
+	                );
+
+	                dto.setUnitPrice(
+	                        productPrice + optionPrice
+	                );
+
+	                dto.setImageUrl(
+	                        rs.getString("IMAGE_URL")
+	                );
+
+	                dto.setOption1Type(
+	                        rs.getString("OPTION1_TYPE")
+	                );
+
+	                dto.setOption1Value(
+	                        rs.getString("OPTION1_VALUE")
+	                );
+
+	                dto.setOption2Type(
+	                        rs.getString("OPTION2_TYPE")
+	                );
+
+	                dto.setOption2Value(
+	                        rs.getString("OPTION2_VALUE")
+	                );
+
+	                dto.setOption3Type(
+	                        rs.getString("OPTION3_TYPE")
+	                );
+
+	                dto.setOption3Value(
+	                        rs.getString("OPTION3_VALUE")
+	                );
+
+	                list.add(dto);
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException(
+	                "장바구니 조회 실패",
+	                e
+	        );
+	    }
+
+	    return list;
 	}
 
 	public int addCart(
