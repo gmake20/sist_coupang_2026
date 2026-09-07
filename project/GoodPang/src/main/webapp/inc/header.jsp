@@ -1228,13 +1228,9 @@
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
     }
-    
-    
 
-    /* if (isLoggedIn) { */
         document.addEventListener('DOMContentLoaded', refreshCart);
         window.addEventListener('focus', refreshCart);
-    /*     setInterval(refreshCart, 3000);
-    } */
+    
 })();
 </script>
