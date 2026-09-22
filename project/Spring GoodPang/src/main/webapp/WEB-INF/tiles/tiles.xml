@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC 
+   "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" 
+   "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+	<definition name="base"
+		template="/WEB-INF/views/inc/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/inc/header.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/views/inc/footer.jsp" />
+		<put-attribute name="title"	value="SiSt Class 5 Spring Tiles" />
+	</definition>
+
+	<definition name="home.index" extends="base">
+		<put-attribute name="content" value="/WEB-INF/views/index.jsp" />
+	</definition>
+
+
+
+
+	<definition name="*.*" template="/WEB-INF/views/{1}/inc/layout.jsp" extends="base">
+		<put-attribute name="visual" value="/WEB-INF/views/{1}/inc/visual.jsp" />
+		<put-attribute name="aside" value="/WEB-INF/views/{1}/inc/aside.jsp" />
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp" />
+		<put-attribute name="css" value="{2}.css" />
+	</definition>
+
+	<!-- home.index -->
+	<!-- <definition name="home.index" template="/inc/layout.jsp"> <put-attribute 
+		name="header" value="/inc/header.jsp"/> <put-attribute name="content" value="/index.jsp"/> 
+		<put-attribute name="footer" value="/inc/footer.jsp"/> </definition> <definition 
+		name="customer.*" template="/customer/inc/layout.jsp"> <put-attribute name="header" 
+		value="/inc/header.jsp"/> <put-attribute name="visual" value="/customer/inc/visual.jsp"/> 
+		<put-attribute name="aside" value="/customer/inc/aside.jsp"/> <put-attribute 
+		name="content" value="/customer/{1}.jsp"/> <put-attribute name="footer" value="/inc/footer.jsp"/> 
+		</definition> -->
+
+
+	<!-- joinus.join -->
+	<!-- joinus.login -->
+
+
+	<!-- <definition name="joinus.*" template="/joinus/inc/layout.jsp"> <put-attribute 
+		name="header" value="/inc/header.jsp"/> <put-attribute name="visual" value="/joinus/inc/visual.jsp"/> 
+		<put-attribute name="aside" value="/joinus/inc/aside.jsp"/> <put-attribute 
+		name="content" value="/joinus/{1}.jsp"/> <put-attribute name="footer" value="/inc/footer.jsp"/> 
+		css <put-attribute name="css" value="{1}.css"/> </definition> -->
+
+</tiles-definitions>
+
+
+
+
+

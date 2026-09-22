@@ -1,0 +1,24 @@
+package org.doit.ik.mapper;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.doit.ik.domain.OrderItemVO;
+
+@Mapper
+public interface OrderMapper {
+
+    // 1. 연도/기간 필터에 따른 회원 총 주문 건수 조회
+    int getOrderCount(
+        @Param("memberNo") int memberNo, 
+        @Param("yearFilter") String yearFilter
+    );
+
+    // 2. 연도 필터링 및 페이징 목록 조회 (OrderItemVO 반환)
+    List<OrderItemVO> getOrderListPaged(
+        @Param("memberNo") int memberNo, 
+        @Param("yearFilter") String yearFilter, 
+        @Param("startRow") int startRow, 
+        @Param("endRow") int endRow
+    );
+}
