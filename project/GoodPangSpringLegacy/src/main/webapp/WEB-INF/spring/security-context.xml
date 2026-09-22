@@ -6,17 +6,14 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
 	<!-- p682 css, js, image, static(정적) 등등   보안 필터 체인 X -->   
-   <security:http pattern="/static/**" security="none"></security:http>   
-   <security:http pattern="/design/**" security="none"></security:http>
+   <security:http pattern="/resources/**" security="none"></security:http>   
 
-	<!-- 인증 설정 -->
+	<!-- 인증 설정 *** 여기 수정 필요 ***-->
 	<security:http use-expressions="true">
 	<!-- FilterSecurityInterceptor에 의해서 -->
 	  <security:intercept-url pattern="/**" access="permitAll"/>
 	  <security:form-login
-	    login-page="/joinus/login.htm"
-		default-target-url="/index.htm"
-		login-processing-url="/login"
+	    login-processing-url="/login"
 	    username-parameter="username"
 	    password-parameter="password"
 	    
@@ -32,11 +29,11 @@
 	 <security:access-denied-handler ref="customAccessDeniedHandler"/>
 	 
 	<!--  logout-url="/logout" invalidate-session="true" 기본값-->
-	   <security:logout 
+	   <!-- <security:logout 
 		logout-url="/joinus/logout.htm"
 		logout-success-url="/"
 		invalidate-session="true"
-	   />
+	   /> -->
 	 </security:http>
 
 	<!-- PasswordEncoder 비번 암호화-->

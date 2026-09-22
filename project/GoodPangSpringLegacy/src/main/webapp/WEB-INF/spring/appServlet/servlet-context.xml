@@ -24,7 +24,13 @@
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 		
-	<context:component-scan base-package="org.doit.goodpang" />
+	<!-- 서블릿 컨텍스트는 @Controller 만 담당.
+	     use-default-filters="false" 가 있어야 @Service/@Component 가 안 딸려옴.
+	     패키지 위치는 안 따지므로 org.doit.goodpang 아래면 어디에 만들어도 잡힘 -->
+	<context:component-scan base-package="org.doit.goodpang" use-default-filters="false">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
 	
 	<!--  Tiles  -->
     <beans:bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
@@ -60,27 +66,8 @@
 	  <beans:property name="defaultEncoding" value="UTF-8"></beans:property>
 	</beans:bean>
 	
-	<!-- p522 선언적 트랜잭션 처리 방법 중 tx:advice 태그 -->
-	<!-- 
-	<tx:advice id="txAdvice" transaction-manager="transactionManager">
-	  <tx:attributes>
-		<tx:method name="insertAndPointUpOfMember"
-					isolation="DEFAULT"
-		 			propagation="REQUIRED" 
-		 			read-only="false"
-		 			timeout="-1"/>
-      </tx:attributes>
-    </tx:advice>
-	<aop:config>
-	  <aop:pointcut expression="execution(public void insertAndPointUpOfMember(*,*))" id="insertOrM"/>
-	  <aop:advisor advice-ref="txAdvice" pointcut-ref="insertOrM"/>
-	</aop:config>
-	 -->
-	 
-	 <tx:annotation-driven
-	   transaction-manager="transactionManager"
-	   proxy-target-class="false"
-	   mode="proxy"
-	 />
-	 
+	<!-- ★ tx:annotation-driven 은 root-context.xml 로 옮김.
+	     @Service 가 루트 컨텍스트에서 생성되므로 프록시 생성기도 같은 컨텍스트에 있어야 함.
+	     (학원 템플릿은 여기에 있었는데, p522 tx:advice 실습을 이 파일에서 한 흔적) -->
+
 </beans:beans>

@@ -21,9 +21,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 			AccessDeniedException accessDeniedException) throws IOException, ServletException {
 		log.error("👌👌👌 Access Denied Handler");
 		log.error("👌👌👌 Redirect...");
-		// 개발자 직접 하고자 하는 다양한 처리  코딩.
-		//  
-				
+		  
+		// 경로 수정 필요 ?
 		response.sendRedirect("/common/accessError.htm");
 	}
 

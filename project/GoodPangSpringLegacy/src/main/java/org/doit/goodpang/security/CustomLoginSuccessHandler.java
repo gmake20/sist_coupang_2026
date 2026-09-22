@@ -38,9 +38,11 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 			response.sendRedirect("/");
 			return;
 		} else if ( roleNames.contains("ROLE_MANAGER") ) {
+			// 경로 수정 필요
 			response.sendRedirect("/customer/notice.htm");
 			return;
 		} else if ( roleNames.contains("ROLE_USER") ) {
+			// 경로 수정 필요
 			response.sendRedirect("/customer/notice.htm");
 			return;
 		}
