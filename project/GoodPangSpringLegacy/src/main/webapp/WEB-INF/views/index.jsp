@@ -1,8 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
+      pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<!DOCTYPE html>
+<%-- 메인페이지 전용 CSS (공통 reset/common 은 layout_shop.jsp 에 있음) --%>
+<link rel="stylesheet"
+      href="${pageContext.request.contextPath}/resources/css/main.css">
+<link rel="stylesheet"
+      href="${pageContext.request.contextPath}/resources/css/wow_modal.css">
+
+<%-- <!DOCTYPE html>
 
 <html lang="ko">
 <head>
@@ -43,7 +49,7 @@
 </head>
 </head>
 
-<body>
+<body> --%>
 	<!-- 최상단 배너 -->
 	<div class="coupang-top-banner">
 		<div class="banner-middle">
@@ -55,8 +61,8 @@
 		</div>
 	</div>
 	<!-- HEADER — 페이지 맨 위. 로고 / 검색 / 메뉴 -->
-	<jsp:include page="/inc/header.jsp" />
-
+	<%-- <jsp:include page="/inc/header.jsp" /> --%>
+	
 	<!-- ==================================================
 
        MAIN — 이 페이지의 진짜 본문. 페이지당 딱 1개만!
@@ -93,15 +99,15 @@
 
 				<!-- 배경 6장. 지금은 1번만 .is-on -->
 
-				<img class="main-today__bg is-on" src="images/banners/hero-bg-1.jpg"
+				<img class="main-today__bg is-on" src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-1.jpg"
 					alt=""> <img class="main-today__bg"
-					src="images/banners/hero-bg-2.jpg" alt=""> <img
-					class="main-today__bg" src="images/banners/hero-bg-3.jpg" alt="">
-
-				<img class="main-today__bg" src="images/banners/hero-bg-4.jpg"
+					src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-2.jpg" alt=""> <img
+					class="main-today__bg" src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-3.jpg" alt="">
+				
+				<img class="main-today__bg" src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-4.jpg"
 					alt=""> <img class="main-today__bg"
-					src="images/banners/hero-bg-5.jpg" alt=""> <img
-					class="main-today__bg" src="images/banners/hero-bg-6.jpg" alt="">
+					src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-5.jpg" alt=""> <img
+					class="main-today__bg" src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-6.jpg" alt="">
 
 				<div class="main-today__selected-product">
 
@@ -133,29 +139,29 @@
 
 						<li class="todayshot-right-thumbnail first-item today-selected">
 
-							<a href="#"><img src="images/banners/hero-thumb-1.jpg"
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-1.jpg"
 								width="180" height="60" alt="1번 배너"><span class="mask"></span></a>
 
 						</li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-								src="images/banners/hero-thumb-2.jpg" width="180" height="60"
+								src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-2.jpg" width="180" height="60"
 								alt="2번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-								src="images/banners/hero-thumb-3.jpg" width="180" height="60"
+								src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-3.jpg" width="180" height="60"
 								alt="3번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-								src="images/banners/hero-thumb-4.jpg" width="180" height="60"
+								src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-4.jpg" width="180" height="60"
 								alt="4번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-								src="images/banners/hero-thumb-5.jpg" width="180" height="60"
+								src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-5.jpg" width="180" height="60"
 								alt="5번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-								src="images/banners/hero-thumb-6.jpg" width="180" height="60"
+								src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-6.jpg" width="180" height="60"
 								alt="6번 배너"><span class="mask"></span></a></li>
 
 					</ul>
@@ -3196,15 +3202,15 @@
 
        ================================================== -->
 
-	<jsp:include page="/inc/footer.jsp" />
+	<%-- <jsp:include page="/inc/footer.jsp" /> --%>
 
 
 
 	<!-- JS는 >> 바로 앞에! HTML을 다 읽은 뒤에 실행되게 하려고 -->
 
-	<script src="js/header.js"></script>
+	<!-- <script src="js/header.js"></script> -->
 
-	<script src="js/main.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/main.js"></script>
 
 	<!-- 와우 가입 모달 -->
 	<!-- 	<div id="wowModal" class="wow-modal-overlay">
@@ -4073,6 +4079,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
-</body>
+
 
 </html>
