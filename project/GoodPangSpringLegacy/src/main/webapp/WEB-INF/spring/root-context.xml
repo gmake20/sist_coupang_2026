@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<context:property-placeholder location="classpath:db.properties" />
+	<context:component-scan base-package="org.doit.goodpang"></context:component-scan>	
+	
+   <!-- p84 -->
+   <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+     <!--    p102
+     <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
+     <property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521/XEPDB1"></property>
+      -->      
+     <!--  
+     <property name="driverClassName"    value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
+     <property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@localhost:1521/XEPDB1"></property>
+     <property name="username" value="scott"></property>
+     <property name="password" value="tiger"></property>
+      -->
+     <property name="driverClassName"    value="${jdbc.driver}"></property>
+     <property name="jdbcUrl" value="${jdbc.url}"></property>
+     <property name="username" value="${jdbc.username}"></property>
+     <property name="password" value="${jdbc.password}"></property>
+   </bean>
+   
+   <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+     <constructor-arg ref="hikariConfig"></constructor-arg>
+   </bean>
+   
+   <!-- p91 mybatis ORM -->
+   <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+     <property name="dataSource" ref="dataSource"></property>
+     <property name="configLocation" value="classpath:org/doit/goodpang/mapper/mybatis-config.xml"></property>
+   </bean>
+      
+   <!-- p95 -->
+   <mybatis-spring:scan base-package="org.doit.goodpang.mapper"/>
+   
+   <!-- p508 스프링 트랜잭션을 처리할 JDBC기반의 트랜잭션 관리자 등록
+    Spring JDBC 또는 mybatis DB처리 -->
+   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+     <property name="dataSource"  ref="dataSource" />
+   </bean>
+
+	<!-- p514 트랜잭션 템플릿 -->
+	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+	  <property name="transactionManager" ref="transactionManager" />
+	</bean>
+
+   	
+   	<!--p486 스프링 JDBC 템플릿 클래스 1)jdbcTemplate 사용해서 DB 처리-->
+   	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+	 <property name="dataSource" ref="dataSource" />
+	</bean>
+   	
+   	
+   	<bean id="namedParameterJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+	  <constructor-arg ref="dataSource"></constructor-arg>
+   	</bean>
+</beans>
+
+
+
+
