@@ -27,7 +27,10 @@
               <put-attribute name="title" value="굿팡 - 상품상세" />
       </definition>
       -->
-  
+  	
+	<definition name="vendor.login" template="/WEB-INF/views/vendor/login.jsp">
+	</definition>	
+	
 </tiles-definitions>
 
 
