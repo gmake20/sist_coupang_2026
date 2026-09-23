@@ -32,6 +32,7 @@
 	<definition name="vendor.login"
 		template="/WEB-INF/views/vendor/login.jsp">
 	</definition>
+
 </tiles-definitions>
 
 

@@ -48,7 +48,7 @@
 
 			<ul class="top-bar-right">
 
-				<li><a href="${pageContext.request.contextPath}/vendor/login">
+				<li><a href="${pageContext.request.contextPath}/vendor/login.htm">
 
 						판매자 로그인 </a></li>
 
