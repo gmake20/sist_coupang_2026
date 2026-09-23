@@ -27,6 +27,9 @@
 
 </head>
 <body>
+	 <%-- 최상단 배너 — 정의한 페이지에만 나옴. 없으면 아무것도 안 나옴 --%>
+      <tiles:insertAttribute name="topBanner" ignore="true" />
+      
 	 <!-- HEADER — 페이지 맨 위. 로고 / 검색 / 메뉴 -->
       <tiles:insertAttribute name="header" />
 
