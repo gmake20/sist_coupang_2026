@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="org.doit.goodpang.mapper.VendorProductMapper">
+
+	<!-- public List<VendorProductListDTO> findBySellerNo(int sellerNo, String displayYn, int offset, int pageSize); -->
+	<!-- PRODUCT 한 건 + PRODUCT_OPTION 가격/재고 요약 + 대표이미지 1장 -->
+	<select id="findBySellerNo" resultType="org.doit.goodpang.domain.VendorProductListDTO">
+            SELECT
+                P.PRODUCT_NO,
+                P.PRODUCT_NAME,
+                P.SALE_METHOD,
+                P.SALE_STATUS,
+                C1.CATEGORY_NAME AS MAIN_CATEGORY_NAME,
+                C2.CATEGORY_NAME AS MID_CATEGORY_NAME,
+                C3.CATEGORY_NAME AS SUB_CATEGORY_NAME,
+                NVL(OPT.MIN_PRICE, 0) + P.PRODUCT_PRICE  AS MIN_PRICE,
+                NVL(OPT.MAX_PRICE, 0) + P.PRODUCT_PRICE  AS MAX_PRICE,
+                NVL(OPT.TOTAL_QUANTITY, P.QUANTITY)  AS TOTAL_QUANTITY,
+                NVL(OPT.OPTION_COUNT, 0)             AS OPTION_COUNT,
+                IMG.IMAGE_URL                        AS THUMBNAIL_URL,
+                P.CREATED_DATE,
+                P.UPDATED_DATE
+            FROM PRODUCT P
+                JOIN CATEGORY C3 ON P.SUB_CATEGORY_NO = C3.CATEGORY_NO
+                LEFT JOIN CATEGORY C2 ON C2.CATEGORY_NO = C3.PARENT_CATEGORY_NO
+                LEFT JOIN CATEGORY C1 ON C1.CATEGORY_NO = C2.PARENT_CATEGORY_NO
+                LEFT JOIN (
+                    SELECT PRODUCT_NO,
+                           MIN(PRICE)    AS MIN_PRICE,
+                           MAX(PRICE)    AS MAX_PRICE,
+                           SUM(QUANTITY) AS TOTAL_QUANTITY,
+                           COUNT(*)      AS OPTION_COUNT
+                    FROM PRODUCT_OPTION
+                    GROUP BY PRODUCT_NO
+                ) OPT ON OPT.PRODUCT_NO = P.PRODUCT_NO
+                LEFT JOIN (
+                    SELECT PRODUCT_NO, IMAGE_URL,
+                           ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID, IMAGE_ORDER) AS RN
+                    FROM PRODUCT_IMAGE
+                    WHERE IMAGE_PURPOSE = '대표'
+                ) IMG ON IMG.PRODUCT_NO = P.PRODUCT_NO AND IMG.RN = 1
+            WHERE P.SELLER_NO = #{sellerNo}
+              AND P.DISPLAY_YN = #{displayYn}
+            ORDER BY P.CREATED_DATE DESC
+            OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+	</select>
+
+	<!-- public int countBySellerNo(int sellerNo, String displayYn, String saleStatus); -->
+	<select id="countBySellerNo" resultType="int">
+            SELECT COUNT(*)
+            FROM PRODUCT
+            WHERE SELLER_NO = #{sellerNo}
+              AND DISPLAY_YN = #{displayYn}
+            <if test="saleStatus != null">
+              AND SALE_STATUS = #{saleStatus}
+            </if>
+	</select>
+
+</mapper>
