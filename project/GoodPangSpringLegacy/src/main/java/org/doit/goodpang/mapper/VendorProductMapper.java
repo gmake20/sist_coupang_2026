@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.doit.goodpang.domain.VendorProductListDTO;
+import org.doit.goodpang.domain.VendorProductOptionDTO;
 import org.springframework.stereotype.Repository;
 
 /*
@@ -19,5 +20,12 @@ public interface VendorProductMapper {
 	// saleStatus가 null이면 노출여부(displayYn)만으로 센다
 	public int countBySellerNo(@Param("sellerNo") int sellerNo, @Param("displayYn") String displayYn,
 			@Param("saleStatus") String saleStatus);
+
+	// 상품 옵션 관리 - productNo가 null이면 전체 상품의 옵션
+	public List<VendorProductOptionDTO> findOptionsBySellerNo(@Param("sellerNo") int sellerNo,
+			@Param("productNo") Integer productNo);
+
+	// 상품 옵션 관리 - 상품 필터 드롭다운 (옵션이 있는 상품만)
+	public List<VendorProductOptionDTO> findDistinctOptionProductsBySellerNo(@Param("sellerNo") int sellerNo);
 
 }
