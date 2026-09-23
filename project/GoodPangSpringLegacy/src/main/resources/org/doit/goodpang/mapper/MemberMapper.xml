@@ -4,42 +4,22 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
   <mapper namespace="org.doit.goodpang.mapper.MemberMapper">
-  
-  <!-- public MemberVO read(@Param("userid") String userid) throws ClassNotFoundException, SQLException; -->
- 	<resultMap type="org.doit.goodpang.domain.MemberVO" id="memberMap">
-       <id property="id" column="id" />
-       <result property="pwd" column="pwd" />
-       <result property="name" column="name"  />
-       <result property="regdate" column="regdate" />   
-       <!-- 1:N 연관관계 -->
-       <collection property="authList" resultMap="authMap">
-       </collection>
-    </resultMap>
-	<resultMap type="org.doit.goodpang.domain.AuthVO" id="authMap">
-       <result property="username" column="username" />
-       <result property="authority" column="authority" />
-     </resultMap>    
-  
-  <select id="read" resultMap="memberMap">
-    SELECT id, id as username, pwd, name, 1 as enabled, regdate
-    	, authority
-    FROM  member  m LEFT JOIN member_authorities auth ON m.id = auth.username
-    WHERE m.id = #{ userid }
-  </select>
-  
-  
-	<!-- public MemberVO getMember(@Param("id") String id) throws ClassNotFoundException, SQLException; -->
-	<select id="getMember" resultType="org.doit.goodpang.domain.MemberVO">
-		SELECT *
-		FROM MEMBER
-		WHERE id =#{id}
-	</select>
 
-	<!-- public int insert(MemberVO member) throws ClassNotFoundException, SQLException; -->
-	<insert id="insert">
-		INSERT INTO member
-	            ( id, pwd, name, gender, birth, is_lunar, cphone, email, habit, regdate)
-	    VALUES( #{id}, #{pwd}, #{name}, #{gender}, #{birth}, #{is_lunar}, #{cphone}, #{email}, #{habit}, SYSDATE)
-	</insert>
-	
-  </mapper>
+    <select id="read"
+            resultType="org.doit.goodpang.domain.MemberVO">
+
+        SELECT
+            MEMBER_NO   AS memberNo,
+            MEMBER_ID   AS memberId,
+            MEMBER_PW   AS memberPw,
+            MEMBER_NAME AS memberName,
+            PHONE       AS phone,
+            EMAIL       AS email,
+            RANK        AS rank,
+            STATUS      AS status
+        FROM MEMBER
+        WHERE MEMBER_ID = #{memberId}
+
+    </select>
+
+</mapper>
