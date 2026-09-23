@@ -1,53 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:security="http://www.springframework.org/schema/security"
-	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
-	<!-- p682 css, js, image, static(정적) 등등   보안 필터 체인 X -->   
-   <security:http pattern="/resources/**" security="none"></security:http>   
+<beans:beans
+    xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 
-	<!-- 인증 설정 *** 여기 수정 필요 ***-->
-	<security:http use-expressions="true">
-	<!-- FilterSecurityInterceptor에 의해서 -->
-	  <security:intercept-url pattern="/**" access="permitAll"/>
-	  <security:form-login
-	    login-processing-url="/login"
-	    username-parameter="username"
-	    password-parameter="password"
-	    
-	    authentication-failure-url="/joinus/login.htm?error=true"
-	    authentication-success-handler-ref="customLoginSuccessHandler"
-	  />
-	  
-	  <!-- [1] 403 접근 제한이 발생한 경우 CommonController.java-->
-	  <!-- 
-	  <security:access-denied-handler error-page="/common/accessError.htm"/>
-	 -->
-	 <!-- [2] 403 접근 제한이 발생한 경우 ExceptionTranslationFilter -->
-	 <security:access-denied-handler ref="customAccessDeniedHandler"/>
-	 
-	<!--  logout-url="/logout" invalidate-session="true" 기본값-->
-	   <!-- <security:logout 
-		logout-url="/joinus/logout.htm"
-		logout-success-url="/"
-		invalidate-session="true"
-	   /> -->
-	 </security:http>
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/security
+        https://www.springframework.org/schema/security/spring-security.xsd
 
-	<!-- PasswordEncoder 비번 암호화-->
-	<bean id="bCryptPasswordEncoder" 
-	class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+        http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<!-- 인증 관리자 : 총괄 책임자 -->
-	<security:authentication-manager>
-	  <!-- 인증 제공자: 실제 인증 작업 진행 -->
-	  <security:authentication-provider user-service-ref="customUserDetailsService">
-		<security:password-encoder ref="bCryptPasswordEncoder" />
-	  </security:authentication-provider>
-	</security:authentication-manager>
 
-<!-- <security:csrf disabled="true"/> -->	
+    <!-- UserDetailsService -->
+    <beans:bean
+        id="customUserDetailsService"
+        class="org.doit.goodpang.security.CustomUserDetailsService" >
+        
+         <beans:constructor-arg
+        	ref="memberMapper" />
+        </beans:bean>
 
-</beans>
+
+    <!-- BCrypt -->
+    <beans:bean
+        id="passwordEncoder"
+        class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+
+
+    <!-- 인증 -->
+    <authentication-manager>
+
+        <authentication-provider
+            user-service-ref="customUserDetailsService">
+
+            <password-encoder
+                ref="passwordEncoder" />
+
+        </authentication-provider>
+
+    </authentication-manager>
+
+
+    <!-- HTTP Security -->
+    <http use-expressions="true">
+
+        <!-- 누구나 접근 -->
+        <intercept-url
+            pattern="/login**"
+            access="permitAll" />
+
+        <intercept-url
+            pattern="/resources/**"
+            access="permitAll" />
+
+        <intercept-url
+            pattern="/images/**"
+            access="permitAll" />
+
+
+        <!-- 관리자 -->
+        <intercept-url
+            pattern="/admin/**"
+            access="hasRole('ADMIN')" />
+
+
+        <!-- 로그인 필요 -->
+        <intercept-url
+            pattern="/mypage/**"
+            access="isAuthenticated()" />
+
+
+        <!-- 나머지 -->
+        <intercept-url
+            pattern="/**"
+            access="permitAll" />
+
+
+        <form-login
+            login-page="/login"
+            login-processing-url="/loginProcess"
+            username-parameter="memberId"
+            password-parameter="password"
+            default-target-url="/"
+            authentication-failure-url="/login?error=true" />
+
+
+        <logout
+            logout-url="/logout"
+            logout-success-url="/"
+            invalidate-session="true"
+            delete-cookies="JSESSIONID" />
+
+    </http>
+
+</beans:beans>
