@@ -15,9 +15,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/vendor_dashboard.css">
-  <title>굿팡 판매자 대시보드</title>
+	<tiles:importAttribute name="css" ignore="true"/>
+	<%
+	    String css = (String) pageContext.getAttribute("css");
+	    if (css != null && application.getResource(css) != null) {
+	%>
+	  <link rel="stylesheet" href="${pageContext.request.contextPath}${css}">
+	<%  } %>  
 
+  <title>굿팡 판매자 대시보드</title>
 </head>
 
 <body>
