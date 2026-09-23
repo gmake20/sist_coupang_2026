@@ -47,6 +47,13 @@
         <url-pattern>/product</url-pattern>
         <url-pattern>/category</url-pattern>
         <url-pattern>/option</url-pattern>
+
+        <!-- ★ 2026-09-06 추가 — 주소를 /product?productNo=131 대신 /product/131 로도 쓰려는 것.
+             "/product/*" 는 "/product/ 뒤에 뭐가 오든 다 이 서블릿으로" 라는 뜻.
+             위의 "/product" 를 지우지 않고 둘 다 두는 이유: 팀원 화면 16곳(cart.jsp, header.jsp,
+             review_list.jsp 등)이 아직 옛 주소를 쓰고 있어서, 둘 다 살려둬야 안 깨짐 -->
+        <url-pattern>/product/*</url-pattern>
+        <url-pattern>/category/*</url-pattern>
     </servlet-mapping>
 
 

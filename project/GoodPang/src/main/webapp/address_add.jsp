@@ -60,7 +60,7 @@
 
 					<div class="phone-row">
 						<input type="text" id="phone1" class="form-input phone-input"
-							maxlength="3" inputmode="numeric" placeholder="010" required>
+							maxlength="3" inputmode="numeric" placeholder="" required>
 
 						<span class="phone-hyphen">-</span> <input type="text" id="phone2"
 							class="form-input phone-input" maxlength="4" inputmode="numeric"

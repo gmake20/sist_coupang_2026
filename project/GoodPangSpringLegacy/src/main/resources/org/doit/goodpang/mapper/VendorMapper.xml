@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="org.doit.goodpang.mapper.VendorMapper">
+	
+	<select id="findByEmail" resultType="org.doit.goodpang.domain.SellerDTO">
+            SELECT
+                SELLER_NO, EMAIL, SELLER_PW, MANAGER_NAME, PHONE,
+                BUSINESS_NO, BUSINESS_TYPE, CEO_NAME, STORE_NAME,
+                ZIPCODE, BUSINESS_ADDRESS, BUSINESS_DETAIL_ADDRESS,
+                MAIL_ORDER_NO, CATEGORY_NO,
+                BANK_NAME, ACCOUNT_NO, ACCOUNT_HOLDER,
+                BUSINESS_CERT_URL, MAIL_ORDER_CERT_URL,
+                APPROVAL_STATUS, REJECT_REASON
+            FROM SELLER
+            WHERE EMAIL = #{email}	
+	</select>
+	
+  </mapper>

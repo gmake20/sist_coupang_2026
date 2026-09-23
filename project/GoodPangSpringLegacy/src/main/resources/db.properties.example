@@ -1,0 +1,5 @@
+jdbc.driver=net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+jdbc.url=jdbc:log4jdbc:oracle:thin:@호스트/XEPDB1
+jdbc.username=
+jdbc.password=
+# db.properties 로 복사해서 채워넣으세요. 팀 단톡 git 밖에서 전달받을 것.

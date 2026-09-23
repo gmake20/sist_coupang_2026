@@ -23,6 +23,13 @@ public class ProductDTO {
     private int productPrice;
     private int quantity;
 
+    /*
+     * PRODUCT.SALE_STATUS — '판매 중' / '품절' / '판매 중지' (2026-09-06 추가).
+     * '승인 대기' 는 ProductDAO 의 WHERE 에서 이미 걸러져서 여기까지 안 옴.
+     * 판매중지 상품을 화면에서 품절과 같은 모습(구매 버튼 비활성)으로 막는 데 씀 — product.jsp 참고.
+     */
+    private String saleStatus;
+
     private int sellerNo;
     private String storeName;          // SELLER.STORE_NAME — product.jsp 의 .brand-info 자리
     private String ceoName;               // SELLER.CEO_NAME

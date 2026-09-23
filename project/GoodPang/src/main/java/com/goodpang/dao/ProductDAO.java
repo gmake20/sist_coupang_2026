@@ -28,6 +28,7 @@ public class ProductDAO {
 			        S.PHONE,
 			        S.MAIL_ORDER_NO,
 			        S.BUSINESS_NO,
+			        P.SALE_STATUS,
 			        P.SUB_CATEGORY_NO,
 			        SC.CATEGORY_NAME    AS SUB_CATEGORY_NAME,
 			        MC.CATEGORY_NO      AS MID_CATEGORY_NO,
@@ -67,6 +68,10 @@ public class ProductDAO {
                     dto.setProductPrice(rs.getInt("PRODUCT_PRICE"));
                     dto.setQuantity(rs.getInt("QUANTITY"));
 
+                    // 2026-09-06 추가 — 판매중지 상품을 화면에서 품절과 같은 모습으로 막기 위해 내려줌.
+                    // 값은 '판매 중' / '품절' / '판매 중지' ('승인 대기' 는 위 WHERE 에서 이미 걸러짐)
+                    dto.setSaleStatus(rs.getString("SALE_STATUS"));
+
                     dto.setSellerNo(rs.getInt("SELLER_NO"));
                     dto.setStoreName(rs.getString("STORE_NAME"));
                     dto.setCeoName(rs.getString("CEO_NAME"));
@@ -90,6 +95,36 @@ public class ProductDAO {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        return null;
+    }
+    
+    public Integer getDefaultOptionId(int productNo) {
+
+        String sql = """
+                SELECT OPTION_ID
+                FROM PRODUCT_OPTION
+                WHERE PRODUCT_NO = ?
+                ORDER BY OPTION_ID
+                FETCH FIRST 1 ROW ONLY
+                """;
+
+        try (
+            Connection conn = ConnectionProvider.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setInt(1, productNo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("OPTION_ID");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("기본 옵션 조회 실패", e);
         }
 
         return null;

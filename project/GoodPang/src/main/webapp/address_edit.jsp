@@ -215,7 +215,7 @@ function combinePhoneNumber() {
 
     const savedTel = tel.value || "";
 
-    const numbers =
+    const nu	mbers =
         savedTel.replace(/[^0-9]/g, "");
 
     if (numbers.length === 11) {
@@ -242,7 +242,7 @@ function combinePhoneNumber() {
 
     } else {
 
-        phone1.value = "010";
+        phone1.value = "";
         phone2.value = "";
         phone3.value = "";
     }

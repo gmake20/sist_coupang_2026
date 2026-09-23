@@ -1366,7 +1366,7 @@ function openAddAddressModal() {
         "newDetailAddress"
     ).value = "";
 
-    document.getElementById("phone1").value = "010";
+    document.getElementById("phone1").value = "";
     document.getElementById("phone2").value = "";
     document.getElementById("phone3").value = "";
     document.getElementById("newTel").value = "";
