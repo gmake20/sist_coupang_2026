@@ -1,6 +1,7 @@
 package org.doit.goodpang.mapper;
 
 import org.apache.ibatis.annotations.Param;
+import org.doit.goodpang.domain.CheckoutDTO;
 
 public interface CheckoutMapper {
 	
@@ -20,7 +21,7 @@ public interface CheckoutMapper {
 
 	    int insertCheckout(
 	            @Param("checkoutNo") int checkoutNo,
-	            @Param("memberNo") Long memberNo,
+	            @Param("memberNo") long memberNo,
 	            @Param("productAmount") int productAmount,
 	            @Param("instantDiscount") int instantDiscount,
 	            @Param("couponDiscount") int couponDiscount,
@@ -36,6 +37,11 @@ public interface CheckoutMapper {
 	            @Param("optionId") Integer optionId,
 	            @Param("quantity") int quantity,
 	            @Param("unitPrice") int unitPrice
+	    );
+	    
+	    CheckoutDTO getCheckout(
+	            @Param("checkoutNo") int checkoutNo,
+	            @Param("memberNo") long memberNo
 	    );
 
 }
