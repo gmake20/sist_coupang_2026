@@ -7,23 +7,17 @@
 
 	<!-- shop 레이아웃 - 헤더 + 본문 + 푸터 페이지 추가할 때 아래 home.index 처럼 definition 만 더 
 		쓰면 됨. -->
-	<definition name="shop"
-		template="/WEB-INF/views/inc/layout_shop.jsp">
-		<put-attribute name="header"
-			value="/WEB-INF/views/inc/header.jsp" />
-		<put-attribute name="footer"
-			value="/WEB-INF/views/inc/footer.jsp" />
+	<definition name="shop" template="/WEB-INF/views/inc/layout_shop.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/inc/header.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/views/inc/footer.jsp" />
 		<put-attribute name="title" value="굿팡" />
 	</definition>
 
 	<!-- 메인화면. HomeController 가 "home.index" 를 리턴함 -->
 	<definition name="home.index" extends="shop">
-		<put-attribute name="content"
-			value="/WEB-INF/views/index.jsp" />
-		<put-attribute name="topBanner"
-			value="/WEB-INF/views/inc/top_banner.jsp" />
+		<put-attribute name="content" value="/WEB-INF/views/index.jsp" />
+		<put-attribute name="topBanner" value="/WEB-INF/views/inc/top_banner.jsp" />
 	</definition>
-
 
 	<!-- 4단계에서 추가 예정 <definition name="product.detail" extends="shop"> <put-attribute 
 		name="content" value="/WEB-INF/views/product.jsp" /> <put-attribute name="title" 
