@@ -32,6 +32,14 @@
 	<definition name="vendor.login"
 		template="/WEB-INF/views/vendor/login.jsp">
 	</definition>
+	
+	<definition name="vendor.*"  template="/WEB-INF/views/vendor/inc/layout.jsp">
+		<put-attribute name="iconsprite" value="/WEB-INF/views/vendor/inc/icon-sprite.jsp"/>
+		<put-attribute name="sidebar" value="/WEB-INF/views/vendor/inc/sidebar.jsp"/>
+		<put-attribute name="topbar" value="/WEB-INF/views/vendor/inc/topbar.jsp"/>
+		<put-attribute name="content" value="/WEB-INF/views/vendor/{1}.jsp"/>
+	</definition>	
+	
 
 </tiles-definitions>
 
