@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+
+	<!-- 스프링이 처리할 컨트롤러가 없는 요청을 톰캣 기본 서블릿으로 넘겨라 -->
+	<default-servlet-handler />
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+		
+	<!-- 서블릿 컨텍스트는 @Controller 만 담당.
+	     use-default-filters="false" 가 있어야 @Service/@Component 가 안 딸려옴.
+	     패키지 위치는 안 따지므로 org.doit.goodpang 아래면 어디에 만들어도 잡힘 -->
+	<context:component-scan base-package="org.doit.goodpang" use-default-filters="false">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	
+	<!--  Tiles  -->
+    <beans:bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+      <beans:property name="definitions">
+        <beans:list>
+          <beans:value>/WEB-INF/tiles/tiles.xml</beans:value>
+        </beans:list>
+      </beans:property>
+    </beans:bean>
+    
+     	
+    <beans:bean id="tilesViewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+      <beans:property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView" />
+      <beans:property name="order" value="1" />
+    </beans:bean>
+   
+   
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+		 <beans:property name="order" value="2" />
+	</beans:bean>
+	
+   
+    
+    <!-- 주의할점 id="multipartResolver" -->
+    <!-- 데이터를 스프링 MVC에서 사용할 수 있도록 변환해주는 역할 -->
+	<beans:bean  id="multipartResolver"
+	  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	  <!-- 최대 업로드 가능한 바이트 크기.-1은 제한이 없음 -->
+	  <beans:property name="maxUploadSize" value="-1"></beans:property>
+	  <beans:property name="maxInMemorySize" value="10240"></beans:property>
+	  <beans:property name="defaultEncoding" value="UTF-8"></beans:property>
+	</beans:bean>
+	
+	<!-- ★ tx:annotation-driven 은 root-context.xml 로 옮김.
+	     @Service 가 루트 컨텍스트에서 생성되므로 프록시 생성기도 같은 컨텍스트에 있어야 함.
+	     (학원 템플릿은 여기에 있었는데, p522 tx:advice 실습을 이 파일에서 한 흔적) -->
+
+</beans:beans>
