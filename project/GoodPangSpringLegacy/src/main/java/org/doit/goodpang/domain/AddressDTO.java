@@ -8,7 +8,7 @@ import lombok.Setter;
 public class AddressDTO {
 
 	 private int addressNo;
-     private int memberNo;
+     private long memberNo;
      private String receiverName;
      private String tel;
      private String zipcode;

@@ -1,5 +1,6 @@
 package org.doit.goodpang.service;
 
+import org.doit.goodpang.domain.CheckoutDTO;
 import org.doit.goodpang.mapper.CheckoutMapper;
 import org.doit.goodpang.mapper.WowMembershipMapper;
 import org.springframework.stereotype.Service;
@@ -141,7 +142,18 @@ public class CheckoutService {
             );
         }
 
-
+	
         return checkoutNo;
     }
+    
+    @Transactional(readOnly = true)
+    public CheckoutDTO getCheckout(
+            int checkoutNo,
+            long memberNo) {
+
+        return checkoutMapper.getCheckout(
+                checkoutNo,
+                memberNo
+        );
+    }	
 }

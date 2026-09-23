@@ -86,6 +86,24 @@
 		)
 
 	</insert>
+	
+	<select id="getCheckout"
+        resultType="org.doit.goodpang.domain.CheckoutDTO">
+
+    SELECT
+        CHECKOUT_NO       AS checkoutNo,
+        MEMBER_NO         AS memberNo,
+        PRODUCT_AMOUNT    AS productAmount,
+        INSTANT_DISCOUNT  AS instantDiscount,
+        COUPON_DISCOUNT   AS couponDiscount,
+        CASH_USED         AS cashUsed,
+        DELIVERY_FEE      AS deliveryFee,
+        TOTAL_PRICE       AS totalPrice
+    FROM CHECKOUT
+    WHERE CHECKOUT_NO = #{checkoutNo}
+      AND MEMBER_NO = #{memberNo}
+
+</select>
 
 
 </mapper>

@@ -1,13 +1,20 @@
 package org.doit.goodpang.controller;
 
+import java.util.List;
+
+import org.doit.goodpang.domain.AddressDTO;
+import org.doit.goodpang.domain.CheckoutDTO;
 import org.doit.goodpang.domain.OrderCompleteDTO;
+import org.doit.goodpang.domain.PaymentMethodDTO;
 import org.doit.goodpang.domain.security.CustomUser;
+import org.doit.goodpang.service.AddressService;
+import org.doit.goodpang.service.CheckoutService;
 import org.doit.goodpang.service.OrderService;
 import org.doit.goodpang.service.OrderService.OrderResult;
 import org.doit.goodpang.service.OrderService.StockOutException;
+import org.doit.goodpang.service.PaymentMethodService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +34,9 @@ import lombok.extern.log4j.Log4j;
 public class OrderController {
 
     private final OrderService orderService;
+    private final AddressService addressService;
+    private final PaymentMethodService paymentMethodService;
+    private final CheckoutService checkoutService;
 
     @PostMapping("/checkout")
     public String checkout(
@@ -189,6 +199,7 @@ public class OrderController {
         return "order/complete";
     }
     
+    
     @GetMapping("/payment")
     public String payment(
             Authentication authentication,
@@ -200,8 +211,51 @@ public class OrderController {
 
         Long memberNo =
                 customUser.getMember().getMemberNo();
-        
-        model.addAttribute("checkoutNo", checkoutNo);
+
+        AddressDTO address =
+                addressService.getAddress(memberNo);
+
+        List<AddressDTO> addressList =
+                addressService.getAddressList(memberNo);
+
+		
+		List<PaymentMethodDTO> paymentMethods =
+		paymentMethodService.getBankMethods(memberNo);
+		
+		List<PaymentMethodDTO> cardMethods =
+		paymentMethodService.getCardMethods(memberNo);
+		
+		CheckoutDTO checkout =
+	            checkoutService.getCheckout(
+	                    checkoutNo,
+	                    memberNo
+	            );
+		 
+        model.addAttribute(
+                "address",
+                address
+        );
+
+        model.addAttribute(
+                "addressList",
+                addressList
+        );
+
+		
+		model.addAttribute( "paymentMethods", paymentMethods );
+		  
+		model.addAttribute( "cardMethods", cardMethods );
+		
+	    model.addAttribute(
+	            "checkout",
+	            checkout
+	    );
+		
+
+        model.addAttribute(
+                "checkoutNo",
+                checkoutNo
+        );
 
         return "order/payment";
     }

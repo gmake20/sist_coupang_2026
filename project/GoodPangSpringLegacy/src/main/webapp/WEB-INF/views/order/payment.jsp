@@ -355,6 +355,8 @@
 					<form id="paymentForm"
 						action="${pageContext.request.contextPath}/order/checkout"
 						method="post" onsubmit="return validatePayment();">
+						
+						<sec:csrfInput/>
 
 						<input type="hidden" id="checkoutNo" name="checkoutNo"
 							value="${checkoutNo}"> <input type="hidden"
@@ -484,6 +486,8 @@
 			<form id="addAddressForm"
 				action="${pageContext.request.contextPath}/address/add"
 				method="post">
+				
+				<sec:csrfInput/>
 
 				<input type="hidden" name="addressNo" id="editAddressNo">
 
@@ -577,11 +581,13 @@
 				<form id="paymentMethodAddForm"
 					action="${pageContext.request.contextPath}/payment-method/add"
 					method="post">
+					
+					<sec:csrfInput/>
 					<input type="hidden" name="checkoutNo" value="${checkoutNo}">
 					<input type="hidden" name="paymentType" id="newPaymentType"
 						value="BANK">
 
-
+					
 					<!-- 계좌 / 카드 탭 -->
 					<div class="payment-add-type">
 

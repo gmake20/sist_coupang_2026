@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -13,7 +16,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>GoodPang | 배송지 추가</title>
+<title>GoodPang | 배송지 수정</title>
 
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/reset.css">
@@ -21,21 +24,21 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/common.css">
 
+<!-- address_add.jsp와 동일한 폼 스타일 재사용 -->
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/address_add.css">
 </head>
-
 <body>
 
-	<jsp:include page="/inc/header.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/inc/header.jsp" />
 
 	<main class="address-add-page">
 
 		<section class="address-add-box">
 
 			<div class="address-add-header">
-				<h1>배송지 추가</h1>
-				<p>배송에 필요한 정보를 입력해주세요.</p>
+				<h1>배송지 수정</h1>
+				<p>배송지 정보를 수정해주세요.</p>
 			</div>
 
 			<c:if test="${not empty error}">
@@ -43,18 +46,20 @@
 			</c:if>
 
 			<form id="addressForm"
-				action="${pageContext.request.contextPath}/address/add"
+				action="${pageContext.request.contextPath}/address/edit"
 				method="post" class="address-form">
 				
-				<sec:csrfInput />
+				<sec:csrfInput/>
+
+				<!-- 어떤 배송지를 수정할지 식별 -->
+				<input type="hidden" name="addressNo" value="${address.addressNo}">
 
 				<div class="form-row">
 					<label for="receiverName"> 받는 사람 <span class="required">*</span>
 					</label> <input type="text" id="receiverName" name="receiverName"
-						class="form-input" maxlength="30" value="${param.receiverName}"
+						class="form-input" maxlength="30" value="${address.receiverName}"
 						placeholder="받는 사람 이름" required>
 				</div>
-
 
 				<div class="form-row">
 					<label> 휴대폰 번호 <span class="required">*</span>
@@ -62,19 +67,17 @@
 
 					<div class="phone-row">
 						<input type="text" id="phone1" class="form-input phone-input"
-							maxlength="3" inputmode="numeric" placeholder="" required>
-
-						<span class="phone-hyphen">-</span> <input type="text" id="phone2"
+							maxlength="3" inputmode="numeric" required> <span
+							class="phone-hyphen">-</span> <input type="text" id="phone2"
 							class="form-input phone-input" maxlength="4" inputmode="numeric"
-							placeholder="1234" required> <span class="phone-hyphen">-</span>
-						<input type="text" id="phone3" class="form-input phone-input"
-							maxlength="4" inputmode="numeric" placeholder="5678" required>
+							required> <span class="phone-hyphen">-</span> <input
+							type="text" id="phone3" class="form-input phone-input"
+							maxlength="4" inputmode="numeric" required>
 					</div>
 
-					<!-- 실제 서버로 전달되는 전화번호 -->
-					<input type="hidden" id="tel" name="tel" value="${param.tel}">
+					<!-- 실제 서버로 전송되는 값 -->
+					<input type="hidden" id="tel" name="tel" value="${address.tel}">
 				</div>
-
 
 				<div class="form-row">
 					<label for="zipcode"> 우편번호 <span class="required">*</span>
@@ -83,70 +86,61 @@
 					<div class="zipcode-row">
 						<input type="text" id="zipcode" name="zipcode"
 							class="form-input zipcode-input" maxlength="10"
-							value="${param.zipcode}" placeholder="우편번호" required>
+							value="${address.zipcode}" placeholder="우편번호" required>
 
 						<button type="button" class="zipcode-button" id="zipcodeButton">
 							우편번호 찾기</button>
 					</div>
 				</div>
 
-
 				<div class="form-row">
 					<label for="address"> 주소 <span class="required">*</span>
 					</label> <input type="text" id="address" name="address" class="form-input"
-						maxlength="200" value="${param.address}" placeholder="기본 주소"
+						maxlength="200" value="${address.address}" placeholder="기본 주소"
 						required>
 				</div>
-
 
 				<div class="form-row">
 					<label for="detailAddress"> 상세주소 </label> <input type="text"
 						id="detailAddress" name="detailAddress" class="form-input"
-						maxlength="200" value="${param.detailAddress}"
+						maxlength="200" value="${address.detailAddress}"
 						placeholder="상세주소를 입력해주세요.">
 				</div>
-
 
 				<div class="form-row">
 					<label for="requestMsg"> 배송 요청사항 </label> <select id="requestMsg"
 						name="requestMsg" class="form-select">
-						<option value="">배송 요청사항을 선택해주세요.</option>
+						<option value="" ${empty address.requestMsg ? 'selected' : ''}>
+							배송 요청사항을 선택해주세요.</option>
 
-						<option value="문 앞" ${param.requestMsg eq '문 앞' ? 'selected' : ''}>
-							문 앞</option>
+						<option value="문 앞"
+							${address.requestMsg eq '문 앞' ? 'selected' : ''}>문 앞</option>
 
 						<option value="직접 받고 부재 시 문 앞"
-							${param.requestMsg eq '직접 받고 부재 시 문 앞' ? 'selected' : ''}>
+							${address.requestMsg eq '직접 받고 부재 시 문 앞' ? 'selected' : ''}>
 							직접 받고 부재 시 문 앞</option>
 
-						<option value="경비실" ${param.requestMsg eq '경비실' ? 'selected' : ''}>
-							경비실</option>
+						<option value="경비실"
+							${address.requestMsg eq '경비실' ? 'selected' : ''}>경비실</option>
 
-						<option value="택배함" ${param.requestMsg eq '택배함' ? 'selected' : ''}>
-							택배함</option>
+						<option value="택배함"
+							${address.requestMsg eq '택배함' ? 'selected' : ''}>택배함</option>
 					</select>
 				</div>
 
-
 				<div class="default-row">
-
 					<label class="default-label"> <input type="checkbox"
 						name="addressDefault" value="Y" class="default-check"
-						${param.addressDefault eq 'Y' ? 'checked' : ''}> <span>
+						${address.addressDefault eq 'Y' ? 'checked' : ''}> <span>
 							기본 배송지로 설정 </span>
-
 					</label>
-
 				</div>
 
-
 				<div class="form-actions">
-
 					<a href="${pageContext.request.contextPath}/address/list"
 						class="cancel-button"> 취소 </a>
 
-					<button type="submit" class="submit-button">배송지 저장</button>
-
+					<button type="submit" class="submit-button">수정 완료</button>
 				</div>
 
 			</form>
@@ -155,13 +149,13 @@
 
 	</main>
 
-	<jsp:include page="/inc/footer.jsp" />
-
+	<jsp:include page="${pageContext.request.contextPath}/inc/footer.jsp" />
 
 	<script
 		src="//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 	<script>
+
 document.getElementById("zipcodeButton").addEventListener("click", function () {
 
     new kakao.Postcode({
@@ -170,21 +164,28 @@ document.getElementById("zipcodeButton").addEventListener("click", function () {
 
             let addr = "";
 
-            // 사용자가 도로명 주소를 선택한 경우
+            // 도로명 주소를 선택한 경우
             if (data.userSelectedType === "R") {
+
                 addr = data.roadAddress;
+
             } else {
+
                 // 지번 주소를 선택한 경우
                 addr = data.jibunAddress;
             }
 
             // 우편번호
-            document.getElementById("zipcode").value = data.zonecode;
+            document.getElementById("zipcode").value =
+                    data.zonecode;
 
-            // 기본 주소
-            document.getElementById("address").value = addr;
+            // 주소
+            document.getElementById("address").value =
+                    addr;
 
-            // 상세주소 입력창으로 이동
+            // 상세주소 초기화 후 포커스
+            document.getElementById("detailAddress").value = "";
+
             document.getElementById("detailAddress").focus();
         }
 
@@ -214,7 +215,47 @@ function combinePhoneNumber() {
     }
 }
 
-/* 첫 번째 번호 */
+/* 기존 DB 전화번호를 3칸으로 분리 */
+(function initPhoneNumber() {
+
+    const savedTel = tel.value || "";
+
+    const nu	mbers =
+        savedTel.replace(/[^0-9]/g, "");
+
+    if (numbers.length === 11) {
+
+        phone1.value =
+            numbers.substring(0, 3);
+
+        phone2.value =
+            numbers.substring(3, 7);
+
+        phone3.value =
+            numbers.substring(7, 11);
+
+    } else if (numbers.length === 10) {
+
+        phone1.value =
+            numbers.substring(0, 3);
+
+        phone2.value =
+            numbers.substring(3, 6);
+
+        phone3.value =
+            numbers.substring(6, 10);
+
+    } else {
+
+        phone1.value = "";
+        phone2.value = "";
+        phone3.value = "";
+    }
+
+    combinePhoneNumber();
+})();
+
+/* 숫자만 입력 + 자동 이동 */
 phone1.addEventListener("input", function() {
 
     onlyNumber(this);
@@ -226,7 +267,6 @@ phone1.addEventListener("input", function() {
     combinePhoneNumber();
 });
 
-/* 가운데 번호 */
 phone2.addEventListener("input", function() {
 
     onlyNumber(this);
@@ -238,7 +278,6 @@ phone2.addEventListener("input", function() {
     combinePhoneNumber();
 });
 
-/* 마지막 번호 */
 phone3.addEventListener("input", function() {
 
     onlyNumber(this);
@@ -246,21 +285,48 @@ phone3.addEventListener("input", function() {
     combinePhoneNumber();
 });
 
-/* 가운데 칸이 비어있을 때 Backspace → 앞 칸 */
+/* Backspace로 이전 칸 이동 */
 phone2.addEventListener("keydown", function(event) {
 
-    if (event.key === "Backspace" && this.value === "") {
+    if (
+        event.key === "Backspace" &&
+        this.value === ""
+    ) {
         phone1.focus();
     }
 });
 
-/* 마지막 칸이 비어있을 때 Backspace → 가운데 칸 */
 phone3.addEventListener("keydown", function(event) {
 
-    if (event.key === "Backspace" && this.value === "") {
+    if (
+        event.key === "Backspace" &&
+        this.value === ""
+    ) {
         phone2.focus();
     }
 });
+
+/* 수정 완료 전에 tel 합치기 */
+document.getElementById("addressForm")
+    .addEventListener("submit", function(event) {
+
+        combinePhoneNumber();
+
+        if (
+            phone1.value.length !== 3 ||
+            phone2.value.length < 3 ||
+            phone3.value.length !== 4
+        ) {
+
+            event.preventDefault();
+
+            alert("휴대폰 번호를 정확히 입력해주세요.");
+
+            phone2.focus();
+
+            return;
+        }
+    });
 </script>
 
 </body>
