@@ -51,6 +51,7 @@
 
 <body> --%>
 	<!-- 최상단 배너 -->
+	<!-- 
 	<div class="coupang-top-banner">
 		<div class="banner-middle">
 			<a href="#"> <span class="top-banner-placeholder"
@@ -60,6 +61,7 @@
 				style="background: #80daff; color: #0b2d45"> <i class="arrow"></i></span></a>
 		</div>
 	</div>
+	 -->
 	<!-- HEADER — 페이지 맨 위. 로고 / 검색 / 메뉴 -->
 	<%-- <jsp:include page="/inc/header.jsp" /> --%>
 	
@@ -99,15 +101,15 @@
 
 				<!-- 배경 6장. 지금은 1번만 .is-on -->
 
-				<img class="main-today__bg is-on" src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-1.jpg"
+				<img class="main-today__bg is-on" src="${pageContext.request.contextPath}/resources/images/banners/hero-bg-1.jpg"
 					alt=""> <img class="main-today__bg"
-					src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-2.jpg" alt=""> <img
-					class="main-today__bg" src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-3.jpg" alt="">
+					src="${pageContext.request.contextPath}/resources/images/banners/hero-bg-2.jpg" alt=""> <img
+					class="main-today__bg" src="${pageContext.request.contextPath}/resources/images/banners/hero-bg-3.jpg" alt="">
 				
-				<img class="main-today__bg" src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-4.jpg"
+				<img class="main-today__bg" src="${pageContext.request.contextPath}/resources/images/banners/hero-bg-4.jpg"
 					alt=""> <img class="main-today__bg"
-					src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-5.jpg" alt=""> <img
-					class="main-today__bg" src="${pageContext.request.contextPath}/resources/imagesbanners/hero-bg-6.jpg" alt="">
+					src="${pageContext.request.contextPath}/resources/images/banners/hero-bg-5.jpg" alt=""> <img
+					class="main-today__bg" src="${pageContext.request.contextPath}/resources/images/banners/hero-bg-6.jpg" alt="">
 
 				<div class="main-today__selected-product">
 
@@ -139,29 +141,29 @@
 
 						<li class="todayshot-right-thumbnail first-item today-selected">
 
-							<a href="#"><img src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-1.jpg"
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/banners/hero-thumb-1.jpg"
 								width="180" height="60" alt="1번 배너"><span class="mask"></span></a>
 
 						</li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-								src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-2.jpg" width="180" height="60"
+								src="${pageContext.request.contextPath}/resources/images/banners/hero-thumb-2.jpg" width="180" height="60"
 								alt="2번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-								src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-3.jpg" width="180" height="60"
+								src="${pageContext.request.contextPath}/resources/images/banners/hero-thumb-3.jpg" width="180" height="60"
 								alt="3번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-								src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-4.jpg" width="180" height="60"
+								src="${pageContext.request.contextPath}/resources/images/banners/hero-thumb-4.jpg" width="180" height="60"
 								alt="4번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-								src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-5.jpg" width="180" height="60"
+								src="${pageContext.request.contextPath}/resources/images/banners/hero-thumb-5.jpg" width="180" height="60"
 								alt="5번 배너"><span class="mask"></span></a></li>
 
 						<li class="todayshot-right-thumbnail"><a href="#"><img
-								src="${pageContext.request.contextPath}/resources/imagesbanners/hero-thumb-6.jpg" width="180" height="60"
+								src="${pageContext.request.contextPath}/resources/images/banners/hero-thumb-6.jpg" width="180" height="60"
 								alt="6번 배너"><span class="mask"></span></a></li>
 
 					</ul>
@@ -4079,6 +4081,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
-
-
-</html>
