@@ -27,7 +27,7 @@
 	<definition name="vendor.login"
 		template="/WEB-INF/views/vendor/login.jsp">
 	</definition>
-	
+
 	<definition name="vendor.*"  template="/WEB-INF/views/vendor/inc/layout.jsp">
 		<put-attribute name="css" value="/vendor/inc/css/{1}.css"/>
 		<put-attribute name="iconsprite" value="/WEB-INF/views/vendor/inc/icon-sprite.jsp"/>
@@ -37,6 +37,22 @@
 	</definition>	
 	
 
+    <!-- 1. 주문/마이페이지 전용 기본 레이아웃 정의 -->
+    <definition name="order-layout" template="/WEB-INF/views/inc/layout_order.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/inc/header.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/views/inc/footer.jsp" />
+        <put-attribute name="rightbanner" value="/WEB-INF/views/inc/right_banner.jsp" />
+        <put-attribute name="leftbanner" value="/WEB-INF/views/inc/left_banner.jsp" />
+        <put-attribute name="title" value="GoodPang" />
+    </definition>
+
+    <!-- 2. 주문 목록 페이지 정의 (OrderController가 "order.order_list"를 리턴함) -->
+    <definition name="order.order_list" extends="order-layout">
+        <put-attribute name="css" value="/resources/css/order_list.css"/>
+        <put-attribute name="content" value="/WEB-INF/views/order/order_list.jsp" />
+        <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
+    </definition>
+    
 </tiles-definitions>
 
 

@@ -1,9 +1,11 @@
 package org.doit.goodpang.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.doit.goodpang.domain.OrderCompleteDTO;
+import org.doit.goodpang.domain.OrderItemDTO;
 import org.doit.goodpang.mapper.CartMapper;
 import org.doit.goodpang.mapper.OrderMapper;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,25 @@ import lombok.extern.log4j.Log4j;
 @Log4j
 @RequiredArgsConstructor
 public class OrderService {
+	
+	
+	public int getOrderCount(long memberNo, String yearFilter) {
+        return orderMapper.getOrderCount(memberNo, yearFilter);
+    }
+
+
+    public List<OrderItemDTO> getOrderListPaged(long memberNo, String yearFilter, int page, int pageSize) {
+        int startRow = (page - 1) * pageSize + 1;
+        int endRow = page * pageSize;
+        return orderMapper.getOrderListPaged(memberNo, yearFilter, startRow, endRow);
+    }
+
+
+    public List<OrderItemDTO> getOrderDetailList(int orderNo, int memberNo) {
+        return orderMapper.getOrderDetailList(orderNo, memberNo);
+    }
+
+	
 
     private final OrderMapper orderMapper;
     private final CartMapper cartMapper;
