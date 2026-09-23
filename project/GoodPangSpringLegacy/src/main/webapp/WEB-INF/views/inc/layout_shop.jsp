@@ -35,7 +35,7 @@
 
       <!-- 본문 -->
       <tiles:insertAttribute name="content" />
-
+      
       <!-- FOOTER -->
       <tiles:insertAttribute name="footer" />
 

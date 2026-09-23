@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.doit.goodpang.mapper.OrderMapper">
+
+    <!-- 1. 필터 조건(최근6개월 / 년도)에 따른 회원 총 주문 건수 조회 -->
+    <select id="getOrderCount" resultType="int">
+        SELECT COUNT(*) 
+        FROM ORDERS o 
+        WHERE o.member_no = #{memberNo}
+        <choose>
+            <when test="yearFilter == 'recent' or yearFilter == null or yearFilter == ''">
+                AND o.order_date >= ADD_MONTHS(SYSDATE, -6)
+            </when>
+            <otherwise>
+                AND TO_CHAR(o.order_date, 'YYYY') = #{yearFilter}
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 2. 연도 필터링 및 페이징 목록 조회 (대표 이미지 포함) -->
+    <select id="getOrderListPaged" resultType="org.doit.goodpang.domain.OrderItemDTO">
+        SELECT * FROM (
+            SELECT o.order_no AS orderNo, 
+                   o.member_no AS memberNo,
+                   o.order_date AS orderDate, 
+                   o.order_status AS orderStatus, 
+                   o.total_price AS totalPrice, 
+                   o.delivery_fee AS deliveryFee,
+                   od.order_detail_no AS orderDetailNo, 
+                   od.order_qty AS quantity, 
+                   od.price AS itemPrice,
+                   p.product_no AS productNo, 
+                   p.product_name AS productName,
+                   po.option1_type AS option1Type, 
+                   po.option1_value AS option1Value, 
+                   po.option2_type AS option2Type, 
+                   po.option2_value AS option2Value,
+                   img.IMAGE_URL AS imageUrl
+            FROM ORDERS o
+            JOIN ORDER_DETAIL od ON o.order_no = od.order_no
+            JOIN PRODUCT p ON od.product_no = p.product_no
+            LEFT JOIN PRODUCT_OPTION po ON od.option_id = po.option_id
+            LEFT JOIN (
+                SELECT product_no, image_url
+                FROM (
+                    SELECT product_no, image_url,
+                           ROW_NUMBER() OVER(PARTITION BY product_no ORDER BY image_no ASC) as rn
+                    FROM PRODUCT_IMAGE
+                    WHERE image_purpose = '대표'
+                ) WHERE rn = 1
+            ) img ON p.product_no = img.product_no
+            WHERE o.member_no = #{memberNo}
+              AND o.order_no IN (
+                  SELECT order_no FROM (
+                      SELECT order_no, ROWNUM as rnum FROM (
+                          SELECT DISTINCT order_no, order_date FROM ORDERS
+                          WHERE member_no = #{memberNo}
+                          <choose>
+                              <when test="yearFilter == 'recent' or yearFilter == null or yearFilter == ''">
+                                  AND order_date >= ADD_MONTHS(SYSDATE, -6)
+                              </when>
+                              <otherwise>
+                                  AND TO_CHAR(order_date, 'YYYY') = #{yearFilter}
+                              </otherwise>
+                          </choose>
+                          ORDER BY order_date DESC, order_no DESC
+                      ) WHERE ROWNUM &lt;= #{endRow}
+                  ) WHERE rnum &gt;= #{startRow}
+              )
+        ) ORDER BY orderDate DESC, orderNo DESC, orderDetailNo ASC
+    </select>
+
+    <!-- 3. 주문 상세 목록 조회 (OrderCancel / OrderDetail 용) -->
+    <select id="getOrderDetailList" resultType="org.doit.goodpang.domain.OrderItemDTO">
+        SELECT od.ORDER_DETAIL_NO AS orderDetailNo, 
+               od.ORDER_NO AS orderNo, 
+               o.MEMBER_NO AS memberNo, 
+               o.ORDER_STATUS AS orderStatus, 
+               o.ORDER_DATE AS orderDate, 
+               o.TOTAL_PRICE AS totalPrice, 
+               p.PRODUCT_NO AS productNo, 
+               p.PRODUCT_NAME AS productName, 
+               od.ORDER_QTY AS quantity, 
+               od.PRICE AS itemPrice,
+               o.DELIVERY_FEE AS deliveryFee, 
+               pay.PAYMENT_METHOD AS paymentMethod, 
+               pm.CARD_COMPANY AS cardCompanyName,
+               pm.BANK_CODE AS bankName,
+               oa.REQUEST_MSG AS requestMsg, 
+               oa.ADDRESS AS address, 
+               oa.DETAIL_ADDRESS AS detailAddress, 
+               m.MEMBER_NAME AS memberName, 
+               m.PHONE AS phone, 
+               po.OPTION1_TYPE AS option1Type, 
+               po.OPTION1_VALUE AS option1Value, 
+               po.OPTION2_TYPE AS option2Type, 
+               po.OPTION2_VALUE AS option2Value,
+               img.IMAGE_URL AS imageUrl
+        FROM ORDERS o 
+        JOIN ORDER_DETAIL od ON o.ORDER_NO = od.ORDER_NO 
+        JOIN PRODUCT p ON od.PRODUCT_NO = p.PRODUCT_NO 
+        JOIN MEMBER m ON o.MEMBER_NO = m.MEMBER_NO 
+        LEFT JOIN ORDER_ADDRESS oa ON o.ORDER_ADDRESS_NO = oa.ORDER_ADDRESS_NO 
+        LEFT JOIN PAYMENT pay ON o.ORDER_NO = pay.ORDER_NO 
+        LEFT JOIN PAYMENT_METHOD pm ON pay.PAYMENT_METHOD_NO = pm.PAYMENT_METHOD_NO
+        LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID 
+        LEFT JOIN (
+            SELECT product_no, image_url 
+            FROM (
+                SELECT product_no, image_url, 
+                       ROW_NUMBER() OVER(PARTITION BY product_no ORDER BY image_no ASC) as rn 
+                FROM PRODUCT_IMAGE 
+                WHERE image_purpose = '대표'
+            ) WHERE rn = 1
+        ) img ON p.PRODUCT_NO = img.PRODUCT_NO
+        WHERE o.ORDER_NO = #{orderNo} AND o.MEMBER_NO = #{memberNo}
+        ORDER BY od.ORDER_DETAIL_NO ASC
+    </select>
+
+</mapper>
