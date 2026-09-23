@@ -59,4 +59,37 @@
             </if>
 	</select>
 
+	<!-- public List<VendorProductOptionDTO> findOptionsBySellerNo(int sellerNo, Integer productNo); -->
+	<!-- 상품 옵션 관리 - 판매자의 전체 상품 옵션을 옵션 단위로 한 줄씩. productNo가 있으면 그 상품만 -->
+	<select id="findOptionsBySellerNo" resultType="org.doit.goodpang.domain.VendorProductOptionDTO">
+            SELECT
+                PO.OPTION_ID, PO.PRODUCT_NO, P.PRODUCT_NAME,
+                PO.OPTION1_VALUE, PO.OPTION2_VALUE, PO.OPTION3_VALUE,
+                NVL(PO.PRICE, 0) AS PRICE, PO.NORMAL_PRICE, PO.QUANTITY, PO.STATUS,
+                IMG.IMAGE_URL AS THUMBNAIL_URL
+            FROM PRODUCT_OPTION PO
+                JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
+                LEFT JOIN (
+                    SELECT PRODUCT_NO, IMAGE_URL,
+                           ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID, IMAGE_ORDER) AS RN
+                    FROM PRODUCT_IMAGE
+                    WHERE IMAGE_PURPOSE = '대표'
+                ) IMG ON IMG.PRODUCT_NO = P.PRODUCT_NO AND IMG.RN = 1
+            WHERE P.SELLER_NO = #{sellerNo}
+            <if test="productNo != null">
+              AND P.PRODUCT_NO = #{productNo}
+            </if>
+            ORDER BY P.CREATED_DATE DESC, P.PRODUCT_NO DESC, PO.OPTION_ID
+	</select>
+
+	<!-- public List<VendorProductOptionDTO> findDistinctOptionProductsBySellerNo(int sellerNo); -->
+	<!-- 상품 필터 드롭다운용 - 옵션이 있는 상품 목록 (productNo, productName만 사용) -->
+	<select id="findDistinctOptionProductsBySellerNo" resultType="org.doit.goodpang.domain.VendorProductOptionDTO">
+            SELECT DISTINCT P.PRODUCT_NO, P.PRODUCT_NAME, P.CREATED_DATE
+            FROM PRODUCT_OPTION PO
+                JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
+            WHERE P.SELLER_NO = #{sellerNo}
+            ORDER BY P.CREATED_DATE DESC, P.PRODUCT_NO DESC
+	</select>
+
 </mapper>
