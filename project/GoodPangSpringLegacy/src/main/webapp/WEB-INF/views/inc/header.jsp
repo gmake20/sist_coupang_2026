@@ -1,5 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
 
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/common.css">
@@ -48,9 +51,9 @@
 
 			<ul class="top-bar-right">
 
-				<li><a href="${pageContext.request.contextPath}/vendor/login.htm">
-
-						판매자 로그인 </a></li>
+				<li><a
+					href="${pageContext.request.contextPath}/vendor/login.htm"> 판매자
+						로그인 </a></li>
 
 				<li class="cs-center"><a href="#"> 고객센터 </a>
 
@@ -65,22 +68,34 @@
 						<li><a href="#">취소 / 반품 안내</a></li>
 
 					</ul></li>
-				<c:choose>
-					<c:when test="${not empty sessionScope.loginMember}">
-						<li><span>${sessionScope.loginMember.memberName}님</span></li>
 
-						<li><a href="${pageContext.request.contextPath}/logout">
-								로그아웃 </a></li>
-					</c:when>
 
-					<c:otherwise>
-						<li><a href="${pageContext.request.contextPath}/signup">
-								회원가입 </a></li>
-						<li><a href="${pageContext.request.contextPath}/login">
-								로그인 </a></li>
-					</c:otherwise>
+				<sec:authorize access="isAnonymous()">
+					<li><a href="${pageContext.request.contextPath}/signup">
+							회원가입 </a></li>
+					<li><a href="${pageContext.request.contextPath}/login">
+							로그인 </a></li>
+				</sec:authorize>
 
-				</c:choose>
+				<sec:authorize access="isAuthenticated()">
+					<li><span> <sec:authentication
+								property="principal.member.memberName" />님
+					</span></li>
+					<li>
+						<form action="${pageContext.request.contextPath}/logout"
+							method="post" style="display: inline;">
+
+							<input type="hidden" name="${_csrf.parameterName}"
+								value="${_csrf.token}" />
+
+							<button type="submit"
+								style="border: 0; background: none; cursor: pointer;">
+								로그아웃</button>
+
+						</form>
+					</li>
+
+				</sec:authorize>
 
 			</ul>
 
@@ -779,8 +794,7 @@
 								<!-- <span class="wrapper" id="cartPreviewWrapper"> <i
 									class="arrow"></i> -->
 								<span class="wrapper" id="cartPreviewWrapper"> <i
-									class="cart-preview-arrow"></i>
-								<c:choose>
+									class="cart-preview-arrow"></i> <c:choose>
 										<c:when test="${not empty sessionScope.cartPreviewItems}">
 											<ul class="cart-preview-list">
 												<c:forEach var="item"
@@ -1109,7 +1123,13 @@
 <script>
 (function() {
     const cartContextPath = '${pageContext.request.contextPath}';
-    const isLoggedIn = ${not empty sessionScope.loginMember ? 'true' : 'false'};
+    /* const isLoggedIn = ${not empty sessionScope.loginMember ? 'true' : 'false'}; */
+    
+     let isLoggedIn = false;
+
+    <sec:authorize access="isAuthenticated()">
+        isLoggedIn = true;
+    </sec:authorize>
 
     async function refreshCart() {
         /* if (!isLoggedIn) return; */

@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -45,6 +45,10 @@
 			<form class="form" id="signupForm"
 				action="${pageContext.request.contextPath}/signup" method="post"
 				novalidate>
+				
+				 <input type="hidden"
+		           name="${_csrf.parameterName}"
+		           value="${_csrf.token}">
 
 				<!-- 아이디 -->
 				<div class="field">
