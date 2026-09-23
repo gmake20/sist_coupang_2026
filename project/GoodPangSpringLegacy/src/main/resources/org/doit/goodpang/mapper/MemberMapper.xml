@@ -21,5 +21,29 @@
         WHERE MEMBER_ID = #{memberId}
 
     </select>
+    
+     <insert id="insert"
+            parameterType="org.doit.goodpang.domain.MemberVO">
+        INSERT INTO MEMBER (
+            MEMBER_NO,
+            MEMBER_ID,
+            MEMBER_PW,
+            MEMBER_NAME,
+            PHONE,
+            EMAIL,
+            RANK,
+            STATUS
+        )
+        VALUES (
+            SEQ_MEMBER_NO.NEXTVAL,
+            #{memberId},
+            #{memberPw},
+            #{memberName},
+            #{phone},
+            #{email},
+            #{rank},
+            #{status}
+        )
+    </insert>
 
 </mapper>

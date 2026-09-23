@@ -11,4 +11,6 @@ public interface MemberMapper {
 
 	public MemberVO read(String userid) throws ClassNotFoundException, SQLException;
 	
+	int insert(MemberVO memberVO);
+	
 }

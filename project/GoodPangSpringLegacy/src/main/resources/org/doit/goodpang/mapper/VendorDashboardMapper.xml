@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="org.doit.goodpang.mapper.VendorDashboardMapper">
+
+	<!-- public VendorDashboardStatDTO getTodayStat(int sellerNo, Date targetDate); -->
+	<!-- 기존 DAO의 fillOrderSalesStat(주문수·매출) + fillTrafficStat(방문자수·상품노출수)를 CROSS JOIN으로 합친 쿼리 -->
+	<select id="getTodayStat" resultType="org.doit.goodpang.domain.VendorDashboardStatDTO">
+            SELECT
+                S.TODAY_ORDER_COUNT,
+                S.TODAY_SALES,
+                S.YESTERDAY_ORDER_COUNT,
+                S.YESTERDAY_SALES,
+                T.TODAY_VISITOR_COUNT,
+                T.TODAY_PRODUCT_VIEW_COUNT,
+                T.YESTERDAY_VISITOR_COUNT,
+                T.YESTERDAY_PRODUCT_VIEW_COUNT
+            FROM (
+                SELECT
+                    COUNT(DISTINCT CASE WHEN TRUNC(O.ORDER_DATE) = D.TARGET_DATE
+                                         THEN O.ORDER_NO END) AS TODAY_ORDER_COUNT,
+                    NVL(SUM(CASE WHEN TRUNC(O.ORDER_DATE) = D.TARGET_DATE
+                                  THEN OD.PRICE * OD.ORDER_QTY END), 0) AS TODAY_SALES,
+                    COUNT(DISTINCT CASE WHEN TRUNC(O.ORDER_DATE) = D.TARGET_DATE - 1
+                                         THEN O.ORDER_NO END) AS YESTERDAY_ORDER_COUNT,
+                    NVL(SUM(CASE WHEN TRUNC(O.ORDER_DATE) = D.TARGET_DATE - 1
+                                  THEN OD.PRICE * OD.ORDER_QTY END), 0) AS YESTERDAY_SALES
+                FROM ORDER_DETAIL OD
+                    JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+                    JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                    CROSS JOIN (SELECT TRUNC(#{targetDate}) AS TARGET_DATE FROM DUAL) D
+                WHERE P.SELLER_NO = #{sellerNo}
+                  AND O.ORDER_STATUS != '주문취소'
+                  AND TRUNC(O.ORDER_DATE) IN (D.TARGET_DATE, D.TARGET_DATE - 1)
+            ) S
+            CROSS JOIN (
+                SELECT
+                    COUNT(DISTINCT CASE WHEN TRUNC(L.VIEW_DATE) = D.TARGET_DATE
+                                         THEN L.SESSION_ID END) AS TODAY_VISITOR_COUNT,
+                    COUNT(CASE WHEN TRUNC(L.VIEW_DATE) = D.TARGET_DATE
+                               THEN 1 END) AS TODAY_PRODUCT_VIEW_COUNT,
+                    COUNT(DISTINCT CASE WHEN TRUNC(L.VIEW_DATE) = D.TARGET_DATE - 1
+                                         THEN L.SESSION_ID END) AS YESTERDAY_VISITOR_COUNT,
+                    COUNT(CASE WHEN TRUNC(L.VIEW_DATE) = D.TARGET_DATE - 1
+                               THEN 1 END) AS YESTERDAY_PRODUCT_VIEW_COUNT
+                FROM PRODUCT_VIEW_LOG L
+                    JOIN PRODUCT P ON L.PRODUCT_NO = P.PRODUCT_NO
+                    CROSS JOIN (SELECT TRUNC(#{targetDate}) AS TARGET_DATE FROM DUAL) D
+                WHERE P.SELLER_NO = #{sellerNo}
+                  AND TRUNC(L.VIEW_DATE) IN (D.TARGET_DATE, D.TARGET_DATE - 1)
+            ) T
+	</select>
+
+	<!-- public List<VendorDailySalesDTO> getDailySalesStat(int sellerNo, Date targetDate); -->
+	<select id="getDailySalesStat" resultType="org.doit.goodpang.domain.VendorDailySalesDTO">
+            SELECT
+                TO_CHAR(D.STAT_DATE, 'FMMM/DD') AS LABEL,
+                NVL(S.SALES_AMOUNT, 0) AS SALES_AMOUNT,
+                NVL(S.ORDER_COUNT, 0) AS ORDER_COUNT
+            FROM (
+                SELECT TRUNC(#{targetDate}) - LEVEL + 1 AS STAT_DATE
+                FROM DUAL
+                CONNECT BY LEVEL &lt;= 7
+            ) D
+            LEFT JOIN (
+                SELECT
+                    TRUNC(O.ORDER_DATE) AS ORDER_DAY,
+                    SUM(OD.PRICE * OD.ORDER_QTY) AS SALES_AMOUNT,
+                    COUNT(DISTINCT O.ORDER_NO) AS ORDER_COUNT
+                FROM ORDER_DETAIL OD
+                    JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+                    JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                WHERE P.SELLER_NO = #{sellerNo}
+                  AND O.ORDER_STATUS != '주문취소'
+                  AND TRUNC(O.ORDER_DATE) &gt;= TRUNC(#{targetDate}) - 6
+                GROUP BY TRUNC(O.ORDER_DATE)
+            ) S ON S.ORDER_DAY = D.STAT_DATE
+            ORDER BY D.STAT_DATE
+	</select>
+
+	<!-- public List<VendorDailyTrafficDTO> getDailyTrafficStat(int sellerNo, Date targetDate); -->
+	<select id="getDailyTrafficStat" resultType="org.doit.goodpang.domain.VendorDailyTrafficDTO">
+            SELECT
+                TO_CHAR(D.STAT_DATE, 'FMMM/DD') AS LABEL,
+                NVL(S.VISITOR_COUNT, 0) AS VISITOR_COUNT,
+                NVL(S.VIEW_COUNT, 0) AS VIEW_COUNT
+            FROM (
+                SELECT TRUNC(#{targetDate}) - LEVEL + 1 AS STAT_DATE
+                FROM DUAL
+                CONNECT BY LEVEL &lt;= 7
+            ) D
+            LEFT JOIN (
+                SELECT
+                    TRUNC(L.VIEW_DATE) AS VIEW_DAY,
+                    COUNT(DISTINCT L.SESSION_ID) AS VISITOR_COUNT,
+                    COUNT(*) AS VIEW_COUNT
+                FROM PRODUCT_VIEW_LOG L
+                    JOIN PRODUCT P ON L.PRODUCT_NO = P.PRODUCT_NO
+                WHERE P.SELLER_NO = #{sellerNo}
+                  AND TRUNC(L.VIEW_DATE) &gt;= TRUNC(#{targetDate}) - 6
+                GROUP BY TRUNC(L.VIEW_DATE)
+            ) S ON S.VIEW_DAY = D.STAT_DATE
+            ORDER BY D.STAT_DATE
+	</select>
+
+	<!-- public List<VendorDailySalesDTO> getWeeklySalesStat(int sellerNo, Date targetDate); -->
+	<select id="getWeeklySalesStat" resultType="org.doit.goodpang.domain.VendorDailySalesDTO">
+            SELECT
+                TO_CHAR(D.WEEK_START, 'FMMM/DD') AS LABEL,
+                NVL(S.SALES_AMOUNT, 0) AS SALES_AMOUNT,
+                NVL(S.ORDER_COUNT, 0) AS ORDER_COUNT
+            FROM (
+                SELECT TRUNC(#{targetDate}, 'IW') - (LEVEL - 1) * 7 AS WEEK_START
+                FROM DUAL
+                CONNECT BY LEVEL &lt;= 5
+            ) D
+            LEFT JOIN (
+                SELECT
+                    TRUNC(O.ORDER_DATE, 'IW') AS WEEK_START,
+                    SUM(OD.PRICE * OD.ORDER_QTY) AS SALES_AMOUNT,
+                    COUNT(DISTINCT O.ORDER_NO) AS ORDER_COUNT
+                FROM ORDER_DETAIL OD
+                    JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+                    JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                WHERE P.SELLER_NO = #{sellerNo}
+                  AND O.ORDER_STATUS != '주문취소'
+                  AND O.ORDER_DATE &gt;= TRUNC(#{targetDate}, 'IW') - 28
+                GROUP BY TRUNC(O.ORDER_DATE, 'IW')
+            ) S ON S.WEEK_START = D.WEEK_START
+            ORDER BY D.WEEK_START
+	</select>
+
+	<!-- public List<VendorDailySalesDTO> getMonthlySalesStat(int sellerNo, Date targetDate); -->
+	<select id="getMonthlySalesStat" resultType="org.doit.goodpang.domain.VendorDailySalesDTO">
+            SELECT
+                TO_CHAR(D.MONTH_START, 'FMMM') || '월' AS LABEL,
+                NVL(S.SALES_AMOUNT, 0) AS SALES_AMOUNT,
+                NVL(S.ORDER_COUNT, 0) AS ORDER_COUNT
+            FROM (
+                SELECT ADD_MONTHS(TRUNC(#{targetDate}, 'MM'), -(LEVEL - 1)) AS MONTH_START
+                FROM DUAL
+                CONNECT BY LEVEL &lt;= 5
+            ) D
+            LEFT JOIN (
+                SELECT
+                    TRUNC(O.ORDER_DATE, 'MM') AS MONTH_START,
+                    SUM(OD.PRICE * OD.ORDER_QTY) AS SALES_AMOUNT,
+                    COUNT(DISTINCT O.ORDER_NO) AS ORDER_COUNT
+                FROM ORDER_DETAIL OD
+                    JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+                    JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                WHERE P.SELLER_NO = #{sellerNo}
+                  AND O.ORDER_STATUS != '주문취소'
+                  AND O.ORDER_DATE &gt;= ADD_MONTHS(TRUNC(#{targetDate}, 'MM'), -4)
+                GROUP BY TRUNC(O.ORDER_DATE, 'MM')
+            ) S ON S.MONTH_START = D.MONTH_START
+            ORDER BY D.MONTH_START
+	</select>
+
+	<!-- public VendorOrderStatSummaryDTO countOrderStats(int sellerNo); -->
+	<!-- 주문/배송 현황 패널 - 기존 VendorOrderListDAO.countStats와 같은 집계 -->
+	<select id="countOrderStats" resultType="org.doit.goodpang.domain.VendorOrderStatSummaryDTO">
+            SELECT
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '결제완료' THEN O.ORDER_NO END) AS WAITING_COUNT,
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '배송중' THEN O.ORDER_NO END) AS SHIPPING_COUNT,
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '배송완료' THEN O.ORDER_NO END) AS DELIVERED_COUNT,
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '배송완료'
+                                      AND D.DELIVERY_END_DATE IS NOT NULL
+                                      AND TRUNC(D.DELIVERY_END_DATE) = TRUNC(SYSDATE)
+                                 THEN O.ORDER_NO END) AS DELIVERED_TODAY_COUNT
+            FROM ORDERS O
+                JOIN ORDER_DETAIL OD ON OD.ORDER_NO = O.ORDER_NO
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                LEFT JOIN DELIVERY D ON D.ORDER_NO = O.ORDER_NO
+            WHERE P.SELLER_NO = #{sellerNo}
+	</select>
+
+	<!-- public List<NoticeDTO> findRecentNotices(int limit); -->
+	<!-- 공지사항 위젯 - 기존 NoticeDAO.findRecent와 같은 쿼리 ('공지' 타입 우선, 최신순) -->
+	<select id="findRecentNotices" resultType="org.doit.goodpang.domain.NoticeDTO">
+            SELECT N.NOTICE_NO, N.TITLE, N.NOTICE_TYPE, N.ADMIN_NO, A.ADMIN_NAME, N.CREATED_DATE, N.UPDATED_DATE
+            FROM NOTICE N
+                JOIN ADMIN A ON N.ADMIN_NO = A.ADMIN_NO
+            ORDER BY CASE WHEN N.NOTICE_TYPE = '공지' THEN 0 ELSE 1 END, N.NOTICE_NO DESC
+            FETCH FIRST #{limit} ROWS ONLY
+	</select>
+
+</mapper>
