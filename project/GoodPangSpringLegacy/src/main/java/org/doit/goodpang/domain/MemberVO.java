@@ -13,30 +13,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class MemberVO {
-	// member 테이블 컬럼명 필드명 동일 확인
-	private String id; // 수정
-	private String pwd;
-	private String name;
-	private String gender;
 	
-	private String birth;
-	/*
-	  <input type="date" name="birth" id="birth">s
-	  @DateTimeFormat(pattern = "yyyy-MM-dd") 
-	  private Date birth;
-	 */
-	private String is_lunar; // 수정
-	private String cphone;  // 수정
-	private String email;
-	private String habit;
-	private Date   regdate; // 수정
-	
-	private int point; // 추가
-	
-	// 
-	private boolean enabled;
-	
-	// 회원이 소유한 권한들 저장
-	private List<AuthVO> authList;
+	  private Long memberNo;
+      private String memberId;
+      private String memberPw;
+      private String memberName;
+      private String phone;
+	  private String email;
+	  private String rank;
+	  private int status;
 	
 }
