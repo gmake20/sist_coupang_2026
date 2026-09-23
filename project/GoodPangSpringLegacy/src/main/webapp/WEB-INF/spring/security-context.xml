@@ -47,6 +47,7 @@
     <http use-expressions="true">
 
         <!-- 누구나 접근 -->
+    <intercept-url pattern="/vendor/**" access="permitAll" />
 
     <intercept-url pattern="/login**" access="permitAll" />
     <intercept-url pattern="/signup**" access="permitAll" />
