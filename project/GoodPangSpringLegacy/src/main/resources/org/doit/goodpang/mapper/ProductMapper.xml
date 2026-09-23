@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="org.doit.goodpang.mapper.ProductMapper">
+  
+   <!--
+         상품 하나 조회 (PRODUCT + SELLER + 카테고리 3단 JOIN)
+         구버전 ProductDAO.selectProduct() 의 SQL 그대로.
+
+         SUB/MID/MAIN 3단은 CATEGORY 테이블의 자기참조(PARENT_CATEGORY_NO)를 세 번 JOIN 한 것.
+         WHERE 의 조건 2개는 화면에 나오면 안 되는 상품을 거르는 것 —
+           SALE_STATUS != '승인 대기' : 관리자 승인 전 상품
+           DISPLAY_YN = 'Y'          : 판매자가 숨김 처리한 상품
+         (그래서 '품절'·'판매 중지' 는 여기서 안 걸러지고 화면에서 구매버튼만 막음)
+
+         컬럼명 -> 필드명은 mybatis-config.xml 의 mapUnderscoreToCamelCase 가 알아서 해줌
+         (SUB_CATEGORY_NAME -> subCategoryName). 그래서 resultMap 없이 resultType 만 씀.
+    -->
+  
+  
+ <!-- public ProductDTO selectProduct(int productNo); -->
+  <select id="selectProduct" parameterType="int" resultType="org.doit.goodpang.domain.ProductDTO">
+ 	
+    SELECT
+    P.PRODUCT_NO,
+    P.PRODUCT_NAME,
+    P.PRODUCT_DESC,
+    P.PRODUCT_PRICE,
+    P.QUANTITY,
+    P.SELLER_NO,
+    S.STORE_NAME,
+    S.CEO_NAME,
+    S.BUSINESS_ADDRESS,
+    S.BUSINESS_DETAIL_ADDRESS,
+    S.EMAIL,
+    S.PHONE,
+    S.MAIL_ORDER_NO,
+    S.BUSINESS_NO,
+    P.SALE_STATUS,
+    P.SUB_CATEGORY_NO,
+    SC.CATEGORY_NAME    AS SUB_CATEGORY_NAME,
+    MC.CATEGORY_NO      AS MID_CATEGORY_NO,
+    MC.CATEGORY_NAME    AS MID_CATEGORY_NAME,
+    MAINC.CATEGORY_NO   AS MAIN_CATEGORY_NO,
+    MAINC.CATEGORY_NAME AS MAIN_CATEGORY_NAME
+    FROM PRODUCT P
+    JOIN SELLER S
+    ON P.SELLER_NO = S.SELLER_NO
+    JOIN CATEGORY SC
+    ON P.SUB_CATEGORY_NO = SC.CATEGORY_NO        
+    JOIN CATEGORY MC
+    ON SC.PARENT_CATEGORY_NO = MC.CATEGORY_NO   
+    JOIN CATEGORY MAINC
+    ON MC.PARENT_CATEGORY_NO = MAINC.CATEGORY_NO
+    WHERE P.PRODUCT_NO = #{productNo}
+      AND P.SALE_STATUS != '승인 대기'
+      AND P.DISPLAY_YN = 'Y'
+ 
+  </select>
+
+  <!--
+       이 상품의 첫 옵션 ID. 구버전 ProductDAO.getDefaultOptionId() 그대로.
+       옵션이 없으면 결과가 0행이고, MyBatis 는 그때 null 을 돌려줌 (구버전 return null 과 같음).
+   -->
+
+  <!-- public Integer getDefaultOptionId(int productNo); -->
+  <select id="getDefaultOptionId" parameterType="int" resultType="java.lang.Integer">
+  	 
+  	 SELECT OPTION_ID
+     FROM PRODUCT_OPTION
+     WHERE PRODUCT_NO = #{productNo}
+     ORDER BY OPTION_ID
+     FETCH FIRST 1 ROW ONLY
+  
+  </select>
+ 
+	
+  </mapper>

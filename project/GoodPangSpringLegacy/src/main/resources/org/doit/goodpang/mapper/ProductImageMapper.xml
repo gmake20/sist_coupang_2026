@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="org.doit.goodpang.mapper.ProductImageMapper">
+  <!-- List<ProductImageDTO> selectImagesByProductNo(int productNo); -->
+  <select id="selectImagesByProductNo" parameterType="int" resultType="org.doit.goodpang.domain.ProductImageDTO">
+  	   
+  	   SELECT
+            IMAGE_NO,
+            PRODUCT_NO,
+            OPTION_ID,
+            IMAGE_PURPOSE,
+            IMAGE_ORDER,
+            IMAGE_URL
+        FROM PRODUCT_IMAGE
+        WHERE PRODUCT_NO = #{productNo}
+        ORDER BY OPTION_ID, CASE WHEN IMAGE_PURPOSE = '대표' THEN 0 ELSE 1 END, IMAGE_ORDER, IMAGE_NO
+        
+  </select>
+  
+  <!-- List<ProductImageDTO> selectImagesByOptionId(int optionId); -->
+  <select id="selectImagesByOptionId" parameterType="int" resultType="org.doit.goodpang.domain.ProductImageDTO">
+	
+	SELECT
+         IMAGE_NO,
+         PRODUCT_NO,
+         OPTION_ID,
+         IMAGE_PURPOSE,
+         IMAGE_ORDER,
+         IMAGE_URL
+     FROM PRODUCT_IMAGE
+     WHERE OPTION_ID = #{optionNo}
+     ORDER BY CASE WHEN IMAGE_PURPOSE = '대표' THEN 0 ELSE 1 END, IMAGE_ORDER, IMAGE_NO 
+      
+  </select>	
+  </mapper>
