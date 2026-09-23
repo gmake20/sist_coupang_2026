@@ -1,64 +1,70 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%-- =========================================================
-     topbar.jspf — 판매자센터 공통 상단바
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%--=========================================================topbar.jsp — 판매자센터 공통 상단바 (Tiles "topbar" 속성) 등급 배지는
+        request/session 속성 "sellerGrade" 가 있을 때만 표시 (예) model.addAttribute("sellerGrade", "파워셀러" ); // 배지 표시 값을 안 넣으면 배지
+        없음 (대부분의 페이지) Tiles의 insertAttribute는 동적 include라 layout.jsp의 스크립틀릿 지역변수가 이 파일에서 안 보임 → 반드시 request 속성 +
+        EL(${sellerGrade})로 받아야 함=========================================================--%>
+<% String sellerGrade="파워셀러" ; String menu="orders" ; %>
 
-     쓰는 쪽(포함하는 JSP)이 include 하기 전에 아래 변수를 선언해둬야 함
-       String sellerGrade = null;   // 등급 배지 없음 (대부분의 페이지)
-       String sellerGrade = "파워셀러";  // 등급 배지 표시 (예: vendor_orders.jsp)
-
-     ⚠ 이 파일에 <%@ page %> 지시어를 넣지 않음.
-     정적 include(<%@ include %>)로만 쓰이는 조각이라, 인코딩은 이 파일을
-     불러오는 쪽 JSP의 <%@ page pageEncoding="UTF-8" %> 하나로 정해짐.
-     여기 따로 넣어도 효과가 없고, 편집기가 저장할 때 인코딩을 잘못 잡으면
-     오히려 한글이 깨질 수 있음 (실제로 한 번 그렇게 깨졌었음)
-========================================================= --%>
 <!-- 상단바 -->
 <header class="topbar">
 
-  <div class="topbar-left">
+	<div class="topbar-left">
 
-    <a href="${pageContext.request.contextPath}/index.jsp" class="brand-seller">
-      <span class="brand-coupang">coupang</span>
-      <span class="brand-seller-text">seller</span>
-    </a>
+		<a href="${pageContext.request.contextPath}/" class="brand-seller">
+			<span class="brand-coupang">coupang</span> <span
+			class="brand-seller-text">seller</span>
+		</a>
 
-    <button class="icon-button menu-toggle" id="sidebarToggle" type="button" aria-label="메뉴 열기/닫기">
-      <svg class="icon"><use href="#ic-menu" /></svg>
-    </button>
+		<button class="icon-button menu-toggle" id="sidebarToggle"
+			type="button" aria-label="메뉴 열기/닫기">
+			<svg class="icon">
+                  <use href="#ic-menu" />
+                </svg>
+		</button>
 
-  </div>
+	</div>
 
-  <div class="topbar-right">
+	<div class="topbar-right">
 
-    <div class="user-menu" id="userMenu">
-<%
-    String topbarStoreName = (String) session.getAttribute("storeName");
-    String topbarDisplayName = (topbarStoreName != null ? topbarStoreName : "판매자") + "님";
-%>
-      <button class="user-menu-trigger" id="userMenuTrigger" type="button">
-        <span class="avatar">
-          <svg class="icon"><use href="#ic-user" /></svg>
-        </span>
-<% if (sellerGrade != null) { %>
-        <span class="user-name-group">
-          <span class="user-name"><%= topbarDisplayName %></span>
-          <span class="user-grade"><%= sellerGrade %></span>
-        </span>
-<% } else { %>
-        <span class="user-name"><%= topbarDisplayName %></span>
-<% } %>
-        <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
-      </button>
+		<div class="user-menu" id="userMenu">
+			<c:set var="topbarDisplayName"
+				value="${empty sessionScope.storeName ? '판매자' : sessionScope.storeName}님" />
+			<button class="user-menu-trigger" id="userMenuTrigger" type="button">
+				<span class="avatar"> <svg class="icon">
+                      <use href="#ic-user" />
+                    </svg>
+				</span>
+				<c:choose>
+					<c:when test="${not empty sellerGrade}">
+						<span class="user-name-group"> <span class="user-name">
+								<c:out value="${topbarDisplayName}" />
+						</span> <span class="user-grade"> <c:out value="${sellerGrade}" />
+						</span>
+						</span>
+					</c:when>
+					<c:otherwise>
+						<span class="user-name"> <c:out
+								value="${topbarDisplayName}" />
+						</span>
+					</c:otherwise>
+				</c:choose>
+				<svg class="icon chevron">
+                    <use href="#ic-chevron-down" />
+                  </svg>
+			</button>
 
-      <div class="user-menu-panel" id="userMenuPanel">
-        <a href="<%= request.getContextPath() %>/vendor/business-info">판매자 정보 관리</a>
-        <a href="<%= request.getContextPath() %>/vendor/logout">로그아웃</a>
-      </div>
+			<div class="user-menu-panel" id="userMenuPanel">
+				<a
+					href="${pageContext.request.contextPath}/vendor/business-info.htm">판매자
+					정보 관리</a> <a
+					href="${pageContext.request.contextPath}/vendor/logout.htm">로그아웃</a>
+			</div>
 
-    </div>
+		</div>
 
-  </div>
+	</div>
 
 </header>

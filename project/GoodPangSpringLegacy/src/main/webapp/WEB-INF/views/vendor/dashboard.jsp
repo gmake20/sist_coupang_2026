@@ -2,6 +2,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="org.doit.goodpang.domain.SellerDTO" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+    
+    <main class="main">
 <%
     SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
     String approvalStatus = (loginSeller != null) ? loginSeller.getApprovalStatus() : null;
@@ -19,7 +21,7 @@
                 bannerColor = "#fff4e5";
                 bannerTitle = "입점 절차가 완료되지 않았습니다.";
                 bannerDesc = "사업장 정보, 정산계좌, 서류를 제출하셔야 상품 등록 및 판매가 가능합니다.";
-                actionUrl = request.getContextPath() + "/vendor/business-info";
+                actionUrl = request.getContextPath() + "/vendor/business-info.htm";
                 actionLabel = "추가정보 입력하기";
                 break;
             case "심사 중":
@@ -33,7 +35,7 @@
                 bannerDesc = (loginSeller.getRejectReason() != null)
                         ? "사유: " + loginSeller.getRejectReason()
                         : "자세한 사유는 판매자 고객센터로 문의해주세요.";
-                actionUrl = request.getContextPath() + "/vendor/business-info";
+                actionUrl = request.getContextPath() + "/vendor/business-info.htm";
                 actionLabel = "정보 다시 제출하기";
                 break;
             default:
@@ -197,7 +199,7 @@
 
           <div class="panel-head">
             <h2>주문/배송 현황</h2>
-            <a href="${pageContext.request.contextPath}/vendor/order" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
+            <a href="${pageContext.request.contextPath}/vendor/order.htm" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
           </div>
 
           <ul class="status-list">

@@ -1,26 +1,24 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%-- =========================================================
-     sidebar.jspf — 판매자센터 공통 좌측 사이드바
+     sidebar.jsp — 판매자센터 공통 좌측 사이드바 (Tiles "sidebar" 속성)
 
-     쓰는 쪽(포함하는 JSP)이 include 하기 전에 아래 변수를 선언해둬야 함
-       String menu = "dashboard";     // 대시보드
-       String menu = "products";        // 상품관리 > 상품 목록
-       String menu = "productWrite";    // 상품관리 > 상품 등록
-       String menu = "productOptions";  // 상품관리 > 상품 옵션 관리
-       String menu = "orders";          // 주문/배송관리 > 주문 목록
-       String menu = "delivery";        // 주문/배송관리 > 배송 관리
-       String menu = "return";          // 주문/배송관리 > 취소/반품/교환 관리
-       String menu = "shipping";        // 주문/배송관리 > 출고/운송장 관리
-       String menu = "settlement";      // 정산관리 > 정산내역 리스트
-       String menu = "businessInfo";    // 하단 > 판매자 정보관리
-       String menu = "notice";          // 공지사항
+     현재 메뉴는 Controller에서 request 속성 "menu"로 넘겨줘야 함
+       (예) mav.addObject("menu", "dashboard");  /  model.addAttribute("menu", "dashboard");
+     Tiles의 insertAttribute는 동적 include라 layout.jsp의 스크립틀릿 지역변수가
+     이 파일에서 안 보임 → 반드시 request 속성 + EL(${menu})로 받아야 함
 
-     ⚠ 이 파일에 <%@ page %> 지시어를 넣지 않음.
-     정적 include(<%@ include %>)로만 쓰이는 조각이라, 인코딩은 이 파일을
-     불러오는 쪽 JSP의 <%@ page pageEncoding="UTF-8" %> 하나로 정해짐.
-     여기 따로 넣어도 효과가 없고, 편집기가 저장할 때 인코딩을 잘못 잡으면
-     오히려 한글이 깨질 수 있음 (실제로 한 번 그렇게 깨졌었음)
+       "dashboard"       // 대시보드
+       "products"        // 상품관리 > 상품 목록
+       "productWrite"    // 상품관리 > 상품 등록
+       "productOptions"  // 상품관리 > 상품 옵션 관리
+       "orders"          // 주문/배송관리 > 주문 목록
+       "delivery"        // 주문/배송관리 > 배송 관리
+       "return"          // 주문/배송관리 > 취소/반품/교환 관리
+       "shipping"        // 주문/배송관리 > 출고/운송장 관리
+       "settlement"      // 정산관리 > 정산내역 리스트
+       "businessInfo"    // 하단 > 판매자 정보관리
+       "notice"          // 공지사항
 
      ⚠ 이 파일은 <div class="layout">과 <aside class="sidebar">를
        열기만 하고 안 닫음. 포함하는 쪽에서
@@ -34,44 +32,44 @@
 
     <nav class="side-nav">
 
-      <a href="/vendor/dashboard" class="side-item <%= "dashboard".equals(menu) ? "active" : "" %>">
+      <a href="${pageContext.request.contextPath}/vendor/dashboard.htm" class="side-item ${menu eq 'dashboard' ? 'active' : ''}">
         <svg class="icon"><use href="#ic-home" /></svg>
         <span>대시보드</span>
       </a>
 
-      <button class="side-item side-group-toggle <%= ("products".equals(menu) || "productWrite".equals(menu) || "productOptions".equals(menu)) ? "active open" : "" %>" type="button">
+      <button class="side-item side-group-toggle ${(menu eq 'products' or menu eq 'productWrite' or menu eq 'productOptions') ? 'active open' : ''}" type="button">
         <svg class="icon"><use href="#ic-box" /></svg>
         <span>상품관리</span>
         <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
       </button>
-      <div class="side-submenu <%= ("products".equals(menu) || "productWrite".equals(menu) || "productOptions".equals(menu)) ? "open" : "" %>">
-        <a href="/vendor/product" class="<%= "products".equals(menu) ? "active" : "" %>">상품 목록</a>
-        <a href="/vendor/product/write" class="<%= "productWrite".equals(menu) ? "active" : "" %>">상품 등록</a>
-        <a href="/vendor/product/options" class="<%= "productOptions".equals(menu) ? "active" : "" %>">상품 옵션 관리</a>
+      <div class="side-submenu ${(menu eq 'products' or menu eq 'productWrite' or menu eq 'productOptions') ? 'open' : ''}">
+        <a href="${pageContext.request.contextPath}/vendor/product.htm" class="${menu eq 'products' ? 'active' : ''}">상품 목록</a>
+        <a href="${pageContext.request.contextPath}/vendor/product/write.htm" class="${menu eq 'productWrite' ? 'active' : ''}">상품 등록</a>
+        <a href="${pageContext.request.contextPath}/vendor/product/options.htm" class="${menu eq 'productOptions' ? 'active' : ''}">상품 옵션 관리</a>
       </div>
 
-      <button class="side-item side-group-toggle <%= ("orders".equals(menu) || "delivery".equals(menu) || "return".equals(menu) || "shipping".equals(menu)) ? "active open" : "" %>" type="button">
+      <button class="side-item side-group-toggle ${(menu eq 'orders' or menu eq 'delivery' or menu eq 'return' or menu eq 'shipping') ? 'active open' : ''}" type="button">
         <svg class="icon"><use href="#ic-truck" /></svg>
         <span>주문/배송관리</span>
         <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
       </button>
-      <div class="side-submenu <%= ("orders".equals(menu) || "delivery".equals(menu) || "return".equals(menu) || "shipping".equals(menu)) ? "open" : "" %>">
-        <a href="/vendor/order" class="<%= "orders".equals(menu) ? "active" : "" %>">주문 목록</a>
-        <a href="/vendor/delivery" class="<%= "delivery".equals(menu) ? "active" : "" %>">배송 관리</a>
-        <a href="/vendor/return" class="<%= "return".equals(menu) ? "active" : "" %>">취소/반품/교환 관리</a>
-        <a href="/vendor/shipping" class="<%= "shipping".equals(menu) ? "active" : "" %>">출고/운송장 관리</a>
+      <div class="side-submenu ${(menu eq 'orders' or menu eq 'delivery' or menu eq 'return' or menu eq 'shipping') ? 'open' : ''}">
+        <a href="${pageContext.request.contextPath}/vendor/order.htm" class="${menu eq 'orders' ? 'active' : ''}">주문 목록</a>
+        <a href="${pageContext.request.contextPath}/vendor/delivery.htm" class="${menu eq 'delivery' ? 'active' : ''}">배송 관리</a>
+        <a href="${pageContext.request.contextPath}/vendor/return.htm" class="${menu eq 'return' ? 'active' : ''}">취소/반품/교환 관리</a>
+        <a href="${pageContext.request.contextPath}/vendor/shipping.htm" class="${menu eq 'shipping' ? 'active' : ''}">출고/운송장 관리</a>
       </div>
 
-      <button class="side-item side-group-toggle <%= "settlement".equals(menu) ? "active open" : "" %>" type="button">
+      <button class="side-item side-group-toggle ${menu eq 'settlement' ? 'active open' : ''}" type="button">
         <svg class="icon"><use href="#ic-calculator" /></svg>
         <span>정산관리</span>
         <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
       </button>
-      <div class="side-submenu <%= "settlement".equals(menu) ? "open" : "" %>">
-        <a href="/vendor/settlement" class="<%= "settlement".equals(menu) ? "active" : "" %>">정산내역 리스트</a>
+      <div class="side-submenu ${menu eq 'settlement' ? 'open' : ''}">
+        <a href="${pageContext.request.contextPath}/vendor/settlement.htm" class="${menu eq 'settlement' ? 'active' : ''}">정산내역 리스트</a>
       </div>
 
-      <a href="/vendor/notice" class="side-item <%= "notice".equals(menu) ? "active" : "" %>">
+      <a href="${pageContext.request.contextPath}/vendor/notice.htm" class="side-item ${menu eq 'notice' ? 'active' : ''}">
         <svg class="icon"><use href="#ic-bell" /></svg>
         <span>공지사항</span>
       </a>
@@ -79,7 +77,7 @@
     </nav>
 
     <div class="side-foot">
-      <a href="/vendor/business-info" class="side-item <%= "businessInfo".equals(menu) ? "active" : "" %>">
+      <a href="${pageContext.request.contextPath}/vendor/business-info.htm" class="side-item ${menu eq 'businessInfo' ? 'active' : ''}">
         <svg class="icon"><use href="#ic-gear" /></svg>
         <span>판매자 정보관리</span>
       </a>

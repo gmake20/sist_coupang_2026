@@ -43,7 +43,7 @@
       </h1>
 
       <form class="form" id="loginForm" novalidate method="post"
-        action="${pageContext.request.contextPath}/vendor/login">
+        action="${pageContext.request.contextPath}/vendor/login.htm">
 
         <% if (request.getAttribute("error") != null) { %>
           <p class="message error show"><%= request.getAttribute("error") %></p>
@@ -71,13 +71,14 @@
           <a href="#" class="find-link">비밀번호 찾기</a>
         </div>
 
+	   <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
       </form>
 
       <div class="divider">
         <span>판매자가 아니신가요?</span>
       </div>
 
-      <a href="${pageContext.request.contextPath}/vendor/signup" class="signup-button">
+      <a href="${pageContext.request.contextPath}/vendor/signup.htm" class="signup-button">
         판매자 회원가입
       </a>
 
