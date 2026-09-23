@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <%-- 상세페이지 전용 CSS (reset/common 은 layout_shop.jsp 에 있음) --%>
 <link rel="stylesheet"
@@ -399,6 +400,9 @@
 					<!-- ⑥ 수량 + 구매 버튼 (원본 실측: 전부 높이 42px) -->
 					<form class="prod-buy-quantity-and-footer" method="post"
 						action="${pageContext.request.contextPath}/cart/add">
+						
+						  <!-- Spring Security CSRF -->
+    					<sec:csrfInput />
 
 						<!-- 실제 CART에 저장할 OPTION_ID
                  2026-08-28: 하드코딩(25) 대신 첫 번째 옵션 값으로 시작, #optionSelect 를 바꾸면

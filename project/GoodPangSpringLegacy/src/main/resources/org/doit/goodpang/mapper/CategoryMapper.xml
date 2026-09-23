@@ -2,9 +2,47 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-  
+
   <mapper namespace="org.doit.goodpang.mapper.CategoryMapper">
-  
-  
-	
-  </mapper>
+
+	<!-- public List<CategoryDTO> selectCategoryTree(); -->
+	<!-- 기존 서블릿에서 Java로 만들던 대분류 이미지 경로("/pds/category_번호.png")를 SQL에서 만든다 -->
+	<select id="selectCategoryTree" resultType="org.doit.goodpang.domain.CategoryDTO">
+            SELECT category_no,
+                   category_name,
+                   parent_category_no,
+                   category_level,
+                   CASE WHEN category_level = 1
+                        THEN '/pds/category_' || category_no || '.png'
+                   END AS img_url
+            FROM CATEGORY
+            START WITH parent_category_no IS NULL
+            CONNECT BY PRIOR category_no = parent_category_no
+                   AND LEVEL &lt;= 3
+            ORDER SIBLINGS BY category_no
+	</select>
+
+	<!-- public List<CategoryDTO> searchLeafByKeyword(String keyword); -->
+	<!--
+	  같은 이름의 리프가 서로 다른 상위 카테고리에 있을 수 있어서(예: 남성패션/여성패션에 각각 "의류"),
+	  루트 → 리프 방향으로 SYS_CONNECT_BY_PATH를 쌓아 categoryPath("대분류 > 중분류 > 소분류")를 함께 내려준다.
+	  (기존 서블릿은 리프 → 루트로 올라간 뒤 Java buildCategoryPath()에서 순서를 뒤집었는데,
+	   루트부터 내려오면 SQL만으로 같은 결과가 나온다)
+	  CONNECT_BY_ISLEAF = 1 : 자식이 없는 최종 항목(상품 등록 시 실제로 선택하는 소분류)
+	-->
+	<select id="searchLeafByKeyword" resultType="org.doit.goodpang.domain.CategoryDTO">
+            SELECT category_no,
+                   category_name,
+                   parent_category_no,
+                   category_level,
+                   SUBSTR(SYS_CONNECT_BY_PATH(category_name, ' > '), 4) AS category_path
+            FROM CATEGORY
+            WHERE CONNECT_BY_ISLEAF = 1
+              AND category_name LIKE '%' || #{keyword} || '%'
+            START WITH parent_category_no IS NULL
+            CONNECT BY PRIOR category_no = parent_category_no
+            ORDER BY category_no
+	</select>
+
+</mapper>
+

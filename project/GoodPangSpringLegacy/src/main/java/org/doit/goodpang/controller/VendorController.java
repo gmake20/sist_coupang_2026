@@ -18,8 +18,10 @@ import org.doit.goodpang.domain.VendorDailySalesDTO;
 import org.doit.goodpang.domain.VendorDailyTrafficDTO;
 import org.doit.goodpang.domain.VendorDashboardStatDTO;
 import org.doit.goodpang.domain.VendorOrderStatSummaryDTO;
+import org.doit.goodpang.domain.VendorProductListDTO;
 import org.doit.goodpang.mapper.VendorDashboardMapper;
 import org.doit.goodpang.mapper.VendorMapper;
+import org.doit.goodpang.mapper.VendorProductMapper;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,10 +41,12 @@ import lombok.RequiredArgsConstructor;
 public class VendorController {
 	private final VendorMapper vendorMapper;
 	private final VendorDashboardMapper vendorDashboardMapper;
+	private final VendorProductMapper vendorProductMapper;
 	// private final MemberShipService memberShipService;
 
 	// 차트 데이터를 JS에 넘길 JSON 변환용 (기존 서블릿의 Gson 대신 pom.xml에 이미 있는 Jackson 사용)
 	private static final ObjectMapper objectMapper = new ObjectMapper();
+	private static final int PAGE_SIZE = 20; // 상품 목록 한 페이지 행 수
 	private static final String[] DAY_NAMES = { "일", "월", "화", "수", "목", "금", "토" };
 
 	// [2]
@@ -111,8 +115,7 @@ public class VendorController {
 	@GetMapping(value = "/dashboard.htm")
 	public ModelAndView dashboard(
 			@RequestParam(value = "date", required = false) String date,
-			HttpSession session
-	) throws JsonProcessingException {
+			HttpSession session) throws JsonProcessingException {
 
 		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
 
@@ -147,7 +150,8 @@ public class VendorController {
 		VendorOrderStatSummaryDTO orderStat = vendorDashboardMapper.countOrderStats(sellerNo);
 		mav.addObject("orderStat", orderStat);
 
-		// 매출 현황 차트(일간/주간/월간) - 실데이터. JS의 salesData.daily/weekly/monthly 자리를 이 JSON으로 채운다.
+		// 매출 현황 차트(일간/주간/월간) - 실데이터. JS의 salesData.daily/weekly/monthly 자리를 이 JSON으로
+		// 채운다.
 		// 선택된 날짜가 속한 구간까지 포함해서 최근 7일/5주/5개월을 보여준다.
 		List<VendorDailySalesDTO> dailySales = vendorDashboardMapper.getDailySalesStat(sellerNo, targetSqlDate);
 		mav.addObject("dailySalesJson", objectMapper.writeValueAsString(dailySales));
@@ -204,11 +208,74 @@ public class VendorController {
 
 	private String formatDateLabel(LocalDate date) {
 		String dayName = DAY_NAMES[date.getDayOfWeek().getValue() % 7];
-		return String.format("%04d.%02d.%02d (%s)", date.getYear(), date.getMonthValue(), date.getDayOfMonth(), dayName);
+		return String.format("%04d.%02d.%02d (%s)", date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
+				dayName);
 	}
 
 	private String formatShortDate(LocalDate date) {
 		return date.getMonthValue() + "/" + date.getDayOfMonth();
+	}
+
+	@GetMapping(value = "/product.htm")
+	public ModelAndView product(
+			@RequestParam(value = "view", required = false) String view,
+			@RequestParam(value = "page", required = false) String pageParam,
+			HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		boolean hiddenView = "hidden".equals(view);
+		int page = parsePage(pageParam);
+
+		int sellerNo = loginSeller.getSellerNo();
+		String displayYn = hiddenView ? "N" : "Y";
+
+		List<VendorProductListDTO> productList = vendorProductMapper.findBySellerNo(sellerNo, displayYn,
+				(page - 1) * PAGE_SIZE, PAGE_SIZE);
+
+		// 통계 카드(전체/판매중/품절/판매중지/승인대기)는 현재 페이지가 아니라 이 탭(노출/숨김)
+		// 전체 상품 기준이어야 하므로, 화면에 뿌리는 productList와 별개로 집계 쿼리를 따로 돌린다.
+		int totalCount = vendorProductMapper.countBySellerNo(sellerNo, displayYn, null);
+		int saleCount = vendorProductMapper.countBySellerNo(sellerNo, displayYn, "판매 중");
+		int soldOutCount = vendorProductMapper.countBySellerNo(sellerNo, displayYn, "품절");
+		int stoppedCount = vendorProductMapper.countBySellerNo(sellerNo, displayYn, "판매 중지");
+		int pendingCount = vendorProductMapper.countBySellerNo(sellerNo, displayYn, "승인 대기");
+		int totalPages = Math.max(1, (int) Math.ceil(totalCount / (double) PAGE_SIZE));
+
+		ModelAndView mav = new ModelAndView("vendor.product");
+		mav.addObject("menu", "products"); // 사이드바 활성 메뉴
+
+		mav.addObject("productList", productList);
+		mav.addObject("hiddenView", hiddenView);
+		mav.addObject("page", page);
+		mav.addObject("totalPages", totalPages);
+		mav.addObject("totalCount", totalCount);
+		mav.addObject("saleCount", saleCount);
+		mav.addObject("soldOutCount", soldOutCount);
+		mav.addObject("stoppedCount", stoppedCount);
+		mav.addObject("pendingCount", pendingCount);
+
+		return mav;
+	}
+
+	// ?page= 파라미터 파싱. 없거나 숫자가 아니면 1페이지
+	private int parsePage(String pageParam) {
+		try {
+			return Math.max(1, Integer.parseInt(pageParam));
+		} catch (NumberFormatException e) {
+			return 1;
+		}
+	}
+
+	@GetMapping(value = "/product_write.htm")
+	public ModelAndView product_write() {
+		ModelAndView mav = new ModelAndView("vendor.product_write");
+		return mav;
+
 	}
 
 }

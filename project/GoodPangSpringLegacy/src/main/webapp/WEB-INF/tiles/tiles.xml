@@ -29,6 +29,7 @@
 	</definition>
 	
 	<definition name="vendor.*"  template="/WEB-INF/views/vendor/inc/layout.jsp">
+		<put-attribute name="css" value="/vendor/inc/css/{1}.css"/>
 		<put-attribute name="iconsprite" value="/WEB-INF/views/vendor/inc/icon-sprite.jsp"/>
 		<put-attribute name="sidebar" value="/WEB-INF/views/vendor/inc/sidebar.jsp"/>
 		<put-attribute name="topbar" value="/WEB-INF/views/vendor/inc/topbar.jsp"/>

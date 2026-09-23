@@ -6,6 +6,7 @@ import org.doit.goodpang.service.OrderService;
 import org.doit.goodpang.service.OrderService.OrderResult;
 import org.doit.goodpang.service.OrderService.StockOutException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,7 +30,7 @@ public class OrderController {
 
     @PostMapping("/checkout")
     public String checkout(
-            @AuthenticationPrincipal CustomUser user,
+    		Authentication authentication,
 
             @RequestParam("checkoutNo")
             int checkoutNo,
@@ -54,10 +55,12 @@ public class OrderController {
 
             RedirectAttributes rttr) {
 
-        Long memberNo =
-                user.getMember()
-                          .getMemberNo();
+    	CustomUser customUser =
+                (CustomUser) authentication.getPrincipal();
 
+        Long memberNo =
+                customUser.getMember().getMemberNo();
+        
         Integer paymentMethodNo;
 
         switch (paymentMethod) {
@@ -149,15 +152,16 @@ public class OrderController {
 
     @GetMapping("/complete")
     public String complete(
-            @AuthenticationPrincipal CustomUser customUser,
+            Authentication authentication,
             @RequestParam("orderNo") int orderNo,
             Model model) {
 
 
-        Long memberNo =
-                customUser.getMember()
-                          .getMemberNo();
+    	CustomUser customUser =
+                (CustomUser) authentication.getPrincipal();
 
+        Long memberNo =
+                customUser.getMember().getMemberNo();
         OrderCompleteDTO orderComplete =
                 orderService.getOrderComplete(
                         orderNo,
@@ -183,5 +187,22 @@ public class OrderController {
         );
 
         return "order/complete";
+    }
+    
+    @GetMapping("/payment")
+    public String payment(
+            Authentication authentication,
+            @RequestParam("checkoutNo") int checkoutNo,
+            Model model) {
+
+        CustomUser customUser =
+                (CustomUser) authentication.getPrincipal();
+
+        Long memberNo =
+                customUser.getMember().getMemberNo();
+        
+        model.addAttribute("checkoutNo", checkoutNo);
+
+        return "order/payment";
     }
 }
