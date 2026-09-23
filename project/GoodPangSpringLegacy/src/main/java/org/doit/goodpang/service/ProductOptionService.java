@@ -4,6 +4,15 @@ import java.util.List;
 
 import org.doit.goodpang.domain.ProductImageDTO;
 import org.doit.goodpang.domain.ProductOptionDTO;
+import org.doit.goodpang.mapper.ProductImageMapper;
+import org.doit.goodpang.mapper.ProductOptionMapper;
+import org.doit.goodpang.util.ImageUrl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 
 
@@ -23,21 +32,26 @@ import org.doit.goodpang.domain.ProductOptionDTO;
  *
  * ※ ProductOptionServlet 은 아직 원본 그대로 살아있음.
  */
+@Service
 public class ProductOptionService {
 
     private static final Gson gson = new Gson();
 
-    private final ProductOptionDAO optionDAO = new ProductOptionDAO();
-    private final ProductImageDAO imageDAO = new ProductImageDAO();
+    @Autowired
+    private ProductOptionMapper productOptionMapper;
+    
+    @Autowired
+    private ProductImageMapper productImageMapper;
+       
 
     /** 옵션 1건. 없으면 null (Handler 가 404 로 처리) */
     public ProductOptionDTO getOption(int optionId) throws Exception {
-        return optionDAO.selectOptionById(optionId);
+        return productOptionMapper.selectOptionById(optionId);
     }
 
     /** 이 옵션 전용 사진들 */
     public List<ProductImageDTO> getImages(int optionId) throws Exception {
-        return imageDAO.selectImagesByOptionId(optionId);
+        return productImageMapper.selectImagesByOptionId(optionId);
     }
 
     /**

@@ -26,7 +26,7 @@
 <!-- 3. 페이지별 CSS — 각 content JSP 안에서 추가 -->
 
 </head>
-<body>
+<body class="${bodyClass}" data-sale-status="${saleStatus}">
 	 <%-- 최상단 배너 — 정의한 페이지에만 나옴. 없으면 아무것도 안 나옴 --%>
       <tiles:insertAttribute name="topBanner" ignore="true" />
       

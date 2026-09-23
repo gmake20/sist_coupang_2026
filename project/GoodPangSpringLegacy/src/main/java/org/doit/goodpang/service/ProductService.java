@@ -9,6 +9,17 @@ import java.util.Locale;
 import org.doit.goodpang.domain.ProductDTO;
 import org.doit.goodpang.domain.ProductImageDTO;
 import org.doit.goodpang.domain.ProductOptionDTO;
+import org.doit.goodpang.mapper.ProductImageMapper;
+import org.doit.goodpang.mapper.ProductMapper;
+import org.doit.goodpang.mapper.ProductOptionMapper;
+import org.doit.goodpang.util.ImageUrl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 
 
@@ -19,7 +30,6 @@ import org.doit.goodpang.domain.ProductOptionDTO;
  * Handler(=컨트롤러 쪽)는 이 클래스의 메서드를 순서대로 부르고 request 에 담기만 하고,
  * DAO(=Persistence)는 이 클래스만 호출함 — controller -> service -> persistence 순서를 지키려고.
  *
- * ※ ProductServlet 은 아직 살아있음(원본 그대로). 이 클래스는 그 로직을 옮겨 담은 것.
  *
  * ★ 원 작성자 표기 — 상세페이지는 여러 명이 같이 만든 화면이라 이 클래스에도 팀원 코드가 섞여 있음
  *   (git blame 기준). 기능을 새로 짠 게 아니라 위치만 옮긴 것이라 원 작성자를 남겨둠:
@@ -27,6 +37,8 @@ import org.doit.goodpang.domain.ProductOptionDTO;
  *     - 리뷰 별점 요약 / 리뷰 사진(getRatingSummary, getReviewsWithImages) : jihoonlee
  *     - 그 외(가격/할인율/적립금/옵션선택/배송예정일/사진분류/평균평점)       : flicker1016
  */
+
+@Service
 public class ProductService {
 
     private static final Gson gson = new Gson();
@@ -34,54 +46,63 @@ public class ProductService {
     /** 적립 혜택 비율 — 실제 적립 정책 테이블이 없어서 판매가의 5% 로 임의 계산 중 */
     private static final int REWARD_RATE_PERCENT = 5;
 
-    private final ProductDAO productDAO = new ProductDAO();
-    private final ProductOptionDAO optionDAO = new ProductOptionDAO();
-    private final ProductImageDAO imageDAO = new ProductImageDAO();
-    private final ReviewDAO reviewDAO = new ReviewDAO();
-    private final ProductViewLogDAO viewLogDAO = new ProductViewLogDAO();
+    @Autowired
+    private ProductMapper productMapper;
+    
+    @Autowired
+    private ProductOptionMapper productOptionMapper;
+    
+    @Autowired
+    private ProductImageMapper productImageMapper;
+
+	/* private final ReviewDAO reviewDAO = new ReviewDAO(); */
+	/* private final ProductViewLogDAO viewLogDAO = new ProductViewLogDAO(); */
 
     // ─────────────────────────────── 조회 ───────────────────────────────
 
     /** 상품 1건. 없으면 null (Handler 가 404 로 처리) */
     public ProductDTO getProduct(int productNo) throws Exception {
-        return productDAO.selectProduct(productNo);
+        return productMapper.selectProduct(productNo);
     }
 
     /**
      * 판매자 대시보드 "오늘 방문자수/상품노출수" 집계용 조회 로그.
      * ★ 원래 ProductServlet 63~65줄에 있던 andy 작성 코드 — 기능은 그대로 두고 위치만 옮김.
      */
-    public void logView(int productNo, Integer memberNo, String sessionId) throws Exception {
-        viewLogDAO.logView(productNo, memberNo, sessionId);
-    }
 
     /** 이 상품의 옵션 전체 (OPTION_ID 순) */
     public List<ProductOptionDTO> getOptions(int productNo) throws Exception {
-        return optionDAO.selectOptionsByProductNo(productNo);
+        return productOptionMapper.selectOptionByProductNo(productNo);
     }
 
+	/*
+	 * public void logView(int productNo, Integer memberNo, String sessionId) throws
+	 * Exception { viewLogDAO.logView(productNo, memberNo, sessionId); }
+	 * 
+	 */
+    
     /**
      * 리뷰 목록 + 리뷰별 사진까지 채워서 반환.
      * ★ 리뷰별 사진 채우는 부분은 원래 ProductServlet 188~195줄에 있던 jihoonlee 작성 코드 —
      *   기능은 그대로 두고 위치만 옮김.
      */
-    public List<ReviewDTO> getReviewsWithImages(int productNo) throws Exception {
-        List<ReviewDTO> reviews = reviewDAO.selectReviewsByProductNo(productNo);
-
-        for (ReviewDTO review : reviews) {
-            review.setImageUrls(reviewDAO.getReviewImages(review.getReviewNo()));
-        }
-        return reviews;
-    }
-
-    /**
+	/*
+	 * public List<ReviewDTO> getReviewsWithImages(int productNo) throws Exception {
+	 * List<ReviewDTO> reviews = reviewDAO.selectReviewsByProductNo(productNo);
+	 * 
+	 * for (ReviewDTO review : reviews) {
+	 * review.setImageUrls(reviewDAO.getReviewImages(review.getReviewNo())); }
+	 * return reviews; }
+	 * 
+	 */    /**
      * 별점 요약(평균/개수/분포).
      * ★ 원래 ProductServlet 170~186줄에 있던 jihoonlee 작성 코드 — 기능은 그대로 두고 위치만 옮김.
      */
-    public ReviewRatingSummaryDTO getRatingSummary(int productNo) throws Exception {
-        return reviewDAO.getRatingSummary(productNo);
-    }
-
+	/*
+	 * public ReviewRatingSummaryDTO getRatingSummary(int productNo) throws
+	 * Exception { return reviewDAO.getRatingSummary(productNo); }
+	 */
+    
     // ─────────────────────────────── 계산 ───────────────────────────────
 
     /** 배송예정일 — "내일(요일) M/d" 형태로 매번 계산 */
@@ -160,17 +181,14 @@ public class ProductService {
      * 평균 평점 — 이미 읽어온 reviews 리스트에서 바로 계산(DB 재조회 없음), 소수 첫째자리까지.
      * 화면의 review-atf/review-score 는 "리뷰 개별 별점"이 아니라 "상품 전체 평균 별점" 자리라 이 값을 씀.
      */
-    public double calcAvgRating(List<ReviewDTO> reviews) {
-        if (reviews.isEmpty()) {
-            return 0;
-        }
-        int sum = 0;
-        for (ReviewDTO r : reviews) {
-            sum += r.getRating();
-        }
-        return Math.round((double) sum / reviews.size() * 10) / 10.0;
-    }
-
+    
+	/*
+	 * public double calcAvgRating(List<ReviewDTO> reviews) { if (reviews.isEmpty())
+	 * { return 0; } int sum = 0; for (ReviewDTO r : reviews) { sum +=
+	 * r.getRating(); } return Math.round((double) sum / reviews.size() * 10) /
+	 * 10.0; }
+	 * 
+	 */   
     /**
      * 사진을 용도별로 갈라줌.
      * PRODUCT_IMAGE 는 OPTION_ID 로 갈리는데, 값이 있으면 그 옵션 전용 사진이라 해당 옵션에 붙이고,
@@ -181,7 +199,7 @@ public class ProductService {
     public List<ProductImageDTO> attachImagesAndGetDetailImages(int productNo, List<ProductOptionDTO> options)
             throws Exception {
 
-        List<ProductImageDTO> images = imageDAO.selectImagesByProductNo(productNo);
+        List<ProductImageDTO> images = productImageMapper.selectImagesByProductNo(productNo);
         List<ProductImageDTO> detailImages = new ArrayList<>();
 
         for (ProductImageDTO image : images) {

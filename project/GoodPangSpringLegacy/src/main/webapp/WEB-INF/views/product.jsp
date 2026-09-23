@@ -2,7 +2,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
-<!DOCTYPE html>
+
+<%-- 상세페이지 전용 CSS (reset/common 은 layout_shop.jsp 에 있음) --%>
+<link rel="stylesheet"
+      href="${pageContext.request.contextPath}/resources/css/product.css">
+<link rel="stylesheet"
+      href="${pageContext.request.contextPath}/resources/css/product_wow_modal.css">
+
+
+<%-- <!DOCTYPE html>
 <html lang="ko">
 <head>
 
@@ -19,29 +27,29 @@
 <link rel="stylesheet"
 	href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 <!-- 1. 브라우저 기본 스타일 지우기 -->
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 <!-- 2. 헤더/푸터 (모든 페이지 공통) -->
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/main.css">
+	href="${pageContext.request.contextPath}/resources/css/main.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/product.css">
-<%-- <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/wow_join_modal.css">
- --%>
+	href="${pageContext.request.contextPath}/resources/css/product.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/product_wow_modal.css">
+	href="${pageContext.request.contextPath}/resources/css/wow_join_modal.css">
+
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/product_wow_modal.css">
 <!-- 4. 상세페이지 전용 -->
 </head>
 
-<%-- 2026-09-06 — 판매중지 상품 처리.
+2026-09-06 — 판매중지 상품 처리.
      ① is-soldout : 품절과 같은 CSS 를 그대로 재사용(구매 버튼이 품절 버튼으로 바뀜, product.css 9장).
         옵션마다 다른 품절과 달리 판매중지는 상품 전체라, 처음부터 여기서 붙여둠.
      ② data-sale-status : product.js 가 옵션을 바꿀 때마다 is-soldout 을 다시 계산해서 덮어쓰기 때문에
         (product.js:460) 자바스크립트도 이 값을 보고 판매중지면 계속 품절 상태를 유지하게 함.
-     옛 버전: <body class="page-product"> --%>
+     옛 버전: <body class="page-product">
 <body class="page-product ${p.saleStatus eq '판매 중지' ? 'is-soldout' : ''}"
       data-sale-status="${p.saleStatus}">
 	<!-- ==================================================
@@ -50,7 +58,7 @@
 	<!-- ★ 이 헤더는 inc/header.jsp 에서 그대로 옮겨온 것 (2026-08-24).
 	     손으로 고치지 말 것 — 고쳐야 하면 inc/header.jsp 를 고치고 여기로 다시 옮길 것.
 	     JSP 판(product.jsp)에서는 이 자리가 &lt;jsp:include page="inc/header.jsp"/&gt; 한 줄임 -->
-	<jsp:include page="inc/header.jsp" />
+	<jsp:include page="inc/header.jsp" /> --%>
 
 	<!-- ==================================================
        MAIN — 상품 상세 페이지 본문
@@ -128,7 +136,7 @@
 							</c:when>
 							<c:otherwise>
 								<li class="is-on"><a href="#"><img
-										src="${pageContext.request.contextPath}/images/product-detail/photo-1.jpg"
+										src="${pageContext.request.contextPath}/resources/images/product-detail/photo-1.jpg"
 										alt=""></a></li>
 							</c:otherwise>
 						</c:choose>
@@ -145,7 +153,7 @@
 							</c:when>
 							<c:otherwise>
 								<img
-									src="${pageContext.request.contextPath}/images/product-detail/photo-1.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/photo-1.jpg"
 									alt="${p.productName}">
 							</c:otherwise>
 						</c:choose>
@@ -235,9 +243,9 @@
 							<!-- 로켓배송/내일도착 배지 — 2026-09-02: CSS로 그리던 텍스트 배지 대신
 							     실제 이미지로 교체(사용자가 images/icons 에 받아다 줌) -->
 							<span class="badge-rocket"><img
-									src="${pageContext.request.contextPath}/images/icons/logo_rocket_filter_medium.png"
+									src="${pageContext.request.contextPath}/resources/images/icons/logo_rocket_filter_medium.png"
 									alt="로켓배송"></span> <span class="badge-tomorrow"><img
-									src="${pageContext.request.contextPath}/images/icons/badge_199cd481e67.png"
+									src="${pageContext.request.contextPath}/resources/images/icons/badge_199cd481e67.png"
 									alt="내일도착"></span>
 						</div>
 
@@ -264,7 +272,7 @@
 							<div class="wow-benefit-badge">
 								<div class="wow-benefit-badge-top">
 									<img class="wow-benefit-badge-logo"
-										src="${pageContext.request.contextPath}/images/wow@2x.png"
+										src="${pageContext.request.contextPath}/resources/images/wow@2x.png"
 										alt="와우"> <span class="wow-benefit-badge-title">고객님은
 										<strong>와우회원</strong>으로
 									</span>
@@ -379,11 +387,11 @@
 						     bankbook_color@4x.png(계좌이체) -->
 						<div class="benefit-row pay-methods">
 							<strong>PC에서도 간편한 결제</strong> <span class="pay-chip"><img
-									src="${pageContext.request.contextPath}/images/icons/coupaymoney_color@4x.png"
+									src="${pageContext.request.contextPath}/resources/images/icons/coupaymoney_color@4x.png"
 									alt="">굿페이머니</span> <span class="pay-chip"><img
-									src="${pageContext.request.contextPath}/images/icons/card_color@4x.png"
+									src="${pageContext.request.contextPath}/resources/images/icons/card_color@4x.png"
 									alt="">카드</span> <span class="pay-chip"><img
-									src="${pageContext.request.contextPath}/images/icons/bankbook_color@4x.png"
+									src="${pageContext.request.contextPath}/resources/images/icons/bankbook_color@4x.png"
 									alt="">계좌이체</span>
 						</div>
 					</div>
@@ -510,7 +518,7 @@
 					<ul class="sdp-ads__list">
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-1.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-1.jpg"
 									alt=""></span> <span class="ad-item__name">베스티하루 로카티 ROKA
 									반팔 티셔츠</span> <span class="ad-item__price"> <span class="was">할인
 										<del>23,900</del>
@@ -521,7 +529,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-2.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-2.jpg"
 									alt=""></span> <span class="ad-item__name">3장 세트 ROKA 기능성
 									냉감 쿨링 남자 여자 반팔티 로카티</span> <span class="ad-item__price"> <span
 									class="now"><strong>18,900</strong></span>
@@ -531,7 +539,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-3.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-3.jpg"
 									alt=""></span> <span class="ad-item__name">워크존 로카티 코리아아미
 									쿨링 반팔 티셔츠 남녀공용</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>18,300</del></span> <span class="now"><em
@@ -542,7 +550,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-4.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-4.jpg"
 									alt=""></span> <span class="ad-item__name">밀리랩 로카티 ROKA
 									반팔 티셔츠 2P</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>25,800</del></span> <span class="now"><em
@@ -553,7 +561,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-5.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-5.jpg"
 									alt=""></span> <span class="ad-item__name">5장 모던프로 스포츠
 									기능성 드라이 라운드 반팔 티셔츠</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>120,000</del></span> <span class="now"><em
@@ -564,7 +572,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-6.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-6.jpg"
 									alt=""></span> <span class="ad-item__name">NEOX 네옥스 쿨론
 									자카드 검정 라운드넥 반팔 티셔츠</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>34,900</del></span> <span class="now"><em
@@ -575,7 +583,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-7.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-7.jpg"
 									alt=""></span> <span class="ad-item__name">쿨링 ROKA 로카티 반팔
 									단체 티셔츠 반티 체육대회 유니폼</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>20,000</del></span> <span class="now"><em
@@ -586,7 +594,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-8.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-8.jpg"
 									alt=""></span> <span class="ad-item__name">아소트 냉감 통기성 메쉬
 									로카티 코리아 아미 반팔 티셔츠</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>21,900</del></span> <span class="now"><em
@@ -599,7 +607,7 @@
 
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-1.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-1.jpg"
 									alt=""></span> <span class="ad-item__name">베스티하루 로카티 ROKA
 									반팔 티셔츠</span> <span class="ad-item__price"> <span class="was">할인
 										<del>23,900</del>
@@ -610,7 +618,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-2.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-2.jpg"
 									alt=""></span> <span class="ad-item__name">3장 세트 ROKA 기능성
 									냉감 쿨링 남자 여자 반팔티 로카티</span> <span class="ad-item__price"> <span
 									class="now"><strong>18,900</strong></span>
@@ -620,7 +628,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-3.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-3.jpg"
 									alt=""></span> <span class="ad-item__name">워크존 로카티 코리아아미
 									쿨링 반팔 티셔츠 남녀공용</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>18,300</del></span> <span class="now"><em
@@ -631,7 +639,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-4.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-4.jpg"
 									alt=""></span> <span class="ad-item__name">밀리랩 로카티 ROKA
 									반팔 티셔츠 2P</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>25,800</del></span> <span class="now"><em
@@ -642,7 +650,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-5.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-5.jpg"
 									alt=""></span> <span class="ad-item__name">5장 모던프로 스포츠
 									기능성 드라이 라운드 반팔 티셔츠</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>120,000</del></span> <span class="now"><em
@@ -653,7 +661,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-6.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-6.jpg"
 									alt=""></span> <span class="ad-item__name">NEOX 네옥스 쿨론
 									자카드 검정 라운드넥 반팔 티셔츠</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>34,900</del></span> <span class="now"><em
@@ -664,7 +672,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-7.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-7.jpg"
 									alt=""></span> <span class="ad-item__name">쿨링 ROKA 로카티 반팔
 									단체 티셔츠 반티 체육대회 유니폼</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>20,000</del></span> <span class="now"><em
@@ -675,7 +683,7 @@
 						</a></li>
 						<li class="ad-item"><a href="#"> <span
 								class="ad-item__thumb"><img
-									src="${pageContext.request.contextPath}/images/product-detail/ad-8.jpg"
+									src="${pageContext.request.contextPath}/resources/images/product-detail/ad-8.jpg"
 									alt=""></span> <span class="ad-item__name">아소트 냉감 통기성 메쉬
 									로카티 코리아 아미 반팔 티셔츠</span> <span class="ad-item__price"> <span
 									class="was">할인 <del>21,900</del></span> <span class="now"><em
@@ -705,7 +713,7 @@
 				<ul class="gw-deal__list">
 					<li class="gw-card"><a href="#"> <span
 							class="gw-card__thumb"><img
-								src="${pageContext.request.contextPath}/images/product-detail/gw-1.jpg"
+								src="${pageContext.request.contextPath}/resources/images/product-detail/gw-1.jpg"
 								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
 							class="gw-card__name">REPUBLIC OF KOREA 쿨링 반팔 티셔츠 RT002 -
 								헬스 운동 기능성</span> <span class="gw-card__was">할인 <em>43%</em> <del>15,000</del></span>
@@ -717,7 +725,7 @@
 
 					<li class="gw-card"><a href="#"> <span
 							class="gw-card__thumb"><img
-								src="${pageContext.request.contextPath}/images/product-detail/gw-1.jpg"
+								src="${pageContext.request.contextPath}/resources/images/product-detail/gw-1.jpg"
 								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
 							class="gw-card__name">REPUBLIC OF KOREA 쿨링 반팔 티셔츠 RT002 -
 								헬스 운동 기능성</span> <span class="gw-card__was">할인 <em>43%</em> <del>15,000</del></span>
@@ -727,7 +735,7 @@
 					</a></li>
 					<li class="gw-card"><a href="#"> <span
 							class="gw-card__thumb"><img
-								src="${pageContext.request.contextPath}/images/product-detail/gw-2.jpg"
+								src="${pageContext.request.contextPath}/resources/images/product-detail/gw-2.jpg"
 								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
 							class="gw-card__name">NEOX 네옥스 밀리터리 디지털 기능성 V넥 쿨론 반팔 티셔츠</span> <span
 							class="gw-card__was">할인 <em>68%</em> <del>24,500</del></span> <strong
@@ -737,7 +745,7 @@
 					</a></li>
 					<li class="gw-card"><a href="#"> <span
 							class="gw-card__thumb"><img
-								src="${pageContext.request.contextPath}/images/product-detail/gw-3.jpg"
+								src="${pageContext.request.contextPath}/resources/images/product-detail/gw-3.jpg"
 								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
 							class="gw-card__name">인디오 남성용 빅사이즈 밀리터리 카모플라쥬 쿨링 반팔티셔츠</span> <span
 							class="gw-card__was">할인 <em>10%</em> <del>10,800</del></span> <strong
@@ -747,7 +755,7 @@
 					</a></li>
 					<li class="gw-card"><a href="#"> <span
 							class="gw-card__thumb"><img
-								src="${pageContext.request.contextPath}/images/product-detail/gw-4.jpg"
+								src="${pageContext.request.contextPath}/resources/images/product-detail/gw-4.jpg"
 								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
 							class="gw-card__name">NEOX 네옥스 쿨론 밀리터리 디지털 라운드넥 로카 런닝</span> <span
 							class="gw-card__was">할인 <em>80%</em> <del>34,900</del></span> <strong
@@ -757,7 +765,7 @@
 					</a></li>
 					<li class="gw-card"><a href="#"> <span
 							class="gw-card__thumb"><img
-								src="${pageContext.request.contextPath}/images/product-detail/gw-5.jpg"
+								src="${pageContext.request.contextPath}/resources/images/product-detail/gw-5.jpg"
 								alt=""></span> <span class="gw-card__tag">특가진행중</span> <span
 							class="gw-card__name">FLY 남녀공용 기능성 드라이 스포츠 반팔 티셔츠 헬스 러닝</span> <span
 							class="gw-card__was">할인 <em>11%</em> <del>6,490</del></span> <strong
@@ -868,17 +876,17 @@
 					<c:otherwise>
 						<div class="detail-image">
 							<img
-								src="${pageContext.request.contextPath}/images/product-detail/detail-1.jpg"
+								src="${pageContext.request.contextPath}/resources/images/product-detail/detail-1.jpg"
 								alt="">
 						</div>
 						<div class="detail-image">
 							<img
-								src="${pageContext.request.contextPath}/images/product-detail/detail-2.jpg"
+								src="${pageContext.request.contextPath}/resources/images/product-detail/detail-2.jpg"
 								alt="">
 						</div>
 						<div class="detail-image">
 							<img
-								src="${pageContext.request.contextPath}/images/product-detail/detail-3.jpg"
+								src="${pageContext.request.contextPath}/resources/images/product-detail/detail-3.jpg"
 								alt="">
 						</div>
 					</c:otherwise>
@@ -1369,7 +1377,7 @@
        쿠팡 원본: footer#wa-footer (높이 428px)
        ================================================== -->
 	<!-- ★ 이 푸터는 inc/footer.jsp 에서 그대로 옮겨온 것. 위 헤더와 같은 규칙 -->
-	<jsp:include page="inc/footer.jsp" />
+	<%-- <jsp:include page="inc/footer.jsp" /> --%>
 
 
 	<!-- ==================================================
@@ -1696,9 +1704,9 @@
 </script>
 
 	<!-- JS는 </body> 바로 앞에! HTML을 다 읽은 뒤에 실행되게 하려고 -->
-	<script src="${pageContext.request.contextPath}/js/header.js"></script>
-	<script src="${pageContext.request.contextPath}/js/product.js"></script>
-
+		<%-- <script src="${pageContext.request.contextPath}/js/header.js"></script> --%>
+	<script src="${pageContext.request.contextPath}/resources/js/product.js"></script>
+ 
 	<script>
 	document.addEventListener("DOMContentLoaded", function () {
 
@@ -2199,6 +2207,5 @@ document.addEventListener("keydown", function(event) {
 	}
 });
 </script>
-</body>
-</html>
+
 
