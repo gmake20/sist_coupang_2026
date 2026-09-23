@@ -66,6 +66,7 @@
 						<li><a href="#">취소 / 반품 안내</a></li>
 
 					</ul></li>
+					
 				<c:choose>
 					<c:when test="${not empty sessionScope.loginMember}">
 						<li><span>${sessionScope.loginMember.memberName}님</span></li>
