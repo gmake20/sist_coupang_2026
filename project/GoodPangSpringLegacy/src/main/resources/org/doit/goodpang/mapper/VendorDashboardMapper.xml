@@ -159,4 +159,32 @@
             ORDER BY D.MONTH_START
 	</select>
 
+	<!-- public VendorOrderStatSummaryDTO countOrderStats(int sellerNo); -->
+	<!-- 주문/배송 현황 패널 - 기존 VendorOrderListDAO.countStats와 같은 집계 -->
+	<select id="countOrderStats" resultType="org.doit.goodpang.domain.VendorOrderStatSummaryDTO">
+            SELECT
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '결제완료' THEN O.ORDER_NO END) AS WAITING_COUNT,
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '배송중' THEN O.ORDER_NO END) AS SHIPPING_COUNT,
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '배송완료' THEN O.ORDER_NO END) AS DELIVERED_COUNT,
+                COUNT(DISTINCT CASE WHEN O.ORDER_STATUS = '배송완료'
+                                      AND D.DELIVERY_END_DATE IS NOT NULL
+                                      AND TRUNC(D.DELIVERY_END_DATE) = TRUNC(SYSDATE)
+                                 THEN O.ORDER_NO END) AS DELIVERED_TODAY_COUNT
+            FROM ORDERS O
+                JOIN ORDER_DETAIL OD ON OD.ORDER_NO = O.ORDER_NO
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                LEFT JOIN DELIVERY D ON D.ORDER_NO = O.ORDER_NO
+            WHERE P.SELLER_NO = #{sellerNo}
+	</select>
+
+	<!-- public List<NoticeDTO> findRecentNotices(int limit); -->
+	<!-- 공지사항 위젯 - 기존 NoticeDAO.findRecent와 같은 쿼리 ('공지' 타입 우선, 최신순) -->
+	<select id="findRecentNotices" resultType="org.doit.goodpang.domain.NoticeDTO">
+            SELECT N.NOTICE_NO, N.TITLE, N.NOTICE_TYPE, N.ADMIN_NO, A.ADMIN_NAME, N.CREATED_DATE, N.UPDATED_DATE
+            FROM NOTICE N
+                JOIN ADMIN A ON N.ADMIN_NO = A.ADMIN_NO
+            ORDER BY CASE WHEN N.NOTICE_TYPE = '공지' THEN 0 ELSE 1 END, N.NOTICE_NO DESC
+            FETCH FIRST #{limit} ROWS ONLY
+	</select>
+
 </mapper>

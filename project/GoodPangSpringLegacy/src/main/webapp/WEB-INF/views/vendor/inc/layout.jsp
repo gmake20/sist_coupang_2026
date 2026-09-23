@@ -24,10 +24,8 @@
 
 	<tiles:insertAttribute name="iconsprite"/>
 
-  <% String sellerGrade = null; %>
 	<tiles:insertAttribute name="topbar"/>
 
-  <% String menu = "dashboard"; %>
 	<tiles:insertAttribute name="sidebar"/>
 
 
