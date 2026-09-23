@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.doit.goodpang.mapper.PaymentMethodMapper">
+
+    <select id="getBankMethods"
+            resultType="org.doit.goodpang.domain.PaymentMethodDTO">
+
+        SELECT
+            PAYMENT_METHOD_NO AS paymentMethodNo,
+            MEMBER_NO AS memberNo,
+            PAYMENT_TYPE AS paymentType,
+            BANK_CODE AS bankCode,
+
+            CASE BANK_CODE
+                WHEN 'SHINHAN' THEN '신한은행'
+                WHEN 'KB'     THEN 'KB국민은행'
+                WHEN 'WOORI'  THEN '우리은행'
+                WHEN 'NH'     THEN 'NH농협은행'
+                WHEN 'HANA'   THEN '하나은행'
+                WHEN 'KAKAO'  THEN '카카오뱅크'
+                WHEN 'TOSS'   THEN '토스뱅크'
+                ELSE BANK_CODE
+            END AS bankName,
+
+            ACCOUNT_LAST4 AS accountLast4,
+            ACCOUNT_HOLDER AS accountHolder,
+            PAYMENT_DEFAULT AS paymentDefault
+
+        FROM PAYMENT_METHOD
+
+        WHERE MEMBER_NO = #{memberNo}
+          AND PAYMENT_TYPE = 'BANK'
+
+        ORDER BY
+            CASE
+                WHEN PAYMENT_DEFAULT = 'Y' THEN 0
+                ELSE 1
+            END,
+            CREATED_AT DESC
+
+    </select>
+
+    <select id="getCardMethods"
+            resultType="org.doit.goodpang.domain.PaymentMethodDTO">
+
+        SELECT
+            PAYMENT_METHOD_NO AS paymentMethodNo,
+            MEMBER_NO AS memberNo,
+            PAYMENT_TYPE AS paymentType,
+
+            CASE CARD_COMPANY
+                WHEN 'BC'      THEN '비씨카드'
+                WHEN 'KB'      THEN 'KB국민카드'
+                WHEN 'SHINHAN' THEN '신한카드'
+                WHEN 'SAMSUNG' THEN '삼성카드'
+                WHEN 'HYUNDAI' THEN '현대카드'
+                WHEN 'LOTTE'   THEN '롯데카드'
+                WHEN 'HANA'    THEN '하나카드'
+                WHEN 'WOORI'   THEN '우리카드'
+                WHEN 'NH'      THEN 'NH농협카드'
+                ELSE CARD_COMPANY
+            END AS cardCompany,
+
+            CARD_LAST4 AS cardLast4,
+            PAYMENT_DEFAULT AS paymentDefault
+
+        FROM PAYMENT_METHOD
+
+        WHERE MEMBER_NO = #{memberNo}
+          AND PAYMENT_TYPE = 'CARD'
+
+        ORDER BY
+            CASE
+                WHEN PAYMENT_DEFAULT = 'Y' THEN 0
+                ELSE 1
+            END,
+            CREATED_AT DESC
+
+    </select>
+
+    <select id="getPaymentMethods"
+            resultType="org.doit.goodpang.domain.PaymentMethodDTO">
+
+        SELECT
+            PAYMENT_METHOD_NO AS paymentMethodNo,
+            MEMBER_NO AS memberNo,
+            PAYMENT_TYPE AS paymentType,
+            BANK_CODE AS bankCode,
+
+            CASE BANK_CODE
+                WHEN 'SHINHAN' THEN '신한은행'
+                WHEN 'KB'      THEN 'KB국민은행'
+                WHEN 'WOORI'   THEN '우리은행'
+                WHEN 'NH'      THEN 'NH농협은행'
+                WHEN 'HANA'    THEN '하나은행'
+                WHEN 'KAKAO'   THEN '카카오뱅크'
+                WHEN 'TOSS'    THEN '토스뱅크'
+                ELSE BANK_CODE
+            END AS bankName,
+
+            ACCOUNT_LAST4 AS accountLast4,
+            ACCOUNT_HOLDER AS accountHolder,
+            CARD_COMPANY AS cardCompany,
+            CARD_LAST4 AS cardLast4,
+            PAYMENT_DEFAULT AS paymentDefault
+
+        FROM PAYMENT_METHOD
+
+        WHERE MEMBER_NO = #{memberNo}
+
+        ORDER BY
+            CASE
+                WHEN PAYMENT_DEFAULT = 'Y' THEN 0
+                ELSE 1
+            END,
+            PAYMENT_METHOD_NO DESC
+
+    </select>
+
+</mapper>

@@ -45,6 +45,8 @@
 			<form id="addressForm"
 				action="${pageContext.request.contextPath}/address/add"
 				method="post" class="address-form">
+				
+				<sec:csrfInput />
 
 				<div class="form-row">
 					<label for="receiverName"> 받는 사람 <span class="required">*</span>

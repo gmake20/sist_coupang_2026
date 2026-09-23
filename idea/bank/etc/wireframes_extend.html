@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>모의 인터넷뱅킹 서비스 확장 화면 와이어프레임</title>
+  <style>
+    :root {
+      --bg: #eef2f7;
+      --panel: #ffffff;
+      --soft: #f8fafc;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #cbd5e1;
+      --blue: #2563eb;
+      --blue-soft: #dbeafe;
+      --green: #15803d;
+      --green-soft: #dcfce7;
+      --amber: #b45309;
+      --amber-soft: #fef3c7;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --purple: #7e22ce;
+      --purple-soft: #f3e8ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, "Malgun Gothic", sans-serif;
+      line-height: 1.55;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .header-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 18px 24px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card,
+    .toc,
+    .menu-map,
+    .screen,
+    .diff {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .summary-card {
+      padding: 14px;
+    }
+
+    .summary-card strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .summary-card span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toc,
+    .menu-map,
+    .diff {
+      padding: 16px;
+      margin-bottom: 22px;
+    }
+
+    .toc h2,
+    .menu-map h2,
+    .diff h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .toc-grid a {
+      display: block;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: var(--soft);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .toc-grid a:hover {
+      border-color: var(--blue);
+      background: #eff6ff;
+      color: var(--blue);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .menu-box {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px;
+      background: var(--soft);
+      font-size: 13px;
+    }
+
+    .menu-box strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .menu-box span {
+      color: var(--muted);
+    }
+
+    .notice {
+      border-left: 4px solid var(--blue);
+      background: #eff6ff;
+      color: #1e3a8a;
+      padding: 12px 14px;
+      margin-bottom: 22px;
+      font-size: 13px;
+    }
+
+    .notice.warn {
+      border-left-color: var(--amber);
+      background: var(--amber-soft);
+      color: #78350f;
+    }
+
+    .diff ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .diff li {
+      margin-bottom: 6px;
+    }
+
+    .diff li span {
+      color: var(--muted);
+    }
+
+    .screen {
+      margin-bottom: 28px;
+      overflow: hidden;
+      break-inside: avoid;
+    }
+
+    .screen-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+      background: #f9fafb;
+      padding: 18px;
+    }
+
+    .screen h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    .screen-purpose {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 6px;
+      min-width: 190px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge.core {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .badge.deep {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .badge.optional {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .badge.role {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .badge.new {
+      background: var(--purple-soft);
+      color: var(--purple);
+    }
+
+    .screen-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.75fr);
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .browser {
+      min-height: 430px;
+      border: 2px solid #94a3b8;
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .browser-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--line);
+      background: #e5e7eb;
+      padding: 8px 10px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #9ca3af;
+    }
+
+    .url {
+      flex: 1;
+      margin-left: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      padding: 3px 10px;
+      font-size: 12px;
+    }
+
+    .app-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding: 12px 16px;
+    }
+
+    .brand {
+      font-weight: 800;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .content {
+      padding: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--soft);
+      padding: 12px;
+    }
+
+    .panel-title {
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .field {
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: #fff;
+      margin-bottom: 9px;
+      padding: 7px 9px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .field.compact {
+      min-height: 26px;
+      padding: 5px 8px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .button {
+      border: 1px solid #93c5fd;
+      border-radius: 5px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .button.gray {
+      border-color: var(--line);
+      background: #f3f4f6;
+      color: var(--ink);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 16px 0;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      border-bottom: 0;
+      border-radius: 6px 6px 0 0;
+      background: #f8fafc;
+      padding: 7px 12px;
+      font-size: 12px;
+    }
+
+    .tab.active {
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px 16px 0;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-value {
+      margin-top: 7px;
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .table {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 0.8fr;
+      min-height: 34px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .row:last-child {
+      border-bottom: 0;
+    }
+
+    .row.head {
+      background: #f1f5f9;
+      font-weight: 800;
+    }
+
+    .cell {
+      border-right: 1px solid var(--line);
+      padding: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .cell:last-child {
+      border-right: 0;
+    }
+
+    .side-section {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .side-section h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    .side-section ul {
+      margin: 8px 0 0 18px;
+      padding: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .side-section li {
+      margin-bottom: 5px;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .flow span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 4px 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .summary,
+      .toc-grid,
+      .menu-grid,
+      .screen-body,
+      .grid-2,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .screen-head {
+        display: block;
+      }
+
+      .badges {
+        justify-content: flex-start;
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>모의 인터넷뱅킹 서비스 확장 화면 와이어프레임</h1>
+      <p class="subtitle">extend_bank_project_README.md(외부 참고 자료)를 기존 README.md와 비교하여, 기존 문서에 없던 업무만 추려 추가 설계한 6개 화면입니다.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="summary">
+      <div class="summary-card"><strong>대상 파일</strong><span>extend_bank_project_README.md</span></div>
+      <div class="summary-card"><strong>신규 화면</strong><span>총 6개 (41~46번)</span></div>
+      <div class="summary-card"><strong>신규 업무 영역</strong><span>외환(환전), 공과금 납부, 지점/ATM 찾기, 관리자 확장</span></div>
+      <div class="summary-card"><strong>번호 체계</strong><span>기존 wireframes.html의 40개 화면 뒤에 이어지는 41~46번</span></div>
+    </section>
+
+    <section class="diff">
+      <h2>README.md 대비 신규/차이 내용 정리</h2>
+      <ul>
+        <li><strong>외환(환전) 업무</strong> — 환율 조회, 환전, 외화 계좌 <span>기존 README.md에는 전혀 없던 메뉴입니다. 다만 원본 README 4장 "구현하지 않아도 되는 기능"에 "외화 환전 등 뱅킹 외 금융업무"가 명시적으로 제외 대상으로 적혀 있어, 채택 시 팀 논의가 필요합니다.</span></li>
+        <li><strong>공과금/생활 납부 업무</strong> — 전기·통신·지방세·관리비·지로 납부, 납부내역 조회 <span>기존 README.md에 없는 완전 신규 메뉴입니다.</span></li>
+        <li><strong>지점/ATM 찾기</strong> — 지점 찾기, ATM 찾기, 지도 API 연동 <span>기존 README.md에 없는 완전 신규 메뉴입니다.</span></li>
+        <li><strong>관리자 - 외환/지점 관리</strong> — 환율 고시, 지점/ATM 데이터 등록·수정 <span>위 3개 신규 업무를 운영하기 위한 관리자 화면으로, 기존 관리자 메뉴(14번)에는 없던 기능입니다.</span></li>
+        <li><strong>참고로 반영하지 않은 항목</strong> — 계좌 비밀번호(이체용 4자리 비밀번호), 신용카드/카드 혜택/분실신고, 대출 상품 세분화(신용/주택담보/전세자금) <span>기존 화면(계좌, 카드, 대출)의 세부 항목 보강 수준이라 별도 화면 대신 기존 README의 해당 항목 보강으로 처리하는 것을 권장합니다.</span></li>
+      </ul>
+    </section>
+
+    <section class="menu-map">
+      <h2>신규 메뉴 요약</h2>
+      <div class="menu-grid">
+        <div class="menu-box"><strong>15. 외환</strong><span>환율 조회, 환전, 외화 계좌 관리</span></div>
+        <div class="menu-box"><strong>16. 공과금</strong><span>공과금 납부, 납부내역 조회</span></div>
+        <div class="menu-box"><strong>17. 지점/ATM</strong><span>지점 찾기, ATM 찾기</span></div>
+        <div class="menu-box"><strong>14. 관리자(확장)</strong><span>환율/지점/ATM 데이터 관리</span></div>
+      </div>
+    </section>
+
+    <section class="toc">
+      <h2>화면 바로가기</h2>
+      <div class="toc-grid" id="toc"></div>
+    </section>
+
+    <section class="notice">
+      이 문서는 실제 디자인 시안이 아니라 저충실도 와이어프레임입니다. 박스는 화면 구성 위치를 뜻하고, 각 화면 오른쪽에는 구현 포인트와 이동 흐름을 정리했습니다. wireframes.html과 이어 보도록 41번부터 번호를 매겼습니다.
+    </section>
+
+    <section class="notice warn">
+      주의: "외환(환전)" 관련 2개 화면(41, 42)은 원본 README.md 4장에서 구현 제외 대상으로 명시한 기능입니다. 팀 범위 확정 시 채택 여부를 다시 논의하세요.
+    </section>
+
+    <section id="screens"></section>
+  </main>
+
+  <script>
+    const screens = [
+      {
+        id: 41,
+        title: "환율 조회 화면",
+        menu: "15. 외환",
+        role: "회원",
+        priority: "선택",
+        isNew: true,
+        url: "/exchange/rates",
+        purpose: "통화별 매매기준율을 조회하고 환전 예상 금액을 미리 계산합니다.",
+        fields: ["기준 통화(KRW)", "대상 통화 선택(USD/JPY/EUR 등)", "환전 예정 금액", "매매기준율 표", "예상 환전 금액"],
+        actions: ["환율 조회", "환전하기로 이동"],
+        points: ["실시간 환율은 mock 데이터 또는 무료 환율 API로 대체 가능", "원본 README 4장은 외화환전을 제외 대상으로 명시 — 채택 여부 팀 논의 필요", "살 때/팔 때 환율을 구분 표시하면 실제 은행과 유사"],
+        flow: ["환전/외화계좌", "메인"]
+      },
+      {
+        id: 42,
+        title: "환전 / 외화계좌 화면",
+        menu: "15. 외환",
+        role: "회원",
+        priority: "선택",
+        isNew: true,
+        url: "/exchange/convert",
+        purpose: "원화 계좌에서 외화 계좌로 환전을 실행하고 통화별 외화 잔액을 관리합니다.",
+        tabs: ["환전", "외화 계좌 조회"],
+        fields: ["원화 출금 계좌", "외화 계좌(신규 개설 가능)", "환전 통화", "환전 금액", "적용 환율", "환전 후 원화 잔액", "통화별 외화 잔액"],
+        actions: ["환전 실행", "외화 계좌 개설"],
+        points: ["원화 계좌 잔액 검증 후 환전 거래내역 생성", "외화 계좌는 통화별로 잔액을 분리 관리", "실제 해외송금/외환 규제는 다루지 않고 환전 시뮬레이션 수준으로 한정"],
+        flow: ["환율 조회", "계좌 목록", "거래내역"]
+      },
+      {
+        id: 43,
+        title: "공과금 납부 화면",
+        menu: "16. 공과금",
+        role: "회원",
+        priority: "선택",
+        isNew: true,
+        url: "/bills/pay",
+        purpose: "전기·통신·지방세 등 생활 요금을 가상 고지서 데이터로 납부합니다.",
+        tabs: ["전기요금", "통신요금", "지방세", "관리비", "지로"],
+        fields: ["출금 계좌", "고지서 번호(mock)", "납부 금액", "납부자명"],
+        actions: ["납부 실행", "고지서 조회(mock)"],
+        points: ["실제 기관 연동 없이 가상 고지서 데이터로 시연", "납부 시 거래내역에 '공과금 출금'으로 기록", "동일 고지서 중복 납부 방지 검증"],
+        flow: ["납부내역 조회", "거래내역"]
+      },
+      {
+        id: 44,
+        title: "납부내역 조회 화면",
+        menu: "16. 공과금",
+        role: "회원",
+        priority: "선택",
+        isNew: true,
+        url: "/bills/history",
+        purpose: "공과금 납부 이력을 요금 유형과 기간별로 검색합니다.",
+        fields: ["기간 선택", "요금 유형 필터", "납부내역 목록", "납부 상세"],
+        actions: ["검색", "영수증 보기"],
+        points: ["TRANSACTION_HISTORY 재사용 또는 별도 BILL_PAYMENT 테이블 신설 검토", "자산관리(README 7번 메뉴)의 소비 분석과 연계 가능"],
+        flow: ["공과금 납부", "자산관리"]
+      },
+      {
+        id: 45,
+        title: "지점/ATM 찾기 화면",
+        menu: "17. 지점/ATM",
+        role: "비회원 + 회원",
+        priority: "심화",
+        isNew: true,
+        url: "/branches",
+        purpose: "지도에서 가까운 지점과 ATM의 위치, 영업시간, 이용 가능 업무를 검색합니다.",
+        tabs: ["지점", "ATM"],
+        fields: ["지역/주소 검색", "지도 영역(mock)", "지점명", "전화번호", "영업시간", "24시간 운영 여부"],
+        actions: ["검색", "길찾기(mock)"],
+        points: ["카카오맵/네이버지도 API 연동 가능, 어려우면 목록형 mock 데이터로 대체", "기존 README.md에는 없던 신규 메뉴로 발표 시 부가 포인트로 활용 가능"],
+        flow: ["메인", "고객센터"]
+      },
+      {
+        id: 46,
+        title: "관리자 - 외환/지점 관리 화면",
+        menu: "14. 관리자(확장)",
+        role: "관리자",
+        priority: "선택",
+        isNew: true,
+        url: "/admin/exchange-branches",
+        purpose: "환율 고시 정보와 지점/ATM 데이터를 등록, 수정, 삭제합니다.",
+        tabs: ["환율 관리", "지점 관리", "ATM 관리"],
+        fields: ["통화 코드", "매매기준율", "지점명", "주소", "전화번호", "영업시간"],
+        actions: ["등록", "수정", "삭제"],
+        points: ["환율은 수동 입력 또는 외부 API 값을 주기적으로 갱신", "지점/ATM 데이터는 초기 시드 데이터 수준으로 충분", "변경 이력은 기존 ADMIN_LOG 테이블에 기록"],
+        flow: ["관리자 대시보드", "환율 조회", "지점 찾기"]
+      }
+    ];
+
+    const priorityClass = (priority) => {
+      if (priority.includes("핵심")) return "core";
+      if (priority.includes("선택")) return "optional";
+      return "deep";
+    };
+
+    const renderFields = (items) => items.map((item) => `<div class="field">${item}</div>`).join("");
+    const renderCompactFields = (items) => items.map((item) => `<div class="field compact">${item}</div>`).join("");
+    const renderButtons = (items = []) => items.map((item, index) => `<div class="button ${index > 0 ? "gray" : ""}">${item}</div>`).join("");
+    const renderFlow = (items) => items.map((item) => `<span>${item}</span>`).join("");
+
+    function renderWireframe(screen) {
+      const statMarkup = screen.stats ? `
+        <div class="stats">
+          ${screen.stats.map((stat, index) => `
+            <div class="stat">
+              <div class="stat-label">${stat}</div>
+              <div class="stat-value">${index === 0 ? "요약" : index === 1 ? "현황" : "확인"}</div>
+            </div>
+          `).join("")}
+        </div>
+      ` : "";
+
+      const tabsMarkup = screen.tabs ? `
+        <div class="tabs">
+          ${screen.tabs.map((tab, index) => `<div class="tab ${index === 0 ? "active" : ""}">${tab}</div>`).join("")}
+        </div>
+      ` : "";
+
+      const tableItems = screen.table || ["목록 항목 A", "목록 항목 B", "목록 항목 C"];
+      const tableMarkup = `
+        <div class="table">
+          <div class="row head"><div class="cell">항목</div><div class="cell">상태</div><div class="cell">값</div><div class="cell">처리</div></div>
+          ${tableItems.slice(0, 3).map((item, index) => `
+            <div class="row">
+              <div class="cell">${item}</div>
+              <div class="cell">${index === 0 ? "확인" : "대기"}</div>
+              <div class="cell">${index === 0 ? "표시값" : "-"}</div>
+              <div class="cell">상세</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+
+      return `
+        ${tabsMarkup}
+        ${statMarkup}
+        <div class="content grid-2">
+          <div class="panel">
+            <div class="panel-title">입력/조회 영역</div>
+            ${renderFields(screen.fields.slice(0, Math.ceil(screen.fields.length / 2)))}
+            <div class="button-row">${renderButtons(screen.actions)}</div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">결과/상세 영역</div>
+            ${renderCompactFields(screen.fields.slice(Math.ceil(screen.fields.length / 2)))}
+            ${screen.stats ? `<div class="visual" style="min-height: 90px;">차트/요약 시각화 영역</div>` : ""}
+          </div>
+        </div>
+        <div class="content">${tableMarkup}</div>
+      `;
+    }
+
+    function renderScreen(screen) {
+      return `
+        <article class="screen" id="screen-${String(screen.id).padStart(2, "0")}">
+          <div class="screen-head">
+            <div>
+              <h2>${screen.id}. ${screen.title}</h2>
+              <p class="screen-purpose">${screen.purpose}</p>
+            </div>
+            <div class="badges">
+              <span class="badge role">${screen.menu}</span>
+              <span class="badge role">${screen.role}</span>
+              <span class="badge ${priorityClass(screen.priority)}">${screen.priority}</span>
+              ${screen.isNew ? `<span class="badge new">README.md 미포함(신규)</span>` : ""}
+            </div>
+          </div>
+          <div class="screen-body">
+            <div class="browser">
+              <div class="browser-bar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="url">${screen.url}</span>
+              </div>
+              <div class="app-nav">
+                <div class="brand">${screen.title}</div>
+                <div class="nav-links">${(screen.nav || ["대시보드", "계좌", "이체", "고객센터"]).map((item) => `<span>${item}</span>`).join("")}</div>
+              </div>
+              ${renderWireframe(screen)}
+            </div>
+            <aside>
+              <div class="side-section">
+                <h3>주요 구성</h3>
+                <ul>${screen.fields.map((item) => `<li>${item}</li>`).join("")}</ul>
+              </div>
+              <div class="side-section">
+                <h3>구현 포인트</h3>
+                <ul>${screen.points.map((item) => `<li>${item}</li>`).join("")}</ul>
+              </div>
+              <div class="side-section">
+                <h3>이동 흐름</h3>
+                <div class="flow">${renderFlow(screen.flow)}</div>
+              </div>
+            </aside>
+          </div>
+        </article>
+      `;
+    }
+
+    document.getElementById("toc").innerHTML = screens.map((screen) => `
+      <a href="#screen-${String(screen.id).padStart(2, "0")}">${screen.id}. ${screen.title}<br><span>${screen.priority}</span></a>
+    `).join("");
+
+    document.getElementById("screens").innerHTML = screens.map(renderScreen).join("");
+  </script>
+</body>
+</html>

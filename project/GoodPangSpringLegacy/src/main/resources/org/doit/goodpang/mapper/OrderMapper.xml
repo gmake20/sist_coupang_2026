@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.doit.goodpang.mapper.OrderMapper">
 
-    <!-- 1. 필터 조건(최근6개월 / 년도)에 따른 회원 총 주문 건수 조회 -->
+
+     <!-- 1. 필터 조건(최근6개월 / 년도)에 따른 회원 총 주문 건수 조회 -->
     <select id="getOrderCount" resultType="int">
         SELECT COUNT(*) 
         FROM ORDERS o 
@@ -119,5 +120,408 @@
         WHERE o.ORDER_NO = #{orderNo} AND o.MEMBER_NO = #{memberNo}
         ORDER BY od.ORDER_DETAIL_NO ASC
     </select>
+   
+
+
+    <select id="getAddress"
+            resultType="org.doit.goodpang.domain.AddressDTO">
+
+        SELECT
+            ADDRESS_NO       AS addressNo,
+            MEMBER_NO        AS memberNo,
+            RECEIVER_NAME    AS receiverName,
+            TEL              AS tel,
+            ZIPCODE          AS zipcode,
+            ADDRESS          AS address,
+            DETAIL_ADDRESS   AS detailAddress,
+            REQUEST_MSG      AS requestMsg,
+            ADDRESS_DEFAULT  AS addressDefault
+
+        FROM DELIVERY_ADDRESS
+
+        WHERE MEMBER_NO = #{memberNo}
+          AND ADDRESS_DEFAULT = 'Y'
+
+    </select>
+
+
+    <select id="getAddressList"
+            resultType="org.doit.goodpang.domain.AddressDTO">
+
+        SELECT
+            ADDRESS_NO       AS addressNo,
+            MEMBER_NO        AS memberNo,
+            RECEIVER_NAME    AS receiverName,
+            TEL              AS tel,
+            ZIPCODE          AS zipcode,
+            ADDRESS          AS address,
+            DETAIL_ADDRESS   AS detailAddress,
+            REQUEST_MSG      AS requestMsg,
+            ADDRESS_DEFAULT  AS addressDefault
+
+        FROM DELIVERY_ADDRESS
+
+        WHERE MEMBER_NO = #{memberNo}
+
+        ORDER BY
+            ADDRESS_DEFAULT DESC,
+            ADDRESS_NO DESC
+
+    </select>
+
+   <select id="existsCheckout"
+            resultType="int">
+
+        SELECT COUNT(*)
+
+        FROM CHECKOUT
+
+        WHERE CHECKOUT_NO = #{checkoutNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </select>
+
+
+    <select id="existsAddress"
+            resultType="int">
+
+        SELECT COUNT(*)
+
+        FROM DELIVERY_ADDRESS
+
+        WHERE ADDRESS_NO = #{addressNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </select>
+
+
+    <select id="getNextOrderAddressNo"
+            resultType="int">
+
+        SELECT SEQ_ORDER_ADDRESS_NO.NEXTVAL
+        FROM DUAL
+
+    </select>
+
+
+    <insert id="insertOrderAddress">
+
+        INSERT INTO ORDER_ADDRESS (
+            ORDER_ADDRESS_NO,
+            MEMBER_NO,
+            RECEIVER_NAME,
+            TEL,
+            ZIPCODE,
+            ADDRESS,
+            DETAIL_ADDRESS,
+            REQUEST_MSG
+        )
+
+        SELECT
+            #{orderAddressNo},
+            MEMBER_NO,
+            RECEIVER_NAME,
+            TEL,
+            ZIPCODE,
+            ADDRESS,
+            DETAIL_ADDRESS,
+            REQUEST_MSG
+
+        FROM DELIVERY_ADDRESS
+
+        WHERE ADDRESS_NO = #{addressNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </insert>
+
+    <select id="getNextOrderNo"
+            resultType="int">
+
+        SELECT SEQ_ORDER_NO.NEXTVAL
+        FROM DUAL
+
+    </select>
+
+
+    <insert id="insertOrderFromCheckout">
+
+        INSERT INTO ORDERS (
+            ORDER_NO,
+            MEMBER_NO,
+            CHECKOUT_NO,
+            ORDER_DATE,
+            DELIVERY_FEE,
+            TOTAL_PRICE,
+            ORDER_STATUS,
+            ORDER_ADDRESS_NO,
+            PRODUCT_AMOUNT,
+            INSTANT_DISCOUNT,
+            COUPON_DISCOUNT,
+            CASH_USED
+        )
+
+        SELECT
+            #{orderNo},
+            MEMBER_NO,
+            CHECKOUT_NO,
+            SYSDATE,
+            DELIVERY_FEE,
+            TOTAL_PRICE,
+            '결제완료',
+            #{orderAddressNo},
+            PRODUCT_AMOUNT,
+            INSTANT_DISCOUNT,
+            COUPON_DISCOUNT,
+            CASH_USED
+
+        FROM CHECKOUT
+
+        WHERE CHECKOUT_NO = #{checkoutNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </insert>
+
+
+    <insert id="insertPayment">
+
+        INSERT INTO PAYMENT (
+            PAYMENT_NO,
+            ORDER_NO,
+            PAYMENT_METHOD,
+            PAYMENT_METHOD_NO,
+            PAYMENT_AMOUNT,
+            PAYMENT_STATUS,
+            PAYMENT_DATE
+        )
+
+        SELECT
+            SEQ_PAYMENT_NO.NEXTVAL,
+            #{orderNo},
+            #{paymentMethod},
+            #{paymentMethodNo, jdbcType=NUMERIC},
+            TOTAL_PRICE,
+            'PAID',
+            SYSDATE
+
+        FROM CHECKOUT
+
+        WHERE CHECKOUT_NO = #{checkoutNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </insert>
+
+
+    <insert id="insertOrderDetailsFromCheckout">
+
+        INSERT INTO ORDER_DETAIL (
+            ORDER_DETAIL_NO,
+            ORDER_NO,
+            PRODUCT_NO,
+            ORDER_QTY,
+            PRICE,
+            OPTION_ID
+        )
+
+        SELECT
+            SEQ_ORDER_DETAIL_NO.NEXTVAL,
+            #{orderNo},
+            PRODUCT_NO,
+            ORDER_QTY,
+            PRICE,
+            OPTION_ID
+
+        FROM CHECKOUT_ITEM
+
+        WHERE CHECKOUT_NO = #{checkoutNo}
+
+    </insert>
+
+
+    <delete id="deleteCheckoutItems">
+
+        DELETE FROM CHECKOUT_ITEM
+
+        WHERE CHECKOUT_NO = #{checkoutNo}
+
+    </delete>
+
+    <delete id="deleteCheckout">
+
+        DELETE FROM CHECKOUT
+
+        WHERE CHECKOUT_NO = #{checkoutNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </delete>
+
+    <select id="findOrderNoByCheckout"
+            resultType="java.lang.Integer">
+
+        SELECT ORDER_NO
+
+        FROM ORDERS
+
+        WHERE CHECKOUT_NO = #{checkoutNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </select>
+
+    <select id="stockOut"
+            statementType="CALLABLE"
+            parameterType="map">
+
+        {
+            CALL PRC_ORDER_STOCK_OUT(
+                #{orderNo,
+                  mode=IN,
+                  jdbcType=NUMERIC},
+
+                #{result,
+                  mode=OUT,
+                  jdbcType=NUMERIC,
+                  javaType=java.lang.Integer},
+
+                #{failProduct,
+                  mode=OUT,
+                  jdbcType=VARCHAR,
+                  javaType=java.lang.String},
+
+                #{failLeft,
+                  mode=OUT,
+                  jdbcType=NUMERIC,
+                  javaType=java.lang.Integer}
+            )
+        }
+
+    </select>
+
+    <update id="updateTotalPrice">
+
+        UPDATE ORDERS
+
+        SET TOTAL_PRICE =
+            GREATEST(
+                0,
+                NVL(PRODUCT_AMOUNT, 0)
+                - NVL(INSTANT_DISCOUNT, 0)
+                - NVL(COUPON_DISCOUNT, 0)
+                - NVL(CASH_USED, 0)
+                + NVL(DELIVERY_FEE, 0)
+            )
+
+        WHERE ORDER_NO = #{orderNo}
+
+    </update>
+
+
+    <update id="updateOrderStatus">
+
+        UPDATE ORDERS
+
+        SET ORDER_STATUS = #{orderStatus}
+
+        WHERE ORDER_NO = #{orderNo}
+
+    </update>
+
+    <update id="updateOrderAddress">
+
+        UPDATE ORDERS
+
+        SET ORDER_ADDRESS_NO = #{addressNo}
+
+        WHERE ORDER_NO = #{orderNo}
+
+    </update>
+
+<!--    <select id="getOrderComplete"
+        resultType="org.doit.goodpang.domain.OrderCompleteDTO">
+
+    SELECT
+        o.ORDER_NO              AS orderNo,
+        o.MEMBER_NO             AS memberNo,
+        o.ORDER_DATE            AS orderDate,
+        o.DELIVERY_FEE          AS shippingFee,
+        o.TOTAL_PRICE           AS paymentAmount,
+        o.ORDER_STATUS          AS orderStatus,
+        o.PRODUCT_AMOUNT        AS orderAmount,
+        o.INSTANT_DISCOUNT      AS instantDiscount,
+        o.COUPON_DISCOUNT       AS couponDiscount,
+        o.CASH_USED             AS cashUsed,
+
+        d.RECEIVER_NAME         AS receiverName,
+        d.TEL                   AS receiverPhone,
+        d.ZIPCODE               AS zipcode,
+        d.ADDRESS               AS address,
+        d.DETAIL_ADDRESS        AS detailAddress,
+        d.REQUEST_MSG           AS requestMsg
+
+    FROM ORDERS o
+
+    JOIN ORDER_ADDRESS d
+      ON o.ORDER_ADDRESS_NO =
+         d.ORDER_ADDRESS_NO
+
+    WHERE o.ORDER_NO = #{orderNo}
+      AND o.MEMBER_NO = #{memberNo}
+
+</select>
+ -->
+<select id="getOrderComplete"
+        resultType="org.doit.goodpang.domain.OrderCompleteDTO">
+
+    SELECT
+        d.RECEIVER_NAME AS receiverName,
+
+        d.TEL AS receiverPhone,
+
+        d.ZIPCODE AS zipcode,
+
+        TRIM(
+            NVL(d.ADDRESS, '')
+            || ' '
+            || NVL(d.DETAIL_ADDRESS, '')
+        ) AS address,
+
+        d.REQUEST_MSG AS requestMsg,
+
+        TO_CHAR(
+            o.ORDER_DATE + 1,
+            'YYYY-MM-DD'
+        ) AS arrivalDate,
+
+        '주식회사 회사이름' AS sellerName,
+
+        NVL(
+            o.PRODUCT_AMOUNT,
+            0
+        ) AS orderAmount,
+
+        (
+            NVL(o.INSTANT_DISCOUNT, 0)
+            +
+            NVL(o.COUPON_DISCOUNT, 0)
+        ) AS discountAmount,
+
+        NVL(
+            o.DELIVERY_FEE,
+            0
+        ) AS shippingFee,
+
+        NVL(
+            o.TOTAL_PRICE,
+            0
+        ) AS paymentAmount
+
+    FROM ORDERS o
+
+    JOIN ORDER_ADDRESS d
+      ON o.ORDER_ADDRESS_NO =
+         d.ORDER_ADDRESS_NO
+
+    WHERE o.ORDER_NO = #{orderNo}
+      AND o.MEMBER_NO = #{memberNo}
+
+</select>
 
 </mapper>

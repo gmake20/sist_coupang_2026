@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.doit.goodpang.mapper.CheckoutMapper">
+
+
+	<!-- 상품 기본 가격 -->
+	<select id="getProductPrice" resultType="java.lang.Integer">
+
+		SELECT PRODUCT_PRICE
+		FROM PRODUCT
+		WHERE PRODUCT_NO = #{productNo}
+
+	</select>
+
+
+	<!-- 옵션 추가 가격 -->
+	<select id="getOptionPrice" resultType="java.lang.Integer">
+
+		SELECT NVL(PRICE, 0)
+		FROM PRODUCT_OPTION
+		WHERE PRODUCT_NO = #{productNo}
+		AND OPTION_ID = #{optionId}
+
+	</select>
+
+
+	<!-- CHECKOUT 번호 생성 -->
+	<select id="getNextCheckoutNo" resultType="int">
+
+		SELECT SEQ_CHECKOUT_NO.NEXTVAL
+		FROM DUAL
+
+	</select>
+
+
+	<!-- CHECKOUT 생성 -->
+	<insert id="insertCheckout">
+
+		INSERT INTO CHECKOUT (
+		CHECKOUT_NO,
+		MEMBER_NO,
+		CREATED_AT,
+		PRODUCT_AMOUNT,
+		INSTANT_DISCOUNT,
+		COUPON_DISCOUNT,
+		CASH_USED,
+		DELIVERY_FEE,
+		TOTAL_PRICE
+		)
+		VALUES (
+		#{checkoutNo},
+		#{memberNo},
+		SYSDATE,
+		#{productAmount},
+		#{instantDiscount},
+		#{couponDiscount},
+		#{cashUsed},
+		#{deliveryFee},
+		#{totalPrice}
+		)
+
+	</insert>
+
+
+	<!-- CHECKOUT_ITEM 생성 -->
+	<insert id="insertCheckoutItem">
+
+		INSERT INTO CHECKOUT_ITEM (
+		CHECKOUT_ITEM_NO,
+		CHECKOUT_NO,
+		PRODUCT_NO,
+		OPTION_ID,
+		ORDER_QTY,
+		PRICE
+		)
+		VALUES (
+		SEQ_CHECKOUT_ITEM_NO.NEXTVAL,
+		#{checkoutNo},
+		#{productNo},
+		#{optionId, jdbcType=NUMERIC},
+		#{quantity},
+		#{unitPrice}
+		)
+
+	</insert>
+	
+	<select id="getCheckout"
+        resultType="org.doit.goodpang.domain.CheckoutDTO">
+
+    SELECT
+        CHECKOUT_NO       AS checkoutNo,
+        MEMBER_NO         AS memberNo,
+        PRODUCT_AMOUNT    AS productAmount,
+        INSTANT_DISCOUNT  AS instantDiscount,
+        COUPON_DISCOUNT   AS couponDiscount,
+        CASH_USED         AS cashUsed,
+        DELIVERY_FEE      AS deliveryFee,
+        TOTAL_PRICE       AS totalPrice
+    FROM CHECKOUT
+    WHERE CHECKOUT_NO = #{checkoutNo}
+      AND MEMBER_NO = #{memberNo}
+
+</select>
+
+
+</mapper>

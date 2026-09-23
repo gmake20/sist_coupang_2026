@@ -1,0 +1,17 @@
+ <style>
+   .view-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+   .view-tab {
+     padding: 8px 16px;
+     border-radius: 8px;
+     font-size: 13px;
+     font-weight: 600;
+     color: #666;
+     background: #fff;
+     border: 1px solid #ddd;
+   }
+   .view-tab.active {
+     background: #346aff;
+     border-color: #346aff;
+    color: #fff;
+   }
+ </style>

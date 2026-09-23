@@ -41,9 +41,6 @@
 			</c:if>
 
 			<!--
-      SignupServlet:
-      @WebServlet("/signup")
-      doPost()로 전송
     -->
 			<form class="form" id="signupForm"
 				action="${pageContext.request.contextPath}/signup" method="post"

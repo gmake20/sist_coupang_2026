@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.doit.goodpang.mapper.AddressMapper">
+
+
+    <!-- 기본 배송지 1개 조회 -->
+    <select id="getAddress"
+            resultType="org.doit.goodpang.domain.AddressDTO">
+
+        SELECT
+            ADDRESS_NO       AS addressNo,
+            MEMBER_NO        AS memberNo,
+            RECEIVER_NAME    AS receiverName,
+            TEL              AS tel,
+            ZIPCODE          AS zipcode,
+            ADDRESS          AS address,
+            DETAIL_ADDRESS   AS detailAddress,
+            REQUEST_MSG      AS requestMsg,
+            ADDRESS_DEFAULT  AS addressDefault
+        FROM DELIVERY_ADDRESS
+        WHERE MEMBER_NO = #{memberNo}
+          AND ADDRESS_DEFAULT = 'Y'
+
+    </select>
+
+
+    <!-- 회원의 전체 배송지 -->
+    <select id="getAddressList"
+            resultType="org.doit.goodpang.domain.AddressDTO">
+
+        SELECT
+            ADDRESS_NO       AS addressNo,
+            MEMBER_NO        AS memberNo,
+            RECEIVER_NAME    AS receiverName,
+            TEL              AS tel,
+            ZIPCODE          AS zipcode,
+            ADDRESS          AS address,
+            DETAIL_ADDRESS   AS detailAddress,
+            REQUEST_MSG      AS requestMsg,
+            ADDRESS_DEFAULT  AS addressDefault
+        FROM DELIVERY_ADDRESS
+        WHERE MEMBER_NO = #{memberNo}
+        ORDER BY
+            ADDRESS_DEFAULT DESC,
+            ADDRESS_NO DESC
+
+    </select>
+
+
+    <!-- 기존 기본배송지 해제 -->
+    <update id="clearDefaultAddress">
+
+        UPDATE DELIVERY_ADDRESS
+        SET ADDRESS_DEFAULT = 'N'
+        WHERE MEMBER_NO = #{memberNo}
+          AND ADDRESS_DEFAULT = 'Y'
+
+    </update>
+
+
+    <!-- 배송지 추가 -->
+    <insert id="insertAddress">
+
+        INSERT INTO DELIVERY_ADDRESS (
+            ADDRESS_NO,
+            MEMBER_NO,
+            RECEIVER_NAME,
+            TEL,
+            ZIPCODE,
+            ADDRESS,
+            DETAIL_ADDRESS,
+            REQUEST_MSG,
+            ADDRESS_DEFAULT
+        )
+        VALUES (
+            SEQ_ADDRESS_NO.NEXTVAL,
+            #{memberNo},
+            #{receiverName},
+            #{tel},
+            #{zipcode},
+            #{address},
+            #{detailAddress},
+            #{requestMsg},
+            #{addressDefault}
+        )
+
+    </insert>
+
+</mapper>
