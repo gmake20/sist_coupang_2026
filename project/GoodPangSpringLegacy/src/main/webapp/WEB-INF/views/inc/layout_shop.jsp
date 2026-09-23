@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -8,7 +9,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title><tiles:getAsString name="title"/></title>
+<%-- <title><tiles:getAsString name="title"/></title> --%>
+<%-- 제목은 두 군데서 옴.
+     ① 컨트롤러가 pageTitle 을 넣으면 그걸 씀 (상품명처럼 값이 페이지마다 달라질 때)
+     ② 없으면 tiles.xml 의 title 을 씀 (고정 문구) --%>
+<c:set var="tilesTitle"><tiles:getAsString name="title" ignore="true"/></c:set>
+<title>${not empty pageTitle ? pageTitle : tilesTitle}</title>
 
 <!-- 파비콘 -->
 <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">

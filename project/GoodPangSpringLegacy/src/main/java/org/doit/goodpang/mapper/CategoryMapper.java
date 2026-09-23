@@ -18,4 +18,5 @@ public interface CategoryMapper {
 	// 이름에 keyword가 포함된 "최종 항목"(자식 없는 리프)만 + categoryPath("대분류 > 중분류 > 소분류")
 	public List<CategoryDTO> searchLeafByKeyword(@Param("keyword") String keyword);
 
+
 }

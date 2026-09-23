@@ -73,6 +73,11 @@ public class ProductController {
 
 		model.addAttribute("p", product);
 
+		// 구버전 product.jsp 16줄의 <title>${p.productName}-${p.subCategoryName}|굿팡</title>.
+        // head 가 layout_shop.jsp 로 올라가면서 여기서 넘겨줌
+        model.addAttribute("pageTitle",
+                        product.getProductName() + "-" + product.getSubCategoryName() + "|굿팡");
+
         /*
          * 2026-09-06 — 판매중지 상품 처리. 구버전은 product.jsp 의 <body> 에 직접 썼는데,
          * Tiles 로 오면서 <body> 가 layout_shop.jsp 로 올라가서 여기서 값만 넘김.
