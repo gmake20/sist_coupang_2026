@@ -44,8 +44,8 @@
       </button>
       <div class="side-submenu ${(menu eq 'products' or menu eq 'productWrite' or menu eq 'productOptions') ? 'open' : ''}">
         <a href="${pageContext.request.contextPath}/vendor/product.htm" class="${menu eq 'products' ? 'active' : ''}">상품 목록</a>
-        <a href="${pageContext.request.contextPath}/vendor/product/write.htm" class="${menu eq 'productWrite' ? 'active' : ''}">상품 등록</a>
-        <a href="${pageContext.request.contextPath}/vendor/product/options.htm" class="${menu eq 'productOptions' ? 'active' : ''}">상품 옵션 관리</a>
+        <a href="${pageContext.request.contextPath}/vendor/product_write.htm" class="${menu eq 'productWrite' ? 'active' : ''}">상품 등록</a>
+        <a href="${pageContext.request.contextPath}/vendor/product_options.htm" class="${menu eq 'productOptions' ? 'active' : ''}">상품 옵션 관리</a>
       </div>
 
       <button class="side-item side-group-toggle ${(menu eq 'orders' or menu eq 'delivery' or menu eq 'return' or menu eq 'shipping') ? 'active open' : ''}" type="button">
@@ -66,10 +66,10 @@
         <svg class="icon chevron"><use href="#ic-chevron-down" /></svg>
       </button>
       <div class="side-submenu ${menu eq 'settlement' ? 'open' : ''}">
-        <a href="${pageContext.request.contextPath}/vendor/settlement.htm" class="${menu eq 'settlement' ? 'active' : ''}">정산내역 리스트</a>
+        <a href="${pageContext.request.contextPath}/vendor_settlement.htm" class="${menu eq 'settlement' ? 'active' : ''}">정산내역 리스트</a>
       </div>
 
-      <a href="${pageContext.request.contextPath}/vendor/notice.htm" class="side-item ${menu eq 'notice' ? 'active' : ''}">
+      <a href="${pageContext.request.contextPath}/vendor_notice.htm" class="side-item ${menu eq 'notice' ? 'active' : ''}">
         <svg class="icon"><use href="#ic-bell" /></svg>
         <span>공지사항</span>
       </a>

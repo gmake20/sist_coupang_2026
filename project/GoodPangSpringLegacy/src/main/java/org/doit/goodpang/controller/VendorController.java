@@ -115,8 +115,7 @@ public class VendorController {
 	@GetMapping(value = "/dashboard.htm")
 	public ModelAndView dashboard(
 			@RequestParam(value = "date", required = false) String date,
-			HttpSession session
-	) throws JsonProcessingException {
+			HttpSession session) throws JsonProcessingException {
 
 		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
 
@@ -151,7 +150,8 @@ public class VendorController {
 		VendorOrderStatSummaryDTO orderStat = vendorDashboardMapper.countOrderStats(sellerNo);
 		mav.addObject("orderStat", orderStat);
 
-		// 매출 현황 차트(일간/주간/월간) - 실데이터. JS의 salesData.daily/weekly/monthly 자리를 이 JSON으로 채운다.
+		// 매출 현황 차트(일간/주간/월간) - 실데이터. JS의 salesData.daily/weekly/monthly 자리를 이 JSON으로
+		// 채운다.
 		// 선택된 날짜가 속한 구간까지 포함해서 최근 7일/5주/5개월을 보여준다.
 		List<VendorDailySalesDTO> dailySales = vendorDashboardMapper.getDailySalesStat(sellerNo, targetSqlDate);
 		mav.addObject("dailySalesJson", objectMapper.writeValueAsString(dailySales));
@@ -208,21 +208,19 @@ public class VendorController {
 
 	private String formatDateLabel(LocalDate date) {
 		String dayName = DAY_NAMES[date.getDayOfWeek().getValue() % 7];
-		return String.format("%04d.%02d.%02d (%s)", date.getYear(), date.getMonthValue(), date.getDayOfMonth(), dayName);
+		return String.format("%04d.%02d.%02d (%s)", date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
+				dayName);
 	}
 
 	private String formatShortDate(LocalDate date) {
 		return date.getMonthValue() + "/" + date.getDayOfMonth();
 	}
 
-	
-	
 	@GetMapping(value = "/product.htm")
 	public ModelAndView product(
 			@RequestParam(value = "view", required = false) String view,
 			@RequestParam(value = "page", required = false) String pageParam,
-			HttpSession session
-	) {
+			HttpSession session) {
 
 		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
 
@@ -271,6 +269,13 @@ public class VendorController {
 		} catch (NumberFormatException e) {
 			return 1;
 		}
+	}
+
+	@GetMapping(value = "/product_write.htm")
+	public ModelAndView product_write() {
+		ModelAndView mav = new ModelAndView("vendor.product_write");
+		return mav;
+
 	}
 
 }
