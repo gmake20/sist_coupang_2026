@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE mapper
-    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.doit.goodpang.mapper.PaymentMethodMapper">
 
-    <select id="getBankMethods"
+
+    <select id="getBankAccounts"
             resultType="org.doit.goodpang.domain.PaymentMethodDTO">
 
         SELECT
-            PAYMENT_METHOD_NO AS paymentMethodNo,
-            MEMBER_NO AS memberNo,
-            PAYMENT_TYPE AS paymentType,
-            BANK_CODE AS bankCode,
+            PAYMENT_METHOD_NO,
+            MEMBER_NO,
+            PAYMENT_TYPE,
+            BANK_CODE,
 
             CASE BANK_CODE
                 WHEN 'SHINHAN' THEN '신한은행'
@@ -24,11 +25,11 @@
                 WHEN 'KAKAO'  THEN '카카오뱅크'
                 WHEN 'TOSS'   THEN '토스뱅크'
                 ELSE BANK_CODE
-            END AS bankName,
+            END AS BANK_NAME,
 
-            ACCOUNT_LAST4 AS accountLast4,
-            ACCOUNT_HOLDER AS accountHolder,
-            PAYMENT_DEFAULT AS paymentDefault
+            ACCOUNT_LAST4,
+            ACCOUNT_HOLDER,
+            PAYMENT_DEFAULT
 
         FROM PAYMENT_METHOD
 
@@ -37,20 +38,22 @@
 
         ORDER BY
             CASE
-                WHEN PAYMENT_DEFAULT = 'Y' THEN 0
+                WHEN PAYMENT_DEFAULT = 'Y'
+                THEN 0
                 ELSE 1
             END,
             CREATED_AT DESC
 
     </select>
 
-    <select id="getCardMethods"
+    <select id="getCards"
             resultType="org.doit.goodpang.domain.PaymentMethodDTO">
 
         SELECT
-            PAYMENT_METHOD_NO AS paymentMethodNo,
-            MEMBER_NO AS memberNo,
-            PAYMENT_TYPE AS paymentType,
+            PAYMENT_METHOD_NO,
+            MEMBER_NO,
+            PAYMENT_TYPE,
+            CARD_COMPANY,
 
             CASE CARD_COMPANY
                 WHEN 'BC'      THEN '비씨카드'
@@ -63,10 +66,10 @@
                 WHEN 'WOORI'   THEN '우리카드'
                 WHEN 'NH'      THEN 'NH농협카드'
                 ELSE CARD_COMPANY
-            END AS cardCompany,
+            END AS CARD_COMPANY_NAME,
 
-            CARD_LAST4 AS cardLast4,
-            PAYMENT_DEFAULT AS paymentDefault
+            CARD_LAST4,
+            PAYMENT_DEFAULT
 
         FROM PAYMENT_METHOD
 
@@ -75,7 +78,8 @@
 
         ORDER BY
             CASE
-                WHEN PAYMENT_DEFAULT = 'Y' THEN 0
+                WHEN PAYMENT_DEFAULT = 'Y'
+                THEN 0
                 ELSE 1
             END,
             CREATED_AT DESC
@@ -86,27 +90,27 @@
             resultType="org.doit.goodpang.domain.PaymentMethodDTO">
 
         SELECT
-            PAYMENT_METHOD_NO AS paymentMethodNo,
-            MEMBER_NO AS memberNo,
-            PAYMENT_TYPE AS paymentType,
-            BANK_CODE AS bankCode,
+            PAYMENT_METHOD_NO,
+            MEMBER_NO,
+            PAYMENT_TYPE,
+            BANK_CODE,
 
             CASE BANK_CODE
                 WHEN 'SHINHAN' THEN '신한은행'
-                WHEN 'KB'      THEN 'KB국민은행'
-                WHEN 'WOORI'   THEN '우리은행'
-                WHEN 'NH'      THEN 'NH농협은행'
-                WHEN 'HANA'    THEN '하나은행'
-                WHEN 'KAKAO'   THEN '카카오뱅크'
-                WHEN 'TOSS'    THEN '토스뱅크'
+                WHEN 'KB' THEN 'KB국민은행'
+                WHEN 'WOORI' THEN '우리은행'
+                WHEN 'NH' THEN 'NH농협은행'
+                WHEN 'HANA' THEN '하나은행'
+                WHEN 'KAKAO' THEN '카카오뱅크'
+                WHEN 'TOSS' THEN '토스뱅크'
                 ELSE BANK_CODE
-            END AS bankName,
+            END AS BANK_NAME,
 
-            ACCOUNT_LAST4 AS accountLast4,
-            ACCOUNT_HOLDER AS accountHolder,
-            CARD_COMPANY AS cardCompany,
-            CARD_LAST4 AS cardLast4,
-            PAYMENT_DEFAULT AS paymentDefault
+            ACCOUNT_LAST4,
+            ACCOUNT_HOLDER,
+            CARD_COMPANY,
+            CARD_LAST4,
+            PAYMENT_DEFAULT
 
         FROM PAYMENT_METHOD
 
@@ -114,11 +118,144 @@
 
         ORDER BY
             CASE
-                WHEN PAYMENT_DEFAULT = 'Y' THEN 0
+                WHEN PAYMENT_DEFAULT = 'Y'
+                THEN 0
                 ELSE 1
             END,
             PAYMENT_METHOD_NO DESC
 
     </select>
+
+    <select id="existsPaymentMethod"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM PAYMENT_METHOD
+        WHERE MEMBER_NO = #{memberNo}
+          AND PAYMENT_METHOD_NO = #{paymentMethodNo}
+
+    </select>
+
+
+    <select id="findPaymentMethod"
+            resultType="org.doit.goodpang.domain.PaymentMethodDTO">
+
+        SELECT
+            PAYMENT_METHOD_NO,
+            MEMBER_NO,
+            PAYMENT_TYPE,
+            PAYMENT_DEFAULT
+        FROM PAYMENT_METHOD
+        WHERE PAYMENT_METHOD_NO = #{paymentMethodNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </select>
+
+    <update id="clearDefault">
+
+        UPDATE PAYMENT_METHOD
+        SET PAYMENT_DEFAULT = 'N'
+        WHERE MEMBER_NO = #{memberNo}
+          AND PAYMENT_TYPE = #{paymentType}
+          AND PAYMENT_DEFAULT = 'Y'
+
+    </update>
+    
+    <insert id="insertBankAccount">
+
+        INSERT INTO PAYMENT_METHOD (
+            PAYMENT_METHOD_NO,
+            MEMBER_NO,
+            PAYMENT_TYPE,
+            BANK_CODE,
+            ACCOUNT_LAST4,
+            ACCOUNT_HOLDER,
+            PAYMENT_DEFAULT,
+            CREATED_AT
+        )
+        VALUES (
+            SEQ_PAYMENT_METHOD_NO.NEXTVAL,
+            #{memberNo},
+            'BANK',
+            #{bankCode},
+            #{accountLast4},
+            #{accountHolder},
+            CASE
+                WHEN #{paymentDefault} = 1
+                THEN 'Y'
+                ELSE 'N'
+            END,
+            SYSDATE
+        )
+
+    </insert>
+
+    <insert id="insertCard">
+
+        INSERT INTO PAYMENT_METHOD (
+            PAYMENT_METHOD_NO,
+            MEMBER_NO,
+            PAYMENT_TYPE,
+            CARD_COMPANY,
+            CARD_LAST4,
+            PAYMENT_DEFAULT,
+            CREATED_AT
+        )
+        VALUES (
+            SEQ_PAYMENT_METHOD_NO.NEXTVAL,
+            #{memberNo},
+            'CARD',
+            #{cardCompany},
+            #{cardLast4},
+            CASE
+                WHEN #{paymentDefault} = 1
+                THEN 'Y'
+                ELSE 'N'
+            END,
+            SYSDATE
+        )
+
+    </insert>
+
+    <insert id="insertPaymentMethod">
+
+        INSERT INTO PAYMENT_METHOD (
+            PAYMENT_METHOD_NO,
+            MEMBER_NO,
+            PAYMENT_TYPE,
+            BANK_CODE,
+            ACCOUNT_LAST4,
+            ACCOUNT_HOLDER,
+            CARD_COMPANY,
+            CARD_LAST4,
+            PAYMENT_DEFAULT
+        )
+        VALUES (
+            SEQ_PAYMENT_METHOD_NO.NEXTVAL,
+            #{memberNo},
+            #{paymentType},
+            #{bankCode},
+            #{accountLast4},
+            #{accountHolder},
+            #{cardCompany},
+            #{cardLast4},
+            CASE
+                WHEN #{paymentDefault} = 1
+                THEN 'Y'
+                ELSE 'N'
+            END
+        )
+
+    </insert>
+
+    <update id="setDefault">
+
+        UPDATE PAYMENT_METHOD
+        SET PAYMENT_DEFAULT = 'Y'
+        WHERE PAYMENT_METHOD_NO = #{paymentMethodNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </update>
+
 
 </mapper>
