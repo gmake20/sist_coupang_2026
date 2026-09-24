@@ -89,5 +89,73 @@
         )
 
     </insert>
+    
+    <select id="editGetAddress"
+            resultType="org.doit.goodpang.domain.AddressDTO">
+
+        SELECT
+            ADDRESS_NO,
+            MEMBER_NO,
+            RECEIVER_NAME,
+            TEL,
+            ZIPCODE,
+            ADDRESS,
+            DETAIL_ADDRESS,
+            REQUEST_MSG,
+            ADDRESS_DEFAULT
+        FROM DELIVERY_ADDRESS
+        WHERE ADDRESS_NO = #{addressNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </select>
+
+    <update id="resetDefaultAddress">
+
+        UPDATE DELIVERY_ADDRESS
+        SET ADDRESS_DEFAULT = 'N'
+        WHERE MEMBER_NO = #{memberNo}
+          AND ADDRESS_DEFAULT = 'Y'
+
+        <if test="addressNo != null">
+            AND ADDRESS_NO &lt;&gt; #{addressNo}
+        </if>
+
+    </update>
+
+    <update id="updateAddress">
+
+        UPDATE DELIVERY_ADDRESS
+        SET
+            RECEIVER_NAME = #{receiverName},
+            TEL = #{tel},
+            ZIPCODE = #{zipcode},
+            ADDRESS = #{address},
+            DETAIL_ADDRESS = #{detailAddress},
+            REQUEST_MSG = #{requestMsg},
+            ADDRESS_DEFAULT = #{addressDefault}
+        WHERE ADDRESS_NO = #{addressNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </update>
+    
+     <select id="editGetAddress"
+            resultType="org.doit.goodpang.domain.AddressDTO">
+
+        SELECT
+            ADDRESS_NO,
+            MEMBER_NO,
+            RECEIVER_NAME,
+            TEL,
+            ZIPCODE,
+            ADDRESS,
+            DETAIL_ADDRESS,
+            REQUEST_MSG,
+            ADDRESS_DEFAULT
+        FROM DELIVERY_ADDRESS
+        WHERE ADDRESS_NO = #{addressNo}
+          AND MEMBER_NO = #{memberNo}
+
+    </select>
+    
 
 </mapper>
