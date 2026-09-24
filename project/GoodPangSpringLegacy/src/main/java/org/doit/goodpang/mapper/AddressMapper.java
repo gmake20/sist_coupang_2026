@@ -22,4 +22,21 @@ public interface AddressMapper {
     int clearDefaultAddress(
             @Param("memberNo") Long memberNo
     );
+    
+    int resetDefaultAddress(
+            @Param("memberNo") Long memberNo,
+            @Param("addressNo") Integer addressNo
+    );
+    
+    AddressDTO getAddressForEdit(
+            @Param("addressNo") Integer addressNo,
+            @Param("memberNo") Long memberNo
+    );
+
+    int updateAddress(AddressDTO dto);
+    
+    AddressDTO editGetAddress(
+            @Param("addressNo") int addressNo,
+            @Param("memberNo") Long memberNo
+    );
 }
