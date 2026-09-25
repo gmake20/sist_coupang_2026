@@ -19,6 +19,8 @@ import org.doit.goodpang.domain.VendorDailyTrafficDTO;
 import org.doit.goodpang.domain.VendorDashboardStatDTO;
 import org.doit.goodpang.domain.VendorOrderStatSummaryDTO;
 import org.doit.goodpang.domain.VendorProductListDTO;
+import org.doit.goodpang.domain.VendorProductOptionDTO;
+import org.doit.goodpang.domain.VendorProductOptionGroupDTO;
 import org.doit.goodpang.mapper.VendorDashboardMapper;
 import org.doit.goodpang.mapper.VendorMapper;
 import org.doit.goodpang.mapper.VendorProductMapper;
@@ -274,8 +276,72 @@ public class VendorController {
 	@GetMapping(value = "/product_write.htm")
 	public ModelAndView product_write() {
 		ModelAndView mav = new ModelAndView("vendor.product_write");
+		mav.addObject("menu", "productWrite"); // 사이드바 활성 메뉴
 		return mav;
 
 	}
+	
+	
+
+	@GetMapping(value = "/product_options.htm")
+	public ModelAndView productOptions(
+			@RequestParam(value = "productNo", required = false) String productNoParam,
+			HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		Integer productNo = parseProductNo(productNoParam);
+		int sellerNo = loginSeller.getSellerNo();
+
+		List<VendorProductOptionDTO> optionList = vendorProductMapper.findOptionsBySellerNo(sellerNo, productNo);
+		List<VendorProductOptionDTO> productFilterOptions = vendorProductMapper.findDistinctOptionProductsBySellerNo(sellerNo);
+
+		ModelAndView mav = new ModelAndView("vendor.product_options");
+		mav.addObject("menu", "productOptions"); // 사이드바 활성 메뉴
+
+		mav.addObject("optionList", optionList);
+		mav.addObject("groupedOptions", groupByProduct(optionList));
+		mav.addObject("productFilterOptions", productFilterOptions);
+		mav.addObject("selectedProductNo", productNo);
+
+		return mav;
+	}
+
+	// ?productNo= 파라미터 파싱. 없거나 숫자가 아니면 null(전체 상품)
+	private Integer parseProductNo(String productNoParam) {
+		if (productNoParam == null || productNoParam.isBlank()) {
+			return null;
+		}
+		try {
+			return Integer.valueOf(productNoParam.trim());
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+	// 상품번호, 옵션번호 순으로 이미 정렬된 optionList를 상품 단위로 묶는다 (테이블 rowspan 렌더링용)
+	private List<VendorProductOptionGroupDTO> groupByProduct(List<VendorProductOptionDTO> optionList) {
+
+		Map<Integer, VendorProductOptionGroupDTO> groupsByProductNo = new LinkedHashMap<>();
+
+		for (VendorProductOptionDTO option : optionList) {
+			VendorProductOptionGroupDTO group = groupsByProductNo.computeIfAbsent(option.getProductNo(), no -> {
+				VendorProductOptionGroupDTO g = new VendorProductOptionGroupDTO();
+				g.setProductNo(option.getProductNo());
+				g.setProductName(option.getProductName());
+				g.setThumbnailUrl(option.getThumbnailUrl());
+				g.setOptions(new ArrayList<>());
+				return g;
+			});
+			group.getOptions().add(option);
+		}
+
+		return new ArrayList<>(groupsByProductNo.values());
+	}
+	
 
 }

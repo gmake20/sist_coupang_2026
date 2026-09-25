@@ -1,7 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 <!DOCTYPE html>
 <html lang="ko">
@@ -41,7 +43,7 @@
 		</div>
 	</div>
 
-	<jsp:include page="/inc/header.jsp" />
+	<%-- <jsp:include page="/inc/header.jsp" /> --%>
 
 	<%-- 정렬/페이지/평점/가격 링크에 항상 같이 실어야 하는 값들. 새 링크 만들 때마다 이어붙임.
 	     색상은 다중선택(2026-09-01)이라 선택된 개수만큼 color= 를 반복해서 실음.

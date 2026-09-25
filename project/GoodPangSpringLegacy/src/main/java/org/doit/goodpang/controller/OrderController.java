@@ -1,13 +1,21 @@
 package org.doit.goodpang.controller;
 
+import java.util.List;
+
+import org.doit.goodpang.domain.AddressDTO;
+import org.doit.goodpang.domain.CheckoutDTO;
 import org.doit.goodpang.domain.OrderCompleteDTO;
+import org.doit.goodpang.domain.OrderItemDTO;
+import org.doit.goodpang.domain.PaymentMethodDTO;
 import org.doit.goodpang.domain.security.CustomUser;
+import org.doit.goodpang.service.AddressService;
+import org.doit.goodpang.service.CheckoutService;
 import org.doit.goodpang.service.OrderService;
 import org.doit.goodpang.service.OrderService.OrderResult;
 import org.doit.goodpang.service.OrderService.StockOutException;
+import org.doit.goodpang.service.PaymentMethodService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,10 +35,70 @@ import lombok.extern.log4j.Log4j;
 public class OrderController {
 
     private final OrderService orderService;
+    private final AddressService addressService;
+    private final PaymentMethodService paymentMethodService;
+    private final CheckoutService checkoutService;
+    
+    
+    // 1. 주문 목록 페이지 (/order/order_list)
+    @GetMapping("/order_list")
+    public String getOrderList(
+    		Authentication authentication,
+            @RequestParam(value = "year", defaultValue = "recent") String yearFilter,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            Model model) {
+
+        // 세션 또는 스프링 시큐리티 처리 전 임시 테스트용 회원번호
+        //int memberNo = 1; 
+    	
+    	 CustomUser customUser =
+                 (CustomUser) authentication.getPrincipal();
+
+         Long memberNo =
+                 customUser.getMember()
+                           .getMemberNo();
+
+        int pageSize = 5;
+        System.out.println("😍😍😍yearFilter" +yearFilter);
+        int totalCount = orderService.getOrderCount(memberNo, yearFilter);
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+        if (totalPages == 0) totalPages = 1;
+
+        List<OrderItemDTO> orderList = orderService.getOrderListPaged(memberNo, yearFilter, page, pageSize);
+
+        model.addAttribute("orderList", orderList);
+        model.addAttribute("yearFilter", yearFilter);
+        model.addAttribute("curPage", page);
+        model.addAttribute("totalPages", totalPages);
+
+        return "order.order_list"; // /WEB-INF/views/order/order_list.jsp
+    }
+
+    // 2. 주문 상세 페이지 (/order/order_detail)
+    @GetMapping("/order_detail")
+    public String getOrderDetail(
+            @RequestParam("orderNo") int orderNo,
+            Model model) {
+
+        int memberNo = 1; // 임시 회원번호
+
+        List<OrderItemDTO> detailList = orderService.getOrderDetailList(orderNo, memberNo);
+        OrderItemDTO orderInfo = null;
+
+        if (detailList != null && !detailList.isEmpty()) {
+            orderInfo = detailList.get(0); // 공통 주문정보용 대표 객체
+        }
+
+        model.addAttribute("detailList", detailList);
+        model.addAttribute("orderInfo", orderInfo);
+
+        return "order.order_detail"; // /WEB-INF/views/order/order_detail.jsp
+    }
+
 
     @PostMapping("/checkout")
     public String checkout(
-    		Authentication authentication,
+          Authentication authentication,
 
             @RequestParam("checkoutNo")
             int checkoutNo,
@@ -55,7 +123,7 @@ public class OrderController {
 
             RedirectAttributes rttr) {
 
-    	CustomUser customUser =
+       CustomUser customUser =
                 (CustomUser) authentication.getPrincipal();
 
         Long memberNo =
@@ -147,7 +215,7 @@ public class OrderController {
 
             return "redirect:/order/payment";
         }
-    }	
+    }   
     
 
     @GetMapping("/complete")
@@ -157,7 +225,7 @@ public class OrderController {
             Model model) {
 
 
-    	CustomUser customUser =
+       CustomUser customUser =
                 (CustomUser) authentication.getPrincipal();
 
         Long memberNo =
@@ -189,6 +257,7 @@ public class OrderController {
         return "order/complete";
     }
     
+    
     @GetMapping("/payment")
     public String payment(
             Authentication authentication,
@@ -200,8 +269,51 @@ public class OrderController {
 
         Long memberNo =
                 customUser.getMember().getMemberNo();
+
+        AddressDTO address =
+                addressService.getAddress(memberNo);
+
+        List<AddressDTO> addressList =
+                addressService.getAddressList(memberNo);
+
+      
+      List<PaymentMethodDTO> paymentMethods =
+      paymentMethodService.getBankMethods(memberNo);
+      
+      List<PaymentMethodDTO> cardMethods =
+      paymentMethodService.getCardMethods(memberNo);
+      
+      CheckoutDTO checkout =
+               checkoutService.getCheckout(
+                       checkoutNo,
+                       memberNo
+               );
+       
+        model.addAttribute(
+                "address",
+                address
+        );
+
+        model.addAttribute(
+                "addressList",
+                addressList
+        );
+
+      
+      model.addAttribute( "paymentMethods", paymentMethods );
         
-        model.addAttribute("checkoutNo", checkoutNo);
+      model.addAttribute( "cardMethods", cardMethods );
+      
+       model.addAttribute(
+               "checkout",
+               checkout
+       );
+      
+
+        model.addAttribute(
+                "checkoutNo",
+                checkoutNo
+        );
 
         return "order/payment";
     }

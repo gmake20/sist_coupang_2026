@@ -45,6 +45,8 @@
 			<form id="addressForm"
 				action="${pageContext.request.contextPath}/address/edit"
 				method="post" class="address-form">
+				
+				<sec:csrfInput />
 
 				<!-- 어떤 배송지를 수정할지 식별 -->
 				<input type="hidden" name="addressNo" value="${address.addressNo}">
