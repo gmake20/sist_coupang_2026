@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="jakarta.tags.core" prefix="c"%>
-<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 <!DOCTYPE html>
 <html lang="ko">
@@ -702,7 +702,7 @@
 		<span class="blind">맨 위로</span>
 	</button>
 
-	<jsp:include page="/inc/footer.jsp" />
+	<%-- <jsp:include page="/inc/footer.jsp" /> --%>
 
 	<script src="${pageContext.request.contextPath}/js/header.js"></script>
 	<script src="${pageContext.request.contextPath}/js/category.js"></script>
