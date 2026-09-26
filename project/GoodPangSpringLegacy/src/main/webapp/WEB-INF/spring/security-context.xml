@@ -18,6 +18,7 @@
         id="customUserDetailsService"
         class="org.doit.goodpang.security.CustomUserDetailsService" >
         
+        
          <beans:constructor-arg
         	ref="memberMapper" />
         </beans:bean>
@@ -53,6 +54,8 @@
     <intercept-url pattern="/signup**" access="permitAll" />
     
     <intercept-url pattern="/order/**" access="isAuthenticated()" />
+    
+    <intercept-url pattern="/wow/**" access="isAuthenticated()" />
 
         <intercept-url
             pattern="/resources/**"
@@ -81,14 +84,15 @@
             access="permitAll" />
 
 
-        <form-login
-            login-page="/login"
-            login-processing-url="/loginProcess"
-            username-parameter="memberId"
-            password-parameter="password"
-            default-target-url="/"
-            authentication-failure-url="/login?error=true" />
-
+		<form-login
+		    login-page="/login"
+		    login-processing-url="/loginProcess"
+		    username-parameter="memberId"
+		    password-parameter="password"
+		    authentication-success-handler-ref=
+		        "customLoginSuccessHandler"
+		    authentication-failure-url=
+		        "/login?error=true" />
 
         <logout
             logout-url="/logout"
@@ -97,5 +101,18 @@
             delete-cookies="JSESSIONID" />
 
     </http>
+    
+    <beans:bean
+    id="customLoginSuccessHandler"
+    class=
+    "org.doit.goodpang.security.CustomLoginSuccessHandler">
+
+    <beans:constructor-arg
+        ref="cartService" />
+
+    <beans:constructor-arg
+        ref="wowMembershipService" />
+
+</beans:bean>
 
 </beans:beans>

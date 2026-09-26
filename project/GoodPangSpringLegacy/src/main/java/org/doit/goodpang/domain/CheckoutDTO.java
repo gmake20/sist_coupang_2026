@@ -8,7 +8,7 @@ import lombok.Setter;
 public class CheckoutDTO {
 
     private int checkoutNo;
-    private int memberNo;
+    private Long memberNo;
 
     private int productAmount;
     private int instantDiscount;
