@@ -29,137 +29,137 @@
        옵션을 바꾸면 setupOptionSelect() 가 아래 setPrice() 를 불러서 판매가/정상가/할인율을 다시 그림.
        판매가 = basePrice + 옵션의 PRICE, 정상가 = basePrice + 옵션의 NORMAL_PRICE(없으면 할인 표시 안 함). */
 function setupQuantity() {
-  const box = document.querySelector('.product-quantity');
-  if (!box) return;                     // 이 페이지에 수량박스가 없으면 아무것도 안 함
+    const box = document.querySelector('.product-quantity');
+    if (!box) return;                     // 이 페이지에 수량박스가 없으면 아무것도 안 함
 
-  const input = box.querySelector('.qty-input');
-  const minus = box.querySelector('.qty-minus');
-  const plus  = box.querySelector('.qty-plus');
-  const priceEl = document.querySelector('.total-price');
-  const discountEl = document.querySelector('.discount');
-  const discountLabelEl = document.querySelector('.discount-label');   // "할인" 글자 — 2026-08-31 추가
-  const originBox = document.querySelector('.price-origin');
-  const originPriceEl = originBox ? originBox.querySelector('.origin-price') : null;
-  // 재고보다 많이 입력했을 때 뜨는 말풍선 — 2026-09-03 추가 (원본 쿠팡 실측 결과 반영)
-  const maxTip = document.getElementById('qtyMaxTip');
-  let tipTimer = null;
-  const basePrice = priceEl ? Number(priceEl.dataset.basePrice) || 0 : 0;
-  let unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
-  // 2026-09-01 추가 — 정상가(취소선)의 "1개당" 값. 할인 중이 아니면 null(취소선 자체를 안 보여줌).
-  // render() 가 이 값 × 수량으로 취소선도 같이 다시 그림 — 예전엔 이 변수가 없어서 수량을 바꿔도
-  // 취소선 금액이 1개 값 그대로 안 바뀌던 버그가 있었음 (사용자가 "수량 버튼 누르면 정상가는 금액이
-  // 안 바뀐다"고 지적함)
-  let normalUnitPrice = null;
+    const input = box.querySelector('.qty-input');
+    const minus = box.querySelector('.qty-minus');
+    const plus = box.querySelector('.qty-plus');
+    const priceEl = document.querySelector('.total-price');
+    const discountEl = document.querySelector('.discount');
+    const discountLabelEl = document.querySelector('.discount-label');   // "할인" 글자 — 2026-08-31 추가
+    const originBox = document.querySelector('.price-origin');
+    const originPriceEl = originBox ? originBox.querySelector('.origin-price') : null;
+    // 재고보다 많이 입력했을 때 뜨는 말풍선 — 2026-09-03 추가 (원본 쿠팡 실측 결과 반영)
+    const maxTip = document.getElementById('qtyMaxTip');
+    let tipTimer = null;
+    const basePrice = priceEl ? Number(priceEl.dataset.basePrice) || 0 : 0;
+    let unitPrice = priceEl ? Number(priceEl.dataset.unitPrice) || 0 : 0;
+    // 2026-09-01 추가 — 정상가(취소선)의 "1개당" 값. 할인 중이 아니면 null(취소선 자체를 안 보여줌).
+    // render() 가 이 값 × 수량으로 취소선도 같이 다시 그림 — 예전엔 이 변수가 없어서 수량을 바꿔도
+    // 취소선 금액이 1개 값 그대로 안 바뀌던 버그가 있었음 (사용자가 "수량 버튼 누르면 정상가는 금액이
+    // 안 바뀐다"고 지적함)
+    let normalUnitPrice = null;
 
-  const MIN = 1;
-  /* 옵션이 없는 상품(재고 정보가 안 내려오는 경우)을 위한 기본값.
-     옵션이 있으면 페이지가 열릴 때 setStock() 이 진짜 재고로 덮어씀 */
-  let max = 20;
+    const MIN = 1;
+    /* 옵션이 없는 상품(재고 정보가 안 내려오는 경우)을 위한 기본값.
+       옵션이 있으면 페이지가 열릴 때 setStock() 이 진짜 재고로 덮어씀 */
+    let max = 20;
 
-  /* 화면에 숫자를 다시 그리고, 버튼을 켤지 끌지 정하는 함수.
-     "값을 바꾸는 곳"과 "화면을 고치는 곳"을 한 군데로 모아두면
-     나중에 고칠 때 여기만 보면 됨 */
-  function render(n) {
-    input.value = n;
-    minus.disabled = (n <= MIN);
-    plus.disabled  = (n >= max);
+    /* 화면에 숫자를 다시 그리고, 버튼을 켤지 끌지 정하는 함수.
+       "값을 바꾸는 곳"과 "화면을 고치는 곳"을 한 군데로 모아두면
+       나중에 고칠 때 여기만 보면 됨 */
+    function render(n) {
+        input.value = n;
+        minus.disabled = (n <= MIN);
+        plus.disabled = (n >= max);
 
-    /* 품절이면 가격을 안 건드림 — CSS 가 이미 회색으로 처리하고 있고,
-       0원으로 다시 그리면 "품절인데 원가는 남아있는" 원본 화면과 달라짐 */
-    if (priceEl && !document.body.classList.contains('is-soldout')) {
-      priceEl.textContent = (unitPrice * n).toLocaleString('ko-KR') + '원';
+        /* 품절이면 가격을 안 건드림 — CSS 가 이미 회색으로 처리하고 있고,
+           0원으로 다시 그리면 "품절인데 원가는 남아있는" 원본 화면과 달라짐 */
+        if (priceEl && !document.body.classList.contains('is-soldout')) {
+            priceEl.textContent = (unitPrice * n).toLocaleString('ko-KR') + '원';
+        }
+        // 취소선(정상가)도 판매가와 똑같이 수량만큼 곱해서 다시 그림 (할인 중일 때만 — normalUnitPrice
+        // 가 null 이면 애초에 취소선 자체가 안 보이는 상태라 건드릴 필요 없음)
+        if (originPriceEl && normalUnitPrice != null) {
+            originPriceEl.textContent = (normalUnitPrice * n).toLocaleString('ko-KR') + '원';
+        }
     }
-    // 취소선(정상가)도 판매가와 똑같이 수량만큼 곱해서 다시 그림 (할인 중일 때만 — normalUnitPrice
-    // 가 null 이면 애초에 취소선 자체가 안 보이는 상태라 건드릴 필요 없음)
-    if (originPriceEl && normalUnitPrice != null) {
-      originPriceEl.textContent = (normalUnitPrice * n).toLocaleString('ko-KR') + '원';
+
+    minus.addEventListener('click', function() {
+        const n = Number(input.value) - 1;
+        if (n >= MIN) render(n);
+    });
+
+    plus.addEventListener('click', function() {
+        const n = Number(input.value) + 1;
+        if (n <= max) render(n);
+    });
+
+    render(Number(input.value) || MIN);    // 페이지가 열릴 때 버튼 상태를 한 번 맞춰둠
+
+    /* ★ 2026-09-02 추가 — 사용자가 숫자를 직접 타이핑해서 수량을 정할 수 있게 함.
+       (그동안 readonly 라 +/- 버튼으로만 바꿀 수 있었음)
+  
+       타이핑 도중(input 이벤트)엔 숫자가 아닌 글자만 지우고, 범위 보정(1~재고)은 하지 않음 —
+       "12"를 치려는데 "1"을 치는 순간 재고 부족으로 잘려버리면 뒷자리를 못 침.
+       범위 보정과 가격 재계산은 입력을 다 마친 시점(포커스 아웃 or Enter)에만 한다. */
+    input.addEventListener('input', function() {
+        const digitsOnly = input.value.replace(/[^0-9]/g, '');
+        input.value = digitsOnly;
+    });
+
+    // 재고보다 많이 입력했을 때 말풍선을 잠깐 보여줌 (2초 후 자동으로 사라짐 — 원본과 같은 방식)
+    function showMaxTip() {
+        if (!maxTip) return;
+        maxTip.textContent = '선택 가능한 수량은 ' + max + '개 입니다.';
+        maxTip.classList.add('show');
+        clearTimeout(tipTimer);
+        tipTimer = setTimeout(function() {
+            maxTip.classList.remove('show');
+        }, 2000);
     }
-  }
 
-  minus.addEventListener('click', function () {
-    const n = Number(input.value) - 1;
-    if (n >= MIN) render(n);
-  });
-
-  plus.addEventListener('click', function () {
-    const n = Number(input.value) + 1;
-    if (n <= max) render(n);
-  });
-
-  render(Number(input.value) || MIN);    // 페이지가 열릴 때 버튼 상태를 한 번 맞춰둠
-
-  /* ★ 2026-09-02 추가 — 사용자가 숫자를 직접 타이핑해서 수량을 정할 수 있게 함.
-     (그동안 readonly 라 +/- 버튼으로만 바꿀 수 있었음)
-
-     타이핑 도중(input 이벤트)엔 숫자가 아닌 글자만 지우고, 범위 보정(1~재고)은 하지 않음 —
-     "12"를 치려는데 "1"을 치는 순간 재고 부족으로 잘려버리면 뒷자리를 못 침.
-     범위 보정과 가격 재계산은 입력을 다 마친 시점(포커스 아웃 or Enter)에만 한다. */
-  input.addEventListener('input', function () {
-    const digitsOnly = input.value.replace(/[^0-9]/g, '');
-    input.value = digitsOnly;
-  });
-
-  // 재고보다 많이 입력했을 때 말풍선을 잠깐 보여줌 (2초 후 자동으로 사라짐 — 원본과 같은 방식)
-  function showMaxTip() {
-    if (!maxTip) return;
-    maxTip.textContent = '선택 가능한 수량은 ' + max + '개 입니다.';
-    maxTip.classList.add('show');
-    clearTimeout(tipTimer);
-    tipTimer = setTimeout(function () {
-      maxTip.classList.remove('show');
-    }, 2000);
-  }
-
-  function commit() {
-    const n = Number(input.value) || MIN;      // 빈 값/0 은 MIN 으로
-    if (n > max) showMaxTip();                 // 재고보다 많이 입력했을 때만 알림
-    render(Math.min(Math.max(n, MIN), max));   // 1 ~ max(재고) 범위로 보정
-  }
-
-  input.addEventListener('blur', commit);
-  input.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();   // 폼 안에 있어서 Enter 로 submit 되는 것 방지
-      commit();
-      input.blur();
+    function commit() {
+        const n = Number(input.value) || MIN;      // 빈 값/0 은 MIN 으로
+        if (n > max) showMaxTip();                 // 재고보다 많이 입력했을 때만 알림
+        render(Math.min(Math.max(n, MIN), max));   // 1 ~ max(재고) 범위로 보정
     }
-  });
 
-  /* 옵션이 바뀔 때마다 setupOptionSelect() 가 이 함수를 불러줌.
-     지금 담아둔 수량이 새 재고보다 많으면 재고만큼으로 줄임
-     (예: 10개 담아뒀는데 재고 3개짜리 옵션으로 바꾸면 3으로) */
-  function setStock(stock) {
-    max = Math.max(stock, MIN);          // 재고 0 이어도 max 는 1 — 품절 처리는 updateFromSelects 가 따로 함
-    const now = Number(input.value) || MIN;
-    render(Math.min(now, max));
-  }
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();   // 폼 안에 있어서 Enter 로 submit 되는 것 방지
+            commit();
+            input.blur();
+        }
+    });
 
-  /* 옵션이 바뀔 때마다 setupOptionSelect() 가 그 옵션의 price/normalPrice 를 넘겨서 불러줌.
-     판매가 = basePrice + optionPrice, 정상가 = basePrice + optionNormalPrice —
-     ProductServlet 의 displayPrice/displayNormalPrice 계산과 똑같은 공식. */
-  function setPrice(optionPrice, optionNormalPrice) {
-    unitPrice = basePrice + (optionPrice || 0);
-
-    const normalPrice = (optionNormalPrice != null) ? basePrice + optionNormalPrice : null;
-    const hasDiscount = normalPrice != null && normalPrice > unitPrice;
-
-    if (discountEl) {
-      discountEl.style.display = hasDiscount ? '' : 'none';
-      if (hasDiscount) {
-        discountEl.textContent = Math.round((1 - unitPrice / normalPrice) * 100) + '%';
-      }
+    /* 옵션이 바뀔 때마다 setupOptionSelect() 가 이 함수를 불러줌.
+       지금 담아둔 수량이 새 재고보다 많으면 재고만큼으로 줄임
+       (예: 10개 담아뒀는데 재고 3개짜리 옵션으로 바꾸면 3으로) */
+    function setStock(stock) {
+        max = Math.max(stock, MIN);          // 재고 0 이어도 max 는 1 — 품절 처리는 updateFromSelects 가 따로 함
+        const now = Number(input.value) || MIN;
+        render(Math.min(now, max));
     }
-    if (discountLabelEl) discountLabelEl.style.display = hasDiscount ? '' : 'none';
-    if (originBox) originBox.style.display = hasDiscount ? '' : 'none';
-    // originPriceEl 의 글자는 여기서 직접 안 쓰고 normalUnitPrice 만 갱신함 —
-    // 실제 텍스트(× 수량)는 바로 아래 render() 가 그림 (수량 곱하는 로직을 두 군데 두면
-    // 하나만 고치고 하나는 깜빡하는 사고가 나서 한 곳으로 모음)
-    normalUnitPrice = hasDiscount ? normalPrice : null;
 
-    render(Number(input.value) || MIN);   // 단가가 바뀌었으니 화면 가격도 다시 그림
-  }
+    /* 옵션이 바뀔 때마다 setupOptionSelect() 가 그 옵션의 price/normalPrice 를 넘겨서 불러줌.
+       판매가 = basePrice + optionPrice, 정상가 = basePrice + optionNormalPrice —
+       ProductServlet 의 displayPrice/displayNormalPrice 계산과 똑같은 공식. */
+    function setPrice(optionPrice, optionNormalPrice) {
+        unitPrice = basePrice + (optionPrice || 0);
 
-  return { setStock: setStock, setPrice: setPrice };
+        const normalPrice = (optionNormalPrice != null) ? basePrice + optionNormalPrice : null;
+        const hasDiscount = normalPrice != null && normalPrice > unitPrice;
+
+        if (discountEl) {
+            discountEl.style.display = hasDiscount ? '' : 'none';
+            if (hasDiscount) {
+                discountEl.textContent = Math.round((1 - unitPrice / normalPrice) * 100) + '%';
+            }
+        }
+        if (discountLabelEl) discountLabelEl.style.display = hasDiscount ? '' : 'none';
+        if (originBox) originBox.style.display = hasDiscount ? '' : 'none';
+        // originPriceEl 의 글자는 여기서 직접 안 쓰고 normalUnitPrice 만 갱신함 —
+        // 실제 텍스트(× 수량)는 바로 아래 render() 가 그림 (수량 곱하는 로직을 두 군데 두면
+        // 하나만 고치고 하나는 깜빡하는 사고가 나서 한 곳으로 모음)
+        normalUnitPrice = hasDiscount ? normalPrice : null;
+
+        render(Number(input.value) || MIN);   // 단가가 바뀌었으니 화면 가격도 다시 그림
+    }
+
+    return { setStock: setStock, setPrice: setPrice };
 }
 
 
@@ -170,28 +170,28 @@ function setupQuantity() {
    옵션 드롭박스(사이즈/색상 등)를 바꾸면 setupOptionSelect() 가 이 목록의 li 들을 통째로 새로 그리는데,
    li 마다 붙여둔 클릭은 새로 그려지면 사라지지만 ul 에 붙여둔 클릭은 안 사라지기 때문. */
 function setupThumbs() {
-  const list = document.querySelector('.product-image__thumbs');
-  if (!list) return;
+    const list = document.querySelector('.product-image__thumbs');
+    if (!list) return;
 
-  list.addEventListener('click', function (e) {
-    const li = e.target.closest('li');
-    if (!li || !list.contains(li)) return;
+    list.addEventListener('click', function(e) {
+        const li = e.target.closest('li');
+        if (!li || !list.contains(li)) return;
 
-    e.preventDefault();                 // <a href="#"> 때문에 맨 위로 튀는 것 방지
+        e.preventDefault();                 // <a href="#"> 때문에 맨 위로 튀는 것 방지
 
-    /* 파란 테두리(.is-on)를 전부 떼고, 누른 것에만 다시 붙임.
-       "하나만 켜기"는 전부 끄고 → 하나 켜기 순서가 제일 간단함 */
-    list.querySelectorAll('li').forEach(function (other) {
-      other.classList.remove('is-on');
+        /* 파란 테두리(.is-on)를 전부 떼고, 누른 것에만 다시 붙임.
+           "하나만 켜기"는 전부 끄고 → 하나 켜기 순서가 제일 간단함 */
+        list.querySelectorAll('li').forEach(function(other) {
+            other.classList.remove('is-on');
+        });
+        li.classList.add('is-on');
+
+        /* 누른 썸네일의 사진을 큰 이미지 자리에 그대로 넣음.
+           썸네일과 큰 이미지가 같은 파일이라 새로 받아올 게 없어 즉시 바뀜 */
+        const main = document.querySelector('.product-image__main img');
+        const picked = li.querySelector('img');
+        if (main && picked) main.src = picked.src;
     });
-    li.classList.add('is-on');
-
-    /* 누른 썸네일의 사진을 큰 이미지 자리에 그대로 넣음.
-       썸네일과 큰 이미지가 같은 파일이라 새로 받아올 게 없어 즉시 바뀜 */
-    const main = document.querySelector('.product-image__main img');
-    const picked = li.querySelector('img');
-    if (main && picked) main.src = picked.src;
-  });
 }
 
 
@@ -214,66 +214,66 @@ function setupThumbs() {
    ★ 렌즈는 이미지 박스 테두리를 못 벗어나게 clamp — 마우스가 이미지 밖으로 나가도 렌즈는
      가장자리에 붙어서 멈춤 (원본도 이렇게 동작하는 걸 실측 확인) */
 function setupImageZoom() {
-  const box = document.querySelector('.product-image__main');
-  if (!box) return;
+    const box = document.querySelector('.product-image__main');
+    if (!box) return;
 
-  const LENS_W = 222, LENS_H = 218;
-  const ZOOM = 2.5;   // = 250% (실측값, 렌즈/확대판 크기 비율로 계산한 값이 아니라 원본에 박혀있던 고정 배율)
+    const LENS_W = 222, LENS_H = 218;
+    const ZOOM = 2.5;   // = 250% (실측값, 렌즈/확대판 크기 비율로 계산한 값이 아니라 원본에 박혀있던 고정 배율)
 
-  let lens = null, overlayImg = null;
+    let lens = null, overlayImg = null;
 
-  function build() {
-    lens = document.createElement('div');
-    lens.className = 'magnifier-lens';
+    function build() {
+        lens = document.createElement('div');
+        lens.className = 'magnifier-lens';
 
-    const overlay = document.createElement('div');
-    overlay.className = 'magnify-overlay';
-    overlayImg = document.createElement('div');
-    overlayImg.className = 'magnify-overlay__img';
-    overlay.appendChild(overlayImg);
+        const overlay = document.createElement('div');
+        overlay.className = 'magnify-overlay';
+        overlayImg = document.createElement('div');
+        overlayImg.className = 'magnify-overlay__img';
+        overlay.appendChild(overlayImg);
 
-    box.appendChild(lens);
-    box.appendChild(overlay);
-  }
-
-  function remove() {
-    box.querySelectorAll('.magnifier-lens, .magnify-overlay').forEach(function (el) { el.remove(); });
-    lens = null;
-    overlayImg = null;
-  }
-
-  function move(e) {
-    if (!lens) return;
-    const rect = box.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
-
-    // 렌즈 중심이 이미지 박스를 못 벗어나게 막음
-    x = Math.max(LENS_W / 2, Math.min(rect.width  - LENS_W / 2, x));
-    y = Math.max(LENS_H / 2, Math.min(rect.height - LENS_H / 2, y));
-
-    const lensLeft = x - LENS_W / 2;
-    const lensTop  = y - LENS_H / 2;
-    lens.style.left = lensLeft + 'px';
-    lens.style.top  = lensTop + 'px';
-
-    // 렌즈가 가리키는 지점을 확대판에서 보여줌 — 배경이 250%로 커져있으니
-    // 좌표에도 같은 배율을 곱해야 렌즈 위치랑 확대판 안 위치가 맞물림
-    if (overlayImg) {
-      overlayImg.style.backgroundPosition = (-lensLeft * ZOOM) + 'px ' + (-lensTop * ZOOM) + 'px';
+        box.appendChild(lens);
+        box.appendChild(overlay);
     }
-  }
 
-  box.addEventListener('mouseenter', function (e) {
-    if (window.innerWidth < 1280) return;   // 원본도 이 폭 밑에서는 기능 자체가 없음
-    const img = box.querySelector('img');
-    if (!img || !img.src) return;
-    build();
-    overlayImg.style.backgroundImage = 'url(' + img.src + ')';
-    move(e);
-  });
-  box.addEventListener('mousemove', move);
-  box.addEventListener('mouseleave', remove);
+    function remove() {
+        box.querySelectorAll('.magnifier-lens, .magnify-overlay').forEach(function(el) { el.remove(); });
+        lens = null;
+        overlayImg = null;
+    }
+
+    function move(e) {
+        if (!lens) return;
+        const rect = box.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+
+        // 렌즈 중심이 이미지 박스를 못 벗어나게 막음
+        x = Math.max(LENS_W / 2, Math.min(rect.width - LENS_W / 2, x));
+        y = Math.max(LENS_H / 2, Math.min(rect.height - LENS_H / 2, y));
+
+        const lensLeft = x - LENS_W / 2;
+        const lensTop = y - LENS_H / 2;
+        lens.style.left = lensLeft + 'px';
+        lens.style.top = lensTop + 'px';
+
+        // 렌즈가 가리키는 지점을 확대판에서 보여줌 — 배경이 250%로 커져있으니
+        // 좌표에도 같은 배율을 곱해야 렌즈 위치랑 확대판 안 위치가 맞물림
+        if (overlayImg) {
+            overlayImg.style.backgroundPosition = (-lensLeft * ZOOM) + 'px ' + (-lensTop * ZOOM) + 'px';
+        }
+    }
+
+    box.addEventListener('mouseenter', function(e) {
+        if (window.innerWidth < 1280) return;   // 원본도 이 폭 밑에서는 기능 자체가 없음
+        const img = box.querySelector('img');
+        if (!img || !img.src) return;
+        build();
+        overlayImg.style.backgroundImage = 'url(' + img.src + ')';
+        move(e);
+    });
+    box.addEventListener('mousemove', move);
+    box.addEventListener('mouseleave', remove);
 }
 
 
@@ -284,38 +284,38 @@ function setupImageZoom() {
    ★ scrollLeft 가 아니라 transform:translateX 를 쓴 이유
      스크롤막대를 만들지 않고 움직이려는 것. CSS 에 transition 을 걸어놔서 부드럽게 밀림. */
 function setupAdSlider() {
-  const body = document.querySelector('.sdp-ads__body');
-  if (!body) return;
+    const body = document.querySelector('.sdp-ads__body');
+    if (!body) return;
 
-  const list = body.querySelector('.sdp-ads__list');
-  const next = body.querySelector('.sdp-ads__next');
-  const item = list.querySelector('.ad-item');
-  if (!list || !next || !item) return;
+    const list = body.querySelector('.sdp-ads__list');
+    const next = body.querySelector('.sdp-ads__next');
+    const item = list.querySelector('.ad-item');
+    if (!list || !next || !item) return;
 
-  /* 카드 하나가 차지하는 가로 길이 = 카드 폭 + 오른쪽 여백.
-     CSS 에 140/16 이라고 적혀 있지만 여기서 다시 계산함 —
-     나중에 CSS 값을 바꿔도 JS 를 안 고쳐도 되게 하려고 */
-  const style = getComputedStyle(item);
-  const step = item.getBoundingClientRect().width + parseFloat(style.marginRight);
+    /* 카드 하나가 차지하는 가로 길이 = 카드 폭 + 오른쪽 여백.
+       CSS 에 140/16 이라고 적혀 있지만 여기서 다시 계산함 —
+       나중에 CSS 값을 바꿔도 JS 를 안 고쳐도 되게 하려고 */
+    const style = getComputedStyle(item);
+    const step = item.getBoundingClientRect().width + parseFloat(style.marginRight);
 
-  let moved = 0;                       // 지금까지 밀어낸 거리(px)
+    let moved = 0;                       // 지금까지 밀어낸 거리(px)
 
-  function render() {
-    list.style.transform = 'translateX(' + (-moved) + 'px)';
-    /* 더 밀 데가 없으면 버튼을 끔 */
-    const max = list.scrollWidth - body.clientWidth;
-    next.disabled = moved >= max - 1;
-  }
+    function render() {
+        list.style.transform = 'translateX(' + (-moved) + 'px)';
+        /* 더 밀 데가 없으면 버튼을 끔 */
+        const max = list.scrollWidth - body.clientWidth;
+        next.disabled = moved >= max - 1;
+    }
 
-  next.addEventListener('click', function () {
-    const max = list.scrollWidth - body.clientWidth;
-    /* 한 번에 "보이는 칸 수"만큼 밀되, 끝을 넘지 않게 */
-    const page = Math.floor(body.clientWidth / step) * step;
-    moved = Math.min(moved + page, max);
-    render();
-  });
+    next.addEventListener('click', function() {
+        const max = list.scrollWidth - body.clientWidth;
+        /* 한 번에 "보이는 칸 수"만큼 밀되, 끝을 넘지 않게 */
+        const page = Math.floor(body.clientWidth / step) * step;
+        moved = Math.min(moved + page, max);
+        render();
+    });
 
-  render();                            // 처음에 버튼 상태를 맞춰둠
+    render();                            // 처음에 버튼 상태를 맞춰둠
 }
 
 
@@ -338,240 +338,240 @@ function setupAdSlider() {
      /option 으로 ajax 요청해서 서버 값을 다시 받아옴 (로그인 회원등급별 할인 대비 — 상세 이유는
      fetchOptionDetail() 위 주석 참고) */
 function setupOptionSelect(setStock, setPrice) {
-  const dataEl = document.getElementById('productOptionsData');
-  const box = document.getElementById('fashionOption');
-  if (!dataEl || !box) return;
+    const dataEl = document.getElementById('productOptionsData');
+    const box = document.getElementById('fashionOption');
+    if (!dataEl || !box) return;
 
-  const combos = JSON.parse(dataEl.textContent);
-  if (!combos.length) return;
+    const combos = JSON.parse(dataEl.textContent);
+    if (!combos.length) return;
 
-  // optionsJson을 만들 때(ProductServlet) 이미지 경로를 img:url과 같은 규칙으로 미리
-  // 절대/상대 경로로 바꿔서 내려주므로, 여기서는 그대로 꺼내 쓰기만 하면 됨
-  const contextPath = dataEl.dataset.contextPath || '';
-  combos.forEach(function (c) {
-    c.imageUrls = (c.images || []).map(function (img) {
-      return img.imageUrl;
-    });
-  });
-
-  // 이 상품이 실제로 쓰는 축 목록. option1 은 항상 있고, option2/option3 는 있을 때만
-  const axes = [];
-  [1, 2, 3].forEach(function (n) {
-    if (combos[0]['option' + n + 'Type']) {
-      axes.push({ key: 'option' + n + 'Value', type: combos[0]['option' + n + 'Type'] });
-    }
-  });
-
-  // 이 상품에 사진이 하나라도 딸린 조합이 있는지 — 2번째 이후 축을 칩으로 할지 드롭박스로 할지 판단 기준
-  const anyImages = combos.some(function (c) { return c.imageUrls.length; });
-
-  /* 2026-09-01 추가 — 새로고침해도 옵션 선택 유지.
-     주소(?optionId=)에 담겨온 조합을 찾아서, 아래에서 드롭박스/칩을 그릴 때 "처음부터 이 값"으로
-     선택해둠. ProductServlet 도 같은 optionId 를 보고 mainOption(대표사진·가격)을 이미 그 옵션
-     기준으로 렌더해놨으니, 여기서 화면(드롭박스·칩)만 맞춰주면 서버가 그린 것과 어긋나지 않음.
-     주소에 optionId 가 없거나 이 상품 조합에 없는 값이면 그냥 null → 아래에서 예전처럼 첫 값 씀 */
-  const urlOptionId = new URLSearchParams(location.search).get('optionId');
-  const initialCombo = urlOptionId
-    ? combos.find(function (c) { return String(c.optionId) === urlOptionId; })
-    : null;
-
-  const optionIdInput = document.getElementById('selectedOptionId');
-  const colorInput    = document.getElementById('selectedColor');
-  const thumbBox      = document.querySelector('.product-image__thumbs');
-  const mainImg       = document.querySelector('.product-image__main img');
-
-  const controls = [];   // { axisKey, getValue(), root, chipList(옵션) }
-
-  // 지금 각 축에서 고른 값과 정확히 일치하는 조합(OPTION_ID)을 찾음
-  function findPickedCombo() {
-    return combos.find(function (c) {
-      return controls.every(function (ctl) { return c[ctl.axisKey] === ctl.getValue(); });
-    });
-  }
-
-  // 칩 축의 사진들을 "지금 다른 축에서 고른 값"기준으로 다시 그림 (사이즈 바꾸면 색상칩 사진도 갱신)
-  function refreshChipThumbnails(chipControl) {
-    chipControl.root.querySelectorAll('li').forEach(function (li) {
-      const testCombo = combos.find(function (c) {
-        if (c[chipControl.axisKey] !== li.dataset.value) return false;
-        return controls.every(function (other) {
-          return other === chipControl || c[other.axisKey] === other.getValue();
+    // optionsJson을 만들 때(ProductServlet) 이미지 경로를 img:url과 같은 규칙으로 미리
+    // 절대/상대 경로로 바꿔서 내려주므로, 여기서는 그대로 꺼내 쓰기만 하면 됨
+    const contextPath = dataEl.dataset.contextPath || '';
+    combos.forEach(function(c) {
+        c.imageUrls = (c.images || []).map(function(img) {
+            return img.imageUrl;
         });
-      });
-      const img = li.querySelector('img');
-      if (img && testCombo && testCombo.imageUrls.length) img.src = testCombo.imageUrls[0];
-    });
-  }
-
-  let optionFetchSeq = 0;   // 응답이 늦게 와서 이전 클릭 결과가 나중에 덮어쓰는 것 방지용 번호표
-
-  function updateFromSelects() {
-    controls.forEach(function (ctl) { if (ctl.chipList) refreshChipThumbnails(ctl); });
-
-    const picked = findPickedCombo();
-    if (!picked) return;   // 이론상 항상 찾아져야 함(모든 조합이 다 있다고 가정) — 방어코드
-
-    if (optionIdInput) optionIdInput.value = picked.optionId;
-
-    // 2026-09-03 추가 — 맨 아래 "굿팡상품번호: 95 - 395" 줄이 옵션을 바꿔도 안 바뀌던 버그.
-    // 서버(/option)에 다시 물어볼 필요 없이 지금 고른 조합(picked)이 이미 optionId 를 갖고 있으므로 바로 찍음.
-    const goodpangOptionNoEl = document.getElementById('goodpangOptionNo');
-    if (goodpangOptionNoEl) goodpangOptionNoEl.textContent = picked.optionId;
-
-    if (colorInput) {
-      // 원래 "색상"만 담던 자리인데, 지금은 고른 값들을 다 이어붙여서 담음 (예: "M / Black")
-      colorInput.value = controls.map(function (ctl) { return ctl.getValue(); }).join(' / ');
-    }
-
-    /* 2026-09-01 추가 — 지금 고른 옵션을 주소창에 실어둠(?optionId=).
-       실제 쿠팡도 옵션을 바꾸면 페이지 이동 없이 주소(itemId/vendorItemId)만 바뀌는 걸
-       Playwright 로 확인함. pushState 가 아니라 replaceState 를 쓰는 이유: 옵션 하나 누를 때마다
-       "뒤로가기" 기록이 쌓이면 안 되고(다른 사이즈 5번 눌렀는데 뒤로가기 5번 눌러야 이 상품
-       페이지를 벗어나는 건 이상함), 주소는 "지금 상태"만 보여주면 되기 때문.
-       이 함수는 페이지 처음 열릴 때도 한 번 불려서(맨 아래 updateFromSelects() 참고), 그때도
-       주소에 optionId 가 없었다면 여기서 채워짐 — 원본도 처음부터 itemId 가 주소에 있는 것과 같음 */
-    if (window.history && window.history.replaceState) {
-      const params = new URLSearchParams(location.search);
-      params.set('optionId', picked.optionId);
-      history.replaceState(null, '', location.pathname + '?' + params.toString());
-    }
-
-    fetchOptionDetail(picked.optionId);
-  }
-
-  /* ★ 2026-08-31 추가 — 가격/재고/사진은 이제 combos(페이지 처음 받아둔 JSON)를 그대로 안 쓰고
-     서버(/option)에 다시 물어봄. combos 는 이제 "이 상품이 어떤 축(사이즈/색상)에 어떤 값을
-     가지는지" 구조를 그리는 데만 쓰고, 실제 값(누구한테 얼마로 보여줄지)은 서버가 매번 계산해서
-     내려줌 — 나중에 로그인 회원등급별 할인이 생겨도 이 함수는 안 고쳐도 됨(서버만 고치면 됨). */
-  function fetchOptionDetail(optionId) {
-    const seq = ++optionFetchSeq;
-
-    fetch(contextPath + '/option?optionId=' + optionId)
-      .then(function (res) {
-        if (!res.ok) throw new Error('옵션 정보를 불러오지 못했습니다: ' + res.status);
-        return res.json();
-      })
-      .then(function (data) {
-        if (seq !== optionFetchSeq) return;   // 그 사이에 다른 옵션을 또 눌렀으면 이 응답은 버림
-
-        /* 재고/품절 — 옵션마다 재고가 다르므로 고를 때마다 다시 판단.
-           STATUS 가 'N'(판매중지)이거나 재고가 0이면 품절로 봄 */
-        // 옛 버전(2026-09-06 이전):
-        //   const soldout = (data.quantity <= 0) || (data.status === 'N');
-        //   document.body.classList.toggle('is-soldout', soldout);
-        /* ★ 2026-09-06 — 상품 전체가 '판매 중지'면 어떤 옵션을 골라도 계속 품절 상태여야 함.
-           이 줄이 옵션을 바꿀 때마다 is-soldout 을 다시 계산해서 덮어쓰기 때문에, 여기서도
-           상품 단위 상태(body 의 data-sale-status, product.jsp 에서 심음)를 같이 봐야 함.
-           안 그러면 판매중지 상품에서 옵션을 한 번만 바꿔도 구매 버튼이 되살아남 */
-        const saleStopped = document.body.dataset.saleStatus === '판매 중지';
-        const soldout = saleStopped || (data.quantity <= 0) || (data.status === 'N');
-        document.body.classList.toggle('is-soldout', soldout);
-        if (setStock) setStock(data.quantity);
-        if (setPrice) setPrice(data.price, data.normalPrice);
-
-        // /option 서블릿도 이미지 경로를 이미 img:url과 같은 규칙으로 변환해서 내려줌
-        const imageUrls = data.imageUrls || [];
-        if (!imageUrls.length || !thumbBox || !mainImg) return;
-
-        thumbBox.innerHTML = imageUrls.map(function (url, i) {
-          return '<li class="' + (i === 0 ? 'is-on' : '') + '">'
-               +   '<a href="#"><img src="' + url + '" alt=""></a>'
-               + '</li>';
-        }).join('');
-
-        mainImg.src = imageUrls[0];
-      })
-      .catch(function (err) {
-        console.error(err);
-      });
-  }
-
-  axes.forEach(function (axis, axisIndex) {
-    // 이 축에서 실제로 쓰인 값만 중복 없이 뽑음 (등장한 순서 그대로 유지)
-    const values = [];
-    combos.forEach(function (c) {
-      if (c[axis.key] && values.indexOf(c[axis.key]) === -1) values.push(c[axis.key]);
     });
 
-    const section = document.createElement('section');
-    section.className = 'option-row';
-
-    const useChips = axisIndex > 0 && anyImages;   // 1번 축은 무조건 드롭박스
-
-    // 이 축에서 "처음부터 선택돼 있어야 할 값" — URL 에 실려온 조합이 있으면 그 값, 없으면 예전처럼 첫 값
-    const initialValue = (initialCombo && initialCombo[axis.key]) || values[0];
-
-    if (useChips) {
-      const label = document.createElement('div');
-      label.innerHTML = axis.type + ': <span class="option-value">' + initialValue + '</span>';
-      label.className = 'option-label';
-      section.appendChild(label);
-
-      const ul = document.createElement('ul');
-      ul.className = 'option-chips';
-
-      values.forEach(function (v) {
-        const li = document.createElement('li');
-        li.dataset.value = v;
-        if (v === initialValue) li.classList.add('is-on');
-        li.innerHTML = '<a href="#"><img src="" alt="' + v + '"></a>';
-        li.addEventListener('click', function (e) {
-          e.preventDefault();
-          ul.querySelectorAll('li').forEach(function (o) { o.classList.remove('is-on'); });
-          li.classList.add('is-on');
-          const valueLabel = label.querySelector('.option-value');
-          if (valueLabel) valueLabel.textContent = v;
-          updateFromSelects();
-        });
-        ul.appendChild(li);
-      });
-
-      section.appendChild(ul);
-      box.appendChild(section);
-
-      controls.push({
-        axisKey: axis.key,
-        root: ul,
-        chipList: true,
-        getValue: function () {
-          const on = ul.querySelector('li.is-on');
-          return on ? on.dataset.value : values[0];
+    // 이 상품이 실제로 쓰는 축 목록. option1 은 항상 있고, option2/option3 는 있을 때만
+    const axes = [];
+    [1, 2, 3].forEach(function(n) {
+        if (combos[0]['option' + n + 'Type']) {
+            axes.push({ key: 'option' + n + 'Value', type: combos[0]['option' + n + 'Type'] });
         }
-      });
+    });
 
-    } else {
-      const label = document.createElement('div');
-      label.className = 'option-label';
-      label.textContent = axis.type;
-      section.appendChild(label);
+    // 이 상품에 사진이 하나라도 딸린 조합이 있는지 — 2번째 이후 축을 칩으로 할지 드롭박스로 할지 판단 기준
+    const anyImages = combos.some(function(c) { return c.imageUrls.length; });
 
-      const wrap = document.createElement('div');
-      wrap.className = 'option-select';
+    /* 2026-09-01 추가 — 새로고침해도 옵션 선택 유지.
+       주소(?optionId=)에 담겨온 조합을 찾아서, 아래에서 드롭박스/칩을 그릴 때 "처음부터 이 값"으로
+       선택해둠. ProductServlet 도 같은 optionId 를 보고 mainOption(대표사진·가격)을 이미 그 옵션
+       기준으로 렌더해놨으니, 여기서 화면(드롭박스·칩)만 맞춰주면 서버가 그린 것과 어긋나지 않음.
+       주소에 optionId 가 없거나 이 상품 조합에 없는 값이면 그냥 null → 아래에서 예전처럼 첫 값 씀 */
+    const urlOptionId = new URLSearchParams(location.search).get('optionId');
+    const initialCombo = urlOptionId
+        ? combos.find(function(c) { return String(c.optionId) === urlOptionId; })
+        : null;
 
-      const select = document.createElement('select');
-      values.forEach(function (v) {
-        const opt = document.createElement('option');
-        opt.value = v;
-        opt.textContent = v;
-        if (v === initialValue) opt.selected = true;
-        select.appendChild(opt);
-      });
-      select.addEventListener('change', updateFromSelects);
+    const optionIdInput = document.getElementById('selectedOptionId');
+    const colorInput = document.getElementById('selectedColor');
+    const thumbBox = document.querySelector('.product-image__thumbs');
+    const mainImg = document.querySelector('.product-image__main img');
 
-      wrap.appendChild(select);
-      section.appendChild(wrap);
-      box.appendChild(section);
+    const controls = [];   // { axisKey, getValue(), root, chipList(옵션) }
 
-      controls.push({
-        axisKey: axis.key,
-        root: select,
-        chipList: false,
-        getValue: function () { return select.value; }
-      });
+    // 지금 각 축에서 고른 값과 정확히 일치하는 조합(OPTION_ID)을 찾음
+    function findPickedCombo() {
+        return combos.find(function(c) {
+            return controls.every(function(ctl) { return c[ctl.axisKey] === ctl.getValue(); });
+        });
     }
-  });
 
-  updateFromSelects();   // 페이지 처음 열렸을 때도 hidden input·칩 사진을 첫 조합 값으로 맞춰둠
+    // 칩 축의 사진들을 "지금 다른 축에서 고른 값"기준으로 다시 그림 (사이즈 바꾸면 색상칩 사진도 갱신)
+    function refreshChipThumbnails(chipControl) {
+        chipControl.root.querySelectorAll('li').forEach(function(li) {
+            const testCombo = combos.find(function(c) {
+                if (c[chipControl.axisKey] !== li.dataset.value) return false;
+                return controls.every(function(other) {
+                    return other === chipControl || c[other.axisKey] === other.getValue();
+                });
+            });
+            const img = li.querySelector('img');
+            if (img && testCombo && testCombo.imageUrls.length) img.src = testCombo.imageUrls[0];
+        });
+    }
+
+    let optionFetchSeq = 0;   // 응답이 늦게 와서 이전 클릭 결과가 나중에 덮어쓰는 것 방지용 번호표
+
+    function updateFromSelects() {
+        controls.forEach(function(ctl) { if (ctl.chipList) refreshChipThumbnails(ctl); });
+
+        const picked = findPickedCombo();
+        if (!picked) return;   // 이론상 항상 찾아져야 함(모든 조합이 다 있다고 가정) — 방어코드
+
+        if (optionIdInput) optionIdInput.value = picked.optionId;
+
+        // 2026-09-03 추가 — 맨 아래 "굿팡상품번호: 95 - 395" 줄이 옵션을 바꿔도 안 바뀌던 버그.
+        // 서버(/option)에 다시 물어볼 필요 없이 지금 고른 조합(picked)이 이미 optionId 를 갖고 있으므로 바로 찍음.
+        const goodpangOptionNoEl = document.getElementById('goodpangOptionNo');
+        if (goodpangOptionNoEl) goodpangOptionNoEl.textContent = picked.optionId;
+
+        if (colorInput) {
+            // 원래 "색상"만 담던 자리인데, 지금은 고른 값들을 다 이어붙여서 담음 (예: "M / Black")
+            colorInput.value = controls.map(function(ctl) { return ctl.getValue(); }).join(' / ');
+        }
+
+        /* 2026-09-01 추가 — 지금 고른 옵션을 주소창에 실어둠(?optionId=).
+           실제 쿠팡도 옵션을 바꾸면 페이지 이동 없이 주소(itemId/vendorItemId)만 바뀌는 걸
+           Playwright 로 확인함. pushState 가 아니라 replaceState 를 쓰는 이유: 옵션 하나 누를 때마다
+           "뒤로가기" 기록이 쌓이면 안 되고(다른 사이즈 5번 눌렀는데 뒤로가기 5번 눌러야 이 상품
+           페이지를 벗어나는 건 이상함), 주소는 "지금 상태"만 보여주면 되기 때문.
+           이 함수는 페이지 처음 열릴 때도 한 번 불려서(맨 아래 updateFromSelects() 참고), 그때도
+           주소에 optionId 가 없었다면 여기서 채워짐 — 원본도 처음부터 itemId 가 주소에 있는 것과 같음 */
+        if (window.history && window.history.replaceState) {
+            const params = new URLSearchParams(location.search);
+            params.set('optionId', picked.optionId);
+            history.replaceState(null, '', location.pathname + '?' + params.toString());
+        }
+
+        fetchOptionDetail(picked.optionId);
+    }
+
+    /* ★ 2026-08-31 추가 — 가격/재고/사진은 이제 combos(페이지 처음 받아둔 JSON)를 그대로 안 쓰고
+       서버(/option)에 다시 물어봄. combos 는 이제 "이 상품이 어떤 축(사이즈/색상)에 어떤 값을
+       가지는지" 구조를 그리는 데만 쓰고, 실제 값(누구한테 얼마로 보여줄지)은 서버가 매번 계산해서
+       내려줌 — 나중에 로그인 회원등급별 할인이 생겨도 이 함수는 안 고쳐도 됨(서버만 고치면 됨). */
+    function fetchOptionDetail(optionId) {
+        const seq = ++optionFetchSeq;
+
+        fetch(contextPath + '/option?optionId=' + optionId)
+            .then(function(res) {
+                if (!res.ok) throw new Error('옵션 정보를 불러오지 못했습니다: ' + res.status);
+                return res.json();
+            })
+            .then(function(data) {
+                if (seq !== optionFetchSeq) return;   // 그 사이에 다른 옵션을 또 눌렀으면 이 응답은 버림
+
+                /* 재고/품절 — 옵션마다 재고가 다르므로 고를 때마다 다시 판단.
+                   STATUS 가 'N'(판매중지)이거나 재고가 0이면 품절로 봄 */
+                // 옛 버전(2026-09-06 이전):
+                //   const soldout = (data.quantity <= 0) || (data.status === 'N');
+                //   document.body.classList.toggle('is-soldout', soldout);
+                /* ★ 2026-09-06 — 상품 전체가 '판매 중지'면 어떤 옵션을 골라도 계속 품절 상태여야 함.
+                   이 줄이 옵션을 바꿀 때마다 is-soldout 을 다시 계산해서 덮어쓰기 때문에, 여기서도
+                   상품 단위 상태(body 의 data-sale-status, product.jsp 에서 심음)를 같이 봐야 함.
+                   안 그러면 판매중지 상품에서 옵션을 한 번만 바꿔도 구매 버튼이 되살아남 */
+                const saleStopped = document.body.dataset.saleStatus === '판매 중지';
+                const soldout = saleStopped || (data.quantity <= 0) || (data.status === 'N');
+                document.body.classList.toggle('is-soldout', soldout);
+                if (setStock) setStock(data.quantity);
+                if (setPrice) setPrice(data.price, data.normalPrice);
+
+                // /option 서블릿도 이미지 경로를 이미 img:url과 같은 규칙으로 변환해서 내려줌
+                const imageUrls = data.imageUrls || [];
+                if (!imageUrls.length || !thumbBox || !mainImg) return;
+
+                thumbBox.innerHTML = imageUrls.map(function(url, i) {
+                    return '<li class="' + (i === 0 ? 'is-on' : '') + '">'
+                        + '<a href="#"><img src="' + url + '" alt=""></a>'
+                        + '</li>';
+                }).join('');
+
+                mainImg.src = imageUrls[0];
+            })
+            .catch(function(err) {
+                console.error(err);
+            });
+    }
+
+    axes.forEach(function(axis, axisIndex) {
+        // 이 축에서 실제로 쓰인 값만 중복 없이 뽑음 (등장한 순서 그대로 유지)
+        const values = [];
+        combos.forEach(function(c) {
+            if (c[axis.key] && values.indexOf(c[axis.key]) === -1) values.push(c[axis.key]);
+        });
+
+        const section = document.createElement('section');
+        section.className = 'option-row';
+
+        const useChips = axisIndex > 0 && anyImages;   // 1번 축은 무조건 드롭박스
+
+        // 이 축에서 "처음부터 선택돼 있어야 할 값" — URL 에 실려온 조합이 있으면 그 값, 없으면 예전처럼 첫 값
+        const initialValue = (initialCombo && initialCombo[axis.key]) || values[0];
+
+        if (useChips) {
+            const label = document.createElement('div');
+            label.innerHTML = axis.type + ': <span class="option-value">' + initialValue + '</span>';
+            label.className = 'option-label';
+            section.appendChild(label);
+
+            const ul = document.createElement('ul');
+            ul.className = 'option-chips';
+
+            values.forEach(function(v) {
+                const li = document.createElement('li');
+                li.dataset.value = v;
+                if (v === initialValue) li.classList.add('is-on');
+                li.innerHTML = '<a href="#"><img src="" alt="' + v + '"></a>';
+                li.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    ul.querySelectorAll('li').forEach(function(o) { o.classList.remove('is-on'); });
+                    li.classList.add('is-on');
+                    const valueLabel = label.querySelector('.option-value');
+                    if (valueLabel) valueLabel.textContent = v;
+                    updateFromSelects();
+                });
+                ul.appendChild(li);
+            });
+
+            section.appendChild(ul);
+            box.appendChild(section);
+
+            controls.push({
+                axisKey: axis.key,
+                root: ul,
+                chipList: true,
+                getValue: function() {
+                    const on = ul.querySelector('li.is-on');
+                    return on ? on.dataset.value : values[0];
+                }
+            });
+
+        } else {
+            const label = document.createElement('div');
+            label.className = 'option-label';
+            label.textContent = axis.type;
+            section.appendChild(label);
+
+            const wrap = document.createElement('div');
+            wrap.className = 'option-select';
+
+            const select = document.createElement('select');
+            values.forEach(function(v) {
+                const opt = document.createElement('option');
+                opt.value = v;
+                opt.textContent = v;
+                if (v === initialValue) opt.selected = true;
+                select.appendChild(opt);
+            });
+            select.addEventListener('change', updateFromSelects);
+
+            wrap.appendChild(select);
+            section.appendChild(wrap);
+            box.appendChild(section);
+
+            controls.push({
+                axisKey: axis.key,
+                root: select,
+                chipList: false,
+                getValue: function() { return select.value; }
+            });
+        }
+    });
+
+    updateFromSelects();   // 페이지 처음 열렸을 때도 hidden input·칩 사진을 첫 조합 값으로 맞춰둠
 }
 
 
@@ -579,16 +579,16 @@ function setupOptionSelect(setStock, setPrice) {
    표에 .is-open 을 붙였다 뗐다 하면 숨겨둔 줄(.is-folded)이 나타나고 사라짐.
    aria-expanded 는 화면낭독기에게 "지금 펼쳐져 있다/접혀 있다"를 알려주는 표시 */
 function setupItemBriefMore() {
-  const btn   = document.querySelector('.item-brief__more');
-  const table = document.querySelector('.item-brief__table');
-  if (!btn || !table) return;
+    const btn = document.querySelector('.item-brief__more');
+    const table = document.querySelector('.item-brief__table');
+    if (!btn || !table) return;
 
-  btn.addEventListener('click', function () {
-    const open = table.classList.toggle('is-open');
-    btn.classList.toggle('is-open', open);
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    btn.firstChild.nodeValue = open ? '필수 표기 정보 접기' : '필수 표기 정보 더보기';
-  });
+    btn.addEventListener('click', function() {
+        const open = table.classList.toggle('is-open');
+        btn.classList.toggle('is-open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.firstChild.nodeValue = open ? '필수 표기 정보 접기' : '필수 표기 정보 더보기';
+    });
 }
 
 
@@ -598,16 +598,16 @@ function setupItemBriefMore() {
    위 setupItemBriefMore 와 완전히 같은 방식이라 구조를 일부러 똑같이 맞춰둠
    (나중에 하나를 고치면 다른 것도 같이 보게 하려고). */
 function setupSurveyMore() {
-  const btn    = document.querySelector('.survey-more');
-  const detail = document.querySelector('.survey-detail');
-  if (!btn || !detail) return;
+    const btn = document.querySelector('.survey-more');
+    const detail = document.querySelector('.survey-detail');
+    if (!btn || !detail) return;
 
-  btn.addEventListener('click', function () {
-    const open = detail.classList.toggle('is-open');
-    btn.classList.toggle('is-open', open);
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    btn.textContent = open ? '접기' : '자세히 보기';
-  });
+    btn.addEventListener('click', function() {
+        const open = detail.classList.toggle('is-open');
+        btn.classList.toggle('is-open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.textContent = open ? '접기' : '자세히 보기';
+    });
 }
 
 
@@ -618,45 +618,45 @@ function setupSurveyMore() {
    ★ 원리: 각 탭이 가리키는 섹션(#detail, #reviews …)의 위치를 재서,
      화면 위쪽 기준선을 이미 지나간 섹션 중 **제일 마지막 것**을 지금 구간으로 봄. */
 function setupTabSpy() {
-  const tabs = [].slice.call(document.querySelectorAll('.detail-tabs a'));
-  if (!tabs.length) return;
+    const tabs = [].slice.call(document.querySelectorAll('.detail-tabs a'));
+    if (!tabs.length) return;
 
-  /* 각 탭과 그 탭이 가리키는 섹션을 짝지어 둠 */
-  const pairs = tabs.map(function (a) {
-    return { tab: a, target: document.querySelector(a.getAttribute('href')) };
-  }).filter(function (p) { return p.target; });
+    /* 각 탭과 그 탭이 가리키는 섹션을 짝지어 둠 */
+    const pairs = tabs.map(function(a) {
+        return { tab: a, target: document.querySelector(a.getAttribute('href')) };
+    }).filter(function(p) { return p.target; });
 
-  /* 탭을 누르면 그 섹션으로 부드럽게 이동.
-     탭이 화면 위에 붙어 있으므로 탭 높이(49)만큼 위로 더 올려야 제목이 안 가림 */
-  pairs.forEach(function (p) {
-    p.tab.addEventListener('click', function (e) {
-      e.preventDefault();
-      const y = window.scrollY + p.target.getBoundingClientRect().top - 49;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+    /* 탭을 누르면 그 섹션으로 부드럽게 이동.
+       탭이 화면 위에 붙어 있으므로 탭 높이(49)만큼 위로 더 올려야 제목이 안 가림 */
+    pairs.forEach(function(p) {
+        p.tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            const y = window.scrollY + p.target.getBoundingClientRect().top - 49;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        });
     });
-  });
 
-  function update() {
-    const line = 60;              // 화면 위에서 60px 지점을 기준선으로 봄
-    let current = pairs[0];
-    pairs.forEach(function (p) {
-      if (p.target.getBoundingClientRect().top <= line) current = p;
+    function update() {
+        const line = 60;              // 화면 위에서 60px 지점을 기준선으로 봄
+        let current = pairs[0];
+        pairs.forEach(function(p) {
+            if (p.target.getBoundingClientRect().top <= line) current = p;
+        });
+        pairs.forEach(function(p) {
+            p.tab.classList.toggle('is-on', p === current);
+        });
+    }
+
+    /* 스크롤할 때마다 계산하면 너무 자주 도니까
+       "다음 화면 그리기 직전에 한 번만" 하도록 묶음 (requestAnimationFrame) */
+    let waiting = false;
+    window.addEventListener('scroll', function() {
+        if (waiting) return;
+        waiting = true;
+        requestAnimationFrame(function() { update(); waiting = false; });
     });
-    pairs.forEach(function (p) {
-      p.tab.classList.toggle('is-on', p === current);
-    });
-  }
 
-  /* 스크롤할 때마다 계산하면 너무 자주 도니까
-     "다음 화면 그리기 직전에 한 번만" 하도록 묶음 (requestAnimationFrame) */
-  let waiting = false;
-  window.addEventListener('scroll', function () {
-    if (waiting) return;
-    waiting = true;
-    requestAnimationFrame(function () { update(); waiting = false; });
-  });
-
-  update();
+    update();
 }
 
 
@@ -669,147 +669,147 @@ function setupTabSpy() {
      (예: ?sort=best&rating=5&q=포장 → SQL 의 ORDER BY / WHERE).
      지금은 서버가 없어서 이미 화면에 있는 카드 3개를 JS 로 줄 세우고 숨기는 걸로 흉내냄. */
 function setupReviewTools() {
-  const tools = document.querySelector('.review-tools');
-  if (!tools) return;
+    const tools = document.querySelector('.review-tools');
+    if (!tools) return;
 
-  const list      = document.querySelector('.review-list');
-  const sortLinks = tools.querySelectorAll('.review-sort a');
-  const searchBox = tools.querySelector('.review-search');
-  const ratingSel = tools.querySelector('.review-filter');
-  const emptyMsg  = document.querySelector('.review-empty');
-  const pager     = document.querySelector('.review-pagination');
-  const pageNums  = pager ? pager.querySelector('.page-numbers') : null;
-  const prevBtn   = pager ? pager.querySelector('.page-prev') : null;
-  const nextBtn   = pager ? pager.querySelector('.page-next') : null;
+    const list = document.querySelector('.review-list');
+    const sortLinks = tools.querySelectorAll('.review-sort a');
+    const searchBox = tools.querySelector('.review-search');
+    const ratingSel = tools.querySelector('.review-filter');
+    const emptyMsg = document.querySelector('.review-empty');
+    const pager = document.querySelector('.review-pagination');
+    const pageNums = pager ? pager.querySelector('.page-numbers') : null;
+    const prevBtn = pager ? pager.querySelector('.page-prev') : null;
+    const nextBtn = pager ? pager.querySelector('.page-next') : null;
 
-  function items() {
-    return Array.from(list.querySelectorAll('.review-item'));
-  }
+    function items() {
+        return Array.from(list.querySelectorAll('.review-item'));
+    }
 
-  /* 별점 — 2026-08-27: 원본과 별 아이콘을 맞추면서 별을 글자(★★★★☆)가 아니라
-     스프라이트 이미지(.star-rating em 의 width%)로 그리게 바꿈 — 그러면 화면엔 셀 수 있는
-     글자가 없어져서, article 태그에 심어둔 data-rating(product.jsp 에서 ${r.rating} 그대로 찍음)
-     을 읽음. "두 군데 값이 어긋날 수 있다"던 예전 우려는 이제 해당 없음 — 화면(width%)과
-     data-rating 이 둘 다 서버에서 같은 ${r.rating} 값 하나로 같이 찍히기 때문 */
-  function ratingOf(item) {
-    return Number(item.dataset.rating) || 0;
-  }
+    /* 별점 — 2026-08-27: 원본과 별 아이콘을 맞추면서 별을 글자(★★★★☆)가 아니라
+       스프라이트 이미지(.star-rating em 의 width%)로 그리게 바꿈 — 그러면 화면엔 셀 수 있는
+       글자가 없어져서, article 태그에 심어둔 data-rating(product.jsp 에서 ${r.rating} 그대로 찍음)
+       을 읽음. "두 군데 값이 어긋날 수 있다"던 예전 우려는 이제 해당 없음 — 화면(width%)과
+       data-rating 이 둘 다 서버에서 같은 ${r.rating} 값 하나로 같이 찍히기 때문 */
+    function ratingOf(item) {
+        return Number(item.dataset.rating) || 0;
+    }
 
 
-  /* 정렬 — 카드 순서를 바꿔서 다시 꽂아넣음.
-      "베스트순" 기준은 원본이 비공개라 지금은 data-helpful(더미 "도움돼요" 수)로 대
-  신함
+    /* 정렬 — 카드 순서를 바꿔서 다시 꽂아넣음.
+        "베스트순" 기준은 원본이 비공개라 지금은 data-helpful(더미 "도움돼요" 수)로 대
+    신함
+  
+         ★ 2026-08-27 버그 수정: insertBefore 의 기준 노드로 emptyMsg 를 썼는데, 리뷰가
+    있으면
+           product.jsp 가 .review-empty 자체를 안 찍어서(<c:otherwise>) emptyMsg 가 null
+     임.
+           insertBefore(el, null) 은 "맨 끝에 붙이기"랑 같아서, 카드들이 .review-list 의
+     진짜 마지막
+           자식인 <nav class="review-pagination"> 뒤로 밀려나가 정렬할 때마다 페이지네이
+    션이
+           리뷰 위로 올라가 보였음. emptyMsg 가 없으면 pager 앞에 꽂도록 기준을 바꿔서
+    고침 */
+    function sortBy(key) {
+        const sorted = items().sort(function(a, b) {
+            if (key === 'latest') {
+                return b.querySelector('.date').textContent.localeCompare(a.querySelector('.date').textContent);
+            }
+            return (Number(b.dataset.helpful) || 0) - (Number(a.dataset.helpful) || 0);
+        });
+        const anchor = emptyMsg || pager || null;
+        sorted.forEach(function(el) { list.insertBefore(el, anchor); });
+    }
 
-       ★ 2026-08-27 버그 수정: insertBefore 의 기준 노드로 emptyMsg 를 썼는데, 리뷰가
-  있으면
-         product.jsp 가 .review-empty 자체를 안 찍어서(<c:otherwise>) emptyMsg 가 null
-   임.
-         insertBefore(el, null) 은 "맨 끝에 붙이기"랑 같아서, 카드들이 .review-list 의
-   진짜 마지막
-         자식인 <nav class="review-pagination"> 뒤로 밀려나가 정렬할 때마다 페이지네이
-  션이
-         리뷰 위로 올라가 보였음. emptyMsg 가 없으면 pager 앞에 꽂도록 기준을 바꿔서
-  고침 */ 
-  function sortBy(key) {
-    const sorted = items().sort(function (a, b) {
-      if (key === 'latest') {
-        return b.querySelector('.date').textContent.localeCompare(a.querySelector('.date').textContent);
-      }
-      return (Number(b.dataset.helpful) || 0) - (Number(a.dataset.helpful) || 0);
-    });
-	const anchor = emptyMsg || pager || null;
-	sorted.forEach(function (el) { list.insertBefore(el, anchor); });
-	  }
-
-  /* ★ 정렬·검색·별점필터·페이지 이동이 전부 한 함수(render)를 거치게 만든 이유:
-       따로 만들면 "2페이지를 보다가 검색어를 치면 2페이지가 그대로 남아 아무것도 안 보이는"
-       식으로 서로 어긋남. 조건이 하나라도 바뀌면 무조건 처음부터 다시 계산하는 게 안전함.
-     순서: ① 필터로 남길 카드를 고른다 → ② 그중 지금 페이지 몫만 보여준다 */
-  const PAGE_SIZE = 3;    // 한 페이지에 리뷰 3개 (더미가 5개라 2페이지가 됨)
-  let page = 1;
+    /* ★ 정렬·검색·별점필터·페이지 이동이 전부 한 함수(render)를 거치게 만든 이유:
+         따로 만들면 "2페이지를 보다가 검색어를 치면 2페이지가 그대로 남아 아무것도 안 보이는"
+         식으로 서로 어긋남. 조건이 하나라도 바뀌면 무조건 처음부터 다시 계산하는 게 안전함.
+       순서: ① 필터로 남길 카드를 고른다 → ② 그중 지금 페이지 몫만 보여준다 */
+    const PAGE_SIZE = 3;    // 한 페이지에 리뷰 3개 (더미가 5개라 2페이지가 됨)
+    let page = 1;
 
     /* 2026-08-27 수정: REVIEW_SUMMARY(한줄요약) 연동하면서 .review-headline 이 리뷰
   카드에
        다시 생김(product.jsp) — 있는 리뷰만 나오므로 null-safe(?.)하게 검색 대상에 같
   이 넣음 */
-  function passesFilter(item) {
-    const q = searchBox.value.trim().toLowerCase();
-    const rating = ratingSel.value;   // '' = 모든 별점
-	const headlineEl = item.querySelector('.review-headline');
-	const textEl = item.querySelector('.review-text');
-	const text = ((headlineEl ? headlineEl.textContent : '') + ' ' + (textEl ? textEl.textContent : '')).toLowerCase();
-	    return (!q || text.includes(q)) && (!rating || ratingOf(item) === Number(rating));
-  }
-
-  function render() {
-    const kept = items().filter(passesFilter);
-    const totalPages = Math.max(1, Math.ceil(kept.length / PAGE_SIZE));
-    if (page > totalPages) page = totalPages;      // 필터로 개수가 줄면 페이지도 당겨줌
-
-    const start = (page - 1) * PAGE_SIZE;
-    items().forEach(function (item) {
-      const idx = kept.indexOf(item);
-      const onThisPage = idx >= start && idx < start + PAGE_SIZE;
-      item.classList.toggle('is-hidden', !onThisPage);
-    });
-
-	/* product.jsp 는 리뷰가 있으면 <c:otherwise> 쪽(.review-empty)을 아예 안 찍음 —
-	       그래서 리뷰가 있을 땐 emptyMsg 가 null 일 수 있음. null-safe 하게 처리 */
-	if (emptyMsg) emptyMsg.style.display = kept.length === 0 ? 'block' : 'none';
-    renderPager(totalPages);
-  }
-
-  /* 페이지 번호 버튼을 매번 새로 그림.
-     미리 HTML 에 박아두지 않는 이유: 필터를 걸면 총 페이지 수가 달라지기 때문 */
-  function renderPager(totalPages) {
-    if (!pager) return;
-    pager.classList.toggle('is-hidden', totalPages <= 1);
-
-    pageNums.innerHTML = '';
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.textContent = i;
-      if (i === page) btn.classList.add('is-on');
-      btn.addEventListener('click', function () { page = i; render(); scrollToTop(); });
-      pageNums.appendChild(btn);
+    function passesFilter(item) {
+        const q = searchBox.value.trim().toLowerCase();
+        const rating = ratingSel.value;   // '' = 모든 별점
+        const headlineEl = item.querySelector('.review-headline');
+        const textEl = item.querySelector('.review-text');
+        const text = ((headlineEl ? headlineEl.textContent : '') + ' ' + (textEl ? textEl.textContent : '')).toLowerCase();
+        return (!q || text.includes(q)) && (!rating || ratingOf(item) === Number(rating));
     }
 
-    prevBtn.disabled = (page === 1);
-    nextBtn.disabled = (page === totalPages);
-  }
+    function render() {
+        const kept = items().filter(passesFilter);
+        const totalPages = Math.max(1, Math.ceil(kept.length / PAGE_SIZE));
+        if (page > totalPages) page = totalPages;      // 필터로 개수가 줄면 페이지도 당겨줌
 
-  /* 페이지를 넘기면 리뷰 목록 맨 위로 올려줌 —
-     안 그러면 3페이지째 아래쪽에 있다가 넘겼을 때 화면 중간에 뚝 떨어짐 */
-  function scrollToTop() {
-    const section = document.querySelector('.product-review');
-    if (section) window.scrollTo({ top: section.offsetTop - 60, behavior: 'smooth' });
-  }
+        const start = (page - 1) * PAGE_SIZE;
+        items().forEach(function(item) {
+            const idx = kept.indexOf(item);
+            const onThisPage = idx >= start && idx < start + PAGE_SIZE;
+            item.classList.toggle('is-hidden', !onThisPage);
+        });
 
-  sortLinks.forEach(function (a) {
-    a.addEventListener('click', function (e) {
-      e.preventDefault();
-      sortLinks.forEach(function (other) { other.classList.remove('is-on'); });
-      a.classList.add('is-on');
-      sortBy(a.dataset.sort);
-      page = 1;          // 정렬이 바뀌면 1페이지부터 다시
-      render();
+        /* product.jsp 는 리뷰가 있으면 <c:otherwise> 쪽(.review-empty)을 아예 안 찍음 —
+               그래서 리뷰가 있을 땐 emptyMsg 가 null 일 수 있음. null-safe 하게 처리 */
+        if (emptyMsg) emptyMsg.style.display = kept.length === 0 ? 'block' : 'none';
+        renderPager(totalPages);
+    }
+
+    /* 페이지 번호 버튼을 매번 새로 그림.
+       미리 HTML 에 박아두지 않는 이유: 필터를 걸면 총 페이지 수가 달라지기 때문 */
+    function renderPager(totalPages) {
+        if (!pager) return;
+        pager.classList.toggle('is-hidden', totalPages <= 1);
+
+        pageNums.innerHTML = '';
+        for (let i = 1;i <= totalPages;i++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = i;
+            if (i === page) btn.classList.add('is-on');
+            btn.addEventListener('click', function() { page = i; render(); scrollToTop(); });
+            pageNums.appendChild(btn);
+        }
+
+        prevBtn.disabled = (page === 1);
+        nextBtn.disabled = (page === totalPages);
+    }
+
+    /* 페이지를 넘기면 리뷰 목록 맨 위로 올려줌 —
+       안 그러면 3페이지째 아래쪽에 있다가 넘겼을 때 화면 중간에 뚝 떨어짐 */
+    function scrollToTop() {
+        const section = document.querySelector('.product-review');
+        if (section) window.scrollTo({ top: section.offsetTop - 60, behavior: 'smooth' });
+    }
+
+    sortLinks.forEach(function(a) {
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            sortLinks.forEach(function(other) { other.classList.remove('is-on'); });
+            a.classList.add('is-on');
+            sortBy(a.dataset.sort);
+            page = 1;          // 정렬이 바뀌면 1페이지부터 다시
+            render();
+        });
     });
-  });
 
-  /* 검색·필터를 건드리면 보고 있던 페이지 번호는 의미가 없어지므로 1페이지로 */
-  searchBox.addEventListener('input',  function () { page = 1; render(); });
-  ratingSel.addEventListener('change', function () { page = 1; render(); });
+    /* 검색·필터를 건드리면 보고 있던 페이지 번호는 의미가 없어지므로 1페이지로 */
+    searchBox.addEventListener('input', function() { page = 1; render(); });
+    ratingSel.addEventListener('change', function() { page = 1; render(); });
 
-  if (prevBtn) prevBtn.addEventListener('click', function () {
-    if (page > 1) { page--; render(); scrollToTop(); }
-  });
-  if (nextBtn) nextBtn.addEventListener('click', function () {
-    page++; render(); scrollToTop();
-  });
+    if (prevBtn) prevBtn.addEventListener('click', function() {
+        if (page > 1) { page--; render(); scrollToTop(); }
+    });
+    if (nextBtn) nextBtn.addEventListener('click', function() {
+        page++; render(); scrollToTop();
+    });
 
-  sortBy('best');   // 페이지가 열릴 때 기본 탭(베스트순) 기준으로 한 번 정렬해둠
-  render();
+    sortBy('best');   // 페이지가 열릴 때 기본 탭(베스트순) 기준으로 한 번 정렬해둠
+    render();
 }
 
 
@@ -825,25 +825,25 @@ function setupReviewTools() {
    ▶JSP: 지금은 "① 기본 선택"을 화면에서만 정하는데, 나중엔 로그인 여부·와우 가입 여부에
      따라 서버가 처음부터 다른 쪽을 선택해서 내려줄 자리 (${member.isWow ? 'is-on' : ''}) */
 function setupDeliveryOption() {
-  const list = document.querySelector('.radio-group');
-  if (!list) return;
+    const list = document.querySelector('.radio-group');
+    if (!list) return;
 
-  const items = list.querySelectorAll('.radio-item');
-  const WOW_INDEX = 1;   // 두 번째 항목 = 로켓와우
+    const items = list.querySelectorAll('.radio-item');
+    const WOW_INDEX = 1;   // 두 번째 항목 = 로켓와우
 
-  items.forEach(function (li, i) {
-    li.addEventListener('click', function () {
-      items.forEach(function (other) { other.classList.remove('is-on'); });
-      li.classList.add('is-on');
+    items.forEach(function(li, i) {
+        li.addEventListener('click', function() {
+            items.forEach(function(other) { other.classList.remove('is-on'); });
+            li.classList.add('is-on');
 
-      /* body 에 클래스를 붙이면 css/product.css 가 버튼을 알아서 바꿔치기함
-         (품절 처리와 똑같은 방식 — CLAUDE.md 참고) */
-      document.body.classList.toggle('is-wow-delivery', i === WOW_INDEX);
+            /* body 에 클래스를 붙이면 css/product.css 가 버튼을 알아서 바꿔치기함
+               (품절 처리와 똑같은 방식 — CLAUDE.md 참고) */
+            document.body.classList.toggle('is-wow-delivery', i === WOW_INDEX);
+        });
     });
-  });
 }
 
-function refreshCartPreview() {
+/*function refreshCartPreview() {
 
     const preview =
         document.getElementById(
@@ -869,124 +869,127 @@ function refreshCartPreview() {
                 "XMLHttpRequest"
         }
     })
-    .then(function(response) {
+        .then(function(response) {
 
-        if (!response.ok) {
-            throw new Error(
-                "장바구니 미리보기를 불러오지 못했습니다."
-            );
-        }
+            if (!response.ok) {
+                throw new Error(
+                    "장바구니 미리보기를 불러오지 못했습니다."
+                );
+            }
 
-        return response.text();
-    })
-    .then(function(html) {
+            return response.text();
+        })
+        .then(function(html) {
 
-        preview.innerHTML = html;
-    })
-    .catch(function(error) {
+            preview.innerHTML = html;
+        })
+        .catch(function(error) {
 
-        console.error(error);
-    });
+            console.error(error);
+        });
 }
-
+*/
 
 function setupCartAdd() {
 
-     const cartAddBtn =
-         document.getElementById("cartAddBtn");
+    const cartAddBtn =
+        document.getElementById("cartAddBtn");
 
-     const cartAddedPopup =
-         document.getElementById("cartAddedPopup");
+    const cartAddedPopup =
+        document.getElementById("cartAddedPopup");
 
-     const cartPopupClose =
-         document.getElementById("cartPopupClose");
+    const cartPopupClose =
+        document.getElementById("cartPopupClose");
 
-     if (!cartAddBtn) return;
+    if (!cartAddBtn) return;
 
-     cartAddBtn.addEventListener("click", function(e) {
+    cartAddBtn.addEventListener("click", function(e) {
 
-         e.preventDefault();
+        e.preventDefault();
 
-         const form =
-             cartAddBtn.closest("form");
+        const form =
+            cartAddBtn.closest("form");
 
-         if (!form) return;
+        if (!form) return;
 
-         const formData =
-             new FormData(form);
+        const formData =
+            new FormData(form);
 
-         const params =
-             new URLSearchParams();
+        const params =
+            new URLSearchParams();
 
-         formData.forEach(function(value, key) {
-             params.append(key, value);
-         });
+        formData.forEach(function(value, key) {
+            params.append(key, value);
+        });
 
-         cartAddBtn.disabled = true;
+        cartAddBtn.disabled = true;
 
-         fetch(form.action, {
-             method: "POST",
-             body: params,
-             headers: {
-                 "X-Requested-With": "XMLHttpRequest"
-             }
-         })
-         .then(function(response) {
+        fetch(form.action, {
+            method: "POST",
+            body: params,
+			 headers: {
+			    "X-Requested-With": "XMLHttpRequest",
+			    "Accept": "application/json"
+			}
+        })
+            .then(function(response) {
 
-             if (!response.ok) {
-                 throw new Error(
-                     "장바구니 담기에 실패했습니다."
-                 );
-             }
+                if (!response.ok) {
+                    throw new Error(
+                        "장바구니 담기에 실패했습니다."
+                    );
+                }
 
-             return response.json();
-         })
-         .then(function(data) {
+                return response.json();
+            })
+            .then(function(data) {
 
-             if (!data.success) return;
+                if (!data.success) return;
 
-             // 팝업 표시
-             if (cartAddedPopup) {
-                 cartAddedPopup.classList.add("show");
-             }
+                // 팝업 표시
+                if (cartAddedPopup) {
+                    cartAddedPopup.classList.add("show");
+                }
 
-             // 헤더 장바구니 개수만 변경
-             const cartCount =
-                 document.getElementById("cartCount");
+                // 헤더 장바구니 개수만 변경
+                const cartCount =
+                    document.getElementById("cartCount");
 
-             if (cartCount && data.cartCount != null) {
-                 cartCount.textContent = data.cartCount;
-             }
-			 
-			 refreshCartPreview();
-         })
-         .catch(function(error) {
+                if (cartCount && data.cartCount != null) {
+                    cartCount.textContent = data.cartCount;
+                }
 
-             console.error(error);
+				if (typeof window.refreshCart === "function") {
+				    window.refreshCart();
+				}
+            })
+            .catch(function(error) {
 
-             alert(
-                 "장바구니 담기 중 오류가 발생했습니다."
-             );
-         })
-         .finally(function() {
+                console.error(error);
 
-             cartAddBtn.disabled = false;
-         });
-     });
+                alert(
+                    "장바구니 담기 중 오류가 발생했습니다."
+                );
+            })
+            .finally(function() {
 
-     if (cartPopupClose) {
+                cartAddBtn.disabled = false;
+            });
+    });
 
-         cartPopupClose.addEventListener(
-             "click",
-             function() {
+    if (cartPopupClose) {
 
-                 if (cartAddedPopup) {
-                     cartAddedPopup.classList.remove("show");
-                 }
-             }
-         );
-     }
- }
+        cartPopupClose.addEventListener(
+            "click",
+            function() {
+
+                if (cartAddedPopup) {
+                    cartAddedPopup.classList.remove("show");
+                }
+            }
+        );
+    }
+}
 
 
 /* ── 7. 품절 상태 ───────────────────────────────
@@ -1031,161 +1034,161 @@ setupCartAdd();
 
    ▶JSP: 카드 안 사진만 <c:forEach> 로 찍어내면 이 JS 는 그대로 동작함. */
 function setupReviewGallery() {
-  const source = document.querySelector('.review-gallery');
-  const modal  = document.querySelector('.review-gallery-modal');
-  const viewer = document.querySelector('.photo-viewer');
-  if (!source || !modal || !viewer) return;
+    const source = document.querySelector('.review-gallery');
+    const modal = document.querySelector('.review-gallery-modal');
+    const viewer = document.querySelector('.photo-viewer');
+    if (!source || !modal || !viewer) return;
 
-  /* 리뷰 카드를 전부 훑어서 사진을 모음. [{ src, reviewId }, ...]
-     ⚠ 페이지네이션으로 숨겨진(.is-hidden) 카드도 DOM 에는 있으므로 같이 걷힘 —
-       원본도 갤러리에는 2페이지 사진까지 다 나오므로 이게 맞음 */
-  const photos = [];
-  document.querySelectorAll('.review-item').forEach(function (card) {
-    const id = card.dataset.reviewId || '';
-    card.querySelectorAll('.review-photos img').forEach(function (img) {
-      photos.push({ src: img.src, reviewId: id });
-    });
-  });
-
-  /* 위쪽 갤러리 줄을 모은 사진으로 그림 (HTML 에는 빈 <ul> 만 있음).
-     클릭은 아래에서 ul 에 이벤트 위임으로 한 번만 걸어둠 */
-  photos.forEach(function (p) {
-    const li = document.createElement('li');
-    const img = document.createElement('img');
-    img.src = p.src;
-    img.alt = '';
-    li.appendChild(img);
-    source.appendChild(li);
-  });
-
-  const grid      = modal.querySelector('.gallery-grid');
-  const countEl   = modal.querySelector('.gallery-count strong');
-  const stage     = viewer.querySelector('.viewer-img');
-  const thumbList = viewer.querySelector('.viewer-thumbs');
-  const prevBtn   = viewer.querySelector('.viewer-prev');
-  const nextBtn   = viewer.querySelector('.viewer-next');
-  let current = 0;
-
-  /* 열려 있는 모달이 하나라도 있으면 뒤 페이지 스크롤을 막음 */
-  function lockScroll() {
-    const open = !modal.hidden || !viewer.hidden;
-    document.body.classList.toggle('is-modal-open', open);
-  }
-
-  /* ── ① 갤러리 모달 ── */
-  function openGallery() {
-    countEl.textContent = photos.length;
-    grid.innerHTML = '';
-    photos.forEach(function (p, i) {
-      const li = document.createElement('li');
-      const img = document.createElement('img');
-      img.src = p.src;
-      img.alt = '';
-      li.appendChild(img);
-      /* 원본에 있는 오른쪽 아래 말풍선 배지 (CSS 로 그림) */
-      const badge = document.createElement('span');
-      badge.className = 'photo-badge';
-      li.appendChild(badge);
-      li.addEventListener('click', function () { openViewer(i); });
-      grid.appendChild(li);
-    });
-    modal.hidden = false;
-    lockScroll();
-  }
-  
- 
-  /* ── ② 사진 뷰어 ── */
-  function openViewer(index) {
-    current = index;
-    thumbList.innerHTML = '';
-    photos.forEach(function (p, i) {
-      const li = document.createElement('li');
-      const img = document.createElement('img');
-      img.src = p.src;
-      img.alt = '';
-      li.appendChild(img);
-      li.addEventListener('click', function () { showPhoto(i); });
-      thumbList.appendChild(li);
-    });
-    viewer.hidden = false;
-    lockScroll();
-    showPhoto(index);
-  }
-
-  /* 사진 한 장을 화면에 올림 + 그 사진 주인 리뷰의 정보로 위아래를 채움 */
-  function showPhoto(index) {
-    current = (index + photos.length) % photos.length;   // 끝에서 넘기면 처음으로 돌아감
-    const p = photos[current];
-    stage.src = p.src;
-
-    [].slice.call(thumbList.children).forEach(function (li, i) {
-      li.classList.toggle('is-on', i === current);
+    /* 리뷰 카드를 전부 훑어서 사진을 모음. [{ src, reviewId }, ...]
+       ⚠ 페이지네이션으로 숨겨진(.is-hidden) 카드도 DOM 에는 있으므로 같이 걷힘 —
+         원본도 갤러리에는 2페이지 사진까지 다 나오므로 이게 맞음 */
+    const photos = [];
+    document.querySelectorAll('.review-item').forEach(function(card) {
+        const id = card.dataset.reviewId || '';
+        card.querySelectorAll('.review-photos img').forEach(function(img) {
+            photos.push({ src: img.src, reviewId: id });
+        });
     });
 
-    /* 사진이 1장뿐이면 화살표를 감춤 */
-    prevBtn.hidden = nextBtn.hidden = (photos.length <= 1);
+    /* 위쪽 갤러리 줄을 모은 사진으로 그림 (HTML 에는 빈 <ul> 만 있음).
+       클릭은 아래에서 ul 에 이벤트 위임으로 한 번만 걸어둠 */
+    photos.forEach(function(p) {
+        const li = document.createElement('li');
+        const img = document.createElement('img');
+        img.src = p.src;
+        img.alt = '';
+        li.appendChild(img);
+        source.appendChild(li);
+    });
 
-    /* 이 사진이 달린 리뷰 카드를 id 로 찾아서 글자를 그대로 가져옴.
-       리뷰 내용을 뷰어에 또 적어두지 않는 이유: 같은 글이 두 군데 있으면
-       한쪽만 고쳤을 때 어긋남 (수량→가격 만들 때 겪은 것과 같은 종류의 실수) */
-	   const card = document.querySelector('.review-item[data-review-id="' + p.reviewId + '"]');
-	       const pick = function (sel) {
-	         const el = card && card.querySelector(sel);
-	         return el ? el.textContent.trim() : '';
-	       };
-	  viewer.querySelector('.viewer-writer .name').textContent  = pick('.name');
- 	  viewer.querySelector('.viewer-writer .date').textContent  = pick('.date');
+    const grid = modal.querySelector('.gallery-grid');
+    const countEl = modal.querySelector('.gallery-count strong');
+    const stage = viewer.querySelector('.viewer-img');
+    const thumbList = viewer.querySelector('.viewer-thumbs');
+    const prevBtn = viewer.querySelector('.viewer-prev');
+    const nextBtn = viewer.querySelector('.viewer-next');
+    let current = 0;
 
-      /* 별점은 글자가 아니라 스프라이트(.star-rating > em 의 width%)라 textContent 로는
-          못 옮김 — 원본 카드의 em width 를 그대로 복사함 (2026-08-27) */
-      const srcStar = card && card.querySelector('.star-rating em');
-      const dstStar = viewer.querySelector('.viewer-writer .star-rating em');
-       if (dstStar) dstStar.style.width = srcStar ? srcStar.style.width : '0%';
-      viewer.querySelector('.viewer-option').textContent        = pick('.review-option');
-      viewer.querySelector('.viewer-text').textContent          = pick('.review-text');
-      viewer.dataset.reviewId = p.reviewId;
-	     }
-
-  function closeViewer() { viewer.hidden = true; lockScroll(); }
-  function closeAll()    { viewer.hidden = true; modal.hidden = true; lockScroll(); }
-
-  /* 리뷰 사진 썸네일 → 갤러리 열기.
-     각 li 가 아니라 부모(ul)에 이벤트를 거는 이유(이벤트 위임): 나중에 JSP 가
-     사진을 몇 장 찍어낼지 모르므로, 목록이 바뀌어도 코드를 안 고치게 하려고 */
-  source.addEventListener('click', function (e) {
-    const li = e.target.closest('li');
-    if (li) { e.preventDefault(); openGallery(); }
-  });
-
-  modal.querySelector('.gallery-close').addEventListener('click', closeAll);
-  viewer.querySelector('.viewer-close').addEventListener('click', closeViewer);
-  prevBtn.addEventListener('click', function () { showPhoto(current - 1); });
-  nextBtn.addEventListener('click', function () { showPhoto(current + 1); });
-
-  /* "전체보기" → 모달을 다 닫고 그 리뷰 카드로 이동 */
-  viewer.querySelector('.viewer-all').addEventListener('click', function () {
-    const id = viewer.dataset.reviewId;
-    closeAll();
-    const card = document.querySelector('.review-item[data-review-id="' + id + '"]');
-    if (card) window.scrollTo({ top: card.offsetTop - 120, behavior: 'smooth' });
-  });
-
-  /* 어두운 배경(덮개)을 직접 눌렀을 때만 닫음.
-     e.target === 덮개 를 확인하는 이유: 안쪽 패널을 눌렀을 때도 클릭이 부모로
-     올라와서(버블링) 같이 닫혀버리기 때문 */
-  modal.addEventListener('click', function (e) { if (e.target === modal) closeAll(); });
-  viewer.addEventListener('click', function (e) { if (e.target === viewer) closeViewer(); });
-
-  /* 키보드 — ESC 로 닫기, 좌우 화살표로 사진 넘기기 (뷰어가 열려 있을 때만) */
-  document.addEventListener('keydown', function (e) {
-    if (!viewer.hidden) {
-      if (e.key === 'Escape')     closeViewer();
-      if (e.key === 'ArrowLeft')  showPhoto(current - 1);
-      if (e.key === 'ArrowRight') showPhoto(current + 1);
-    } else if (!modal.hidden && e.key === 'Escape') {
-      closeAll();
+    /* 열려 있는 모달이 하나라도 있으면 뒤 페이지 스크롤을 막음 */
+    function lockScroll() {
+        const open = !modal.hidden || !viewer.hidden;
+        document.body.classList.toggle('is-modal-open', open);
     }
-  });
+
+    /* ── ① 갤러리 모달 ── */
+    function openGallery() {
+        countEl.textContent = photos.length;
+        grid.innerHTML = '';
+        photos.forEach(function(p, i) {
+            const li = document.createElement('li');
+            const img = document.createElement('img');
+            img.src = p.src;
+            img.alt = '';
+            li.appendChild(img);
+            /* 원본에 있는 오른쪽 아래 말풍선 배지 (CSS 로 그림) */
+            const badge = document.createElement('span');
+            badge.className = 'photo-badge';
+            li.appendChild(badge);
+            li.addEventListener('click', function() { openViewer(i); });
+            grid.appendChild(li);
+        });
+        modal.hidden = false;
+        lockScroll();
+    }
+
+
+    /* ── ② 사진 뷰어 ── */
+    function openViewer(index) {
+        current = index;
+        thumbList.innerHTML = '';
+        photos.forEach(function(p, i) {
+            const li = document.createElement('li');
+            const img = document.createElement('img');
+            img.src = p.src;
+            img.alt = '';
+            li.appendChild(img);
+            li.addEventListener('click', function() { showPhoto(i); });
+            thumbList.appendChild(li);
+        });
+        viewer.hidden = false;
+        lockScroll();
+        showPhoto(index);
+    }
+
+    /* 사진 한 장을 화면에 올림 + 그 사진 주인 리뷰의 정보로 위아래를 채움 */
+    function showPhoto(index) {
+        current = (index + photos.length) % photos.length;   // 끝에서 넘기면 처음으로 돌아감
+        const p = photos[current];
+        stage.src = p.src;
+
+        [].slice.call(thumbList.children).forEach(function(li, i) {
+            li.classList.toggle('is-on', i === current);
+        });
+
+        /* 사진이 1장뿐이면 화살표를 감춤 */
+        prevBtn.hidden = nextBtn.hidden = (photos.length <= 1);
+
+        /* 이 사진이 달린 리뷰 카드를 id 로 찾아서 글자를 그대로 가져옴.
+           리뷰 내용을 뷰어에 또 적어두지 않는 이유: 같은 글이 두 군데 있으면
+           한쪽만 고쳤을 때 어긋남 (수량→가격 만들 때 겪은 것과 같은 종류의 실수) */
+        const card = document.querySelector('.review-item[data-review-id="' + p.reviewId + '"]');
+        const pick = function(sel) {
+            const el = card && card.querySelector(sel);
+            return el ? el.textContent.trim() : '';
+        };
+        viewer.querySelector('.viewer-writer .name').textContent = pick('.name');
+        viewer.querySelector('.viewer-writer .date').textContent = pick('.date');
+
+        /* 별점은 글자가 아니라 스프라이트(.star-rating > em 의 width%)라 textContent 로는
+            못 옮김 — 원본 카드의 em width 를 그대로 복사함 (2026-08-27) */
+        const srcStar = card && card.querySelector('.star-rating em');
+        const dstStar = viewer.querySelector('.viewer-writer .star-rating em');
+        if (dstStar) dstStar.style.width = srcStar ? srcStar.style.width : '0%';
+        viewer.querySelector('.viewer-option').textContent = pick('.review-option');
+        viewer.querySelector('.viewer-text').textContent = pick('.review-text');
+        viewer.dataset.reviewId = p.reviewId;
+    }
+
+    function closeViewer() { viewer.hidden = true; lockScroll(); }
+    function closeAll() { viewer.hidden = true; modal.hidden = true; lockScroll(); }
+
+    /* 리뷰 사진 썸네일 → 갤러리 열기.
+       각 li 가 아니라 부모(ul)에 이벤트를 거는 이유(이벤트 위임): 나중에 JSP 가
+       사진을 몇 장 찍어낼지 모르므로, 목록이 바뀌어도 코드를 안 고치게 하려고 */
+    source.addEventListener('click', function(e) {
+        const li = e.target.closest('li');
+        if (li) { e.preventDefault(); openGallery(); }
+    });
+
+    modal.querySelector('.gallery-close').addEventListener('click', closeAll);
+    viewer.querySelector('.viewer-close').addEventListener('click', closeViewer);
+    prevBtn.addEventListener('click', function() { showPhoto(current - 1); });
+    nextBtn.addEventListener('click', function() { showPhoto(current + 1); });
+
+    /* "전체보기" → 모달을 다 닫고 그 리뷰 카드로 이동 */
+    viewer.querySelector('.viewer-all').addEventListener('click', function() {
+        const id = viewer.dataset.reviewId;
+        closeAll();
+        const card = document.querySelector('.review-item[data-review-id="' + id + '"]');
+        if (card) window.scrollTo({ top: card.offsetTop - 120, behavior: 'smooth' });
+    });
+
+    /* 어두운 배경(덮개)을 직접 눌렀을 때만 닫음.
+       e.target === 덮개 를 확인하는 이유: 안쪽 패널을 눌렀을 때도 클릭이 부모로
+       올라와서(버블링) 같이 닫혀버리기 때문 */
+    modal.addEventListener('click', function(e) { if (e.target === modal) closeAll(); });
+    viewer.addEventListener('click', function(e) { if (e.target === viewer) closeViewer(); });
+
+    /* 키보드 — ESC 로 닫기, 좌우 화살표로 사진 넘기기 (뷰어가 열려 있을 때만) */
+    document.addEventListener('keydown', function(e) {
+        if (!viewer.hidden) {
+            if (e.key === 'Escape') closeViewer();
+            if (e.key === 'ArrowLeft') showPhoto(current - 1);
+            if (e.key === 'ArrowRight') showPhoto(current + 1);
+        } else if (!modal.hidden && e.key === 'Escape') {
+            closeAll();
+        }
+    });
 }
 
 
