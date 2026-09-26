@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -188,64 +189,36 @@ public class CartController {
         return "/cart/cart";
     }
     
-    @PostMapping("/add")
-    public Object addCart(
+    @PostMapping(
+            value = "/add",
+            produces = "application/json;charset=UTF-8"
+    )
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> addCart(
             @RequestParam("optionId") Integer optionId,
             @RequestParam(value = "quantity", defaultValue = "1")
             Integer quantity,
             Authentication authentication,
-            HttpSession session,
-            @RequestParam(value = "ajax", required = false)
-            String ajaxParam) {
-
-        log.info(">>>> POST /cart/add");
-        log.info(">>>> optionId = " + optionId);
-        log.info(">>>> quantity = " + quantity);
-
-        /*
-         * 잘못된 값 방어
-         */
-        if (optionId == null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(
-                        createErrorResponse(
-                            "잘못된 상품 정보입니다."
-                        )
-                    );
-        }
+            HttpSession session) {
 
         if (quantity == null || quantity < 1) {
             quantity = 1;
         }
 
-
         int cartCount;
 
-
-        /*
-         * ====================================
-         * 로그인 사용자
-         * ====================================
-         */
         if (authentication != null
                 && authentication.isAuthenticated()
-                && authentication.getPrincipal()
-                        instanceof CustomUser) {
+                && authentication.getPrincipal() instanceof CustomUser) {
 
             CustomUser customUser =
-                    (CustomUser)
-                    authentication.getPrincipal();
+                    (CustomUser) authentication.getPrincipal();
 
             Long memberNo =
-                    customUser
-                        .getMember()
-                        .getMemberNo();
+                    customUser.getMember()
+                              .getMemberNo();
 
 
-            /*
-             * DB 장바구니 추가
-             */
             cartService.addCart(
                     memberNo,
                     optionId,
@@ -253,13 +226,11 @@ public class CartController {
             );
 
 
-            /*
-             * 장바구니 세션 갱신
-             */
             List<CartItemDTO> cartItems =
                     cartService.getCartItems(
                             memberNo
                     );
+
 
             cartCount =
                     cartItems.size();
@@ -276,20 +247,12 @@ public class CartController {
             );
         }
 
-
-        /*
-         * ====================================
-         * 비로그인 사용자
-         * ====================================
-         */
         else {
 
             @SuppressWarnings("unchecked")
             Map<Integer, Integer> guestCart =
                     (Map<Integer, Integer>)
-                    session.getAttribute(
-                            "guestCart"
-                    );
+                    session.getAttribute("guestCart");
 
 
             if (guestCart == null) {
@@ -304,9 +267,6 @@ public class CartController {
             }
 
 
-            /*
-             * 같은 optionId면 수량 증가
-             */
             guestCart.merge(
                     optionId,
                     quantity,
@@ -314,25 +274,20 @@ public class CartController {
             );
 
 
-            session.setAttribute(
-                    "guestCart",
-                    guestCart
-            );
-
-
-            /*
-             * 비회원 장바구니 상품 정보 조회
-             */
             List<CartItemDTO> cartItems =
-                    cartService
-                        .getGuestCartItems(
+                    cartService.getGuestCartItems(
                             guestCart
-                        );
+                    );
 
 
             cartCount =
                     guestCart.size();
 
+
+            session.setAttribute(
+                    "guestCart",
+                    guestCart
+            );
 
             session.setAttribute(
                     "cartCount",
@@ -347,35 +302,26 @@ public class CartController {
 
 
         /*
-         * AJAX 요청
+         * JSON 응답
          */
-        if ("true".equalsIgnoreCase(ajaxParam)) {
+        Map<String, Object> result =
+                new HashMap<>();
 
-            Map<String, Object> result =
-                    new HashMap<>();
+        result.put(
+                "success",
+                true
+        );
 
-            result.put(
-                    "success",
-                    true
-            );
-
-            result.put(
-                    "cartCount",
-                    cartCount
-            );
-
-            return ResponseEntity.ok(
-                    result
-            );
-        }
+        result.put(
+                "cartCount",
+                cartCount
+        );
 
 
-        /*
-         * 일반 form 요청
-         */
-        return "redirect:/cart";
+        return ResponseEntity.ok(
+                result
+        );
     }
-
 
     private Map<String, Object> createErrorResponse(
             String message) {
