@@ -13,7 +13,7 @@
 
 </head>
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/order_already_completed.css">
+	href="${pageContext.request.contextPath}/resources/css/order_already_completed.css">
 
 </head>
 

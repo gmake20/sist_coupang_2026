@@ -15,7 +15,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GoodPang 주문완료</title>
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/goodpang_order_complete.css">
+	href="${pageContext.request.contextPath}/resources/css/goodpang_order_complete.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/reset.css">
 <link rel="stylesheet"
