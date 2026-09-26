@@ -134,8 +134,6 @@ public class PaymentMethodService {
             Long memberNo,
             int paymentMethodNo) {
 
-
-        // 해당 회원의 결제수단 조회
         PaymentMethodDTO paymentMethod =
                 paymentMethodMapper
                         .findPaymentMethod(
@@ -151,18 +149,68 @@ public class PaymentMethodService {
             );
         }
 
-
-        // 같은 타입의 기존 기본값 해제
         paymentMethodMapper.clearDefault(
                 memberNo,
                 paymentMethod.getPaymentType()
         );
 
-
-        // 새 기본 결제수단 설정
         return paymentMethodMapper.setDefault(
                 memberNo,
                 paymentMethodNo
         );
+    }
+    
+    @Transactional
+    public int addPaymentMethod(
+            PaymentMethodDTO dto) {
+
+        if (dto.isPaymentDefault()) {
+
+            paymentMethodMapper
+                    .clearDefault(
+                            dto.getMemberNo(),
+                            dto.getPaymentType()
+                    );
+        }
+
+
+        int result;
+
+
+        if ("BANK".equals(
+                dto.getPaymentType())) {
+
+            result =
+                    paymentMethodMapper
+                            .insertBankAccount(
+                                    dto
+                            );
+
+        } else if ("CARD".equals(
+                dto.getPaymentType())) {
+
+            result =
+                    paymentMethodMapper
+                            .insertCard(
+                                    dto
+                            );
+
+        } else {
+
+            throw new IllegalArgumentException(
+                    "지원하지 않는 결제수단입니다."
+            );
+        }
+
+
+        if (result <= 0) {
+
+            throw new IllegalStateException(
+                    "결제수단 등록에 실패했습니다."
+            );
+        }	
+
+
+        return result;
     }
 }

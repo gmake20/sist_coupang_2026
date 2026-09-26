@@ -19,7 +19,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>쿠팡 주문/결제</title>
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/goodpang_order_payment.css">
+	href="${pageContext.request.contextPath}/resources/css/goodpang_order_payment.css">
 </head>
 
 <body>

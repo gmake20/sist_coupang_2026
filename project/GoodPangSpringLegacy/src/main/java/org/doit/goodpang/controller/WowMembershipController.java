@@ -9,6 +9,7 @@ import org.doit.goodpang.domain.WowMembershipDTO;
 import org.doit.goodpang.domain.security.CustomUser;
 import org.doit.goodpang.service.PaymentMethodService;
 import org.doit.goodpang.service.WowMembershipService;
+import org.doit.goodpang.util.PaymentMethodValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -61,7 +62,7 @@ public class WowMembershipController {
         model.addAttribute("returnSaving", 0);
         model.addAttribute("globalSaving", 0);
 
-        return "wow/wowmembership";
+        return "wow/wow_membership";
     }
     
     @GetMapping("/join")
@@ -79,12 +80,6 @@ public class WowMembershipController {
         Long memberNo =
                 customUser.getMember()
                           .getMemberNo();
-
-        log.info(
-                "와우 멤버십 가입 화면 memberNo : "
-                + memberNo
-        );
-
 
         if (wowMembershipService.isWowMember(memberNo)) {
 
@@ -344,5 +339,196 @@ public class WowMembershipController {
 
 
         return "redirect:/wow/membership";
+    }
+    
+    @GetMapping("/payment-method")
+    public String paymentMethodList(
+            Authentication authentication,
+            Model model) {
+
+        CustomUser customUser =
+                (CustomUser) authentication.getPrincipal();
+
+        Long memberNo =
+                customUser.getMember().getMemberNo();
+        
+        log.info(">>>> /wow/payment-method GET 진입");
+
+        List<PaymentMethodDTO> paymentMethods =
+                paymentMethodService.getPaymentMethods(memberNo);
+
+        model.addAttribute(
+                "paymentMethods",
+                paymentMethods
+        );
+        return "wow/wow_payment_methods";
+    }
+
+    @PostMapping("/payment-method")
+    public String addPaymentMethod(
+            Authentication authentication,
+
+            @RequestParam("paymentType")
+            String paymentType,
+
+            @RequestParam(
+                    value = "paymentDefault",
+                    required = false
+            )
+            String paymentDefault,
+
+            @RequestParam(
+                    value = "bankCode",
+                    required = false
+            )
+            String bankCode,
+
+            @RequestParam(
+                    value = "accountNumber",
+                    required = false
+            )
+            String accountNumber,
+
+            @RequestParam(
+                    value = "accountHolder",
+                    required = false
+            )
+            String accountHolder,
+
+            @RequestParam(
+                    value = "cardCompany",
+                    required = false
+            )
+            String cardCompany,
+
+            @RequestParam(
+                    value = "cardNumber",
+                    required = false
+            )
+            String cardNumber,
+
+            Model model) {
+
+        CustomUser customUser =
+                (CustomUser) authentication.getPrincipal();
+
+        Long memberNo =
+                customUser.getMember().getMemberNo();
+
+        String error =
+                PaymentMethodValidator
+                        .validatePaymentType(paymentType);
+
+        if (error != null) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    error
+            );
+        }
+
+
+        PaymentMethodDTO dto =
+                new PaymentMethodDTO();
+
+        dto.setMemberNo(memberNo);
+
+        dto.setPaymentType(paymentType);
+
+        dto.setPaymentDefault(
+                "Y".equals(paymentDefault)
+        );
+
+
+        if ("BANK".equals(paymentType)) {
+
+            error =
+                    PaymentMethodValidator
+                            .validateBank(
+                                    bankCode,
+                                    accountNumber,
+                                    accountHolder
+                            );
+
+            if (error != null) {
+
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        error
+                );
+            }
+
+            accountNumber =
+                    accountNumber.replaceAll(
+                            "[^0-9]",
+                            ""
+                    );
+
+            String accountLast4 =
+                    accountNumber.substring(
+                            accountNumber.length() - 4
+                    );
+
+            dto.setBankCode(bankCode);
+            dto.setAccountLast4(accountLast4);
+            dto.setAccountHolder(
+                    accountHolder.trim()
+            );
+        }
+
+        else if ("CARD".equals(paymentType)) {
+
+            error =
+                    PaymentMethodValidator
+                            .validateCard(
+                                    cardCompany,
+                                    cardNumber
+                            );
+
+            if (error != null) {
+
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        error
+                );
+            }
+
+            cardNumber =
+                    cardNumber.replaceAll(
+                            "[^0-9]",
+                            ""
+                    );
+
+            String cardLast4 =
+                    cardNumber.substring(
+                            cardNumber.length() - 4
+                    );
+
+            dto.setCardCompany(cardCompany);
+            dto.setCardLast4(cardLast4);
+        }
+
+        int result =
+                paymentMethodService
+                        .addPaymentMethod(dto);
+
+        if (result != 1) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "결제수단 등록에 실패했습니다."
+            );
+        }
+
+        List<PaymentMethodDTO> paymentMethods =
+                paymentMethodService
+                        .getPaymentMethods(memberNo);
+
+        model.addAttribute(
+                "paymentMethods",
+                paymentMethods
+        );
+
+        return "wow/wow_payment_methods";
     }
 }

@@ -6,104 +6,621 @@
 <mapper namespace="org.doit.goodpang.mapper.CheckoutMapper">
 
 
-	<!-- 상품 기본 가격 -->
-	<select id="getProductPrice" resultType="java.lang.Integer">
+    <resultMap
+        id="checkoutResultMap"
+        type="org.doit.goodpang.domain.CheckoutDTO">
 
-		SELECT PRODUCT_PRICE
-		FROM PRODUCT
-		WHERE PRODUCT_NO = #{productNo}
+        <id
+            property="checkoutNo"
+            column="CHECKOUT_NO" />
 
-	</select>
+        <result
+            property="memberNo"
+            column="MEMBER_NO" />
 
+        <result
+            property="productAmount"
+            column="PRODUCT_AMOUNT" />
 
-	<!-- 옵션 추가 가격 -->
-	<select id="getOptionPrice" resultType="java.lang.Integer">
+        <result
+            property="instantDiscount"
+            column="INSTANT_DISCOUNT" />
 
-		SELECT NVL(PRICE, 0)
-		FROM PRODUCT_OPTION
-		WHERE PRODUCT_NO = #{productNo}
-		AND OPTION_ID = #{optionId}
+        <result
+            property="couponDiscount"
+            column="COUPON_DISCOUNT" />
 
-	</select>
+        <result
+            property="cashUsed"
+            column="CASH_USED" />
 
+        <result
+            property="deliveryFee"
+            column="DELIVERY_FEE" />
 
-	<!-- CHECKOUT 번호 생성 -->
-	<select id="getNextCheckoutNo" resultType="int">
+        <result
+            property="totalPrice"
+            column="TOTAL_PRICE" />
 
-		SELECT SEQ_CHECKOUT_NO.NEXTVAL
-		FROM DUAL
-
-	</select>
-
-
-	<!-- CHECKOUT 생성 -->
-	<insert id="insertCheckout">
-
-		INSERT INTO CHECKOUT (
-		CHECKOUT_NO,
-		MEMBER_NO,
-		CREATED_AT,
-		PRODUCT_AMOUNT,
-		INSTANT_DISCOUNT,
-		COUPON_DISCOUNT,
-		CASH_USED,
-		DELIVERY_FEE,
-		TOTAL_PRICE
-		)
-		VALUES (
-		#{checkoutNo},
-		#{memberNo},
-		SYSDATE,
-		#{productAmount},
-		#{instantDiscount},
-		#{couponDiscount},
-		#{cashUsed},
-		#{deliveryFee},
-		#{totalPrice}
-		)
-
-	</insert>
+    </resultMap>
 
 
-	<!-- CHECKOUT_ITEM 생성 -->
-	<insert id="insertCheckoutItem">
+    <resultMap
+        id="checkoutItemResultMap"
+        type="org.doit.goodpang.domain.CheckoutItemDTO">
 
-		INSERT INTO CHECKOUT_ITEM (
-		CHECKOUT_ITEM_NO,
-		CHECKOUT_NO,
-		PRODUCT_NO,
-		OPTION_ID,
-		ORDER_QTY,
-		PRICE
-		)
-		VALUES (
-		SEQ_CHECKOUT_ITEM_NO.NEXTVAL,
-		#{checkoutNo},
-		#{productNo},
-		#{optionId, jdbcType=NUMERIC},
-		#{quantity},
-		#{unitPrice}
-		)
+        <id
+            property="checkoutItemNo"
+            column="CHECKOUT_ITEM_NO" />
 
-	</insert>
-	
-	<select id="getCheckout"
-        resultType="org.doit.goodpang.domain.CheckoutDTO">
+        <result
+            property="checkoutNo"
+            column="CHECKOUT_NO" />
 
-    SELECT
-        CHECKOUT_NO       AS checkoutNo,
-        MEMBER_NO         AS memberNo,
-        PRODUCT_AMOUNT    AS productAmount,
-        INSTANT_DISCOUNT  AS instantDiscount,
-        COUPON_DISCOUNT   AS couponDiscount,
-        CASH_USED         AS cashUsed,
-        DELIVERY_FEE      AS deliveryFee,
-        TOTAL_PRICE       AS totalPrice
-    FROM CHECKOUT
-    WHERE CHECKOUT_NO = #{checkoutNo}
-      AND MEMBER_NO = #{memberNo}
+        <result
+            property="productNo"
+            column="PRODUCT_NO" />
 
-</select>
+        <result
+            property="optionId"
+            column="OPTION_ID" />
 
+        <result
+            property="orderQty"
+            column="ORDER_QTY" />
+
+        <result
+            property="price"
+            column="PRICE" />
+
+        <result
+            property="productName"
+            column="PRODUCT_NAME" />
+
+        <result
+            property="optionName"
+            column="OPTION_NAME" />
+
+        <result
+            property="productImage"
+            column="IMAGE_URL" />
+
+    </resultMap>
+
+
+    <!-- checkout 한 건 -->
+    <select
+        id="getCheckout"
+        resultMap="checkoutResultMap">
+
+        SELECT
+            CHECKOUT_NO,
+            MEMBER_NO,
+            PRODUCT_AMOUNT,
+            INSTANT_DISCOUNT,
+            COUPON_DISCOUNT,
+            CASH_USED,
+            DELIVERY_FEE,
+            TOTAL_PRICE
+
+        FROM CHECKOUT
+
+        WHERE CHECKOUT_NO =
+              #{checkoutNo}
+
+          AND MEMBER_NO =
+              #{memberNo}
+
+    </select>
+
+
+    <!-- checkout item 기본 목록 -->
+    <select
+        id="getCheckoutItems"
+        resultMap="checkoutItemResultMap">
+
+        SELECT
+            CHECKOUT_ITEM_NO,
+            CHECKOUT_NO,
+            PRODUCT_NO,
+            OPTION_ID,
+            ORDER_QTY,
+            PRICE
+
+        FROM CHECKOUT_ITEM
+
+        WHERE CHECKOUT_NO =
+              #{checkoutNo}
+
+        ORDER BY
+            CHECKOUT_ITEM_NO
+
+    </select>
+
+
+    <!-- 결제 화면용 상품 상세 -->
+    <select
+        id="getCheckoutItemsProduct"
+        resultMap="checkoutItemResultMap">
+
+        SELECT
+            ci.CHECKOUT_ITEM_NO,
+            ci.CHECKOUT_NO,
+            ci.PRODUCT_NO,
+            ci.OPTION_ID,
+            ci.ORDER_QTY,
+            ci.PRICE,
+
+            p.PRODUCT_NAME,
+
+            pi.IMAGE_URL,
+
+            CASE
+                WHEN po.OPTION1_VALUE IS NOT NULL
+                THEN
+                    CASE
+                        WHEN po.OPTION1_TYPE IS NOT NULL
+                        THEN po.OPTION1_TYPE || ' : '
+                        ELSE ''
+                    END
+                    || po.OPTION1_VALUE
+
+                ELSE ''
+            END
+
+            ||
+
+            CASE
+                WHEN po.OPTION2_VALUE IS NOT NULL
+                THEN
+                    CASE
+                        WHEN po.OPTION1_VALUE IS NOT NULL
+                        THEN ' / '
+                        ELSE ''
+                    END
+                    ||
+                    CASE
+                        WHEN po.OPTION2_TYPE IS NOT NULL
+                        THEN po.OPTION2_TYPE || ' : '
+                        ELSE ''
+                    END
+                    || po.OPTION2_VALUE
+
+                ELSE ''
+            END
+
+            ||
+
+            CASE
+                WHEN po.OPTION3_VALUE IS NOT NULL
+                THEN
+                    CASE
+                        WHEN po.OPTION1_VALUE IS NOT NULL
+                             OR po.OPTION2_VALUE IS NOT NULL
+                        THEN ' / '
+                        ELSE ''
+                    END
+                    ||
+                    CASE
+                        WHEN po.OPTION3_TYPE IS NOT NULL
+                        THEN po.OPTION3_TYPE || ' : '
+                        ELSE ''
+                    END
+                    || po.OPTION3_VALUE
+
+                ELSE ''
+            END
+            AS OPTION_NAME
+
+        FROM CHECKOUT_ITEM ci
+
+        JOIN PRODUCT p
+          ON ci.PRODUCT_NO =
+             p.PRODUCT_NO
+
+        LEFT JOIN PRODUCT_OPTION po
+          ON ci.OPTION_ID =
+             po.OPTION_ID
+
+        LEFT JOIN (
+            SELECT
+                PRODUCT_NO,
+                MIN(IMAGE_URL)
+                    AS IMAGE_URL
+
+            FROM PRODUCT_IMAGE
+
+            WHERE IMAGE_PURPOSE =
+                  '대표'
+
+            GROUP BY
+                PRODUCT_NO
+        ) pi
+          ON p.PRODUCT_NO =
+             pi.PRODUCT_NO
+
+        WHERE ci.CHECKOUT_NO =
+              #{checkoutNo}
+
+        ORDER BY
+            ci.CHECKOUT_ITEM_NO
+
+    </select>
+
+    <insert
+        id="createCheckout"
+        parameterType="org.doit.goodpang.domain.CheckoutDTO">
+
+        <selectKey
+            keyProperty="checkoutNo"
+            resultType="int"
+            order="BEFORE">
+
+            SELECT
+                SEQ_CHECKOUT_NO.NEXTVAL
+            FROM DUAL
+
+        </selectKey>
+
+        INSERT INTO CHECKOUT (
+            CHECKOUT_NO,
+            MEMBER_NO,
+            CREATED_AT
+        )
+        VALUES (
+            #{checkoutNo},
+            #{memberNo},
+            SYSDATE
+        )
+
+    </insert>
+
+    <insert id="addCheckoutItem">
+
+        INSERT INTO CHECKOUT_ITEM (
+            CHECKOUT_ITEM_NO,
+            CHECKOUT_NO,
+            PRODUCT_NO,
+            OPTION_ID,
+            ORDER_QTY,
+            PRICE
+        )
+
+        SELECT
+            SEQ_CHECKOUT_ITEM_NO.NEXTVAL,
+            #{checkoutNo},
+            p.PRODUCT_NO,
+            po.OPTION_ID,
+            #{quantity},
+            NVL(p.PRODUCT_PRICE, 0)
+                + NVL(po.PRICE, 0)
+
+        FROM PRODUCT_OPTION po
+
+        JOIN PRODUCT p
+          ON po.PRODUCT_NO =
+             p.PRODUCT_NO
+
+        WHERE po.OPTION_ID =
+              #{optionId}
+
+    </insert>
+
+    <update id="updateCheckoutAmount">
+
+        UPDATE CHECKOUT c
+
+        SET
+            PRODUCT_AMOUNT = (
+
+                SELECT
+                    NVL(
+                        SUM(
+                            ci.PRICE
+                            * ci.ORDER_QTY
+                        ),
+                        0
+                    )
+
+                FROM CHECKOUT_ITEM ci
+
+                WHERE ci.CHECKOUT_NO =
+                      c.CHECKOUT_NO
+            ),
+
+            DELIVERY_FEE =
+
+                CASE
+
+                    WHEN (
+                        SELECT
+                            NVL(
+                                SUM(
+                                    ci.PRICE
+                                    * ci.ORDER_QTY
+                                ),
+                                0
+                            )
+
+                        FROM CHECKOUT_ITEM ci
+
+                        WHERE ci.CHECKOUT_NO =
+                              c.CHECKOUT_NO
+                    ) >= 19800
+
+                    THEN 0
+
+                    ELSE 3000
+
+                END,
+
+            TOTAL_PRICE =
+
+                GREATEST(
+                    0,
+
+                    (
+                        SELECT
+                            NVL(
+                                SUM(
+                                    ci.PRICE
+                                    * ci.ORDER_QTY
+                                ),
+                                0
+                            )
+
+                        FROM CHECKOUT_ITEM ci
+
+                        WHERE ci.CHECKOUT_NO =
+                              c.CHECKOUT_NO
+                    )
+
+                    +
+
+                    CASE
+
+                        WHEN (
+                            SELECT
+                                NVL(
+                                    SUM(
+                                        ci.PRICE
+                                        * ci.ORDER_QTY
+                                    ),
+                                    0
+                                )
+
+                            FROM CHECKOUT_ITEM ci
+
+                            WHERE ci.CHECKOUT_NO =
+                                  c.CHECKOUT_NO
+                        ) >= 19800
+
+                        THEN 0
+
+                        ELSE 3000
+
+                    END
+
+                    - NVL(
+                        c.INSTANT_DISCOUNT,
+                        0
+                    )
+
+                    - NVL(
+                        c.COUPON_DISCOUNT,
+                        0
+                    )
+
+                    - NVL(
+                        c.CASH_USED,
+                        0
+                    )
+                )
+
+        WHERE c.CHECKOUT_NO =
+              #{checkoutNo}
+
+    </update>
+
+    <update id="updateCheckoutAmountV2">
+
+        UPDATE CHECKOUT c
+
+        SET
+            PRODUCT_AMOUNT = (
+
+                SELECT
+                    NVL(
+                        SUM(
+                            ci.PRICE
+                            * ci.ORDER_QTY
+                        ),
+                        0
+                    )
+
+                FROM CHECKOUT_ITEM ci
+
+                WHERE ci.CHECKOUT_NO =
+                      c.CHECKOUT_NO
+            ),
+
+
+            DELIVERY_FEE =
+
+                CASE
+
+                    <!-- WOW 회원 무료배송 -->
+                    WHEN EXISTS (
+
+                        SELECT 1
+
+                        FROM WOW_MEMBERSHIP wm
+
+                        WHERE wm.MEMBER_NO =
+                              c.MEMBER_NO
+
+                          AND wm.STATUS IN (
+                              'ACTIVE',
+                              'CANCEL_PENDING'
+                          )
+
+                          AND wm.END_DATE >=
+                              TRUNC(SYSDATE)
+                    )
+
+                    THEN 0
+
+
+                    <!-- 일반회원 19,800원 이상 -->
+                    WHEN (
+
+                        SELECT
+                            NVL(
+                                SUM(
+                                    ci.PRICE
+                                    * ci.ORDER_QTY
+                                ),
+                                0
+                            )
+
+                        FROM CHECKOUT_ITEM ci
+
+                        WHERE ci.CHECKOUT_NO =
+                              c.CHECKOUT_NO
+
+                    ) >= 19800
+
+                    THEN 0
+
+                    ELSE 3000
+
+                END,
+
+
+            TOTAL_PRICE =
+
+                GREATEST(
+                    0,
+
+                    (
+                        SELECT
+                            NVL(
+                                SUM(
+                                    ci.PRICE
+                                    * ci.ORDER_QTY
+                                ),
+                                0
+                            )
+
+                        FROM CHECKOUT_ITEM ci
+
+                        WHERE ci.CHECKOUT_NO =
+                              c.CHECKOUT_NO
+                    )
+
+                    +
+
+                    CASE
+
+                        WHEN EXISTS (
+
+                            SELECT 1
+
+                            FROM WOW_MEMBERSHIP wm
+
+                            WHERE wm.MEMBER_NO =
+                                  c.MEMBER_NO
+
+                              AND wm.STATUS IN (
+                                  'ACTIVE',
+                                  'CANCEL_PENDING'
+                              )
+
+                              AND wm.END_DATE >=
+                                  TRUNC(SYSDATE)
+                        )
+
+                        THEN 0
+
+
+                        WHEN (
+
+                            SELECT
+                                NVL(
+                                    SUM(
+                                        ci.PRICE
+                                        * ci.ORDER_QTY
+                                    ),
+                                    0
+                                )
+
+                            FROM CHECKOUT_ITEM ci
+
+                            WHERE ci.CHECKOUT_NO =
+                                  c.CHECKOUT_NO
+
+                        ) >= 19800
+
+                        THEN 0
+
+                        ELSE 3000
+
+                    END
+
+                    - NVL(
+                        c.INSTANT_DISCOUNT,
+                        0
+                    )
+
+                    - NVL(
+                        c.COUPON_DISCOUNT,
+                        0
+                    )
+
+                    - NVL(
+                        c.CASH_USED,
+                        0
+                    )
+                )
+
+        WHERE c.CHECKOUT_NO =
+              #{checkoutNo}
+
+    </update>
+
+
+    <select
+        id="getProductPrice"
+        resultType="int">
+
+        SELECT PRODUCT_PRICE
+
+        FROM PRODUCT
+
+        WHERE PRODUCT_NO =
+              #{productNo}
+
+    </select>
+
+
+    <select
+        id="getOptionPrice"
+        resultType="int">
+
+        SELECT
+            NVL(
+                PRICE,
+                0
+            )
+
+        FROM PRODUCT_OPTION
+
+        WHERE PRODUCT_NO =
+              #{productNo}
+
+          AND OPTION_ID =
+              #{optionId}
+
+    </select>
 
 </mapper>
