@@ -843,7 +843,7 @@ function setupDeliveryOption() {
     });
 }
 
-function refreshCartPreview() {
+/*function refreshCartPreview() {
 
     const preview =
         document.getElementById(
@@ -888,7 +888,7 @@ function refreshCartPreview() {
             console.error(error);
         });
 }
-
+*/
 
 function setupCartAdd() {
 
@@ -959,7 +959,9 @@ function setupCartAdd() {
                     cartCount.textContent = data.cartCount;
                 }
 
-                refreshCartPreview();
+				if (typeof window.refreshCart === "function") {
+				    window.refreshCart();
+				}
             })
             .catch(function(error) {
 

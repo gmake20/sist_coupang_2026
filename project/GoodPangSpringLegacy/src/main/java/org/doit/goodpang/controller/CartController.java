@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.doit.goodpang.domain.CartItemDTO;
 import org.doit.goodpang.domain.security.CustomUser;
 import org.doit.goodpang.service.CartService;
+import org.doit.goodpang.service.CartSessionService;
 import org.doit.goodpang.service.CheckoutService;
 import org.doit.goodpang.service.WowMembershipService;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,7 @@ public class CartController {
     private final CartService cartService;
     private final WowMembershipService wowMembershipService;
     private final CheckoutService checkoutService;
+    private final CartSessionService cartSessionService;
 
     @GetMapping
     public String cart(
@@ -44,151 +46,70 @@ public class CartController {
             HttpServletResponse response,
             Model model) {
 
-        log.info(">>>> /cart GET");
+        log.info(">>>> GET /cart");
 
-        response.setHeader(
-                "Cache-Control",
-                "no-cache, no-store, must-revalidate"
-        );
-
-        response.setHeader(
-                "Pragma",
-                "no-cache"
-        );
-
-        response.setDateHeader(
-                "Expires",
-                0
-        );
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
 
         List<CartItemDTO> cartItems;
 
-        /*
-         * 로그인 사용자
-         */
         if (authentication != null
                 && authentication.isAuthenticated()
-                && authentication.getPrincipal()
-                        instanceof CustomUser) {
+                && authentication.getPrincipal() instanceof CustomUser) {
 
             CustomUser customUser =
                     (CustomUser) authentication.getPrincipal();
 
             Long memberNo =
-                    customUser.getMember()
-                              .getMemberNo();
+                    customUser.getMember().getMemberNo();
 
             cartItems =
-                    cartService.getCartItems(
-                            memberNo
-                    );
+                    cartService.getCartItems(memberNo);
 
             boolean isWowMember =
-                    wowMembershipService
-                            .isWowMember(
-                                    memberNo
-                            );
+                    wowMembershipService.isWowMember(memberNo);
 
-            model.addAttribute(
-                    "isWowMember",
-                    isWowMember
-            );
+            model.addAttribute("isWowMember", isWowMember);
 
-        /*
-         * 비회원
-         */
         } else {
 
             @SuppressWarnings("unchecked")
             Map<Integer, Integer> guestCart =
-                    (Map<Integer, Integer>)
-                    session.getAttribute(
-                            "guestCart"
-                    );
+                    (Map<Integer, Integer>) session.getAttribute("guestCart");
 
-            if (guestCart == null
-                    || guestCart.isEmpty()) {
-
-                cartItems =
-                        new ArrayList<>();
-
+            if (guestCart == null || guestCart.isEmpty()) {
+                cartItems = new ArrayList<>();
             } else {
-
-                cartItems =
-                        cartService
-                                .getGuestCartItems(
-                                        guestCart
-                                );
+                cartItems = cartService.getGuestCartItems(guestCart);
             }
 
-            model.addAttribute(
-                    "isWowMember",
-                    false
-            );
+            model.addAttribute("isWowMember", false);
         }
 
-
-        /*
-         * 총 상품 가격
-         */
         int totalPrice = 0;
 
         for (CartItemDTO item : cartItems) {
-            totalPrice +=
-                    item.getTotalPrice();
+            totalPrice += item.getTotalPrice();
         }
 
+        int cartCount = cartItems.size();
 
-        /*
-         * 장바구니 개수
-         */
-        int cartCount =
-                cartItems.size();
-
-
-        /*
-         * 상단 장바구니 미리보기
-         */
         if (cartItems.isEmpty()) {
-
-            session.removeAttribute(
-                    "cartPreviewItems"
-            );
-
+            session.removeAttribute("cartPreviewItems");
         } else {
-
-            session.setAttribute(
-                    "cartPreviewItems",
-                    cartItems
-            );
+            session.setAttribute("cartPreviewItems", cartItems);
         }
 
+        session.setAttribute("cartCount", cartCount);
 
-        session.setAttribute(
-                "cartCount",
-                cartCount
-        );
-
-
-        model.addAttribute(
-                "cartItems",
-                cartItems
-        );
-
-        model.addAttribute(
-                "cartCount",
-                cartCount
-        );
-
-        model.addAttribute(
-                "totalPrice",
-                totalPrice
-        );
-
+        model.addAttribute("cartItems", cartItems);
+        model.addAttribute("cartCount", cartCount);
+        model.addAttribute("totalPrice", totalPrice);
 
         return "/cart/cart";
     }
-    
+
     @PostMapping(
             value = "/add",
             produces = "application/json;charset=UTF-8"
@@ -196,10 +117,13 @@ public class CartController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> addCart(
             @RequestParam("optionId") Integer optionId,
-            @RequestParam(value = "quantity", defaultValue = "1")
-            Integer quantity,
+            @RequestParam(value = "quantity", defaultValue = "1") Integer quantity,
             Authentication authentication,
             HttpSession session) {
+
+        log.info(">>>> POST /cart/add");
+        log.info(">>>> optionId = " + optionId);
+        log.info(">>>> quantity = " + quantity);
 
         if (quantity == null || quantity < 1) {
             quantity = 1;
@@ -215,141 +139,48 @@ public class CartController {
                     (CustomUser) authentication.getPrincipal();
 
             Long memberNo =
-                    customUser.getMember()
-                              .getMemberNo();
+                    customUser.getMember().getMemberNo();
 
+            cartService.addCart(memberNo, optionId, quantity);
+            cartSessionService.refreshCartSession(session, memberNo);
 
-            cartService.addCart(
-                    memberNo,
-                    optionId,
-                    quantity
-            );
-
-
-            List<CartItemDTO> cartItems =
-                    cartService.getCartItems(
-                            memberNo
-                    );
-
+            Integer sessionCartCount =
+                    (Integer) session.getAttribute("cartCount");
 
             cartCount =
-                    cartItems.size();
+                    sessionCartCount != null ? sessionCartCount : 0;
 
-
-            session.setAttribute(
-                    "cartCount",
-                    cartCount
-            );
-
-            session.setAttribute(
-                    "cartPreviewItems",
-                    cartItems
-            );
-        }
-
-        else {
+        } else {
 
             @SuppressWarnings("unchecked")
             Map<Integer, Integer> guestCart =
-                    (Map<Integer, Integer>)
-                    session.getAttribute("guestCart");
-
+                    (Map<Integer, Integer>) session.getAttribute("guestCart");
 
             if (guestCart == null) {
-
-                guestCart =
-                        new HashMap<>();
-
-                session.setAttribute(
-                        "guestCart",
-                        guestCart
-                );
+                guestCart = new HashMap<>();
             }
 
+            guestCart.merge(optionId, quantity, Integer::sum);
 
-            guestCart.merge(
-                    optionId,
-                    quantity,
-                    Integer::sum
-            );
-
-
-            List<CartItemDTO> cartItems =
-                    cartService.getGuestCartItems(
-                            guestCart
-                    );
-
-
-            cartCount =
-                    guestCart.size();
-
-
-            session.setAttribute(
-                    "guestCart",
+            cartSessionService.refreshGuestCartSession(
+                    session,
                     guestCart
             );
 
-            session.setAttribute(
-                    "cartCount",
-                    cartCount
-            );
-
-            session.setAttribute(
-                    "cartPreviewItems",
-                    cartItems
-            );
+            cartCount = guestCart.size();
         }
 
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("cartCount", cartCount);
 
-        /*
-         * JSON 응답
-         */
-        Map<String, Object> result =
-                new HashMap<>();
-
-        result.put(
-                "success",
-                true
-        );
-
-        result.put(
-                "cartCount",
-                cartCount
-        );
-
-
-        return ResponseEntity.ok(
-                result
-        );
+        return ResponseEntity.ok(result);
     }
 
-    private Map<String, Object> createErrorResponse(
-            String message) {
-
-        Map<String, Object> result =
-                new HashMap<>();
-
-        result.put(
-                "success",
-                false
-        );
-
-        result.put(
-                "message",
-                message
-        );
-
-        return result;
-    }
-    
     @PostMapping("/checkout")
     public String checkout(
-            @RequestParam(value = "optionId", required = false)
-            String[] optionIdParams,
-
-            @RequestParam(value = "quantity", required = false)
-            String[] quantityParams,
-
+            @RequestParam(value = "optionId", required = false) String[] optionIdParams,
+            @RequestParam(value = "quantity", required = false) String[] quantityParams,
             Authentication authentication,
             HttpSession session,
             HttpServletResponse response)
@@ -357,26 +188,17 @@ public class CartController {
 
         log.info(">>>> POST /cart/checkout");
 
-        /*
-         * 로그인 확인
-         */
         if (authentication == null
                 || !authentication.isAuthenticated()
-                || !(authentication.getPrincipal()
-                        instanceof CustomUser)) {
+                || !(authentication.getPrincipal() instanceof CustomUser)) {
 
             return "redirect:/login";
         }
 
-
-        /*
-         * 구매 상품 확인
-         */
         if (optionIdParams == null
                 || quantityParams == null
                 || optionIdParams.length == 0
-                || optionIdParams.length
-                        != quantityParams.length) {
+                || optionIdParams.length != quantityParams.length) {
 
             response.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
@@ -386,16 +208,11 @@ public class CartController {
             return null;
         }
 
-
         CustomUser customUser =
-                (CustomUser)
-                authentication.getPrincipal();
+                (CustomUser) authentication.getPrincipal();
 
         Long memberNo =
-                customUser
-                    .getMember()
-                    .getMemberNo();
-
+                customUser.getMember().getMemberNo();
 
         try {
 
@@ -405,39 +222,27 @@ public class CartController {
             int[] quantities =
                     new int[quantityParams.length];
 
-
-            for (int i = 0;
-                    i < optionIdParams.length;
-                    i++) {
-
+            for (int i = 0; i < optionIdParams.length; i++) {
                 optionIds[i] =
-                        Integer.parseInt(
-                                optionIdParams[i]
-                        );
+                        Integer.parseInt(optionIdParams[i]);
 
                 quantities[i] =
-                        Integer.parseInt(
-                                quantityParams[i]
-                        );
+                        Integer.parseInt(quantityParams[i]);
             }
 
             Integer checkoutNo =
-                    checkoutService
-                        .createCartCheckout(
-                                memberNo,
-                                optionIds,
-                                quantities
-                        );
+                    checkoutService.createCartCheckout(
+                            memberNo,
+                            optionIds,
+                            quantities
+                    );
 
             session.setAttribute(
                     "cartCheckoutNo",
                     checkoutNo
             );
 
-
-            return "redirect:/order/payment?checkoutNo="
-                    + checkoutNo;
-
+            return "redirect:/order/payment?checkoutNo=" + checkoutNo;
 
         } catch (NumberFormatException e) {
 
@@ -458,21 +263,19 @@ public class CartController {
             return null;
         }
     }
-    
+
     @PostMapping("/delete-selected")
     public String deleteSelected(
-            @RequestParam(value = "optionId", required = false)
-            int[] optionIds,
+            @RequestParam(value = "optionId", required = false) int[] optionIds,
             Authentication authentication,
             HttpSession session) {
+
+        log.info(">>>> POST /cart/delete-selected");
 
         if (optionIds == null || optionIds.length == 0) {
             return "redirect:/cart";
         }
 
-        /*
-         * 로그인 사용자
-         */
         if (authentication != null
                 && authentication.isAuthenticated()
                 && authentication.getPrincipal() instanceof CustomUser) {
@@ -481,117 +284,40 @@ public class CartController {
                     (CustomUser) authentication.getPrincipal();
 
             Long memberNo =
-                    customUser.getMember()
-                              .getMemberNo();
+                    customUser.getMember().getMemberNo();
 
-            cartService.deleteSelected(
-                    memberNo,
-                    optionIds
-            );
+            cartService.deleteSelected(memberNo, optionIds);
+            cartSessionService.refreshCartSession(session, memberNo);
 
-            /*
-             * 삭제 후 장바구니 세션 갱신
-             */
-            List<CartItemDTO> cartItems =
-                    cartService.getCartItems(
-                            memberNo
-                    );
-
-            session.setAttribute(
-                    "cartCount",
-                    cartItems.size()
-            );
-
-            if (cartItems.isEmpty()) {
-                session.removeAttribute(
-                        "cartPreviewItems"
-                );
-            } else {
-                session.setAttribute(
-                        "cartPreviewItems",
-                        cartItems
-                );
-            }
-        }
-
-        /*
-         * 비회원
-         */
-        else {
+        } else {
 
             @SuppressWarnings("unchecked")
             Map<Integer, Integer> guestCart =
-                    (Map<Integer, Integer>)
-                    session.getAttribute(
-                            "guestCart"
-                    );
+                    (Map<Integer, Integer>) session.getAttribute("guestCart");
 
             if (guestCart != null) {
-
                 for (int optionId : optionIds) {
-
-                    guestCart.remove(
-                            optionId
-                    );
+                    guestCart.remove(optionId);
                 }
 
-
-                if (guestCart.isEmpty()) {
-
-                    session.removeAttribute(
-                            "guestCart"
-                    );
-
-                    session.removeAttribute(
-                            "cartItems"
-                    );
-
-                    session.removeAttribute(
-                            "cartPreviewItems"
-                    );
-
-                    session.setAttribute(
-                            "cartCount",
-                            0
-                    );
-
-                } else {
-
-                    session.setAttribute(
-                            "guestCart",
-                            guestCart
-                    );
-
-
-                    List<CartItemDTO> cartItems =
-                            cartService
-                                .getGuestCartItems(
-                                        guestCart
-                                );
-
-
-                    session.setAttribute(
-                            "cartCount",
-                            guestCart.size()
-                    );
-
-                    session.setAttribute(
-                            "cartPreviewItems",
-                            cartItems
-                    );
-                }
+                cartSessionService.refreshGuestCartSession(
+                        session,
+                        guestCart
+                );
             }
         }
 
-
         return "redirect:/cart";
     }
-    
+
     @PostMapping("/delete")
     public String deleteCart(
             @RequestParam("optionId") Integer optionId,
             Authentication authentication,
             HttpSession session) {
+
+        log.info(">>>> POST /cart/delete");
+        log.info(">>>> optionId = " + optionId);
 
         if (optionId == null) {
             throw new IllegalArgumentException(
@@ -601,114 +327,40 @@ public class CartController {
 
         if (authentication != null
                 && authentication.isAuthenticated()
-                && authentication.getPrincipal()
-                        instanceof CustomUser) {
+                && authentication.getPrincipal() instanceof CustomUser) {
 
             CustomUser customUser =
-                    (CustomUser)
-                    authentication.getPrincipal();
+                    (CustomUser) authentication.getPrincipal();
 
             Long memberNo =
-                    customUser
-                        .getMember()
-                        .getMemberNo();
+                    customUser.getMember().getMemberNo();
 
-            cartService.deleteCart(
-                    memberNo,
-                    optionId
-            );
+            cartService.deleteCart(memberNo, optionId);
+            cartSessionService.refreshCartSession(session, memberNo);
 
-            List<CartItemDTO> cartItems =
-                    cartService.getCartItems(
-                            memberNo
-                    );
-
-            session.setAttribute(
-                    "cartCount",
-                    cartItems.size()
-            );
-
-            if (cartItems.isEmpty()) {
-
-                session.removeAttribute(
-                        "cartPreviewItems"
-                );
-
-            } else {
-
-                session.setAttribute(
-                        "cartPreviewItems",
-                        cartItems
-                );
-            }
-        }
-
-        else {
+        } else {
 
             @SuppressWarnings("unchecked")
             Map<Integer, Integer> guestCart =
-                    (Map<Integer, Integer>)
-                    session.getAttribute(
-                            "guestCart"
-                    );
-
+                    (Map<Integer, Integer>) session.getAttribute("guestCart");
 
             if (guestCart != null) {
+                guestCart.remove(optionId);
 
-                guestCart.remove(
-                        optionId
+                cartSessionService.refreshGuestCartSession(
+                        session,
+                        guestCart
                 );
-
-                if (guestCart.isEmpty()) {
-
-                    session.removeAttribute(
-                            "guestCart"
-                    );
-
-                    session.removeAttribute(
-                            "cartPreviewItems"
-                    );
-
-                    session.setAttribute(
-                            "cartCount",
-                            0
-                    );
-
-                } else {
-
-                    List<CartItemDTO> cartItems =
-                            cartService
-                                .getGuestCartItems(
-                                        guestCart
-                                );
-
-
-                    session.setAttribute(
-                            "guestCart",
-                            guestCart
-                    );
-
-                    session.setAttribute(
-                            "cartCount",
-                            guestCart.size()
-                    );
-
-                    session.setAttribute(
-                            "cartPreviewItems",
-                            cartItems
-                    );
-                }
             }
         }
+
         return "redirect:/cart";
     }
-    
+
     @GetMapping("/preview")
     public String preview(
             Authentication authentication,
             HttpSession session) {
-
-        log.info(">>>> GET /cart/preview");
 
         if (authentication != null
                 && authentication.isAuthenticated()
@@ -718,91 +370,32 @@ public class CartController {
                     (CustomUser) authentication.getPrincipal();
 
             Long memberNo =
-                    customUser.getMember()
-                              .getMemberNo();
+                    customUser.getMember().getMemberNo();
 
-
-            List<CartItemDTO> cartItems =
-                    cartService.getCartItems(
-                            memberNo
-                    );
-
-
-            session.setAttribute(
-                    "cartCount",
-                    cartItems.size()
+            cartSessionService.refreshCartSession(
+                    session,
+                    memberNo
             );
 
-
-            if (cartItems.isEmpty()) {
-
-                session.removeAttribute(
-                        "cartPreviewItems"
-                );
-
-            } else {
-
-                session.setAttribute(
-                        "cartPreviewItems",
-                        cartItems
-                );
-            }
-        }
-
-        else {
+        } else {
 
             @SuppressWarnings("unchecked")
             Map<Integer, Integer> guestCart =
-                    (Map<Integer, Integer>)
-                    session.getAttribute(
-                            "guestCart"
-                    );
+                    (Map<Integer, Integer>) session.getAttribute("guestCart");
 
-
-            if (guestCart == null
-                    || guestCart.isEmpty()) {
-
-                session.setAttribute(
-                        "cartCount",
-                        0
-                );
-
-                session.removeAttribute(
-                        "cartPreviewItems"
-                );
-
-            } else {
-
-                List<CartItemDTO> cartItems =
-                        cartService.getGuestCartItems(
-                                guestCart
-                        );
-
-
-                session.setAttribute(
-                        "cartCount",
-                        guestCart.size()
-                );
-
-                session.setAttribute(
-                        "cartPreviewItems",
-                        cartItems
-                );
-            }
+            cartSessionService.refreshGuestCartSession(
+                    session,
+                    guestCart
+            );
         }
 
-
-        return "cart_preview";
+        return "/cart/cart_preview";
     }
-    
+
     @PostMapping("/update")
     public String updateQuantity(
-            @RequestParam(value = "optionId", required = false)
-            Integer optionId,
-
-            @RequestParam(value = "quantity", required = false)
-            Integer quantity,
-
+            @RequestParam(value = "optionId", required = false) Integer optionId,
+            @RequestParam(value = "quantity", required = false) Integer quantity,
             Authentication authentication,
             HttpSession session,
             HttpServletResponse response)
@@ -824,17 +417,13 @@ public class CartController {
 
         if (authentication != null
                 && authentication.isAuthenticated()
-                && authentication.getPrincipal()
-                        instanceof CustomUser) {
+                && authentication.getPrincipal() instanceof CustomUser) {
 
             CustomUser customUser =
-                    (CustomUser)
-                    authentication.getPrincipal();
+                    (CustomUser) authentication.getPrincipal();
 
             Long memberNo =
-                    customUser
-                        .getMember()
-                        .getMemberNo();
+                    customUser.getMember().getMemberNo();
 
             cartService.updateQuantity(
                     memberNo,
@@ -842,40 +431,16 @@ public class CartController {
                     quantity
             );
 
-            List<CartItemDTO> cartItems =
-                    cartService.getCartItems(
-                            memberNo
-                    );
-
-            session.setAttribute(
-                    "cartCount",
-                    cartItems.size()
+            cartSessionService.refreshCartSession(
+                    session,
+                    memberNo
             );
 
-
-            if (cartItems.isEmpty()) {
-
-                session.removeAttribute(
-                        "cartPreviewItems"
-                );
-
-            } else {
-
-                session.setAttribute(
-                        "cartPreviewItems",
-                        cartItems
-                );
-            }
-        }
-
-        else {
+        } else {
 
             @SuppressWarnings("unchecked")
             Map<Integer, Integer> guestCart =
-                    (Map<Integer, Integer>)
-                    session.getAttribute(
-                            "guestCart"
-                    );
+                    (Map<Integer, Integer>) session.getAttribute("guestCart");
 
             if (guestCart == null
                     || !guestCart.containsKey(optionId)) {
@@ -888,47 +453,22 @@ public class CartController {
                 return null;
             }
 
-            guestCart.put(
-                    optionId,
-                    quantity
-            );
+            guestCart.put(optionId, quantity);
 
-            List<CartItemDTO> cartItems =
-                    cartService.getGuestCartItems(
-                            guestCart
-                    );
-
-
-            session.setAttribute(
-                    "guestCart",
+            cartSessionService.refreshGuestCartSession(
+                    session,
                     guestCart
             );
-
-            session.setAttribute(
-                    "cartCount",
-                    guestCart.size()
-            );
-
-
-            if (cartItems.isEmpty()) {
-
-                session.removeAttribute(
-                        "cartPreviewItems"
-                );
-
-            } else {
-
-                session.setAttribute(
-                        "cartPreviewItems",
-                        cartItems
-                );
-            }
         }
-        
+
         return "redirect:/cart";
     }
-    
-    @GetMapping("/status")
+
+    @GetMapping(
+            value = "/status",
+            produces = "application/json;charset=UTF-8"
+    )
+    @ResponseBody
     public ResponseEntity<Map<String, Object>> cartStatus(
             Authentication authentication,
             HttpSession session,
@@ -939,89 +479,54 @@ public class CartController {
                 "no-cache, no-store, must-revalidate"
         );
 
-        List<CartItemDTO> cartItems;
-        int cartCount;
-
         if (authentication != null
                 && authentication.isAuthenticated()
-                && authentication.getPrincipal()
-                        instanceof CustomUser) {
+                && authentication.getPrincipal() instanceof CustomUser) {
 
             CustomUser customUser =
-                    (CustomUser)
-                    authentication.getPrincipal();
+                    (CustomUser) authentication.getPrincipal();
 
             Long memberNo =
-                    customUser.getMember()
-                              .getMemberNo();
+                    customUser.getMember().getMemberNo();
 
+            cartSessionService.refreshCartSession(
+                    session,
+                    memberNo
+            );
 
-            cartItems =
-                    cartService.getCartItems(
-                            memberNo
-                    );
-
-            cartCount =
-                    cartItems.size();
-        }
-
-        else {
+        } else {
 
             @SuppressWarnings("unchecked")
             Map<Integer, Integer> guestCart =
-                    (Map<Integer, Integer>)
-                    session.getAttribute(
-                            "guestCart"
-                    );
+                    (Map<Integer, Integer>) session.getAttribute("guestCart");
 
-
-            if (guestCart == null
-                    || guestCart.isEmpty()) {
-
-                cartItems =
-                        new ArrayList<>();
-
-                cartCount = 0;
-
-            } else {
-
-                cartItems =
-                        cartService
-                            .getGuestCartItems(
-                                    guestCart
-                            );
-
-                cartCount =
-                        guestCart.size();
-            }
+            cartSessionService.refreshGuestCartSession(
+                    session,
+                    guestCart
+            );
         }
 
-        session.setAttribute(
-                "cartCount",
-                cartCount
-        );
+        Integer cartCount =
+                (Integer) session.getAttribute("cartCount");
 
-        session.setAttribute(
-                "cartPreviewItems",
-                cartItems
-        );
+        @SuppressWarnings("unchecked")
+        List<CartItemDTO> cartItems =
+                (List<CartItemDTO>) session.getAttribute(
+                        "cartPreviewItems"
+                );
 
-        Map<String, Object> result =
-                new HashMap<>();
+        if (cartCount == null) {
+            cartCount = 0;
+        }
 
-        result.put(
-                "count",
-                cartCount
-        );
+        if (cartItems == null) {
+            cartItems = new ArrayList<>();
+        }
 
-        result.put(
-                "items",
-                cartItems
-        );
+        Map<String, Object> result = new HashMap<>();
+        result.put("count", cartCount);
+        result.put("items", cartItems);
 
-
-        return ResponseEntity.ok(
-                result
-        );
+        return ResponseEntity.ok(result);
     }
 }
