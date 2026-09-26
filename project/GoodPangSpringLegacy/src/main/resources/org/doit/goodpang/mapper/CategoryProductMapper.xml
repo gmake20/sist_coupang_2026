@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <!-- 카테고리 목록 페이지(PLP) 조회 — 구버전 CategoryProductDAO 의 SQL 을 옮김 -->
+  <!-- 컬럼 CATEGORY_NO → 필드 categoryNo 는 mybatis-config.xml 의 mapUnderscoreToCamelCase 가 자동 변환. -->
+  
+  <mapper namespace="org.doit.goodpang.mapper.CategoryProductMapper">
+  
+  <!-- 1. include(4개) : categoryTree, visibleProduct, productWith, productFilterWhere -->
+  
+  <!-- (1) 구버전 CATEGORY_TREE_CONDITION — "이 카테고리 + 그 밑에 딸린 카테고리 전부"
+        START WITH 여기서 출발 → CONNECT BY PRIOR 자식 방향으로 계속 내려감
+        103(중분류) 넣으면 103, 10301, 10302 … / 10301(소분류) 넣으면 자기 자신 하나
+   --> 		 
+  <sql id="categoryTree">
+	P.SUB_CATEGORY_NO IN(
+			SELECT CATEGORY_NO FROM CATEGORY
+			START WITH CATEGORY_NO = #{categoryNo}
+			CONNECT BY PRIOR CATEGORY_NO = PARENT_CATEGORY_NO
+	)
+  </sql>  
+  
+  <!-- (2)  구버전 VISIBLE_PRODUCT_CONDITION — 화면에 보여도 되는 상품만 '품절'은 일부러 안 뺌 (목록에 남기고 회색 처리하기로 확정된 사항) -->
+  <sql id="visibleProduct">
+  	AND P.SALE_STATUS NOT IN('승인 대기', '판매 중지')
+  	AND P.DISPLAY_YN = 'Y'
+  </sql>
+ 
+  <!-- (3) ===== 상품 목록/개수 공통 조각 — 구버전 buildFromHead() 를  WITH절로 다시 씀 ===== -->
+  <!--
+        WITH절 = 서브쿼리를 맨 위로 빼서 이름을 붙여두는 문법 (준비물 먼저, 본문은 짧게)
+        6개 전부 "상품마다 1줄"짜리. 본문에서 LEFT JOIN 이름 으로 불러 씀.
+        개수 SQL 은 OPT·RV 만, 목록 SQL 은 6개 다 씀 (안 부른 건 Oracle 이 실행 안 함)
+  -->
+  <sql id="productWith">
+   WITH
+      <!-- OPT: 상품마다 대표 옵션 1개. 색상 필터 걸면 그 색상 옵션 중 1개 -->
+   OPT AS (
+			SELECT PRODUCT_NO, OPTION_ID, PRICE, NORMAL_PRICE, QUANTITY, OPT_STOCK
+			FROM (
+					SELECT PRODUCT_NO, OPTION_ID, PRICE, NORMAL_PRICE, QUANTITY,
+					SUM(NVL(QUANTITY,0)) OVER (PARTITION BY PRODUCT_NO) AS OPT_STOCK,
+					ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID) AS RN
+					FROM PRODUCT_OPTION
+					<if test="color != null and color.size() > 0">
+					WHERE CASE WHEN OPTION1_TYPE = '색상' THEN OPTION1_VALUE
+							   WHEN OPTION2_TYPE = '색상' THEN OPTION2_VALUE
+							   WHEN OPTION3_TYPE = '색상' THEN OPTION3_VALUE
+						  END IN
+						  <foreach collection="color" item="c" open="(" separator="," close=")">#{c}</foreach>	   
+					</if>
+			)
+   			WHERE RN = 1
+    ),
+    <!-- RV: 상품마다 평균 별점 + 리뷰 수 -->
+    RV AS (
+    		SELECT od.PRODUCT_NO,
+    				ROUND(AVG(r.PRODUCT_RATING), 1) AS AVG_RATING,
+    				COUNT(*) AS REVIEW_COUNT
+    		FROM REVIEW r
+    		JOIN ORDER_DETAIL od ON r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO		
+    		GROUP BY od.PRODUCT_NO
+    ),
+     <!-- IMG: 옵션마다 대표 사진 1장 → OPT 가 고른 옵션의 사진 찾을 때 -->
+    IMG AS (
+              SELECT PRODUCT_NO, OPTION_ID, IMAGE_URL
+              FROM (
+                              SELECT PRODUCT_NO, OPTION_ID, IMAGE_URL,
+                              ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO, OPTION_ID ORDER BY IMAGE_ORDER) AS RN
+                              FROM PRODUCT_IMAGE
+                              WHERE IMAGE_PURPOSE = '대표'
+              )
+              WHERE RN = 1
+    ),
+    <!-- IMG_ANY: 상품마다 첫 사진 1장 → 그 옵션에 사진이 없을 때 대신 씀 -->
+    IMG_ANY AS (
+              SELECT PRODUCT_NO, IMAGE_URL
+              FROM (
+                              SELECT PRODUCT_NO, IMAGE_URL,
+                              ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID, IMAGE_ORDER) AS RN
+                              FROM PRODUCT_IMAGE
+                              WHERE IMAGE_PURPOSE = '대표'
+              )
+              WHERE RN = 1
+    ),
+    <!-- SC: 상품마다 판매량 (주문취소 제외) → 판매량순·랭킹순 -->
+    SC AS (
+              SELECT od.PRODUCT_NO, SUM(od.ORDER_QTY) AS SALE_COUNT
+              FROM ORDER_DETAIL od
+              JOIN ORDERS o ON od.ORDER_NO = o.ORDER_NO
+              WHERE o.ORDER_STATUS != '주문취소'
+              GROUP BY od.PRODUCT_NO
+    ),
+    <!-- OC: 상품마다 옵션 개수 → 랭킹순 마지막 동점 처리용 -->
+    OC AS (
+              SELECT PRODUCT_NO, COUNT(*) AS OPTION_COUNT
+              FROM PRODUCT_OPTION
+              GROUP BY PRODUCT_NO
+    )                
+  </sql>
+  
+   <!-- (4) 필터 조건 — 개수·목록이 반드시 같아야 해서 한 곳에만 둠
+        색상 필터를 걸면 그 색상 옵션이 없는 상품은 OPT 가 비어서(NULL) 여기서 떨어짐
+   -->
+   <sql id="productFilterWhere">
+   	WHERE <include refid="categoryTree"/>
+   		  <include refid="visibleProduct"/>
+    AND (NVL(P.PRODUCT_PRICE, 0) + NVL(OPT.PRICE, 0)) BETWEEN #{minPrice} AND #{maxPrice}
+    AND NVL(RV.AVG_RATING, 0) &gt;=#{rating}
+    <if test="color != null and color.size() > 0">
+    AND OPT.OPTION_ID IS NOT NULL
+    </if>		  	
+   </sql>
+ 
+  <!-- 2. 카테고리 SQL  findCategory / findChildCategories / findBreadcrumb / findSiblingCategories -->
+  
+  <!-- public CategoryDTO findCategory(long categoryNo); 없는 번호면 null -->
+  <select id="findCategory" resultType="org.doit.goodpang.domain.CategoryDTO">
+    SELECT CATEGORY_NO, CATEGORY_NAME, PARENT_CATEGORY_NO, CATEGORY_LEVEL
+    FROM CATEGORY
+    WHERE CATEGORY_NO = #{categoryNo}
+  </select>
+ 
+  <!-- public List<CategoryDTO> findChildCategories(long categoryNo); 중분류 페이지 타일 -->
+  <select id="findChildCategories" resultType="org.doit.goodpang.domain.CategoryDTO">
+    SELECT CATEGORY_NO, CATEGORY_NAME, PARENT_CATEGORY_NO, CATEGORY_LEVEL
+    FROM CATEGORY
+    WHERE PARENT_CATEGORY_NO = #{categoryNo}
+    ORDER BY CATEGORY_NO
+  </select>
+ 
+  <!--
+  public List<CategoryDTO> findBreadcrumb(long categoryNo);
+  현재 카테고리에서 출발해 부모 방향으로 올라감 → ORDER BY CATEGORY_LEVEL 로 [대분류 → … → 현재] 순
+   -->
+  <select id="findBreadcrumb"  resultType="org.doit.goodpang.domain.CategoryDTO">
+    SELECT CATEGORY_NO, CATEGORY_NAME, PARENT_CATEGORY_NO, CATEGORY_LEVEL
+    FROM CATEGORY
+    START WITH CATEGORY_NO = #{categoryNo}
+    CONNECT BY PRIOR PARENT_CATEGORY_NO = CATEGORY_NO
+    ORDER BY CATEGORY_LEVEL
+  </select>
+ 
+  <!--
+  public List<CategoryDTO> findSiblingCategories(long categoryNo);
+  같은 부모를 가진 형제들. 대분류는 부모가 둘 다 NULL 이라 (NULL = NULL 은 거짓)
+  IS NULL 분기로 "다른 대분류들"이 형제로 잡히게 함 (구버전 2026-09-03 수정 그대로)
+  -->
+  <select id="findSiblingCategories"  resultType="org.doit.goodpang.domain.CategoryDTO">
+	SELECT SIB.CATEGORY_NO, SIB.CATEGORY_NAME, SIB.PARENT_CATEGORY_NO, SIB.CATEGORY_LEVEL
+	FROM CATEGORY SELF
+	JOIN CATEGORY SIB ON (SIB.PARENT_CATEGORY_NO = SELF.PARENT_CATEGORY_NO
+						  OR (SIB.PARENT_CATEGORY_NO IS NULL AND SELF.PARENT_CATEGORY_NO IS NULL))
+	WHERE SELF.CATEGORY_NO = #{categoryNo}
+	ORDER BY SIB.CATEGORY_NO					   
+  </select>	
+	
+ <!--  ===== 원본(구버전 DAO) 방식 — UNION 별로인거 같아서 ->  CASE 버전으로 교체(2026-09-26), 비교용으로 남김 =====
+  <select id="findColorOptionsByCategory" resultType="String">
+	SELECT DISTINCT OPTION_VALUE FROM (
+			SELECT PO.OPTION1_VALUE AS OPTION_VALUE
+			FROM PRODUCT_OPTION PO
+			JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
+			WHERE <include refid="categoryTree"></include>
+				  <include refid="visibleProduct"></include>
+				 AND PO.OPTION1_TYPE = '색상' 	
+			UNION
+			SELECT PO.OPTION2_VALUE
+			FROM PRODUCT_OPTION PO
+			JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
+			WHERE <include refid="categoryTree"></include>
+				  <include refid="visibleProduct"></include>
+				 AND PO.OPTION2_TYPE = '색상' 	
+			UNION
+			SELECT PO.OPTION3_VALUE
+			FROM PRODUCT_OPTION PO
+			JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
+			WHERE <include refid="categoryTree"></include>
+				  <include refid="visibleProduct"></include>
+				 AND PO.OPTION3_TYPE = '색상'
+	)
+	WHERE OPTION_VALUE IS NOT NULL
+	ORDER BY OPTION_VALUE
+  </select>	
+  -->
+  
+  <!-- public List<String> findColorOptionsByCategory(long categoryNo); -->
+  <select id="findColorOptionsByCategory" resultType="String">
+    SELECT DISTINCT
+    		CASE WHEN PO.OPTION1_TYPE = '색상' THEN PO.OPTION1_VALUE
+    			 WHEN PO.OPTION2_TYPE = '색상' THEN PO.OPTION2_VALUE
+    			 WHEN PO.OPTION3_TYPE = '색상' THEN PO.OPTION3_VALUE
+    		END AS OPTION_VALUE
+    FROM PRODUCT_OPTION PO
+    JOIN PRODUCT P ON PO.PRODUCT_NO = P.PRODUCT_NO
+    WHERE <include refid="categoryTree"></include>
+    	  <include refid="visibleProduct"></include>
+    	  AND '색상' IN (PO.OPTION1_TYPE, PO.OPTION2_TYPE, PO.OPTION3_TYPE)
+   ORDER BY OPTION_VALUE 	  				 
+  </select>
+  
+  <!-- public int countByCategory(CategorySearchDTO search);  페이지 번호 계산용 전체 개수-->	
+  <select id="countByCategory" resultType="int">
+  	<include refid="productWith"/>
+  	SELECT COUNT(*)
+  	FROM PRODUCT P
+  	LEFT JOIN OPT ON OPT.PRODUCT_NO = P.PRODUCT_NO
+  	LEFT JOIN RV ON RV.PRODUCT_NO = P.PRODUCT_NO
+  	<include refid="productFilterWhere"></include>
+  </select>
+  
+  <!-- public List<CategoryProductDTO> findByCategory(CategorySearchDTO search); -->	
+  <select id="findByCategory" resultType="org.doit.goodpang.domain.CategoryProductDTO">
+      <include refid="productWith"/>
+      SELECT
+              P.PRODUCT_NO,
+              P.PRODUCT_NAME,
+              OPT.OPTION_ID,
+              NVL(IMG.IMAGE_URL, IMG_ANY.IMAGE_URL) AS THUMBNAIL_URL,
+              NVL(P.PRODUCT_PRICE, 0) + NVL(OPT.PRICE, 0) AS SALE_PRICE,
+              CASE WHEN OPT.NORMAL_PRICE IS NOT NULL
+                       THEN NVL(P.PRODUCT_PRICE, 0) + OPT.NORMAL_PRICE END AS NORMAL_PRICE,
+              <!-- 품절: 1/0 숫자로 (MyBatis 가 boolean 으로 바꿀 수 있게. 'Y'/'N' 문자는 못 바꿈) -->
+              <choose>
+                      <when test="color != null and color.size() > 0">
+              CASE WHEN P.SALE_STATUS = '품절' OR NVL(OPT.OPT_STOCK, 0) &lt;= 0 THEN 1 ELSE 0 END AS SOLD_OUT,
+                      </when>
+                      <otherwise>
+              CASE WHEN P.SALE_STATUS = '품절' THEN 1 ELSE 0 END AS SOLD_OUT,
+                      </otherwise>
+              </choose>
+              NVL(RV.AVG_RATING, 0) AS AVG_RATING,
+              NVL(RV.REVIEW_COUNT, 0) AS REVIEW_COUNT,
+              NVL(SC.SALE_COUNT, 0) AS SALE_COUNT
+      FROM PRODUCT P
+      LEFT JOIN OPT     ON OPT.PRODUCT_NO = P.PRODUCT_NO
+      LEFT JOIN IMG     ON IMG.PRODUCT_NO = P.PRODUCT_NO AND IMG.OPTION_ID = OPT.OPTION_ID
+      LEFT JOIN IMG_ANY ON IMG_ANY.PRODUCT_NO = P.PRODUCT_NO
+      LEFT JOIN RV      ON RV.PRODUCT_NO = P.PRODUCT_NO
+      LEFT JOIN SC      ON SC.PRODUCT_NO = P.PRODUCT_NO
+      LEFT JOIN OC      ON OC.PRODUCT_NO = P.PRODUCT_NO
+      <include refid="productFilterWhere"/>
+      <!-- 정렬: sort 값은 DTO normalize() 에서 이미 5개로 걸러짐. 여기서도 5개만 받음(${} 안 씀) -->
+      ORDER BY
+      <choose>
+              <when test="sort == 'PRICE_ASC'">  NVL(P.PRODUCT_PRICE, 0) + NVL(OPT.PRICE, 0) ASC,  P.PRODUCT_NO DESC</when>
+              <when test="sort == 'PRICE_DESC'"> NVL(P.PRODUCT_PRICE, 0) + NVL(OPT.PRICE, 0) DESC, P.PRODUCT_NO DESC</when>
+              <when test="sort == 'SALE_COUNT'"> NVL(SC.SALE_COUNT, 0) DESC, P.PRODUCT_NO DESC</when>
+              <when test="sort == 'RANKING'">
+                      NVL(SC.SALE_COUNT, 0) DESC, NVL(RV.AVG_RATING, 0) DESC,
+                      NVL(RV.REVIEW_COUNT, 0) DESC, NVL(OC.OPTION_COUNT, 0) DESC, P.PRODUCT_NO DESC
+              </when>
+              <otherwise> P.CREATED_DATE DESC, P.PRODUCT_NO DESC</otherwise>
+      </choose>
+      <!-- 페이징: offset 개 건너뛰고 listSize 개만 -->
+      OFFSET #{offset} ROWS FETCH NEXT #{listSize} ROWS ONLY
+  </select>	
+  </mapper>
+  
+  
+  
+  
+  
+
+
+
+
+
+
+  
