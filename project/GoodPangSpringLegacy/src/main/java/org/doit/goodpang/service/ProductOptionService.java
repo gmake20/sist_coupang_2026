@@ -7,12 +7,14 @@ import org.doit.goodpang.domain.ProductOptionDTO;
 import org.doit.goodpang.mapper.ProductImageMapper;
 import org.doit.goodpang.mapper.ProductOptionMapper;
 import org.doit.goodpang.util.ImageUrl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 
 /**
  * 옵션 변경 ajax(/option)의 업무 로직 담당 (Service 계층).
@@ -31,15 +33,15 @@ import com.google.gson.JsonObject;
  * ※ ProductOptionServlet 은 아직 원본 그대로 살아있음.
  */
 @Service
+@Log4j
+@RequiredArgsConstructor
 public class ProductOptionService {
 
     private static final Gson gson = new Gson();
 
-    @Autowired
-    private ProductOptionMapper productOptionMapper;
+    private final ProductOptionMapper productOptionMapper;
     
-    @Autowired
-    private ProductImageMapper productImageMapper;
+    private final ProductImageMapper productImageMapper;
        
 
     /** 옵션 1건. 없으면 null (Handler 가 404 로 처리) */
