@@ -22,5 +22,4 @@ public class MemberVO {
 	  private String email;
 	  private String rank;
 	  private int status;
-	
 }

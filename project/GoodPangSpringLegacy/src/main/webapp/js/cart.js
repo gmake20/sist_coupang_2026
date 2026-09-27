@@ -18,14 +18,101 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	}
 
-	const form =
-	document.createElement("form");
+	const orderBtn =
+	    document.getElementById("btn-order");
 
-	form.method = "post";
+	if (orderBtn) {
 
-	form.action =
-	contextPath + "/cart/checkout";
+	    orderBtn.addEventListener(
+	        "click",
+	        function () {
 
+	            const checkedItems =
+	                document.querySelectorAll(
+	                    ".item-chk:checked"
+	                );
+
+	            if (checkedItems.length === 0) {
+	                alert("구매할 상품을 선택해주세요.");
+	                return;
+	            }
+
+
+	            const form =
+	                document.getElementById(
+	                    "checkout-form"
+	                );
+
+	            form.querySelectorAll(
+	                ".checkout-param"
+	            ).forEach(function(input) {
+	                input.remove();
+	            });
+
+
+	            checkedItems.forEach(
+	                function(checkbox) {
+
+	                    const cartItem =
+	                        checkbox.closest(
+	                            ".cart-item"
+	                        );
+
+
+	                    const optionId =
+	                        cartItem.dataset.optionId;
+
+
+	                    const quantityInput =
+	                        cartItem.querySelector(
+	                            ".cart-quantity"
+	                        );
+
+
+	                    const optionInput =
+	                        document.createElement(
+	                            "input"
+	                        );
+
+	                    optionInput.type = "hidden";
+	                    optionInput.name = "optionId";
+	                    optionInput.value = optionId;
+	                    optionInput.className =
+	                        "checkout-param";
+
+	                    form.appendChild(
+	                        optionInput
+	                    );
+
+
+	                    const quantityHidden =
+	                        document.createElement(
+	                            "input"
+	                        );
+
+	                    quantityHidden.type =
+	                        "hidden";
+
+	                    quantityHidden.name =
+	                        "quantity";
+
+	                    quantityHidden.value =
+	                        quantityInput.value;
+
+	                    quantityHidden.className =
+	                        "checkout-param";
+
+	                    form.appendChild(
+	                        quantityHidden
+	                    );
+	                }
+	            );
+
+
+	            form.submit();
+	        }
+	    );
+	}
 
 	checkedItems.forEach(function (checkbox) {
 

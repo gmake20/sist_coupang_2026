@@ -23,6 +23,12 @@
 	   <put-attribute name="content" value="/WEB-INF/views/product.jsp" /> 
 	   <!-- <put-attribute name="title" value="굿팡 - 상품상세" />  -->
 	</definition>
+	
+	<!-- 카테고리 목록(PLP). CategoryListController 가 "category.list" 를 리턴함 -->
+    <definition name="category.list" extends="shop">
+             <put-attribute name="content" value="/WEB-INF/views/category_list.jsp" />
+             <put-attribute name="topBanner" value="/WEB-INF/views/inc/top_banner.jsp" />
+    </definition>
 
 	<definition name="vendor.login"
 		template="/WEB-INF/views/vendor/login.jsp">

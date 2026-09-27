@@ -1154,7 +1154,7 @@
 
             if (!wrapper) return;
 
-            let html = '<i class="arrow"></i>';
+            let html = '<i class="cart-preview-arrow"></i>';
 
             if (!data.items || data.items.length === 0) {
                 html += '<div class="cart-preview-empty">'
@@ -1247,6 +1247,7 @@
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
     }
+		window.refreshCart = refreshCart;
 
         document.addEventListener('DOMContentLoaded', refreshCart);
         window.addEventListener('focus', refreshCart);

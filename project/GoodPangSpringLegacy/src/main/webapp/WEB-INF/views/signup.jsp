@@ -15,7 +15,7 @@
 <title>회원가입</title>
 
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/signup.css">
+	href="${pageContext.request.contextPath}/resources/css/signup.css">
 </head>
 
 <body>

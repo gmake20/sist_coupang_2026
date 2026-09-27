@@ -8,7 +8,7 @@ import lombok.Setter;
 public class PaymentMethodDTO {
 
     private int paymentMethodNo;
-    private int memberNo;
+    private long memberNo;
 
     private String paymentType;
 

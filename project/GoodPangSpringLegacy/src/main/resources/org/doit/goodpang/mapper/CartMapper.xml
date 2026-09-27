@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.doit.goodpang.mapper.CartMapper">
+
+    <resultMap
+        id="cartItemResultMap"
+        type="org.doit.goodpang.domain.CartItemDTO">
+
+        <result property="memberNo"
+                column="MEMBER_NO" />
+
+        <result property="optionId"
+                column="OPTION_ID" />
+
+        <result property="quantity"
+                column="QUANTITY" />
+
+        <result property="productNo"
+                column="PRODUCT_NO" />
+
+        <result property="productName"
+                column="PRODUCT_NAME" />
+
+        <result property="productPrice"
+                column="PRODUCT_PRICE" />
+
+        <result property="optionPrice"
+                column="OPTION_PRICE" />
+
+        <result property="unitPrice"
+                column="UNIT_PRICE" />
+
+        <result property="imageUrl"
+                column="IMAGE_URL" />
+
+        <result property="option1Type"
+                column="OPTION1_TYPE" />
+
+        <result property="option1Value"
+                column="OPTION1_VALUE" />
+
+        <result property="option2Type"
+                column="OPTION2_TYPE" />
+
+        <result property="option2Value"
+                column="OPTION2_VALUE" />
+
+        <result property="option3Type"
+                column="OPTION3_TYPE" />
+
+        <result property="option3Value"
+                column="OPTION3_VALUE" />
+
+    </resultMap>
+
+
+    <!-- 회원 장바구니 목록 -->
+    <select id="getCartItems"
+            resultMap="cartItemResultMap">
+
+        SELECT
+            c.MEMBER_NO,
+            c.OPTION_ID,
+            c.QUANTITY,
+
+            p.PRODUCT_NO,
+            p.PRODUCT_NAME,
+            p.PRODUCT_PRICE,
+
+            po.OPTION1_TYPE,
+            po.OPTION1_VALUE,
+            po.OPTION2_TYPE,
+            po.OPTION2_VALUE,
+            po.OPTION3_TYPE,
+            po.OPTION3_VALUE,
+
+            NVL(po.PRICE, 0)
+                AS OPTION_PRICE,
+
+            (
+                p.PRODUCT_PRICE
+                + NVL(po.PRICE, 0)
+            ) AS UNIT_PRICE,
+
+            (
+                SELECT pi.IMAGE_URL
+                FROM PRODUCT_IMAGE pi
+                WHERE pi.PRODUCT_NO =
+                      p.PRODUCT_NO
+
+                ORDER BY
+                    CASE
+                        WHEN pi.OPTION_ID =
+                             po.OPTION_ID
+                         AND pi.IMAGE_PURPOSE =
+                             '대표'
+                        THEN 0
+
+                        WHEN pi.OPTION_ID =
+                             po.OPTION_ID
+                        THEN 1
+
+                        WHEN pi.IMAGE_PURPOSE =
+                             '대표'
+                        THEN 2
+
+                        ELSE 3
+                    END
+
+                FETCH FIRST 1 ROW ONLY
+            ) AS IMAGE_URL
+
+        FROM CART c
+
+        JOIN PRODUCT_OPTION po
+          ON c.OPTION_ID =
+             po.OPTION_ID
+
+        JOIN PRODUCT p
+          ON po.PRODUCT_NO =
+             p.PRODUCT_NO
+
+        WHERE c.MEMBER_NO =
+              #{memberNo}
+
+        ORDER BY
+            p.PRODUCT_NO DESC
+
+    </select>
+
+
+    <!-- 장바구니 추가 -->
+    <update id="addCart">
+
+        MERGE INTO CART c
+
+        USING (
+            SELECT
+                #{memberNo}
+                    AS MEMBER_NO,
+
+                #{optionId}
+                    AS OPTION_ID,
+
+                #{quantity}
+                    AS QUANTITY
+
+            FROM DUAL
+        ) src
+
+        ON (
+            c.MEMBER_NO =
+                src.MEMBER_NO
+
+            AND
+
+            c.OPTION_ID =
+                src.OPTION_ID
+        )
+
+        WHEN MATCHED THEN
+            UPDATE SET
+                c.QUANTITY =
+                    c.QUANTITY
+                    + src.QUANTITY
+
+        WHEN NOT MATCHED THEN
+
+            INSERT (
+                MEMBER_NO,
+                OPTION_ID,
+                QUANTITY
+            )
+
+            VALUES (
+                src.MEMBER_NO,
+                src.OPTION_ID,
+                src.QUANTITY
+            )
+
+    </update>
+
+
+    <!-- 수량 변경 -->
+    <update id="updateQuantity">
+
+        UPDATE CART
+
+        SET QUANTITY =
+            #{quantity}
+
+        WHERE MEMBER_NO =
+              #{memberNo}
+
+          AND OPTION_ID =
+              #{optionId}
+
+    </update>
+
+
+    <!-- 한 상품 삭제 -->
+    <delete id="deleteCart">
+
+        DELETE FROM CART
+
+        WHERE MEMBER_NO =
+              #{memberNo}
+
+          AND OPTION_ID =
+              #{optionId}
+
+    </delete>
+
+
+    <!-- optionId 기준 상품 정보 -->
+    <select id="getCartItemByOptionId"
+            resultMap="cartItemResultMap">
+
+        SELECT
+            p.PRODUCT_NO,
+            p.PRODUCT_NAME,
+            p.PRODUCT_PRICE,
+
+            po.OPTION_ID,
+
+            po.OPTION1_TYPE,
+            po.OPTION1_VALUE,
+            po.OPTION2_TYPE,
+            po.OPTION2_VALUE,
+            po.OPTION3_TYPE,
+            po.OPTION3_VALUE,
+
+            NVL(po.PRICE, 0)
+                AS OPTION_PRICE,
+
+            (
+                p.PRODUCT_PRICE
+                + NVL(po.PRICE, 0)
+            ) AS UNIT_PRICE,
+
+            (
+                SELECT pi.IMAGE_URL
+                FROM PRODUCT_IMAGE pi
+                WHERE pi.PRODUCT_NO =
+                      p.PRODUCT_NO
+
+                ORDER BY
+                    CASE
+                        WHEN pi.OPTION_ID =
+                             po.OPTION_ID
+                         AND pi.IMAGE_PURPOSE =
+                             '대표'
+                        THEN 0
+
+                        WHEN pi.OPTION_ID =
+                             po.OPTION_ID
+                        THEN 1
+
+                        WHEN pi.IMAGE_PURPOSE =
+                             '대표'
+                        THEN 2
+
+                        ELSE 3
+                    END
+
+                FETCH FIRST 1 ROW ONLY
+            ) AS IMAGE_URL
+
+        FROM PRODUCT_OPTION po
+
+        JOIN PRODUCT p
+          ON po.PRODUCT_NO =
+             p.PRODUCT_NO
+
+        WHERE po.OPTION_ID =
+              #{optionId}
+
+    </select>
+
+
+    <!-- 회원 장바구니 개수 -->
+    <select id="getCartCount"
+            resultType="int">
+
+        SELECT COUNT(*)
+
+        FROM CART
+
+        WHERE MEMBER_NO =
+              #{memberNo}
+
+    </select>
+
+
+    <!-- 선택 상품 삭제 -->
+    <delete id="deleteSelected">
+
+        DELETE FROM CART
+
+        WHERE MEMBER_NO =
+              #{memberNo}
+
+          AND OPTION_ID IN
+
+        <foreach
+            collection="optionIds"
+            item="optionId"
+            open="("
+            separator=","
+            close=")">
+
+            #{optionId}
+
+        </foreach>
+
+    </delete>
+
+
+    <!-- 비회원 장바구니 상품 -->
+    <select id="getGuestCartItems"
+            resultMap="cartItemResultMap">
+
+        SELECT
+            po.OPTION_ID,
+
+            p.PRODUCT_NO,
+            p.PRODUCT_NAME,
+            p.PRODUCT_PRICE,
+
+            NVL(po.PRICE, 0)
+                AS OPTION_PRICE,
+
+            (
+                p.PRODUCT_PRICE
+                + NVL(po.PRICE, 0)
+            ) AS UNIT_PRICE,
+
+            po.OPTION1_TYPE,
+            po.OPTION1_VALUE,
+            po.OPTION2_TYPE,
+            po.OPTION2_VALUE,
+            po.OPTION3_TYPE,
+            po.OPTION3_VALUE,
+
+            (
+                SELECT pi.IMAGE_URL
+                FROM PRODUCT_IMAGE pi
+
+                WHERE pi.PRODUCT_NO =
+                      p.PRODUCT_NO
+
+                ORDER BY
+                    CASE
+                        WHEN pi.OPTION_ID =
+                             po.OPTION_ID
+                         AND pi.IMAGE_PURPOSE =
+                             '대표'
+                        THEN 0
+
+                        WHEN pi.OPTION_ID =
+                             po.OPTION_ID
+                        THEN 1
+
+                        WHEN pi.IMAGE_PURPOSE =
+                             '대표'
+                        THEN 2
+
+                        ELSE 3
+                    END
+
+                FETCH FIRST 1 ROW ONLY
+            ) AS IMAGE_URL
+
+        FROM PRODUCT_OPTION po
+
+        JOIN PRODUCT p
+          ON p.PRODUCT_NO =
+             po.PRODUCT_NO
+
+        WHERE po.OPTION_ID IN
+
+        <foreach
+            collection="optionIds"
+            item="optionId"
+            open="("
+            separator=","
+            close=")">
+
+            #{optionId}
+
+        </foreach>
+
+    </select>
+
+
+    <!-- 회원 장바구니 전체 삭제 -->
+    <delete id="clearCart">
+
+        DELETE FROM CART
+
+        WHERE MEMBER_NO =
+              #{memberNo}
+
+    </delete>
+
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.doit.goodpang.mapper.WowPaymentMapper">
+
+    <!-- 와우 멤버십 결제 -->
+    <insert id="insertPayment">
+        INSERT INTO WOW_PAYMENT (
+            WOW_PAYMENT_NO,
+            WOW_MEMBERSHIP_NO,
+            MEMBER_NO,
+            PAYMENT_METHOD_NO,
+            PAYMENT_AMOUNT,
+            PAYMENT_DATE,
+            PAYMENT_STATUS,
+            PAYMENT_TYPE
+        )
+        VALUES (
+            SEQ_WOW_PAYMENT_NO.NEXTVAL,
+            #{wowMembershipNo},
+            #{memberNo},
+            #{paymentMethodNo},
+            #{amount},
+            SYSDATE,
+            #{paymentStatus},
+            #{paymentType}
+        )
+    </insert>
+
+
+    <!-- 와우 멤버십 해지 예약 -->
+    <update id="cancelMembership">
+        UPDATE WOW_MEMBERSHIP
+           SET STATUS = 'CANCEL_PENDING',
+               AUTO_PAYMENT_YN = 'N',
+               CANCEL_DATE = SYSDATE
+         WHERE MEMBER_NO = #{memberNo}
+           AND STATUS = 'ACTIVE'
+    </update>
+
+</mapper>

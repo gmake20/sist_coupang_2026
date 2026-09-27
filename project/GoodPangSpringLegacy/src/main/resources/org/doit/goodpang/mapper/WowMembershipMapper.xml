@@ -1,16 +1,185 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE mapper
-    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.doit.goodpang.mapper.WowMembershipMapper">
 
+
+    <!-- 현재 와우 회원 여부 -->
     <select id="isWowMember"
             resultType="int">
 
         SELECT COUNT(*)
         FROM WOW_MEMBERSHIP
         WHERE MEMBER_NO = #{memberNo}
+          AND STATUS IN (
+              'ACTIVE',
+              'CANCEL_PENDING'
+          )
+
+    </select>
+
+
+    <!-- 회원 탈퇴 차단 여부 -->
+    <select id="isWithdrawalBlocked"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM WOW_MEMBERSHIP
+        WHERE MEMBER_NO = #{memberNo}
+          AND STATUS = 'ACTIVE'
+
+    </select>
+
+
+    <!-- 다음 결제일 -->
+    <select id="nextPaymentDate"
+            resultType="java.util.Date">
+
+        SELECT NEXT_PAYMENT_DATE
+        FROM WOW_MEMBERSHIP
+        WHERE MEMBER_NO = #{memberNo}
+
+    </select>
+
+
+    <!-- 해지 예정 여부 -->
+    <select id="isCancelPending"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM WOW_MEMBERSHIP
+        WHERE MEMBER_NO = #{memberNo}
+          AND STATUS = 'CANCEL_PENDING'
+
+    </select>
+
+
+    <!-- 회원 멤버십 조회 -->
+    <select id="findByMemberNo"
+            resultType="org.doit.goodpang.domain.WowMembershipDTO">
+
+        SELECT
+            WOW_MEMBERSHIP_NO,
+            MEMBER_NO,
+            STATUS,
+            START_DATE,
+            NEXT_PAYMENT_DATE,
+            CANCEL_DATE,
+            END_DATE,
+            AUTO_PAYMENT_YN,
+            PAYMENT_METHOD_NO
+        FROM WOW_MEMBERSHIP
+        WHERE MEMBER_NO = #{memberNo}
+
+    </select>
+
+
+    <!-- 멤버십 번호 생성 -->
+    <select id="getNextMembershipNo"
+            resultType="int">
+
+        SELECT
+            SEQ_WOW_MEMBERSHIP_NO.NEXTVAL
+        FROM DUAL
+
+    </select>
+
+
+    <!-- 신규 멤버십 가입 -->
+    <insert id="insertMembership">
+
+        INSERT INTO WOW_MEMBERSHIP (
+            WOW_MEMBERSHIP_NO,
+            MEMBER_NO,
+            STATUS,
+            START_DATE,
+            NEXT_PAYMENT_DATE,
+            END_DATE,
+            AUTO_PAYMENT_YN,
+            PAYMENT_METHOD_NO
+        )
+        VALUES (
+            #{wowMembershipNo},
+            #{memberNo},
+            'ACTIVE',
+            SYSDATE,
+            ADD_MONTHS(SYSDATE, 1),
+            ADD_MONTHS(SYSDATE, 1),
+            'Y',
+            #{paymentMethodNo}
+        )
+
+    </insert>
+
+
+    <!-- 멤버십 해지 -->
+    <update id="cancelMembership">
+
+        UPDATE WOW_MEMBERSHIP
+           SET STATUS = 'CANCEL_PENDING',
+               AUTO_PAYMENT_YN = 'N',
+               CANCEL_DATE = SYSDATE
+         WHERE MEMBER_NO = #{memberNo}
+           AND STATUS = 'ACTIVE'
+
+    </update>
+
+
+    <!-- 멤버십 재활성화 -->
+    <update id="reactivateMembership">
+
+        UPDATE WOW_MEMBERSHIP
+           SET STATUS = 'ACTIVE',
+               START_DATE = SYSDATE,
+               NEXT_PAYMENT_DATE =
+                   ADD_MONTHS(SYSDATE, 1),
+               END_DATE =
+                   ADD_MONTHS(SYSDATE, 1),
+               CANCEL_DATE = NULL,
+               AUTO_PAYMENT_YN = 'Y',
+               PAYMENT_METHOD_NO =
+                   #{paymentMethodNo}
+         WHERE MEMBER_NO = #{memberNo}
+           AND STATUS IN (
+               'EXPIRED',
+               'SUSPENDED'
+           )
+
+    </update>
+
+
+    <!-- 멤버십 상세 조회 -->
+    <select id="getMembershipDetail"
+            resultType="org.doit.goodpang.domain.WowMembershipDTO">
+
+        SELECT
+            WM.WOW_MEMBERSHIP_NO,
+            WM.MEMBER_NO,
+            WM.STATUS,
+            WM.START_DATE,
+            WM.NEXT_PAYMENT_DATE,
+            WM.CANCEL_DATE,
+            WM.END_DATE,
+            WM.AUTO_PAYMENT_YN,
+            WM.PAYMENT_METHOD_NO,
+
+            PM.PAYMENT_TYPE,
+            PM.BANK_CODE,
+            PM.ACCOUNT_LAST4,
+            PM.ACCOUNT_HOLDER,
+            PM.CARD_COMPANY,
+            PM.CARD_LAST4
+
+        FROM WOW_MEMBERSHIP WM
+
+        LEFT JOIN PAYMENT_METHOD PM
+               ON WM.PAYMENT_METHOD_NO =
+                  PM.PAYMENT_METHOD_NO
+
+        WHERE WM.MEMBER_NO = #{memberNo}
 
     </select>
 

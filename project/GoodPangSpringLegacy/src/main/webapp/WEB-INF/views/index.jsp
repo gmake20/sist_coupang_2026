@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec"
+uri="http://www.springframework.org/security/tags" %>
 
 <%-- 메인페이지 전용 CSS (공통 reset/common 은 layout_shop.jsp 에 있음) --%>
 <link rel="stylesheet"
@@ -3306,6 +3308,7 @@
 
 			</div>
 
+			<sec:authorize access="isAuthenticated()" var="isLogin" />
 
 			<!-- 버튼 -->
 			<div class="wow-modal-buttons">
@@ -3377,8 +3380,7 @@
 
 				<div class="wow-join-buttons">
 					<button type="button" id="wowJoinCancelBtn" class="wow-join-cancel">취소</button>
-					<button type="button" id="wowJoinNextBtn" class="wow-join-submit">와우
-						멤버십 가입하기</button>
+					<button type="button" id="wowJoinNextBtn" class="wow-join-submit">와우 멤버십 가입하기</button>
 				</div>
 			</div>
 
@@ -3397,6 +3399,7 @@
 				      method="post"
 				      id="wowPaymentForm">
 				
+					  <sec:csrfInput/>
 				    <input type="hidden" name="joinMode" value="modal">
 					<!-- 기존 결제수단 목록 -->
 					<div id="wowPaymentMethodList" class="wow-payment-method-list">
@@ -3507,13 +3510,17 @@
 			</form>
 		</div>
 	</div>
+	
 
 	<script>
-const isLogin =
+/*const isLogin =
     ${not empty sessionScope.loginMember};
 
-/* const isWowMember = ${sessionScope.wowMember}; */
-const isWowMember = ${sessionScope.wowMember == true};
+ const isWowMember = ${sessionScope.wowMember}; 
+const isWowMember = ${sessionScope.wowMember == true};*/
+
+const isLogin = ${isLogin};
+const isWowMember = ${wowMember eq true};
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -3910,7 +3917,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert(error.message);
         }
     });
-    async function loadWowPaymentMethods() {
+/*    async function loadWowPaymentMethods() {
 
         paymentMethodList.innerHTML =
             "결제수단을 불러오는 중입니다...";
@@ -3937,7 +3944,54 @@ document.addEventListener("DOMContentLoaded", function () {
         const html = await response.text();
 
         paymentMethodList.innerHTML = html;
-    }
+    }*/
+	
+	async function loadWowPaymentMethods() {
+
+	    const response = await fetch(
+	        "${pageContext.request.contextPath}/wow/payment-method",
+	        {
+	            method: "GET"
+	        }
+	    );
+
+	    console.log(
+	        "/wow/payment-method status =",
+	        response.status
+	    );
+
+	    if (response.status === 401) {
+
+	        window.location.href =
+	            "${pageContext.request.contextPath}/login";
+
+	        throw new Error(
+	            "로그인이 필요합니다."
+	        );
+	    }
+
+	    if (!response.ok) {
+
+	        const text =
+	            await response.text();
+
+	        console.error(
+	            "서버 응답:",
+	            text
+	        );
+
+	        throw new Error(
+	            "결제수단 조회 실패: "
+	            + response.status
+	        );
+	    }
+
+	    const html =
+	        await response.text();
+
+	    paymentMethodList.innerHTML =
+	        html;
+	}
     
     const wowPaymentForm = document.getElementById("wowPaymentForm");
 

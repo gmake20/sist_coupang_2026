@@ -44,4 +44,37 @@ public class AddressService {
 
         return addressMapper.insertAddress(dto);
     }
+    
+    public List<AddressDTO> getAddressList(
+            Long memberNo) {
+        return addressMapper.getAddressList(
+                memberNo
+        );
+    }
+    
+    public AddressDTO getAddressForEdit(
+            Integer addressNo,
+            Long memberNo) {
+
+        return addressMapper.getAddressForEdit(
+                addressNo,
+                memberNo
+        );
+    }
+
+    public int updateAddress(AddressDTO dto) {
+
+        return addressMapper.updateAddress(dto);
+    }
+    
+    public AddressDTO editGetAddress(
+            int addressNo,
+            Long memberNo) {
+
+        return addressMapper.editGetAddress(
+                addressNo,
+                memberNo
+        );
+    }
+
 }

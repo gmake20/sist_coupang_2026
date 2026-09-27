@@ -18,29 +18,199 @@ public class PaymentMethodService {
     private final PaymentMethodMapper paymentMethodMapper;
 
 
-    @Transactional(readOnly = true)
+    // 계좌 목록
+    public List<PaymentMethodDTO> getBankMethods(
+            Long memberNo) {
+
+        return paymentMethodMapper
+                .getBankAccounts(memberNo);
+    }
+
+
+    // 카드 목록
+    public List<PaymentMethodDTO> getCardMethods(
+            Long memberNo) {
+
+        return paymentMethodMapper
+                .getCards(memberNo);
+    }
+
     public List<PaymentMethodDTO> getPaymentMethods(
-            long memberNo) {
+            Long memberNo) {
 
         return paymentMethodMapper
                 .getPaymentMethods(memberNo);
     }
 
-
-    @Transactional(readOnly = true)
-    public List<PaymentMethodDTO> getBankMethods(
-            long memberNo) {
+    public boolean existsPaymentMethod(
+            Long memberNo,
+            int paymentMethodNo) {
 
         return paymentMethodMapper
-                .getBankMethods(memberNo);
+                .existsPaymentMethod(
+                        memberNo,
+                        paymentMethodNo
+                ) > 0;
     }
 
 
-    @Transactional(readOnly = true)
-    public List<PaymentMethodDTO> getCardMethods(
-            long memberNo) {
+    // 결제수단 단건 조회
+    public PaymentMethodDTO findPaymentMethod(
+            Long memberNo,
+            int paymentMethodNo) {
 
         return paymentMethodMapper
-                .getCardMethods(memberNo);
+                .findPaymentMethod(
+                        memberNo,
+                        paymentMethodNo
+                );
+    }
+
+    @Transactional
+    public int insertBankAccount(
+            PaymentMethodDTO dto) {
+
+        log.info(
+                "계좌 등록 memberNo : "
+                + dto.getMemberNo()
+        );
+
+
+        if (dto.isPaymentDefault()) {
+
+            paymentMethodMapper.clearDefault(
+                    Long.valueOf(dto.getMemberNo()),
+                    "BANK"
+            );
+        }
+
+
+        return paymentMethodMapper
+                .insertBankAccount(dto);
+    }
+
+    @Transactional
+    public int insertCard(
+            PaymentMethodDTO dto) {
+
+        log.info(
+                "카드 등록 memberNo : "
+                + dto.getMemberNo()
+        );
+
+
+        if (dto.isPaymentDefault()) {
+
+            paymentMethodMapper.clearDefault(
+                    Long.valueOf(dto.getMemberNo()),
+                    "CARD"
+            );
+        }
+
+
+        return paymentMethodMapper
+                .insertCard(dto);
+    }
+
+    @Transactional
+    public int insertPaymentMethod(
+            PaymentMethodDTO dto) {
+
+        if (dto.isPaymentDefault()) {
+
+            paymentMethodMapper.clearDefault(
+                    Long.valueOf(dto.getMemberNo()),
+                    dto.getPaymentType()
+            );
+        }
+
+
+        return paymentMethodMapper
+                .insertPaymentMethod(dto);
+    }
+
+    @Transactional
+    public int setDefault(
+            Long memberNo,
+            int paymentMethodNo) {
+
+        PaymentMethodDTO paymentMethod =
+                paymentMethodMapper
+                        .findPaymentMethod(
+                                memberNo,
+                                paymentMethodNo
+                        );
+
+
+        if (paymentMethod == null) {
+
+            throw new IllegalArgumentException(
+                    "결제수단을 찾을 수 없습니다."
+            );
+        }
+
+        paymentMethodMapper.clearDefault(
+                memberNo,
+                paymentMethod.getPaymentType()
+        );
+
+        return paymentMethodMapper.setDefault(
+                memberNo,
+                paymentMethodNo
+        );
+    }
+    
+    @Transactional
+    public int addPaymentMethod(
+            PaymentMethodDTO dto) {
+
+        if (dto.isPaymentDefault()) {
+
+            paymentMethodMapper
+                    .clearDefault(
+                            dto.getMemberNo(),
+                            dto.getPaymentType()
+                    );
+        }
+
+
+        int result;
+
+
+        if ("BANK".equals(
+                dto.getPaymentType())) {
+
+            result =
+                    paymentMethodMapper
+                            .insertBankAccount(
+                                    dto
+                            );
+
+        } else if ("CARD".equals(
+                dto.getPaymentType())) {
+
+            result =
+                    paymentMethodMapper
+                            .insertCard(
+                                    dto
+                            );
+
+        } else {
+
+            throw new IllegalArgumentException(
+                    "지원하지 않는 결제수단입니다."
+            );
+        }
+
+
+        if (result <= 0) {
+
+            throw new IllegalStateException(
+                    "결제수단 등록에 실패했습니다."
+            );
+        }	
+
+
+        return result;
     }
 }
