@@ -14,9 +14,9 @@
 <meta charset="UTF-8">
 <title>리뷰관리</title>
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/review_list.css">
 <link rel="stylesheet"
@@ -24,14 +24,14 @@
 </head>
 
 <body>
-	<%-- <jsp:include page="/inc/header.jsp" /> --%>
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<div class="mypang-layout">
 
 		<!-- 리뷰관리 메뉴 파란색 활성화 -->
-		<%--  <jsp:include page="/inc/left_banner.jsp">
+		<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views//inc/left_banner.jsp">
 			<jsp:param name="activeMenu" value="review" />
-		</jsp:include> --%>
+		</jsp:include>
 		<!-- 중앙 리뷰관리 -->
 		<main class="review-page">
 			<h1 class="review-title">리뷰관리</h1>
@@ -260,15 +260,12 @@
 			</c:if>
 		</main>
 
-		<%--
 		<aside class="review-right-banner">
-			<jsp:include page="/inc/right_banner.jsp" />
+			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views//inc/right_banner.jsp" />
 		</aside>
-		
-				--%>
 	</div>
 
-	<%-- <jsp:include page="/inc/footer.jsp" /> --%>
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
 	<div id="reviewImageModal" class="review-image-modal"
 		onclick="closeReviewImage()">
 		<div class="review-image-modal-content"
