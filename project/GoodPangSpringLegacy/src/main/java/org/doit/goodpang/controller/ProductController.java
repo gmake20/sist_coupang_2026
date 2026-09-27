@@ -1,17 +1,17 @@
 package org.doit.goodpang.controller;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.doit.goodpang.domain.ProductDTO;
 import org.doit.goodpang.domain.ProductImageDTO;
 import org.doit.goodpang.domain.ProductOptionDTO;
+import org.doit.goodpang.domain.ReviewDTO2;
+import org.doit.goodpang.domain.ReviewRatingSummaryDTO;
 import org.doit.goodpang.service.ProductOptionService;
 import org.doit.goodpang.service.ProductService;
+import org.doit.goodpang.service.ReviewService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +30,8 @@ public class ProductController {
 	private final ProductService productService;
 
 	private final ProductOptionService productOptionService;
+	
+	private final ReviewService reviewService;
 
 	/** ① 경로형 — /product/131 */
 	@GetMapping("/product/{productNo}")
@@ -120,17 +122,28 @@ public class ProductController {
 		 *   null 로 두면 "width: %" 가 되므로 0 으로 채운 Map 을 넣음.
 		 *   담당자 Mapper 가 생기면 아래 4줄을 ProductService 호출로 바꾸면 됨.
 		 */
-		Map<String, Integer> emptyReviewStats = new LinkedHashMap<>();
-		emptyReviewStats.put("bestPercent", 0);
-		emptyReviewStats.put("goodPercent", 0);
-		emptyReviewStats.put("normalPercent", 0);
-		emptyReviewStats.put("poorPercent", 0);
-		emptyReviewStats.put("badPercent", 0);
+		/*
+		 * Map<String, Integer> emptyReviewStats = new LinkedHashMap<>();
+		 * emptyReviewStats.put("bestPercent", 0); emptyReviewStats.put("goodPercent",
+		 * 0); emptyReviewStats.put("normalPercent", 0);
+		 * emptyReviewStats.put("poorPercent", 0); emptyReviewStats.put("badPercent",
+		 * 0);
+		 * 
+		 * model.addAttribute("reviews", new ArrayList<>());
+		 * model.addAttribute("reviewStats", emptyReviewStats);
+		 * model.addAttribute("reviewCount", 0); model.addAttribute("avgRating", 0.0);
+		 */
+		
+		List<ReviewDTO2> reviews =
+		        reviewService.selectReviewsByProductNo(productNo);
 
-		model.addAttribute("reviews", new ArrayList<>());
-		model.addAttribute("reviewStats", emptyReviewStats);
-		model.addAttribute("reviewCount", 0);
-		model.addAttribute("avgRating", 0.0);
+		ReviewRatingSummaryDTO reviewStats =
+		        reviewService.getRatingSummary(productNo);
+
+		model.addAttribute("reviews", reviews);
+		model.addAttribute("reviewStats", reviewStats);
+		model.addAttribute("reviewCount", reviewStats.getReviewCount());
+		model.addAttribute("avgRating", reviewStats.getAvgRating());
 
 		return "product.detail";
 	}
@@ -165,7 +178,4 @@ public class ProductController {
 			return null;
 		}
 	}
-
-
-
 }

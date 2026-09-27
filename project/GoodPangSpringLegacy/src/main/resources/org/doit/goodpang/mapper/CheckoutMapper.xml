@@ -246,6 +246,50 @@
             ci.CHECKOUT_ITEM_NO
 
     </select>
+    
+    <insert id="insertCheckout">
+    INSERT INTO CHECKOUT (
+        CHECKOUT_NO,
+        MEMBER_NO,
+        CREATED_AT,
+        PRODUCT_AMOUNT,
+        INSTANT_DISCOUNT,
+        COUPON_DISCOUNT,
+        CASH_USED,
+        DELIVERY_FEE,
+        TOTAL_PRICE
+    )
+    VALUES (
+        #{checkoutNo},
+        #{memberNo},
+        SYSDATE,
+        #{productAmount},
+        #{instantDiscount},
+        #{couponDiscount},
+        #{cashUsed},
+        #{deliveryFee},
+        #{totalPrice}
+    )
+</insert>
+
+<insert id="insertCheckoutItem">
+    INSERT INTO CHECKOUT_ITEM (
+        CHECKOUT_ITEM_NO,
+        CHECKOUT_NO,
+        PRODUCT_NO,
+        OPTION_ID,
+        ORDER_QTY,
+        PRICE
+    )
+    VALUES (
+        SEQ_CHECKOUT_ITEM_NO.NEXTVAL,
+        #{checkoutNo},
+        #{productNo},
+        #{optionId, jdbcType=NUMERIC},
+        #{quantity},
+        #{price}
+    )
+</insert>
 
     <insert
         id="createCheckout"
@@ -601,6 +645,11 @@
               #{productNo}
 
     </select>
+    
+    <select id="getNextCheckoutNo" resultType="int">
+    SELECT SEQ_CHECKOUT_NO.NEXTVAL
+    FROM DUAL
+</select>
 
 
     <select

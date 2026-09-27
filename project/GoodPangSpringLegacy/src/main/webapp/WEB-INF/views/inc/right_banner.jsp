@@ -98,32 +98,32 @@
     <ul class="order-promotion-banner">
         <li>
             <a href="${pageContext.request.contextPath}/" class="order-ad-link">
-                <img src="${pageContext.request.contextPath}/images/ads/beauty.png" alt="오늘의 뷰티 특가">
+                <img src="${pageContext.request.contextPath}/resources/images/ads/beauty.png" alt="오늘의 뷰티 특가">
             </a>
         </li>
         <li>
             <a href="${pageContext.request.contextPath}/" class="order-ad-link">
-                <img src="${pageContext.request.contextPath}/images/ads/fresh.png" alt="신선식품 로켓프레시">
+                <img src="${pageContext.request.contextPath}/resources/images/ads/fresh.png" alt="신선식품 로켓프레시">
             </a>
         </li>
         <li>
             <a href="${pageContext.request.contextPath}/" class="order-ad-link">
-                <img src="${pageContext.request.contextPath}/images/ads/only.png" alt="GoodPang 단독 상품">
+                <img src="${pageContext.request.contextPath}/resources/images/ads/only.png" alt="GoodPang 단독 상품">
             </a>
         </li>
         <li>
             <a href="${pageContext.request.contextPath}/" class="order-ad-link">
-                <img src="${pageContext.request.contextPath}/images/ads/tech.png" alt="디지털 인기상품">
+                <img src="${pageContext.request.contextPath}/resources/images/ads/tech.png" alt="디지털 인기상품">
             </a>
         </li>
         <li>
             <a href="${pageContext.request.contextPath}/wow/join" class="order-ad-link">
-                <img src="${pageContext.request.contextPath}/images/ads/wow.png" alt="와우회원 전용 혜택">
+                <img src="${pageContext.request.contextPath}/resources/images/ads/wow.png" alt="와우회원 전용 혜택">
             </a>
         </li>
         <li>
             <a href="${pageContext.request.contextPath}/" class="order-ad-link">
-                <img src="${pageContext.request.contextPath}/images/ads/seller.png" alt="GoodPang 판매자 모집">
+                <img src="${pageContext.request.contextPath}/resources/images/ads/seller.png" alt="GoodPang 판매자 모집">
             </a>
         </li>
     </ul>

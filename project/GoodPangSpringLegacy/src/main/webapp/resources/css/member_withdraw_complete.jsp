@@ -11,7 +11,7 @@
 </head>
 <body>
 
-<jsp:include page="/inc/header.jsp" />
+<%-- <jsp:include page="/inc/header.jsp" /> --%>
 
 <div class="withdraw-page">
     <div class="withdraw-layout">
@@ -53,13 +53,13 @@
         </main>
 
         <div class="withdraw-right-banner">
-            <jsp:include page="/inc/right_banner.jsp" />
+            <!-- < jsp:include page="/inc/right_banner.jsp" /> -->
         </div>
 
     </div>
 </div>
 
-<jsp:include page="/inc/footer.jsp" />
+<%-- <jsp:include page="/inc/footer.jsp" /> --%>
 
 </body>
 </html>

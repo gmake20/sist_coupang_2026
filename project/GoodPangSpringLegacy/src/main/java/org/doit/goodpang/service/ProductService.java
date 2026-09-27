@@ -13,13 +13,15 @@ import org.doit.goodpang.mapper.ProductImageMapper;
 import org.doit.goodpang.mapper.ProductMapper;
 import org.doit.goodpang.mapper.ProductOptionMapper;
 import org.doit.goodpang.util.ImageUrl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 
 
 
@@ -39,6 +41,8 @@ import com.google.gson.JsonObject;
  */
 
 @Service
+@Log4j
+@RequiredArgsConstructor
 public class ProductService {
 
     private static final Gson gson = new Gson();
@@ -46,14 +50,11 @@ public class ProductService {
     /** 적립 혜택 비율 — 실제 적립 정책 테이블이 없어서 판매가의 5% 로 임의 계산 중 */
     private static final int REWARD_RATE_PERCENT = 5;
 
-    @Autowired
-    private ProductMapper productMapper;
+    private final ProductMapper productMapper;
     
-    @Autowired
-    private ProductOptionMapper productOptionMapper;
+    private final ProductOptionMapper productOptionMapper;
     
-    @Autowired
-    private ProductImageMapper productImageMapper;
+    private final ProductImageMapper productImageMapper;
 
 	/* private final ReviewDAO reviewDAO = new ReviewDAO(); */
 	/* private final ProductViewLogDAO viewLogDAO = new ProductViewLogDAO(); */

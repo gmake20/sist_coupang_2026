@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <%-- 상세페이지 전용 CSS (reset/common 은 layout_shop.jsp 에 있음) --%>
@@ -1083,7 +1084,11 @@
 												<div class="meta">
 													<span class="star-rating" aria-label="별점 ${r.rating}점">
 														<em style="width:${r.rating * 20}%"></em>
-													</span> <span class="date"> ${r.reviewDate} </span>
+													</span>
+													<!-- <span class="date"> ${r.reviewDate} </span>-->
+													<span class="date">
+													    <fmt:formatDate value="${r.reviewDate}" pattern="yyyy-MM-dd HH:mm"/>
+													</span>
 												</div>
 											</div>
 										</div>

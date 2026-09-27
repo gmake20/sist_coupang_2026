@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -6,6 +5,12 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
+
+<%-- 카테고리 전용 CSS (reset/common 은 layout_shop.jsp 에 있음) --%>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/main.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/category.css">
+
+<%-- 
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -28,12 +33,12 @@
 </head>
 
 <body class="page-category">
-
+ --%>
 	<%-- 상단 띠배너 — index.html 21~27번 줄과 완전히 동일한 마크업 재사용(2026-09-01).
 	     header.jsp 안에는 이 배너가 없고, index.html 이 header include 앞에 직접 넣어둔 걸 그대로 가져옴.
 	     CSS(.coupang-top-banner, .top-banner-placeholder)와 배너 이미지(top-1.jpg/top-2.jpg)는
 	     common.css/main.css 에 이미 있는 걸 그대로 씀 — 새로 만든 것 없음 --%>
-	<div class="coupang-top-banner">
+	<!-- <div class="coupang-top-banner">
 		<div class="banner-middle">
 			<a href="#"> <span class="top-banner-placeholder"
 				style="background: #b5f3fe; color: #0b3d5c"> 오늘 밤 12시까지 주문해도
@@ -42,7 +47,7 @@
 				style="background: #80daff; color: #0b2d45"> 김원훈의 모발관리템 <i
 					class="arrow"></i></span></a>
 		</div>
-	</div>
+	</div> -->
 
 	<%-- <jsp:include page="/inc/header.jsp" /> --%>
 
@@ -53,13 +58,16 @@
 	     같은 파라미터가 두 번(listSize=기존값&...&listSize=새값) 들어가서 서블릿이 앞의(기존) 값을
 	     먼저 읽어버려 토글이 안 먹힘. 대신 아래 각 링크마다 "&listSize=${listSize}" 를 직접 붙임
 	     (60/120 토글 두 줄만 리터럴 60/120 을 씀) --%>
-	<c:url var="baseUrl" value="/category">
-		<c:param name="categoryNo" value="${categoryNo}" />
+	<c:url var="baseUrl" value="/category/${categoryNo}">
+		<%-- <c:param name="categoryNo" value="${categoryNo}" /> --%>
 		<c:forEach var="c" items="${selectedColors}">
 			<c:param name="color" value="${c}" />
 		</c:forEach>
 	</c:url>
-
+	<%-- 경로형(/category/103)은 색상을 안 고르면 baseUrl 에 "?" 가 없음 →
+           뒤에 붙일 첫 글자를 골라줌: "?" 있으면 "&", 없으면 "?" --%>
+    <c:set var="sep" value="${fn:contains(baseUrl, '?') ? '&' : '?'}" />
+	
 	<%-- 필터가 하나라도 선택돼 있는지 — "전체해제" 버튼과 "선택한 필터" 줄을 보여줄지 결정하는 데만 씀 --%>
 	<c:set var="hasActiveFilter"
 		value="${not empty selectedColors || rating > 0 || minPrice > 0 || not empty maxPrice}" />
@@ -77,7 +85,7 @@
 				     "current" 클래스는 그대로 둬서 색상 등 스타일 구분은 유지.
 				     2026-09-03: current 판정을 "레벨3이면" → "지금 보고 있는 번호와 같으면" 으로 바꿈.
 				     중분류 페이지는 마지막 칸이 레벨2라 예전 조건으론 아무 칸도 굵게 안 됐음 --%>
-				<a href="${pageContext.request.contextPath}/category?categoryNo=${crumb.categoryNo}"
+				<a href="${pageContext.request.contextPath}/category/${crumb.categoryNo}"
 					class="${crumb.categoryNo == categoryNo ? 'current' : ''}">${crumb.categoryName}</a>
 			</c:forEach>
 		</nav>
@@ -99,7 +107,7 @@
 					     ★ 2026-09-01: 브랜드/핏 같은 장식용 체크박스만 골랐을 때도 이 버튼이 떠야 해서(버그 리포트 1번),
 					     서버가 모르는 상태라 JS가 관리할 수 있게 항상 DOM에 두고 hidden 속성만 토글하는 식으로 바꿈 --%>
 					<%-- listSize 는 필터가 아니라 "몇 개씩 볼지" 화면 설정이라 전체해제해도 유지(2026-09-03) --%>
-					<a href="${pageContext.request.contextPath}/category?categoryNo=${categoryNo}&listSize=${listSize}"
+					<a href="${pageContext.request.contextPath}/category/${categoryNo}?listSize=${listSize}"
 						id="filterClearAll" class="filter-clear-all" ${hasActiveFilter ? '' : 'hidden'}>전체해제</a>
 				</div>
 
@@ -133,7 +141,7 @@
 				<section class="filter-group">
 					<ul class="filter-top-row">
 						<li>
-							<label><input type="checkbox" data-deco-id="top-rocket-all" data-label="로켓"><i class="filter-function-bar-asset"></i><span class="service-badge"><img src="${pageContext.request.contextPath}/images/icons/logo_rocket_filter_medium.png" alt="로켓"></span></label>
+							<label><input type="checkbox" data-deco-id="top-rocket-all" data-label="로켓"><i class="filter-function-bar-asset"></i><span class="service-badge"><img src="${pageContext.request.contextPath}/resources/images/icons/logo_rocket_filter_medium.png" alt="로켓"></span></label>
 							<%-- ★ 2026-09-05 3차 수정. 원본은 이 줄들이 전부 "브랜드 로고 이미지 + '만 보기' 글자" 인데
 							     우리는 그 로고 이미지가 없어서 글자로 대신 씀. 그래서 최소한 색이라도 맞추려고
 							     원본 로고 이미지를 화면에서 캡처해 픽셀 색을 직접 뽑아왔음(눈대중 아님):
@@ -148,15 +156,15 @@
 							     brand-rlux/brand-rocket/brand-jikgu 색상 규칙은 category.css 에서 주석 처리해 둠 --%>
 							<ul class="filter-service-sub">
 								<%-- <li><label class="is-dimmed"><input type="checkbox" data-deco-id="top-rlux" data-label="R.LUX 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-rlux">R.LUX</span> 만 보기</label></li> --%>
-								<li><label class="is-dimmed"><input type="checkbox" data-deco-id="top-rlux" data-label="R.LUX 만 보기"><i class="filter-function-bar-asset"></i><span class="service-badge sub is-rlux"><img src="${pageContext.request.contextPath}/images/category/badge_rlux.png" alt="R.LUX"></span>만 보기</label></li>
+								<li><label class="is-dimmed"><input type="checkbox" data-deco-id="top-rlux" data-label="R.LUX 만 보기"><i class="filter-function-bar-asset"></i><span class="service-badge sub is-rlux"><img src="${pageContext.request.contextPath}/resources/images/category/badge_rlux.png" alt="R.LUX"></span>만 보기</label></li>
 								<%-- <li><label><input type="checkbox" data-deco-id="top-rocket" data-label="로켓배송 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-rocket">로켓배송</span> 만 보기</label></li> --%>
-								<li><label><input type="checkbox" data-deco-id="top-rocket" data-label="로켓배송 만 보기"><i class="filter-function-bar-asset"></i><span class="service-badge sub"><img src="${pageContext.request.contextPath}/images/category/badge_rocket.png" alt="로켓배송"></span>만 보기</label></li>
+								<li><label><input type="checkbox" data-deco-id="top-rocket" data-label="로켓배송 만 보기"><i class="filter-function-bar-asset"></i><span class="service-badge sub"><img src="${pageContext.request.contextPath}/resources/images/category/badge_rocket.png" alt="로켓배송"></span>만 보기</label></li>
 								<%-- <li><label><input type="checkbox" data-deco-id="top-jikgu" data-label="로켓직구 만 보기"><i class="filter-function-bar-asset"></i><span class="brand-jikgu">로켓직구</span> 만 보기</label></li> --%>
-								<li><label><input type="checkbox" data-deco-id="top-jikgu" data-label="로켓직구 만 보기"><i class="filter-function-bar-asset"></i><span class="service-badge sub"><img src="${pageContext.request.contextPath}/images/category/badge_jikgu.png" alt="로켓직구"></span>만 보기</label></li>
+								<li><label><input type="checkbox" data-deco-id="top-jikgu" data-label="로켓직구 만 보기"><i class="filter-function-bar-asset"></i><span class="service-badge sub"><img src="${pageContext.request.contextPath}/resources/images/category/badge_jikgu.png" alt="로켓직구"></span>만 보기</label></li>
 							</ul>
 						</li>
 						<%-- <li><label><input type="checkbox" data-deco-id="top-topbrand" data-label="C.에비뉴"><i class="filter-function-bar-asset"></i><span class="brand-cavenue">C.에비뉴</span></label></li> --%>
-						<li><label><input type="checkbox" data-deco-id="top-topbrand" data-label="C.에비뉴"><i class="filter-function-bar-asset"></i><span class="service-badge sub is-cavenue"><img src="${pageContext.request.contextPath}/images/category/badge_cavenue.svg" alt="C.에비뉴"></span></label></li>
+						<li><label><input type="checkbox" data-deco-id="top-topbrand" data-label="C.에비뉴"><i class="filter-function-bar-asset"></i><span class="service-badge sub is-cavenue"><img src="${pageContext.request.contextPath}/resources/images/category/badge_cavenue.svg" alt="C.에비뉴"></span></label></li>
 						<li><label><input type="checkbox" data-deco-id="top-free" data-label="무료배송"><i class="filter-function-bar-asset"></i><span>무료배송</span></label></li>
 					</ul>
 				</section>
@@ -170,7 +178,7 @@
 						     맨 아래 "함께 본 카테고리"는 계속 siblingCategories 를 씀(원본도 거긴 형제) --%>
 						<c:forEach var="sib" items="${sidebarCategories}">
 							<li>
-								<a href="${pageContext.request.contextPath}/category?categoryNo=${sib.categoryNo}"
+								<a href="${pageContext.request.contextPath}/category/${sib.categoryNo}"
 									class="${sib.categoryNo == categoryNo ? 'selected' : ''}">
 									${sib.categoryName}
 								</a>
@@ -200,8 +208,8 @@
 				<c:if test="${not empty colorOptions}">
 					<section class="filter-group">
 						<h3>색상</h3>
-						<form id="colorFilterForm" method="get" action="${pageContext.request.contextPath}/category">
-							<input type="hidden" name="categoryNo" value="${categoryNo}">
+						<form id="colorFilterForm" method="get" action="${pageContext.request.contextPath}/category/${categoryNo}">
+						<%-- 	<input type="hidden" name="categoryNo" value="${categoryNo}"> --%>
 							<input type="hidden" name="sort" value="${sort}">
 							<input type="hidden" name="minPrice" value="${minPrice}">
 							<input type="hidden" name="maxPrice" value="${maxPrice}">
@@ -245,10 +253,10 @@
 					<h3>별점</h3>
 					<%-- JSP EL 은 리스트 리터럴이 없어서 5개를 그냥 하나씩 적음(0=전체) --%>
 					<ul>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=0" class="${rating == 0 ? 'selected' : ''}">별점 전체</a></li>
+						<li><a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=0" class="${rating == 0 ? 'selected' : ''}">별점 전체</a></li>
 						<c:forEach var="r" begin="1" end="4" step="1">
 							<c:set var="star" value="${5 - r}" />
-							<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${star}"
+							<li><a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${star}"
 									class="${rating == star ? 'selected' : ''}"><span class="star-rating" aria-hidden="true"><em style="width:${star * 20}%"></em></span>${star}점 이상</a></li>
 						</c:forEach>
 					</ul>
@@ -258,24 +266,24 @@
 				<section class="filter-group">
 					<h3>가격</h3>
 					<ul>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=0&maxPrice="
+						<li><a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=0&maxPrice="
 								class="${empty maxPrice ? 'selected' : ''}">전체</a></li>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=0&maxPrice=9000"
+						<li><a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=0&maxPrice=9000"
 								class="${maxPrice == 9000 ? 'selected' : ''}">9,000원 이하</a></li>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=9000&maxPrice=18000"
+						<li><a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=9000&maxPrice=18000"
 								class="${minPrice == 9000 && maxPrice == 18000 ? 'selected' : ''}">9,000원~18,000원</a></li>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=18000&maxPrice=27000"
+						<li><a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=18000&maxPrice=27000"
 								class="${minPrice == 18000 && maxPrice == 27000 ? 'selected' : ''}">18,000원~27,000원</a></li>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=27000&maxPrice=36000"
+						<li><a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=27000&maxPrice=36000"
 								class="${minPrice == 27000 && maxPrice == 36000 ? 'selected' : ''}">27,000원~36,000원</a></li>
-						<li><a href="${baseUrl}&listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=36000&maxPrice="
+						<li><a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&rating=${rating}&minPrice=36000&maxPrice="
 								class="${minPrice == 36000 && empty maxPrice ? 'selected' : ''}">36,000원 이상</a></li>
 					</ul>
 					<%-- 2026-09-01: 여기 색상 hidden input 이 빠져있어서, 가격을 직접 입력해서 검색하면
 					     선택해둔 색상이 통째로 날아가는 버그가 있었음 — 다른 필터 링크들처럼 선택된 색상을
 					     그대로 실어서 보냄 --%>
-					<form class="filter-price-direct" method="get" action="${pageContext.request.contextPath}/category">
-						<input type="hidden" name="categoryNo" value="${categoryNo}">
+					<form class="filter-price-direct" method="get" action="${pageContext.request.contextPath}/category/${categoryNo}">
+						<%-- <input type="hidden" name="categoryNo" value="${categoryNo}"> --%>
 						<input type="hidden" name="sort" value="${sort}">
 						<input type="hidden" name="rating" value="${rating}">
 						<input type="hidden" name="listSize" value="${listSize}">
@@ -329,9 +337,9 @@
 							<ul class="category-tiles">
 								<c:forEach var="tile" items="${categoryTiles}">
 									<li>
-										<a href="${pageContext.request.contextPath}/category?categoryNo=${tile.categoryNo}">
+										<a href="${pageContext.request.contextPath}/category/${tile.categoryNo}">
 											<span class="tile-thumb">
-												<img src="${pageContext.request.contextPath}/images/category/tile_${tile.categoryNo}.png" alt="">
+												<img src="${pageContext.request.contextPath}/resources/images/category/tile_${tile.categoryNo}.png" alt="">
 											</span>
 											<span class="tile-name">${tile.categoryName}</span>
 										</a>
@@ -347,16 +355,16 @@
 						<c:if test="${hasMidBanners}">
 						<div class="mid-banners">
 							<a href="#" class="banner-quicklinks">
-								<img src="${pageContext.request.contextPath}/images/category/banner_quicklinks.png" alt="쿠팡 추천 모음">
+								<img src="${pageContext.request.contextPath}/resources/images/category/banner_quicklinks.png" alt="쿠팡 추천 모음">
 							</a>
 							<a href="#">
-								<img src="${pageContext.request.contextPath}/images/category/banner_promo1.png" alt="기획전 배너">
+								<img src="${pageContext.request.contextPath}/resources/images/category/banner_promo1.png" alt="기획전 배너">
 							</a>
 							<a href="#">
-								<img src="${pageContext.request.contextPath}/images/category/banner_promo2.png" alt="기획전 배너">
+								<img src="${pageContext.request.contextPath}/resources/images/category/banner_promo2.png" alt="기획전 배너">
 							</a>
 							<a href="#">
-								<img src="${pageContext.request.contextPath}/images/category/banner_promo3.png" alt="기획전 배너">
+								<img src="${pageContext.request.contextPath}/resources/images/category/banner_promo3.png" alt="기획전 배너">
 							</a>
 						</div>
 						</c:if>
@@ -389,7 +397,7 @@
 
 							<div class="top-hero-main">
 								<c:forEach var="n" begin="1" end="10">
-									<a href="#" class="hero-slide"><img src="${pageContext.request.contextPath}/images/category/l1_hero_${n}.png" alt="기획전 배너"></a>
+									<a href="#" class="hero-slide"><img src="${pageContext.request.contextPath}/resources/images/category/l1_hero_${n}.png" alt="기획전 배너"></a>
 								</c:forEach>
 							</div>
 
@@ -399,7 +407,7 @@
 							<div class="top-hero-side">
 								<div class="hero-side-track">
 									<c:forEach var="n" begin="1" end="10">
-										<a href="#" class="hero-side-item"><img src="${pageContext.request.contextPath}/images/category/l1_side_${n}.png" alt="기획전 배너"></a>
+										<a href="#" class="hero-side-item"><img src="${pageContext.request.contextPath}/resources/images/category/l1_side_${n}.png" alt="기획전 배너"></a>
 									</c:forEach>
 								</div>
 								<div class="hero-side-nav">
@@ -420,12 +428,12 @@
 						<div class="top-banners">
 
 							<div class="top-tiles">
-								<img src="${pageContext.request.contextPath}/images/category/l1_tiles.png" alt="카테고리 바로가기">
+								<img src="${pageContext.request.contextPath}/resources/images/category/l1_tiles.png" alt="카테고리 바로가기">
 								<div class="tile-hits">
 									<c:forEach var="slot" items="${tileSlots}">
 										<c:choose>
 											<c:when test="${slot.categoryNo > 0}">
-												<a class="tile-hit" href="${pageContext.request.contextPath}/category?categoryNo=${slot.categoryNo}" title="${slot.categoryName}"></a>
+												<a class="tile-hit" href="${pageContext.request.contextPath}/category/${slot.categoryNo}" title="${slot.categoryName}"></a>
 											</c:when>
 											<c:otherwise>
 												<a class="tile-hit is-empty"></a>
@@ -435,21 +443,21 @@
 								</div>
 							</div>
 
-							<img src="${pageContext.request.contextPath}/images/category/l1_promo_cards.png" alt="기획전 모음">
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_1.png" alt="기획전 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_2.png" alt="기획전 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_3.png" alt="기획전 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_4.png" alt="기획전 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_5.png" alt="기획전 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_6.png" alt="기획전 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_7.png" alt="기획전 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_8.png" alt="기획전 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_band_9.png" alt="기획전 배너"></a>
-							<img src="${pageContext.request.contextPath}/images/category/l1_brand_title.png" alt="브랜드관">
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_brand_1.png" alt="브랜드관 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_brand_2.png" alt="브랜드관 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_brand_3.png" alt="브랜드관 배너"></a>
-							<a href="#"><img src="${pageContext.request.contextPath}/images/category/l1_brand_4.png" alt="브랜드관 배너"></a>
+							<img src="${pageContext.request.contextPath}/resources/images/category/l1_promo_cards.png" alt="기획전 모음">
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_band_1.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_band_2.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_band_3.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_band_4.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_band_5.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_band_6.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_band_7.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_band_8.png" alt="기획전 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_band_9.png" alt="기획전 배너"></a>
+							<img src="${pageContext.request.contextPath}/resources/images/category/l1_brand_title.png" alt="브랜드관">
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_brand_1.png" alt="브랜드관 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_brand_2.png" alt="브랜드관 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_brand_3.png" alt="브랜드관 배너"></a>
+							<a href="#"><img src="${pageContext.request.contextPath}/resources/images/category/l1_brand_4.png" alt="브랜드관 배너"></a>
 						</div>
 
 					</div>
@@ -459,19 +467,19 @@
 				<div class="sort-bar">
 					<ul>
 			     	    <li class="${sort == 'RANKING' ? 'Sort_selected' : ''}">
-            			  <a href="${baseUrl}&listSize=${listSize}&sort=RANKING&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">쿠팡랭킹순</a>
+            			  <a href="${baseUrl}${sep}listSize=${listSize}&sort=RANKING&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">쿠팡랭킹순</a>
        				    </li>
 						<li class="${sort == 'LATEST' ? 'Sort_selected' : ''}">
-							<a href="${baseUrl}&listSize=${listSize}&sort=LATEST&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">최신순</a>
+							<a href="${baseUrl}${sep}listSize=${listSize}&sort=LATEST&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">최신순</a>
 						</li>
 						<li class="${sort == 'PRICE_ASC' ? 'Sort_selected' : ''}">
-							<a href="${baseUrl}&listSize=${listSize}&sort=PRICE_ASC&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">낮은가격순</a>
+							<a href="${baseUrl}${sep}listSize=${listSize}&sort=PRICE_ASC&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">낮은가격순</a>
 						</li>
 						<li class="${sort == 'PRICE_DESC' ? 'Sort_selected' : ''}">
-							<a href="${baseUrl}&listSize=${listSize}&sort=PRICE_DESC&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">높은가격순</a>
+							<a href="${baseUrl}${sep}listSize=${listSize}&sort=PRICE_DESC&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">높은가격순</a>
 						</li>
 						<li class="${sort == 'SALE_COUNT' ? 'Sort_selected' : ''}">
-							<a href="${baseUrl}&listSize=${listSize}&sort=SALE_COUNT&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">판매량순</a>
+							<a href="${baseUrl}${sep}listSize=${listSize}&sort=SALE_COUNT&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}">판매량순</a>
 						</li>
 					</ul>
 					<%-- 보기 개수 60/120 — 2026-09-03 2차 수정: 처음엔 정렬(ul.Sort_sort)처럼 두 개를 나란히
@@ -483,10 +491,10 @@
 					<div class="list-size-dropdown">
 						<ul>
 							<li class="${listSize == 60 ? 'selected' : ''}">
-								<a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&listSize=60">60개씩 보기</a>
+								<a href="${baseUrl}${sep}sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&listSize=60">60개씩 보기</a>
 							</li>
 							<li class="${listSize == 120 ? 'selected' : ''}">
-								<a href="${baseUrl}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&listSize=120">120개씩 보기</a>
+								<a href="${baseUrl}${sep}sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&listSize=120">120개씩 보기</a>
 							</li>
 						</ul>
 					</div>
@@ -501,7 +509,7 @@
 					<span class="filter-selected-label">선택한 필터:</span>
 					<ul id="filterSelectedChips" class="filter-selected-chips">
 						<c:forEach var="color" items="${selectedColors}">
-							<c:url var="removeColorUrl" value="/category">
+							<c:url var="removeColorUrl" value="/category/${categoryNo}">
 								<c:param name="categoryNo" value="${categoryNo}" />
 								<c:param name="listSize" value="${listSize}" />
 								<c:param name="sort" value="${sort}" />
@@ -518,7 +526,7 @@
 						</c:forEach>
 
 						<c:if test="${rating > 0}">
-							<c:url var="removeRatingUrl" value="/category">
+							<c:url var="removeRatingUrl" value="/category/${categoryNo}">
 								<c:param name="categoryNo" value="${categoryNo}" />
 								<c:param name="listSize" value="${listSize}" />
 								<c:param name="sort" value="${sort}" />
@@ -531,7 +539,7 @@
 						</c:if>
 
 						<c:if test="${minPrice > 0 || not empty maxPrice}">
-							<c:url var="removePriceUrl" value="/category">
+							<c:url var="removePriceUrl" value="/category/${categoryNo}">
 								<c:param name="categoryNo" value="${categoryNo}" />
 								<c:param name="listSize" value="${listSize}" />
 								<c:param name="sort" value="${sort}" />
@@ -610,8 +618,8 @@
 												<%-- 실제 배송정보 컬럼(DELIVERY_METHOD 등)을 아직 안 써서 모든 카드에 똑같이 표시.
 												     내일도착 배지(badge_199cd481e67.png)는 우리 파일이 58×32 라 높이 16px 로 맞추면
 												     폭이 29px — 원본 실측(29×16)과 정확히 같아짐 --%>
-												<img class="badge-rocket" src="${pageContext.request.contextPath}/images/icons/logo_rocket_filter_medium.png" alt="로켓배송">
-												<img class="badge-tomorrow" src="${pageContext.request.contextPath}/images/icons/badge_199cd481e67.png" alt="내일도착">
+												<img class="badge-rocket" src="${pageContext.request.contextPath}/resources/images/icons/logo_rocket_filter_medium.png" alt="로켓배송">
+												<img class="badge-tomorrow" src="${pageContext.request.contextPath}/resources/images/icons/badge_199cd481e67.png" alt="내일도착">
 											</span>
 										</p>
 										<%-- 품절 표시 — 2026-09-03 원본 실측(Playwright). 모든 옵션 재고 0(PRODUCT.SALE_STATUS='품절')일 때만.
@@ -642,7 +650,7 @@
 										     아이콘은 2026-09-05 사용자가 원본과 같은 파일(list-cash-icon@2x.png, 28×28)을
 										     images/icons 에 직접 넣어줘서 그걸 씀 — 동그란 테두리는 CSS 가 아니라 이 이미지 자체임 --%>
 										<p class="cash-reward">
-											<img src="${pageContext.request.contextPath}/images/icons/list-cash-icon@2x.png" alt="">
+											<img src="${pageContext.request.contextPath}/resources/images/icons/list-cash-icon@2x.png" alt="">
 											최대 <fmt:formatNumber value="${item.cashReward}" pattern="#,###"/>원 적립
 										</p>
 									</a>
@@ -666,14 +674,14 @@
 						<%-- 페이지네이션 --%>
 						<nav class="pagination" aria-label="페이지">
 							<c:if test="${page > 1}">
-								<a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${page - 1}">이전</a>
+								<a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${page - 1}">이전</a>
 							</c:if>
 							<c:forEach var="p" begin="1" end="${totalPages}">
-								<a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${p}"
+								<a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${p}"
 									class="${p == page ? 'current' : ''}">${p}</a>
 							</c:forEach>
 							<c:if test="${page < totalPages}">
-								<a href="${baseUrl}&listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${page + 1}">다음</a>
+								<a href="${baseUrl}${sep}listSize=${listSize}&sort=${sort}&minPrice=${minPrice}&maxPrice=${maxPrice}&rating=${rating}&page=${page + 1}">다음</a>
 							</c:if>
 						</nav>
 					</c:otherwise>
@@ -687,7 +695,7 @@
 				<ul class="also-viewed-list">
 					<c:forEach var="sib" items="${siblingCategories}">
 						<c:if test="${sib.categoryNo != categoryNo}">
-							<li><a href="${pageContext.request.contextPath}/category?categoryNo=${sib.categoryNo}">${sib.categoryName}</a></li>
+							<li><a href="${pageContext.request.contextPath}/category/${sib.categoryNo}">${sib.categoryName}</a></li>
 						</c:if>
 					</c:forEach>
 				</ul>
@@ -707,7 +715,7 @@
 
 	<%-- <jsp:include page="/inc/footer.jsp" /> --%>
 
-	<script src="${pageContext.request.contextPath}/js/header.js"></script>
-	<script src="${pageContext.request.contextPath}/js/category.js"></script>
-</body>
-</html>
+ 	<%-- header.js 는 layout_shop.jsp 가 읽음 (두 번 읽으면 이벤트가 두 번 붙음) --%>
+    <%-- <script src="${pageContext.request.contextPath}/js/header.js"></script> --%>
+	<script src="${pageContext.request.contextPath}/resources/js/category.js"></script>
+

@@ -6,14 +6,28 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 import org.doit.goodpang.domain.AddressDTO;
 import org.doit.goodpang.domain.OrderCompleteDTO;
+import org.doit.goodpang.domain.OrderDetailDTO;
 import org.doit.goodpang.domain.OrderItemDTO;
 import org.doit.goodpang.service.OrderService.StockFail;
 
+
 public interface OrderMapper {
 	
+	//order_list, order_detail
+	
 	 int getOrderCount(@Param("memberNo")long memberNo, @Param("yearFilter") String yearFilter);
-	    List<OrderItemDTO> getOrderListPaged(long memberNo, String yearFilter, int page, int pageSize);
-	    List<OrderItemDTO> getOrderDetailList(int orderNo, long memberNo);
+	 List<OrderItemDTO> getOrderListPaged(@Param("memberNo") long memberNo, @Param("yearFilter") String yearFilter,
+	         @Param("startRow") int startRow, @Param("endRow") int endRow);
+	 
+	 
+	 List<OrderDetailDTO> getOrderDetail(@Param("memberNo")int memberNo,@Param("orderNo")int orderNo);
+	 //List<OrderDetailDTO> getorderDetailPaged(@Param("memberNo")int memberNo,@Param("orderNo")int orderNo);
+	 
+
+     //order_list_detail
+	 
+	    
+
 
 
     Integer findOrderNoByCheckout(

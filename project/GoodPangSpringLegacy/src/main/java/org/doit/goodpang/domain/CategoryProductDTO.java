@@ -10,8 +10,6 @@ import lombok.Setter;
  *
  * 가격은 이미 "PRODUCT_PRICE + 옵션 추가금" 계산이 끝난 총액으로 채워서 내려줌(2026-08-30 팀 확정,
  * ref/category/STRUCTURE.md 11장 참고) — JSP 에서 다시 계산하지 않음.
- * 옵션이 여러 개인 상품은 "최저가 옵션"을 대표로 씀(상세페이지 ProductServlet 은 "첫 옵션" 기준이라
- * 서로 다름 — 아직 팀 확인 안 된 부분, STRUCTURE.md 11장에 플래그 남겨둠).
  */
 @Getter
 @Setter
@@ -32,12 +30,29 @@ public class CategoryProductDTO {
 
     private int salePrice;             // PRODUCT_PRICE + 최저가 옵션의 PRICE
     private Integer normalPrice;       // PRODUCT_PRICE + 최저가 옵션의 NORMAL_PRICE. 정상가가 판매가보다 클 때만 값이 들어감(그 외 null)
-    private int discountRate;          // normalPrice 가 있을 때만 0보다 큼
+   // private int discountRate;          // normalPrice 가 있을 때만 0보다 큼 -> getDiscountRate()에서 계산
 
     private double avgRating;          // 리뷰 없으면 0
     private int reviewCount;           // 리뷰 없으면 0
     private int saleCount;             // ORDER_DETAIL.ORDER_QTY 합계(주문취소 제외). 판매량순 정렬 기준
 
-    private int cashReward;            // 적립 
+   // private int cashReward;            // 적립 -> getCashReward()에서 계산 
     private boolean soldOut;
+    
+
+    /*
+     * 할인율 — 구버전 CategoryProductDAO.mapRow() 에서 계산하던 것을 옮김.
+     * MyBatis 는 DB 컬럼만 채우므로, 계산값은 꺼낼 때(getter) 계산함.
+     * 정상가가 판매가보다 클 때만 0보다 큼
+     */
+    public int getDiscountRate( ) {
+    	if (normalPrice == null || normalPrice <= salePrice) return 0; 
+		return (int) Math.round((1 - (double) salePrice / normalPrice) * 100);	
+    }//getDiscountRate
+
+    // 적립금 — 판매가의 5% (구버전 mapRow() 그대로)
+    public int getCashReward() {
+    	return (int) Math.floor(salePrice * 0.05); 
+    }//getCashReward
+    
 }

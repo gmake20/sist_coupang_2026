@@ -5,11 +5,13 @@ import java.util.List;
 import org.doit.goodpang.domain.AddressDTO;
 import org.doit.goodpang.domain.CheckoutDTO;
 import org.doit.goodpang.domain.OrderCompleteDTO;
+import org.doit.goodpang.domain.OrderDetailDTO;
 import org.doit.goodpang.domain.OrderItemDTO;
 import org.doit.goodpang.domain.PaymentMethodDTO;
 import org.doit.goodpang.domain.security.CustomUser;
 import org.doit.goodpang.service.AddressService;
 import org.doit.goodpang.service.CheckoutService;
+import org.doit.goodpang.service.OrderCancelService;
 import org.doit.goodpang.service.OrderService;
 import org.doit.goodpang.service.OrderService.OrderResult;
 import org.doit.goodpang.service.OrderService.StockOutException;
@@ -49,23 +51,26 @@ public class OrderController {
             Model model) {
 
         // 세션 또는 스프링 시큐리티 처리 전 임시 테스트용 회원번호
-        //int memberNo = 1; 
+          int memberNo = 1; 
     	
-    	 CustomUser customUser =
-                 (CustomUser) authentication.getPrincipal();
-
-         Long memberNo =
-                 customUser.getMember()
-                           .getMemberNo();
+		/*
+		 * CustomUser customUser = (CustomUser) authentication.getPrincipal();
+		 * 
+		 * Long memberNo = customUser.getMember() .getMemberNo();
+		 */
 
         int pageSize = 5;
-        System.out.println("😍😍😍yearFilter" +yearFilter);
+       // System.out.println("😍😍😍yearFilter" +yearFilter);
+        log.info("OrderController 주문리스트 😍😍😍yearFilter" +yearFilter);
         int totalCount = orderService.getOrderCount(memberNo, yearFilter);
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
         if (totalPages == 0) totalPages = 1;
 
         List<OrderItemDTO> orderList = orderService.getOrderListPaged(memberNo, yearFilter, page, pageSize);
-
+        
+        System.out.println("orderList size = " +
+                (orderList == null ? "null" : orderList.size()));
+        
         model.addAttribute("orderList", orderList);
         model.addAttribute("yearFilter", yearFilter);
         model.addAttribute("curPage", page);
@@ -77,13 +82,17 @@ public class OrderController {
     // 2. 주문 상세 페이지 (/order/order_detail)
     @GetMapping("/order_detail")
     public String getOrderDetail(
+    		Authentication authentication,
             @RequestParam("orderNo") int orderNo,
-            Model model) {
+            Model model) {    	
+    	
+    	log.info("========== OrderController 주문상세  진입 ==========");
 
         int memberNo = 1; // 임시 회원번호
 
-        List<OrderItemDTO> detailList = orderService.getOrderDetailList(orderNo, memberNo);
-        OrderItemDTO orderInfo = null;
+        List<OrderDetailDTO> detailList = orderService.getOrderDetailList(memberNo, orderNo);
+        OrderDetailDTO orderInfo = null;
+        
 
         if (detailList != null && !detailList.isEmpty()) {
             orderInfo = detailList.get(0); // 공통 주문정보용 대표 객체
@@ -91,10 +100,84 @@ public class OrderController {
 
         model.addAttribute("detailList", detailList);
         model.addAttribute("orderInfo", orderInfo);
+        
+        System.out.println("========== 주문상세 ==========");
+        System.out.println("orderNo = " + orderNo);
+        System.out.println("memberNo = " + memberNo);
+        System.out.println("detailList size = " +
+                (detailList == null ? "null" : detailList.size()));
+
+        if (detailList != null && !detailList.isEmpty()) {
+            System.out.println("orderDetailNo = "
+                    + detailList.get(0).getOrderDetailNo());
+
+            System.out.println("productNo = "
+                    + detailList.get(0).getProductNo());
+
+            System.out.println("productName = "
+                    + detailList.get(0).getProductName());
+        }
+
+        System.out.println("============================");
 
         return "order.order_detail"; // /WEB-INF/views/order/order_detail.jsp
     }
 
+    private final OrderCancelService orderCancelService; // 서비스 주입[cite: 1, 8]
+
+    // 주문 취소 처리
+    
+    @GetMapping("/order_cancel")
+    public String orderCancelForm(@RequestParam("orderNo") int orderNo, Model model) {
+        log.info("> 주문 취소 페이지(Form) 진입 - orderNo: " + orderNo);
+
+        // TODO: 취소 화면에 보여줄 주문/상품 정보(cancelInfo)를 DB에서 조회하여 Model에 담습니다.
+        List<OrderDetailDTO> list = orderCancelService.getCancelInfo(orderNo);
+     // 2. 리스트가 비어있지 않다면 첫 번째 DTO 객체를 꺼내서 cancelInfo로 전달
+        if (list != null && !list.isEmpty()) {
+            OrderDetailDTO cancelInfo = list.get(0);
+            model.addAttribute("cancelInfo", cancelInfo);
+        }
+        
+         
+
+        // Tiles를 사용하는 경우 tiles.xml의 definition 이름 또는 WEB-INF/views/order/order_cancel.jsp
+        return "order/order_cancel"; 
+    }
+    
+    @PostMapping("/order_cancel")
+    public String orderCancelAction(
+            @RequestParam("orderNo") int orderNo,
+            @RequestParam("memberNo") long memberNo,
+            @RequestParam("cancelReason") String cancelReason,
+            RedirectAttributes rttr // 리다이렉트 시 1회성 메시지 전달용[cite: 7]
+    ) {
+        log.info("> 주문 취소 컨트롤러 진입 - orderNo: " + orderNo + ", memberNo: " + memberNo + ", reason: " + cancelReason);
+
+        // 1. 주문 취소 비즈니스 로직 수행
+        Integer result = orderCancelService.orderCancelAction(orderNo, memberNo, cancelReason);
+
+        // 2. 결과 처리 메시지 담기
+        if (result != null && result > 0) {
+            rttr.addFlashAttribute("msg", "주문 취소가 성공적으로 완료되었습니다.");
+        } else {
+            rttr.addFlashAttribute("msg", "주문 취소 처리에 실패했습니다.");
+        }
+
+        // 3. ⭕ 올바른 리다이렉트: 주문 취소 후 이동할 '목록 페이지' 경로로 리다이렉트!
+        // (예: /mypage/order_list 또는 프로젝트의 실제 주문 목록 URL)
+        return "redirect:/order/cancel_confirm"; 
+    }
+    
+
+    // 3. 취소 완료 화면 (GET 요청: /order/cancel_confirm)
+   
+    @GetMapping("/cancel_confirm")
+    public String orderCancelConfirm() {
+        return "order/cancel_confirm"; // cancel_confirm.jsp 전달
+    }
+
+    
 
     @PostMapping("/checkout")
     public String checkout(
