@@ -13,7 +13,7 @@
 <script>
 	var contextPath = "${pageContext.request.contextPath}";
 </script>
-</head>
+
 
 		<main class="mypage-main">
 
@@ -82,7 +82,7 @@
 											</c:when>
 
 											<%-- [2] 결제 완료 상태 -> [배송 조회] | [주문 취소] 2개 버튼만 출력 --%>
-											<c:when test="${prevItem.orderStatus eq '결제완료' or prevItem.orderStatus eq '결제 완료'}">
+											<c:when test="${prevItem.orderStatus eq '결제완료' or prevItem.orderStatus eq '결제 완료' or prevItem.orderStatus eq '주문접수'}">
 												<div class="delivery-buttons">
 													<button type="button" class="delivery-btn btn-action primary"
 														onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'">
@@ -249,7 +249,7 @@
 											</c:when>
 
 											<%-- [2] 결제 완료 상태 -> [배송 조회] | [주문 취소] 2개 버튼만 출력 --%>
-											<c:when test="${prevItem.orderStatus eq '결제완료' or prevItem.orderStatus eq '결제 완료'}">
+											<c:when test="${prevItem.orderStatus eq '결제완료' or prevItem.orderStatus eq '결제 완료' or prevItem.orderStatus eq '주문접수'}">
 												<div class="delivery-buttons">
 													<button type="button" class="delivery-btn btn-action primary"
 														onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${prevOrderNo}'">
@@ -306,7 +306,7 @@
 														<c:otherwise>
 															<button type="button" class="delivery-btn btn-action"
 																onclick="location.href='${pageContext.request.contextPath}/review/write?orderDetailNo=${prevItem.orderDetailNo}&productNo=${prevItem.productNo}'">
-																리뷰 작성하기
+																리뷰 작성하기 
 															</button>
 														</c:otherwise>
 													</c:choose>
