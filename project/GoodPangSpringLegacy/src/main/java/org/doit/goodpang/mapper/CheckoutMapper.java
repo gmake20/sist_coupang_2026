@@ -34,12 +34,26 @@ public interface CheckoutMapper {
 	    );
 
 
+		/*
+		 * int insertCheckoutItem(
+		 * 
+		 * @Param("checkoutNo") int checkoutNo,
+		 * 
+		 * @Param("productNo") int productNo,
+		 * 
+		 * @Param("optionId") Integer optionId,
+		 * 
+		 * @Param("quantity") int quantity,
+		 * 
+		 * @Param("unitPrice") int unitPrice );
+		 */
+	    
 	    int insertCheckoutItem(
 	            @Param("checkoutNo") int checkoutNo,
 	            @Param("productNo") int productNo,
 	            @Param("optionId") Integer optionId,
 	            @Param("quantity") int quantity,
-	            @Param("unitPrice") int unitPrice
+	            @Param("price") int price
 	    );
 	    
 	    CheckoutDTO getCheckout(
