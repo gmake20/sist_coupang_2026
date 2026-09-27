@@ -17,6 +17,7 @@ import org.doit.goodpang.domain.SellerDTO;
 import org.doit.goodpang.domain.VendorDailySalesDTO;
 import org.doit.goodpang.domain.VendorDailyTrafficDTO;
 import org.doit.goodpang.domain.VendorDashboardStatDTO;
+import org.doit.goodpang.domain.VendorDeliveryDTO;
 import org.doit.goodpang.domain.VendorOrderListDTO;
 import org.doit.goodpang.domain.VendorOrderStatSummaryDTO;
 import org.doit.goodpang.domain.VendorProductListDTO;
@@ -405,5 +406,32 @@ public class VendorController {
 		} catch (DateTimeParseException e) {
 			return null;
 		}
+	}
+
+	/*
+	 * 배송 관리 - 배송중인 주문을 모니터링하고 지연 건을 잡아내는 용도. 배송완료 처리는 여기서 하지 않음
+	 * (실제 배송완료는 배송기사가 처리해야 할 일이라, 지금은 관리자가 배송 관리 화면에서 대행 중).
+	 */
+	@GetMapping(value = "/delivery.htm")
+	public ModelAndView delivery(HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		List<VendorDeliveryDTO> deliveryList = vendorOrderMapper.findShippingBySellerNo(loginSeller.getSellerNo());
+
+		// 배송 시작 후 3일 이상 지난 건 (VendorDeliveryDTO.isDelayed 기준)
+		long delayedCount = deliveryList.stream().filter(VendorDeliveryDTO::isDelayed).count();
+
+		ModelAndView mav = new ModelAndView("vendor.delivery");
+		mav.addObject("menu", "delivery"); // 사이드바 활성 메뉴
+
+		mav.addObject("deliveryList", deliveryList);
+		mav.addObject("delayedCount", delayedCount);
+
+		return mav;
 	}
 }

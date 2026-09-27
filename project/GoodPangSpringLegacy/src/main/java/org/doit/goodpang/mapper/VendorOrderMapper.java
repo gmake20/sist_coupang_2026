@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.doit.goodpang.domain.VendorDeliveryDTO;
 import org.doit.goodpang.domain.VendorOrderListDTO;
 import org.doit.goodpang.domain.VendorOrderStatSummaryDTO;
 import org.springframework.stereotype.Repository;
@@ -30,5 +31,8 @@ public interface VendorOrderMapper {
 
 	// 상단 통계 카드(출고대기/배송중/배송완료/오늘 배송완료)
 	public VendorOrderStatSummaryDTO countStats(@Param("sellerNo") int sellerNo);
+
+	// 배송 관리 - 이 판매자 상품이 포함된 배송중 주문 (배송 시작일 최신순)
+	public List<VendorDeliveryDTO> findShippingBySellerNo(@Param("sellerNo") int sellerNo);
 
 }

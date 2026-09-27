@@ -106,4 +106,34 @@
             WHERE P.SELLER_NO = #{sellerNo}
 	</select>
 
+	<!-- public List<VendorDeliveryDTO> findShippingBySellerNo(int sellerNo); -->
+	<!--
+	  배송 관리 - 이 판매자의 상품이 포함된 "배송중" 주문 (기존 VendorDeliveryDAO.findShippingBySellerNo).
+	  다른 판매자 상품이 섞인 주문이라도 PN 서브쿼리에서 이 판매자 몫만 상품명/개수로 집계한다.
+	  구매자 이름/전화는 DTO 필드(buyerName/buyerPhone)에 맞춰 별칭을 준다.
+	-->
+	<select id="findShippingBySellerNo" resultType="org.doit.goodpang.domain.VendorDeliveryDTO">
+            SELECT
+                D.DELIVERY_NO, D.ORDER_NO, D.DELIVERY_SERVICE_CODE, D.INVOICE_NO,
+                D.DELIVERY_START_DATE,
+                M.MEMBER_NAME AS BUYER_NAME,
+                M.PHONE AS BUYER_PHONE,
+                PN.PRODUCT_NAME, PN.ITEM_COUNT
+            FROM DELIVERY D
+                JOIN ORDERS O ON D.ORDER_NO = O.ORDER_NO
+                JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO
+                JOIN (
+                    SELECT
+                        OD.ORDER_NO,
+                        MIN(P.PRODUCT_NAME) KEEP (DENSE_RANK FIRST ORDER BY OD.ORDER_DETAIL_NO) AS PRODUCT_NAME,
+                        COUNT(*) AS ITEM_COUNT
+                    FROM ORDER_DETAIL OD
+                        JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                    WHERE P.SELLER_NO = #{sellerNo}
+                    GROUP BY OD.ORDER_NO
+                ) PN ON PN.ORDER_NO = D.ORDER_NO
+            WHERE D.DELIVERY_STATUS = '배송중'
+            ORDER BY D.DELIVERY_START_DATE DESC
+	</select>
+
   </mapper>
