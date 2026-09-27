@@ -12,8 +12,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/vendor-login.css">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">	
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/vendor-login.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css">	
   <title>굿팡 비즈니스 판매자 로그인</title>
 
 </head>

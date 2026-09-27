@@ -17,12 +17,14 @@ import org.doit.goodpang.domain.SellerDTO;
 import org.doit.goodpang.domain.VendorDailySalesDTO;
 import org.doit.goodpang.domain.VendorDailyTrafficDTO;
 import org.doit.goodpang.domain.VendorDashboardStatDTO;
+import org.doit.goodpang.domain.VendorOrderListDTO;
 import org.doit.goodpang.domain.VendorOrderStatSummaryDTO;
 import org.doit.goodpang.domain.VendorProductListDTO;
 import org.doit.goodpang.domain.VendorProductOptionDTO;
 import org.doit.goodpang.domain.VendorProductOptionGroupDTO;
 import org.doit.goodpang.mapper.VendorDashboardMapper;
 import org.doit.goodpang.mapper.VendorMapper;
+import org.doit.goodpang.mapper.VendorOrderMapper;
 import org.doit.goodpang.mapper.VendorProductMapper;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
@@ -44,6 +46,7 @@ public class VendorController {
 	private final VendorMapper vendorMapper;
 	private final VendorDashboardMapper vendorDashboardMapper;
 	private final VendorProductMapper vendorProductMapper;
+	private final VendorOrderMapper vendorOrderMapper;
 	// private final MemberShipService memberShipService;
 
 	// 차트 데이터를 JS에 넘길 JSON 변환용 (기존 서블릿의 Gson 대신 pom.xml에 이미 있는 Jackson 사용)
@@ -280,8 +283,6 @@ public class VendorController {
 		return mav;
 
 	}
-	
-	
 
 	@GetMapping(value = "/product_options.htm")
 	public ModelAndView productOptions(
@@ -298,7 +299,8 @@ public class VendorController {
 		int sellerNo = loginSeller.getSellerNo();
 
 		List<VendorProductOptionDTO> optionList = vendorProductMapper.findOptionsBySellerNo(sellerNo, productNo);
-		List<VendorProductOptionDTO> productFilterOptions = vendorProductMapper.findDistinctOptionProductsBySellerNo(sellerNo);
+		List<VendorProductOptionDTO> productFilterOptions = vendorProductMapper
+				.findDistinctOptionProductsBySellerNo(sellerNo);
 
 		ModelAndView mav = new ModelAndView("vendor.product_options");
 		mav.addObject("menu", "productOptions"); // 사이드바 활성 메뉴
@@ -342,6 +344,66 @@ public class VendorController {
 
 		return new ArrayList<>(groupsByProductNo.values());
 	}
-	
 
+	@GetMapping(value = "/order.htm")
+	public ModelAndView order(
+			@RequestParam(value = "startDate", required = false) String startDateParam,
+			@RequestParam(value = "endDate", required = false) String endDateParam,
+			@RequestParam(value = "orderStatus", required = false) String orderStatus,
+			@RequestParam(value = "deliveryStatus", required = false) String deliveryStatus,
+			@RequestParam(value = "paymentStatus", required = false) String paymentStatus,
+			@RequestParam(value = "page", required = false) String pageParam,
+			HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		int sellerNo = loginSeller.getSellerNo();
+		java.sql.Date startDate = parseSqlDate(startDateParam);
+		java.sql.Date endDate = parseSqlDate(endDateParam);
+		int page = parsePage(pageParam);
+
+		List<VendorOrderListDTO> orderList = vendorOrderMapper.findBySellerNo(sellerNo, startDate, endDate,
+				orderStatus, deliveryStatus, paymentStatus, (page - 1) * PAGE_SIZE, PAGE_SIZE);
+		int totalCount = vendorOrderMapper.countBySellerNo(sellerNo, startDate, endDate,
+				orderStatus, deliveryStatus, paymentStatus);
+		int totalPages = Math.max(1, (int) Math.ceil(totalCount / (double) PAGE_SIZE));
+
+		VendorOrderStatSummaryDTO orderStat = vendorOrderMapper.countStats(sellerNo);
+
+		ModelAndView mav = new ModelAndView("vendor.order");
+		mav.addObject("menu", "orders"); // 사이드바 활성 메뉴
+
+		mav.addObject("orderList", orderList);
+		mav.addObject("orderStat", orderStat);
+		mav.addObject("page", page);
+		mav.addObject("totalPages", totalPages);
+		mav.addObject("totalCount", totalCount);
+
+		// 검색폼에 입력값을 그대로 남겨두기 위해 원본 파라미터를 그대로 되돌려준다
+		mav.addObject("searchStartDate", startDateParam);
+		mav.addObject("searchEndDate", endDateParam);
+		mav.addObject("searchOrderStatus", orderStatus);
+		mav.addObject("searchDeliveryStatus", deliveryStatus);
+		mav.addObject("searchPaymentStatus", paymentStatus);
+
+		return mav;
+	}
+
+	// ?startDate=/?endDate= (yyyy-MM-dd) 파싱. 없거나 형식이 잘못됐으면 null(조건 안 붙임)
+	private java.sql.Date parseSqlDate(String value) {
+
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+
+		try {
+			return java.sql.Date.valueOf(LocalDate.parse(value.trim()));
+		} catch (DateTimeParseException e) {
+			return null;
+		}
+	}
 }
