@@ -59,9 +59,13 @@
         <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
     </definition>
     
+    <definition name="order.order_detail" extends="order-layout">
+        <put-attribute name="css" value="/resources/css/order_detail.css"/>
+        <put-attribute name="content" value="/WEB-INF/views/order/order_detail.jsp" />
+        <put-attribute name="title" value="주문상세 - GoodPang" />
+    </definition>
+    
 </tiles-definitions>
-
-
 
 
 

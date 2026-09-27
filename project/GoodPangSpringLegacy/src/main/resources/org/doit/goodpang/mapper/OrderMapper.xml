@@ -5,7 +5,7 @@
 
 <mapper namespace="org.doit.goodpang.mapper.OrderMapper">
 
-
+<!-- order_list -->
      <!-- 1. 필터 조건(최근6개월 / 년도)에 따른 회원 총 주문 건수 조회 -->
     <select id="getOrderCount" resultType="int">
         SELECT COUNT(*) 
@@ -74,53 +74,115 @@
         ) ORDER BY orderDate DESC, orderNo DESC, orderDetailNo ASC
     </select>
 
-    <!-- 3. 주문 상세 목록 조회 (OrderCancel / OrderDetail 용) -->
-    <select id="getOrderDetailList" resultType="org.doit.goodpang.domain.OrderItemDTO">
-        SELECT od.ORDER_DETAIL_NO AS orderDetailNo, 
-               od.ORDER_NO AS orderNo, 
-               o.MEMBER_NO AS memberNo, 
-               o.ORDER_STATUS AS orderStatus, 
-               o.ORDER_DATE AS orderDate, 
-               o.TOTAL_PRICE AS totalPrice, 
-               p.PRODUCT_NO AS productNo, 
-               p.PRODUCT_NAME AS productName, 
-               od.ORDER_QTY AS quantity, 
-               od.PRICE AS itemPrice,
-               o.DELIVERY_FEE AS deliveryFee, 
-               pay.PAYMENT_METHOD AS paymentMethod, 
-               pm.CARD_COMPANY AS cardCompanyName,
-               pm.BANK_CODE AS bankName,
-               oa.REQUEST_MSG AS requestMsg, 
-               oa.ADDRESS AS address, 
-               oa.DETAIL_ADDRESS AS detailAddress, 
-               m.MEMBER_NAME AS memberName, 
-               m.PHONE AS phone, 
-               po.OPTION1_TYPE AS option1Type, 
-               po.OPTION1_VALUE AS option1Value, 
-               po.OPTION2_TYPE AS option2Type, 
-               po.OPTION2_VALUE AS option2Value,
-               img.IMAGE_URL AS imageUrl
-        FROM ORDERS o 
-        JOIN ORDER_DETAIL od ON o.ORDER_NO = od.ORDER_NO 
-        JOIN PRODUCT p ON od.PRODUCT_NO = p.PRODUCT_NO 
-        JOIN MEMBER m ON o.MEMBER_NO = m.MEMBER_NO 
-        LEFT JOIN ORDER_ADDRESS oa ON o.ORDER_ADDRESS_NO = oa.ORDER_ADDRESS_NO 
-        LEFT JOIN PAYMENT pay ON o.ORDER_NO = pay.ORDER_NO 
-        LEFT JOIN PAYMENT_METHOD pm ON pay.PAYMENT_METHOD_NO = pm.PAYMENT_METHOD_NO
-        LEFT JOIN PRODUCT_OPTION po ON od.OPTION_ID = po.OPTION_ID 
+    <!-- 3. 주문 상세 목록 조회 (OrderDetail 용) -->
+    <select id="getOrderDetail" resultType="org.doit.goodpang.domain.OrderDetailDTO">
+          SELECT
+        od.ORDER_DETAIL_NO AS orderDetailNo,
+        od.ORDER_NO AS orderNo,
+        o.MEMBER_NO AS memberNo,
+        o.ORDER_STATUS AS orderStatus,
+        o.ORDER_DATE AS orderDate,
+        o.TOTAL_PRICE AS totalPrice,
+
+        p.PRODUCT_NO AS productNo,
+        p.PRODUCT_NAME AS productName,
+
+        od.OPTION_ID AS optionId,
+        od.ORDER_QTY AS quantity,
+        od.PRICE AS itemPrice,
+
+        o.DELIVERY_FEE AS deliveryFee,
+
+        pay.PAYMENT_METHOD AS paymentMethod,
+
+        CASE pm.CARD_COMPANY
+            WHEN 'BC' THEN '비씨카드'
+            WHEN 'SHINHAN' THEN '신한카드'
+            WHEN 'KB' THEN 'KB국민카드'
+            WHEN 'SAMSUNG' THEN '삼성카드'
+            WHEN 'HYUNDAI' THEN '현대카드'
+            WHEN 'LOTTE' THEN '롯데카드'
+            WHEN 'HANA' THEN '하나카드'
+            WHEN 'WOORI' THEN '우리카드'
+            WHEN 'NH' THEN 'NH농협카드'
+            ELSE pm.CARD_COMPANY
+        END AS cardCompanyName,
+
+        CASE pm.BANK_CODE
+            WHEN 'SHINHAN' THEN '신한은행'
+            WHEN 'KB' THEN 'KB국민은행'
+            WHEN 'WOORI' THEN '우리은행'
+            WHEN 'NH' THEN 'NH농협은행'
+            WHEN 'HANA' THEN '하나은행'
+            WHEN 'KAKAO' THEN '카카오뱅크'
+            WHEN 'TOSS' THEN '토스뱅크'
+            ELSE pm.BANK_CODE
+        END AS bankName,
+
+        oa.REQUEST_MSG AS requestMsg,
+        oa.ADDRESS AS address,
+        oa.DETAIL_ADDRESS AS detailAddress,
+
+        m.MEMBER_NAME AS memberName,
+        m.PHONE AS phone,
+
+        po.OPTION1_TYPE AS option1Type,
+        po.OPTION1_VALUE AS option1Value,
+        po.OPTION2_TYPE AS option2Type,
+        po.OPTION2_VALUE AS option2Value,
+
+        img.IMAGE_URL AS imageUrl
+
+    FROM ORDERS o
+
+        JOIN ORDER_DETAIL od
+            ON o.ORDER_NO = od.ORDER_NO
+
+        JOIN PRODUCT p
+            ON od.PRODUCT_NO = p.PRODUCT_NO
+
+        JOIN MEMBER m
+            ON o.MEMBER_NO = m.MEMBER_NO
+
+        LEFT JOIN ORDER_ADDRESS oa
+            ON o.ORDER_ADDRESS_NO = oa.ORDER_ADDRESS_NO
+
+        LEFT JOIN PAYMENT pay
+            ON o.ORDER_NO = pay.ORDER_NO
+
+        LEFT JOIN PAYMENT_METHOD pm
+            ON pay.PAYMENT_METHOD_NO = pm.PAYMENT_METHOD_NO
+
+        LEFT JOIN PRODUCT_OPTION po
+            ON od.OPTION_ID = po.OPTION_ID
+
         LEFT JOIN (
-            SELECT product_no, image_url 
+            SELECT
+                product_no,
+                image_url
             FROM (
-                SELECT product_no, image_url, 
-                       ROW_NUMBER() OVER(PARTITION BY product_no ORDER BY image_no ASC) as rn 
-                FROM PRODUCT_IMAGE 
+                SELECT
+                    product_no,
+                    image_url,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY product_no
+                        ORDER BY image_no ASC
+                    ) AS rn
+                FROM PRODUCT_IMAGE
                 WHERE image_purpose = '대표'
-            ) WHERE rn = 1
-        ) img ON p.PRODUCT_NO = img.PRODUCT_NO
-        WHERE o.ORDER_NO = #{orderNo} AND o.MEMBER_NO = #{memberNo}
-        ORDER BY od.ORDER_DETAIL_NO ASC
+            )
+            WHERE rn = 1
+        ) img
+            ON p.PRODUCT_NO = img.PRODUCT_NO
+
+    WHERE o.MEMBER_NO = #{memberNo}
+      AND o.ORDER_NO = #{orderNo}
+
+    ORDER BY od.ORDER_DETAIL_NO ASC
+        
     </select>
-   
+    
+ <!-- order_list , order_list-->  
 
 
     <select id="getAddress"

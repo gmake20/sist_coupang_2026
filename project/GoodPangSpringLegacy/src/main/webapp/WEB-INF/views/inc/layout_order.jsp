@@ -41,14 +41,20 @@
     
     <div class="mypage-container">
     
+    
     <tiles:insertAttribute name="leftbanner" />
     <!-- 본문 영역 (tiles.xml에 작성된 content JSP가 여기에 들어옵니다) -->
-     <tiles:insertAttribute name="content" />
-     
+    
+      <!--  <main class="page-content"> -->
+       
+        <tiles:insertAttribute name="content" />
+        
+     <!--   </main> -->
      
      <tiles:insertAttribute name="rightbanner" />
      
      </div>
+    
     
      
      

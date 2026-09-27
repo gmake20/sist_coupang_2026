@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.doit.goodpang.domain.OrderCompleteDTO;
+import org.doit.goodpang.domain.OrderDetailDTO;
 import org.doit.goodpang.domain.OrderItemDTO;
 import org.doit.goodpang.mapper.CartMapper;
 import org.doit.goodpang.mapper.OrderMapper;
@@ -21,6 +22,7 @@ import lombok.extern.log4j.Log4j;
 @RequiredArgsConstructor
 public class OrderService {
 	
+//  order_list	
 	
 	public int getOrderCount(long memberNo, String yearFilter) {
         return orderMapper.getOrderCount(memberNo, yearFilter);
@@ -34,11 +36,11 @@ public class OrderService {
     }
 
 
-    public List<OrderItemDTO> getOrderDetailList(int orderNo, int memberNo) {
-        return orderMapper.getOrderDetailList(orderNo, memberNo);
+    public List<OrderDetailDTO>  getOrderDetailList(int memberNo, int orderNo) {
+        return orderMapper.getOrderDetail(memberNo, orderNo);
     }
 
-	
+//   order_list
 
     private final OrderMapper orderMapper;
     private final CartMapper cartMapper;
