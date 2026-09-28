@@ -63,4 +63,25 @@
 
 </select>
 
+
+<update id="updateEmail">
+    UPDATE MEMBER
+    SET EMAIL = #{newEmail}
+    WHERE MEMBER_NO = #{memberNo}
+</update>
+
+
+<update id="updatePhone">
+    UPDATE MEMBER
+    SET PHONE = #{newPhone}
+    WHERE MEMBER_NO = #{memberNo}
+</update>
+
+<update id="updatePassword">
+
+    UPDATE MEMBER
+    SET MEMBER_PW = #{encodedPassword}
+    WHERE MEMBER_NO = #{memberNo}
+
+</update>
 </mapper>
