@@ -1,134 +1,153 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html>
-<html lang="ko">
-<head>
+<%@ page language="java"
+    contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 
-    <!-- 파비콘 설정 -->
-    <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
+<%@ taglib prefix="c"
+    uri="http://java.sun.com/jsp/jstl/core" %>
 
-</head>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<section class="content-area">
 
-<title>GoodPang | 배송지 관리</title>
+    <div class="benefit-bar">
 
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/reset.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/common.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/goodpang_addressbook.css">
+        <div class="benefit-item">
+            <strong>굿페이 머니</strong>
+            <span>
+                0
+                <small>원</small>
+            </span>
+        </div>
 
-</head>
-<body>
+        <div class="benefit-item">
+            <strong>굿팡캐시</strong>
+            <span>
+                0
+                <small>원</small>
+            </span>
+        </div>
 
-	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
+    </div>
 
-	<main class="addressbook-page">
 
-			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/left_banner.jsp">
-	    <jsp:param name="activeMenu" value="address" />
-	      </jsp:include>
-		<section class="content-area">
+    <div class="address-panel">
 
-			<div class="benefit-bar">
-				<div class="benefit-item">
-					<strong>굿페이 머니</strong> <span>0 <small>원</small></span>
-				</div>
+        <div class="panel-header">
 
-				<div class="benefit-item">
-					<strong>굿팡캐시</strong> <span>0 <small>원</small></span>
-				</div>
-			</div>
+            <h2>주소록·배송지 관리</h2>
 
-			<div class="address-panel">
+            <button type="button"
+                class="guide-btn">
+                가려진 정보 보기
+            </button>
 
-				<div class="panel-header">
-					<h2>주소록·배송지 관리</h2>
+        </div>
 
-					<button type="button" class="guide-btn">가려진 정보 보기</button>
-				</div>
 
-				<c:choose>
+        <c:choose>
 
-					<c:when test="${not empty addressList}">
+            <c:when test="${not empty addressList}">
 
-						<c:forEach var="address" items="${addressList}">
+                <c:forEach var="address"
+                    items="${addressList}">
 
-							<article class="address-card">
+                    <article class="address-card">
 
-								<div class="name-line">
+                        <div class="name-line">
 
-									<strong>${address.receiverName}</strong>
+                            <strong>
+                                <c:out value="${address.receiverName}" />
+                            </strong>
 
-									<c:if test="${address.addressDefault eq 'Y'}">
-										<span class="badge default"> 기본배송지 </span>
-									</c:if>
+                            <c:if test="${address.addressDefault eq 'Y'}">
 
-									<span class="badge green"> 로켓프레시 가능 </span> <span
-										class="badge blue"> 로켓와우 가능 </span>
+                                <span class="badge default">
+                                    기본배송지
+                                </span>
 
-								</div>
+                            </c:if>
 
-								<p class="road">
-									${address.address}
+                            <span class="badge green">
+                                로켓프레시 가능
+                            </span>
 
-									<c:if test="${not empty address.detailAddress}">
-                                    ${address.detailAddress}
-                                </c:if>
-								</p>
+                            <span class="badge blue">
+                                로켓와우 가능
+                            </span>
 
-								<p>${address.tel}</p>
+                        </div>
 
-								<p>
-									<c:choose>
-										<c:when test="${not empty address.requestMsg}">
-                                        ${address.requestMsg}
-                                    </c:when>
-										<c:otherwise>
-                                        문 앞
-                                    </c:otherwise>
-									</c:choose>
-								</p>
+                        <p class="road">
 
-								<form method="get"
-									action="${pageContext.request.contextPath}/address/edit">
+                            <c:out value="${address.address}" />
 
-									<input type="hidden" name="addressNo"
-										value="${address.addressNo}">
+                            <c:if test="${not empty address.detailAddress}">
 
-									<button class="edit-btn" type="submit">수정</button>
-								</form>
+                                <c:out value="${address.detailAddress}" />
 
-							</article>
+                            </c:if>
 
-						</c:forEach>
+                        </p>
 
-					</c:when>
+                        <p>
+                            <c:out value="${address.tel}" />
+                        </p>
 
-					<c:otherwise>
-						<div class="empty-address">등록된 배송지가 없습니다.</div>
-					</c:otherwise>
 
-				</c:choose>
+                        <p>
 
-			</div>
+                            <c:choose>
 
-			<a href="${pageContext.request.contextPath}/address/add"
-				class="add-address"> <span class="plus">＋</span> 배송지 추가
-			</a>
+                                <c:when test="${not empty address.requestMsg}">
 
-		</section>
+                                    <c:out value="${address.requestMsg}" />
 
-		<aside class="address-right-area">
-			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/right_banner.jsp" />
-		</aside>
-	</main>
+                                </c:when>
 
-	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
+                                <c:otherwise>
+                                    문 앞
+                                </c:otherwise>
 
-</body>
-</html>
+                            </c:choose>
+
+                        </p>
+
+                        <form method="get"
+                            action="${pageContext.request.contextPath}/address/edit">
+
+                            <input type="hidden"
+                                name="addressNo"
+                                value="${address.addressNo}" />
+
+                            <button class="edit-btn"
+                                type="submit">
+                                수정
+                            </button>
+
+                        </form>
+
+                    </article>
+
+                </c:forEach>
+
+            </c:when>
+
+            <c:otherwise>
+
+                <div class="empty-address">
+                    등록된 배송지가 없습니다.
+                </div>
+
+            </c:otherwise>
+
+        </c:choose>
+
+    </div>
+
+    <a href="${pageContext.request.contextPath}/address/add"
+        class="add-address">
+
+        <span class="plus">＋</span>
+        배송지 추가
+
+    </a>
+
+</section>

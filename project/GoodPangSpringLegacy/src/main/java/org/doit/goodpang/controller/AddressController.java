@@ -43,7 +43,7 @@ public class AddressController {
         model.addAttribute("checkoutNo", checkoutNo);
         model.addAttribute("from", from);
 
-        return "address/address_add";
+        return "address.add";
     }
 
 
@@ -171,7 +171,7 @@ public class AddressController {
                 addressList
         );
 
-        return "address/addressbook";
+        return "address.list";
     }
     
     @GetMapping("/edit")
@@ -246,7 +246,7 @@ public class AddressController {
         );
 
 
-        return "address/address_edit";
+        return "address.edit";
     }
 
     @PostMapping("/edit")
