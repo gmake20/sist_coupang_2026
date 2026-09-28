@@ -54,12 +54,6 @@ public class SignupController {
                     );
 
         } catch (ClassNotFoundException | SQLException e) {
-
-            log.error(
-                    "회원 중복 조회 중 오류",
-                    e
-            );
-
             model.addAttribute(
                     "error",
                     "회원가입 처리 중 오류가 발생했습니다."
@@ -116,10 +110,6 @@ public class SignupController {
             return "signup";
         }
 
-
-        // ============================
-        // 회원가입 성공 → 자동 로그인
-        // ============================
         try {
 
             UserDetails userDetails =
