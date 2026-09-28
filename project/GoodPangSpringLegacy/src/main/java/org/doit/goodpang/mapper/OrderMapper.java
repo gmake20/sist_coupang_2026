@@ -20,15 +20,13 @@ public interface OrderMapper {
 	         @Param("startRow") int startRow, @Param("endRow") int endRow);
 	 
 	 
-	 List<OrderDetailDTO> getOrderDetail(@Param("memberNo")int memberNo,@Param("orderNo")int orderNo);
+	 List<OrderDetailDTO> getOrderDetail(@Param("memberNo")Long memberNo,@Param("orderNo")int orderNo);
 	 //List<OrderDetailDTO> getorderDetailPaged(@Param("memberNo")int memberNo,@Param("orderNo")int orderNo);
 	 
 
      //order_list_detail
 	 
-	    
-
-
+	 
 
     Integer findOrderNoByCheckout(
             @Param("checkoutNo") int checkoutNo,
