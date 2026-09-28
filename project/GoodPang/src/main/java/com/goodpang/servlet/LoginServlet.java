@@ -165,7 +165,7 @@ public class LoginServlet extends HttpServlet {
         @SuppressWarnings("unchecked")
         Map<Integer, Integer> guestCart =
                 (Map<Integer, Integer>)
-                session.getAttribute("guestCart");
+                session.getAttribute("guestCart");	
 
         if (guestCart != null && !guestCart.isEmpty()) {
             for (Map.Entry<Integer, Integer> entry

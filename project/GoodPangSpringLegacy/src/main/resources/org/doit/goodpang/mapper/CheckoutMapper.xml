@@ -136,116 +136,6 @@
             CHECKOUT_ITEM_NO
 
     </select>
-
-
-    <!-- 결제 화면용 상품 상세 -->
-    <select
-        id="getCheckoutItemsProduct"
-        resultMap="checkoutItemResultMap">
-
-        SELECT
-            ci.CHECKOUT_ITEM_NO,
-            ci.CHECKOUT_NO,
-            ci.PRODUCT_NO,
-            ci.OPTION_ID,
-            ci.ORDER_QTY,
-            ci.PRICE,
-
-            p.PRODUCT_NAME,
-
-            pi.IMAGE_URL,
-
-            CASE
-                WHEN po.OPTION1_VALUE IS NOT NULL
-                THEN
-                    CASE
-                        WHEN po.OPTION1_TYPE IS NOT NULL
-                        THEN po.OPTION1_TYPE || ' : '
-                        ELSE ''
-                    END
-                    || po.OPTION1_VALUE
-
-                ELSE ''
-            END
-
-            ||
-
-            CASE
-                WHEN po.OPTION2_VALUE IS NOT NULL
-                THEN
-                    CASE
-                        WHEN po.OPTION1_VALUE IS NOT NULL
-                        THEN ' / '
-                        ELSE ''
-                    END
-                    ||
-                    CASE
-                        WHEN po.OPTION2_TYPE IS NOT NULL
-                        THEN po.OPTION2_TYPE || ' : '
-                        ELSE ''
-                    END
-                    || po.OPTION2_VALUE
-
-                ELSE ''
-            END
-
-            ||
-
-            CASE
-                WHEN po.OPTION3_VALUE IS NOT NULL
-                THEN
-                    CASE
-                        WHEN po.OPTION1_VALUE IS NOT NULL
-                             OR po.OPTION2_VALUE IS NOT NULL
-                        THEN ' / '
-                        ELSE ''
-                    END
-                    ||
-                    CASE
-                        WHEN po.OPTION3_TYPE IS NOT NULL
-                        THEN po.OPTION3_TYPE || ' : '
-                        ELSE ''
-                    END
-                    || po.OPTION3_VALUE
-
-                ELSE ''
-            END
-            AS OPTION_NAME
-
-        FROM CHECKOUT_ITEM ci
-
-        JOIN PRODUCT p
-          ON ci.PRODUCT_NO =
-             p.PRODUCT_NO
-
-        LEFT JOIN PRODUCT_OPTION po
-          ON ci.OPTION_ID =
-             po.OPTION_ID
-
-        LEFT JOIN (
-            SELECT
-                PRODUCT_NO,
-                MIN(IMAGE_URL)
-                    AS IMAGE_URL
-
-            FROM PRODUCT_IMAGE
-
-            WHERE IMAGE_PURPOSE =
-                  '대표'
-
-            GROUP BY
-                PRODUCT_NO
-        ) pi
-          ON p.PRODUCT_NO =
-             pi.PRODUCT_NO
-
-        WHERE ci.CHECKOUT_NO =
-              #{checkoutNo}
-
-        ORDER BY
-            ci.CHECKOUT_ITEM_NO
-
-    </select>
     
     <insert id="insertCheckout">
     INSERT INTO CHECKOUT (
@@ -669,6 +559,110 @@
 
           AND OPTION_ID =
               #{optionId}
+
+    </select>
+    
+    <select id="getCheckoutItemsPRODUCT"
+            resultType="org.doit.goodpang.domain.CheckoutItemDTO">
+
+        SELECT
+            ci.CHECKOUT_ITEM_NO AS checkoutItemNo,
+            ci.CHECKOUT_NO      AS checkoutNo,
+            ci.PRODUCT_NO       AS productNo,
+            ci.OPTION_ID        AS optionId,
+            ci.ORDER_QTY        AS orderQty,
+            ci.PRICE            AS price,
+
+            p.PRODUCT_NAME      AS productName,
+
+            pi.IMAGE_URL        AS productImage,
+
+            RTRIM(
+                CASE
+                    WHEN po.OPTION1_VALUE IS NOT NULL
+                         AND TRIM(po.OPTION1_VALUE) IS NOT NULL
+                    THEN
+                        CASE
+                            WHEN po.OPTION1_TYPE IS NOT NULL
+                            THEN po.OPTION1_TYPE || ' : '
+                            ELSE ''
+                        END
+                        || po.OPTION1_VALUE
+                    ELSE ''
+                END
+
+                ||
+
+                CASE
+                    WHEN po.OPTION2_VALUE IS NOT NULL
+                         AND TRIM(po.OPTION2_VALUE) IS NOT NULL
+                    THEN
+                        CASE
+                            WHEN po.OPTION1_VALUE IS NOT NULL
+                                 AND TRIM(po.OPTION1_VALUE) IS NOT NULL
+                            THEN ' / '
+                            ELSE ''
+                        END
+                        ||
+                        CASE
+                            WHEN po.OPTION2_TYPE IS NOT NULL
+                            THEN po.OPTION2_TYPE || ' : '
+                            ELSE ''
+                        END
+                        || po.OPTION2_VALUE
+                    ELSE ''
+                END
+
+                ||
+
+                CASE
+                    WHEN po.OPTION3_VALUE IS NOT NULL
+                         AND TRIM(po.OPTION3_VALUE) IS NOT NULL
+                    THEN
+                        CASE
+                            WHEN (
+                                po.OPTION1_VALUE IS NOT NULL
+                                AND TRIM(po.OPTION1_VALUE) IS NOT NULL
+                            )
+                            OR (
+                                po.OPTION2_VALUE IS NOT NULL
+                                AND TRIM(po.OPTION2_VALUE) IS NOT NULL
+                            )
+                            THEN ' / '
+                            ELSE ''
+                        END
+                        ||
+                        CASE
+                            WHEN po.OPTION3_TYPE IS NOT NULL
+                            THEN po.OPTION3_TYPE || ' : '
+                            ELSE ''
+                        END
+                        || po.OPTION3_VALUE
+                    ELSE ''
+                END
+            ) AS optionName
+
+        FROM CHECKOUT_ITEM ci
+
+        JOIN PRODUCT p
+          ON ci.PRODUCT_NO = p.PRODUCT_NO
+
+        LEFT JOIN PRODUCT_OPTION po
+          ON ci.OPTION_ID = po.OPTION_ID
+
+        LEFT JOIN (
+            SELECT
+                PRODUCT_NO,
+                MIN(IMAGE_URL) AS IMAGE_URL
+            FROM PRODUCT_IMAGE
+            WHERE IMAGE_PURPOSE = '대표'
+            GROUP BY PRODUCT_NO
+        ) pi
+          ON p.PRODUCT_NO = pi.PRODUCT_NO
+
+        WHERE ci.CHECKOUT_NO = #{checkoutNo}
+
+        ORDER BY ci.CHECKOUT_ITEM_NO
 
     </select>
 

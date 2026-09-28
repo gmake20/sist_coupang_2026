@@ -315,4 +315,11 @@ public class CheckoutService {
 
         return checkoutNo;
     }
+    
+    public List<CheckoutItemDTO> getCheckoutItemsPRODUCT(
+            int checkoutNo) {
+
+        return checkoutMapper
+                .getCheckoutItemsPRODUCT(checkoutNo);
+    }
 }
