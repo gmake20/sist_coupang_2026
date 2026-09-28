@@ -260,4 +260,14 @@
             )
 	</insert>
 
+	<!-- public int hideAllBySeller(int sellerNo); -->
+	<!-- 판매자 탈퇴 시 이 판매자의 노출 중인 상품을 전부 숨김 (기존 ProductListDAO.hideAllBySeller) -->
+	<update id="hideAllBySeller">
+            UPDATE PRODUCT
+            SET DISPLAY_YN = 'N',
+                UPDATED_DATE = SYSDATE
+            WHERE SELLER_NO = #{sellerNo}
+              AND DISPLAY_YN = 'Y'
+	</update>
+
 </mapper>
