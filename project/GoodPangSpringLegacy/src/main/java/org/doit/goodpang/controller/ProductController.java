@@ -69,6 +69,7 @@ public class ProductController {
 
 		if (product == null) {
 			// 여기서 응답을 끝냈으므로 뷰로 안 감 (구버전 Handler 가 null 리턴하던 것과 같음)
+			
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, "상품을 찾을 수 없습니다.");
 			return null;
 		}
@@ -144,7 +145,7 @@ public class ProductController {
 		model.addAttribute("reviewStats", reviewStats);
 		model.addAttribute("reviewCount", reviewStats.getReviewCount());
 		model.addAttribute("avgRating", reviewStats.getAvgRating());
-
+		
 		return "product.detail";
 	}
 
