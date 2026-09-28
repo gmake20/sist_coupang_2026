@@ -15,10 +15,10 @@
 <title>리뷰 수정</title>
 
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/review_edit.css">
@@ -26,7 +26,7 @@
 
 <body>
 
-	<%-- <jsp:include page="/inc/header.jsp" /> --%>
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<div class="review-page">
 
@@ -129,7 +129,7 @@
 		</form>
 	</div>
 
-	<%-- <jsp:include page="/inc/footer.jsp" /> --%>
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
 
 
 	<script>

@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -18,7 +18,7 @@
 </head>
 
 <body>
-<jsp:include page="/inc/header.jsp" />
+<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 <div class="mypang-layout">
 
@@ -225,11 +225,11 @@
 	</main>
 
 	<aside class="address-right-area">
-		<jsp:include page="/inc/right_banner.jsp" />
+		<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views//inc/right_banner.jsp" />
 	</aside>
 </div>
 
-<jsp:include page="/inc/footer.jsp" />
+<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
 
 <script>
 function showReviewTab(tab) {

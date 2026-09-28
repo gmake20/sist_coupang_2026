@@ -30,7 +30,7 @@
 
 <body>
 
-	<jsp:include page="${pageContext.request.contextPath}/inc/header.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<main class="address-add-page">
 
@@ -158,7 +158,7 @@
 
 	</main>
 
-	<jsp:include page="${pageContext.request.contextPath}/inc/footer.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
 
 
 	<script

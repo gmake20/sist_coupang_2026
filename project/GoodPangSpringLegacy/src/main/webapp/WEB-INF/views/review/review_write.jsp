@@ -17,16 +17,16 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/review_write.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 </head>
 <body>
-		<%-- <jsp:include page="/inc/header.jsp" /> --%>
+		<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 		
 		<div class="mypang-layout">
 		
-		<jsp:include page="/inc/left_banner.jsp" />
+		<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/left_banner.jsp" />
 		
 			<main class="review-page">
 
@@ -237,14 +237,13 @@
 
 			</main>
 			
-						<%-- 
 			<aside class="review-right-banner">
-			<jsp:include page="/inc/right_banner.jsp" />
-		</aside> --%>
+			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/right_banner.jsp" />
+		</aside>
 
 		</div>
 
-		<%-- <jsp:include page="/inc/footer.jsp" /> --%> 
+		<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" /> 
 
 		<script>
 document.addEventListener("DOMContentLoaded", function () {
