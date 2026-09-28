@@ -102,8 +102,7 @@
             logout-url="/logout"
             invalidate-session="true"
             delete-cookies="JSESSIONID"
-            success-handler-ref="customLogoutSuccessHandler" 
-            />
+            success-handler-ref="customLogoutSuccessHandler" />
 
     </http>
     
