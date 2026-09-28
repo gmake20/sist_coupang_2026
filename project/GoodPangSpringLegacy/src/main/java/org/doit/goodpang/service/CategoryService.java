@@ -26,7 +26,7 @@ import lombok.extern.log4j.Log4j;
  * 카테고리 목록페이지(PLP)의 업무 로직 담당 (Service 계층).
  *
  * 구버전 com.goodpang.service.CategoryService 를 옮김. 달라진 것 3가지:
- *  ① DAO 를 new 하던 것 → 스프링이 Mapper 를 넣어줌(@Autowired)
+ *  ① DAO 를 new 하던 것 → 스프링이 Mapper 를 넣어줌
  *  ② 조회 파라미터 8개 → CategorySearchDTO 봉투 1개
  *  ③ tilesWithImage 의 ServletContext — Handler 가 넘겨주던 것 → 스프링이 넣어줌
  * 계산/정적 목록/타일 메서드는 구버전 그대로.
@@ -244,7 +244,7 @@ public class CategoryService {
      * 파일이 없는 카테고리는 타일에서 빼고, 왼쪽 사이드바 목록에는 그대로 남는다(원본과 같은 동작).
      *
      * ★ 구버전과 달라진 것
-     *   - ServletContext: Handler 가 파라미터로 넘겨주던 것 → 위의 @Autowired 필드로
+     *   - ServletContext: Handler 가 파라미터로 넘겨주던 것 → 생성자 주입 필드로
      *   - 경로: /images/category/ → /resources/images/category/ (정적파일을 resources 밑으로 옮겨서)
      */
     public List<CategoryDTO> tilesWithImage(List<CategoryDTO> children) {

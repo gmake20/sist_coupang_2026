@@ -1,7 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+
+	<div class="order-detail-wrap">
+
+		<!-- =========================
+         [2열] 가운데 본문
+    ========================== -->
 		<main class="order-content">
 
 			<!-- 주문 상세 제목 -->
@@ -96,7 +102,7 @@
 						</c:when>
 
 						<%-- [2] 결제 완료 상태 -> [배송 조회] | [주문 취소] 2개 버튼만 출력 --%>
-						<c:when test="${item.orderStatus eq '결제완료' or item.orderStatus eq '결제 완료'or item.orderStatus eq '주문접수'}">
+						<c:when test="${item.orderStatus eq '결제완료' or item.orderStatus eq '결제 완료'}">
 							<div class="delivery-buttons">
 								<button type="button" class="delivery-btn btn-action primary"
 									onclick="location.href='${pageContext.request.contextPath}/order/order_tracking?orderNo=${orderInfo.orderNo}'">
@@ -350,4 +356,3 @@
 
 		</main>
 
-		

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="org.doit.goodpang.mapper.VendorSettlementMapper">
+
+	<!-- public List<VendorSettlementDTO> findBySellerNo(int sellerNo); -->
+	<!--
+	  배송완료된 주문을 DELIVERY_END_DATE(배송완료일) 기준 1주 단위(TRUNC 'IW' = 월요일 시작)로 묶어 매출 집계.
+	  PERIOD_START(DATE) → VendorSettlementDTO.periodStart(LocalDate)는 MyBatis 3.4.5+ 기본 LocalDateTypeHandler가 변환.
+	  수수료/정산금액/정산예정일은 DTO의 getter가 계산한다.
+	-->
+	<select id="findBySellerNo" resultType="org.doit.goodpang.domain.VendorSettlementDTO">
+            SELECT
+                TRUNC(D.DELIVERY_END_DATE, 'IW') AS PERIOD_START,
+                COUNT(DISTINCT O.ORDER_NO) AS ORDER_COUNT,
+                SUM(OD.PRICE * OD.ORDER_QTY) AS SALES_AMOUNT
+            FROM ORDER_DETAIL OD
+                JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                JOIN DELIVERY D ON D.ORDER_NO = O.ORDER_NO
+            WHERE P.SELLER_NO = #{sellerNo}
+              AND O.ORDER_STATUS = '배송완료'
+              AND D.DELIVERY_END_DATE IS NOT NULL
+            GROUP BY TRUNC(D.DELIVERY_END_DATE, 'IW')
+            ORDER BY PERIOD_START DESC
+	</select>
+
+	<!-- public List<VendorSettlementDetailDTO> findDetailBySellerNo(int sellerNo, LocalDate periodStart); -->
+	<!--
+	  정산상세 - 특정 정산기간(월요일 시작일)에 포함된 주문라인을 하나씩 그대로 보여준다.
+	  findBySellerNo()가 GROUP BY로 합친 걸 풀어서 보여주는 것 (기존 VendorSettlementDAO.findDetailBySellerNo).
+	  QUANTITY: DTO 필드명(quantity)에 맞춰 ORDER_QTY에 별칭
+	  OPTION_LABEL: 기존 buildOptionLabel()과 같은 규칙 - 값이 있는 옵션만 " / "로 이어붙임
+	-->
+	<select id="findDetailBySellerNo" resultType="org.doit.goodpang.domain.VendorSettlementDetailDTO">
+            SELECT
+                O.ORDER_NO,
+                P.PRODUCT_NAME,
+                SUBSTR(
+                    CASE WHEN TRIM(PO.OPTION1_VALUE) IS NOT NULL THEN ' / ' || PO.OPTION1_VALUE END ||
+                    CASE WHEN TRIM(PO.OPTION2_VALUE) IS NOT NULL THEN ' / ' || PO.OPTION2_VALUE END ||
+                    CASE WHEN TRIM(PO.OPTION3_VALUE) IS NOT NULL THEN ' / ' || PO.OPTION3_VALUE END,
+                    4) AS OPTION_LABEL,
+                OD.ORDER_QTY AS QUANTITY,
+                OD.PRICE,
+                D.DELIVERY_END_DATE
+            FROM ORDER_DETAIL OD
+                JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                JOIN DELIVERY D ON D.ORDER_NO = O.ORDER_NO
+                LEFT JOIN PRODUCT_OPTION PO ON OD.OPTION_ID = PO.OPTION_ID
+            WHERE P.SELLER_NO = #{sellerNo}
+              AND O.ORDER_STATUS = '배송완료'
+              AND TRUNC(D.DELIVERY_END_DATE, 'IW') = #{periodStart}
+            ORDER BY D.DELIVERY_END_DATE, O.ORDER_NO
+	</select>
+
+</mapper>

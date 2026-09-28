@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.doit.goodpang.domain.VendorDeliveryDTO;
+import org.doit.goodpang.domain.VendorOrderDetailDTO;
+import org.doit.goodpang.domain.VendorOrderItemDTO;
 import org.doit.goodpang.domain.VendorOrderListDTO;
 import org.doit.goodpang.domain.VendorOrderStatSummaryDTO;
 import org.doit.goodpang.domain.VendorReturnDTO;
@@ -58,5 +60,13 @@ public interface VendorOrderMapper {
 	// DELIVERY 행 생성 (배송중, 배송 시작일 = 지금)
 	public int insertDelivery(@Param("orderNo") int orderNo, @Param("deliveryServiceCode") String deliveryServiceCode,
 			@Param("invoiceNo") String invoiceNo);
+
+	// ===== 주문 상세 - VendorOrderService.getOrderDetail에서 조립 =====
+
+	// 주문 + 주문자 + 배송지 + 최근 배송 이력. 이 판매자 상품이 없는 주문이면 null
+	public VendorOrderDetailDTO selectOrderDetail(@Param("orderNo") int orderNo, @Param("sellerNo") int sellerNo);
+
+	// 이 주문 중 이 판매자 상품 라인만
+	public List<VendorOrderItemDTO> selectOrderItems(@Param("orderNo") int orderNo, @Param("sellerNo") int sellerNo);
 
 }

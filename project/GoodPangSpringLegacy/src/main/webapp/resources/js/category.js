@@ -92,7 +92,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	var FOLD_LIMIT = 5;
 	var lists = document.querySelectorAll('.category-filter .filter-group ul');
 
-	var categoryNo = new URLSearchParams(location.search).get('categoryNo') || '';
+	// var categoryNo = new URLSearchParams(location.search).get('categoryNo') || '';
+	var pathMatch = location.pathname.match(/\/category\/(\d+)/);
+    var categoryNo = pathMatch ? pathMatch[1]
+                     : (new URLSearchParams(location.search).get('categoryNo') || '');
 	var STORAGE_KEY = 'category-filter-unfolded:' + categoryNo;
 
 	function loadUnfolded() {

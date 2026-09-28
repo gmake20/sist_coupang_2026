@@ -204,7 +204,7 @@
                         </td>
                         <td class="col-manage">
                           <a class="btn btn-outline btn-sm"
-                             href="${pageContext.request.contextPath}/vendor/order/detail?orderNo=${order.orderNo}">상세보기</a>
+                             href="${pageContext.request.contextPath}/vendor/order_detail.htm?orderNo=${order.orderNo}">상세보기</a>
                           <c:if test="${order.orderStatus == '결제완료'}">
                             <form method="post" action="${pageContext.request.contextPath}/vendor/order/ship.htm"
                                   style="display:inline-flex; gap:4px; align-items:center; margin-top:4px;"

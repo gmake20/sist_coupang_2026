@@ -105,7 +105,7 @@
                       </td>
                       <td class="col-manage">
                         <a class="btn btn-outline btn-sm"
-                           href="${pageContext.request.contextPath}/vendor/order/detail.htm?orderNo=${delivery.orderNo}">상세보기</a>
+                           href="${pageContext.request.contextPath}/vendor/order_detail.htm?orderNo=${delivery.orderNo}">상세보기</a>
                       </td>
                     </tr>
                   </c:forEach>

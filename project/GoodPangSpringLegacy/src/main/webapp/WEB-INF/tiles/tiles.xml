@@ -34,6 +34,10 @@
 		template="/WEB-INF/views/vendor/login.jsp">
 	</definition>
 
+	<definition name="vendor.signup"
+		template="/WEB-INF/views/vendor/signup.jsp">
+	</definition>
+
 	<definition name="vendor.*"  template="/WEB-INF/views/vendor/inc/layout.jsp">
 		<put-attribute name="css" value="/vendor/inc/css/{1}.css"/>
 		<put-attribute name="iconsprite" value="/WEB-INF/views/vendor/inc/icon-sprite.jsp"/>
@@ -59,10 +63,11 @@
         <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
     </definition>
     
+    <!-- 2. 주문 목록 페이지 정의 (OrderController가 "order.order_list"를 리턴함) -->
     <definition name="order.order_detail" extends="order-layout">
         <put-attribute name="css" value="/resources/css/order_detail.css"/>
         <put-attribute name="content" value="/WEB-INF/views/order/order_detail.jsp" />
-        <put-attribute name="title" value="주문상세 - GoodPang" />
+        <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
     </definition>
     
     <!-- 배송지 전용 레이아웃 -->
@@ -134,6 +139,25 @@
 	
 	</definition>
     
+    <!-- 2. 주문 목록 페이지 정의 (OrderController가 "order.order_list"를 리턴함) -->
+    <definition name="order.cancel_history" extends="order-layout">
+        <put-attribute name="css" value="/resources/css/cancel_history.css"/>
+        <put-attribute name="content" value="/WEB-INF/views/order/cancel_history.jsp" />
+        <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
+    </definition>
+    
+    
+	<!-- 관리자 로그인 - 레이아웃 없는 단독 화면 (AdminController.login) -->
+	<definition name="admin.login"
+		template="/WEB-INF/views/admin/login.jsp">
+	</definition>
+
+	<!-- 관리자 화면 - 기존 GoodPang 관리자 페이지들은 공통 레이아웃 없이 각자 단독 화면이라 JSP를 그대로 template으로 씀.
+	     admin.dashboard → /WEB-INF/views/admin/dashboard.jsp -->
+	<definition name="admin.*"
+		template="/WEB-INF/views/admin/{1}.jsp">
+	</definition>
+
 </tiles-definitions>
 
 
