@@ -17,15 +17,21 @@ import org.doit.goodpang.domain.SellerDTO;
 import org.doit.goodpang.domain.VendorDailySalesDTO;
 import org.doit.goodpang.domain.VendorDailyTrafficDTO;
 import org.doit.goodpang.domain.VendorDashboardStatDTO;
+import org.doit.goodpang.domain.VendorDeliveryDTO;
 import org.doit.goodpang.domain.VendorOrderListDTO;
 import org.doit.goodpang.domain.VendorOrderStatSummaryDTO;
 import org.doit.goodpang.domain.VendorProductListDTO;
 import org.doit.goodpang.domain.VendorProductOptionDTO;
 import org.doit.goodpang.domain.VendorProductOptionGroupDTO;
+import org.doit.goodpang.domain.VendorReturnDTO;
+import org.doit.goodpang.domain.VendorShippingDTO;
+import org.doit.goodpang.mapper.VendorActionLogMapper;
 import org.doit.goodpang.mapper.VendorDashboardMapper;
 import org.doit.goodpang.mapper.VendorMapper;
 import org.doit.goodpang.mapper.VendorOrderMapper;
 import org.doit.goodpang.mapper.VendorProductMapper;
+import org.doit.goodpang.service.VendorOrderService;
+import org.doit.goodpang.service.VendorOrderService.ShipResult;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +53,8 @@ public class VendorController {
 	private final VendorDashboardMapper vendorDashboardMapper;
 	private final VendorProductMapper vendorProductMapper;
 	private final VendorOrderMapper vendorOrderMapper;
+	private final VendorActionLogMapper vendorActionLogMapper;
+	private final VendorOrderService vendorOrderService;
 	// private final MemberShipService memberShipService;
 
 	// 차트 데이터를 JS에 넘길 JSON 변환용 (기존 서블릿의 Gson 대신 pom.xml에 이미 있는 Jackson 사용)
@@ -406,4 +414,148 @@ public class VendorController {
 			return null;
 		}
 	}
+
+	/*
+	 * 배송 관리 - 배송중인 주문을 모니터링하고 지연 건을 잡아내는 용도. 배송완료 처리는 여기서 하지 않음
+	 * (실제 배송완료는 배송기사가 처리해야 할 일이라, 지금은 관리자가 배송 관리 화면에서 대행 중).
+	 */
+	@GetMapping(value = "/delivery.htm")
+	public ModelAndView delivery(HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		List<VendorDeliveryDTO> deliveryList = vendorOrderMapper.findShippingBySellerNo(loginSeller.getSellerNo());
+
+		// 배송 시작 후 3일 이상 지난 건 (VendorDeliveryDTO.isDelayed 기준)
+		long delayedCount = deliveryList.stream().filter(VendorDeliveryDTO::isDelayed).count();
+
+		ModelAndView mav = new ModelAndView("vendor.delivery");
+		mav.addObject("menu", "delivery"); // 사이드바 활성 메뉴
+
+		mav.addObject("deliveryList", deliveryList);
+		mav.addObject("delayedCount", delayedCount);
+
+		return mav;
+	}
+	
+	// return은 예약어라서 함수이름으로 사용안됨 
+	@GetMapping(value = "/return.htm")
+	public ModelAndView vendorReturn(HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		List<VendorReturnDTO> returnList = vendorOrderMapper.findReturnsBySellerNo(loginSeller.getSellerNo());
+
+		// 상단 통계 카드 - 유형(RETURN_TYPE)별 건수
+		long cancelCount = returnList.stream().filter(r -> "취소".equals(r.getReturnType())).count();
+		long returnCount = returnList.stream().filter(r -> "반품".equals(r.getReturnType())).count();
+		long exchangeCount = returnList.stream().filter(r -> "교환".equals(r.getReturnType())).count();
+
+		ModelAndView mav = new ModelAndView("vendor.return");
+		mav.addObject("menu", "return"); // 사이드바 활성 메뉴
+
+		mav.addObject("returnList", returnList);
+		mav.addObject("cancelCount", cancelCount);
+		mav.addObject("returnCount", returnCount);
+		mav.addObject("exchangeCount", exchangeCount);
+
+		return mav;
+	}
+	
+	/*
+	 * 출고/운송장 관리 - '결제완료' 상태인 출고 대기 주문만 모아서 보여주고, 출고 지연 임박 건을 잡아낸다.
+	 * 실제 송장 등록/출고 처리는 주문 쪽 출고 처리(기존 /vendor/order/ship)를 그대로 쓴다.
+	 */
+	@GetMapping(value = "/shipping.htm")
+	public ModelAndView shipping(HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		List<VendorShippingDTO> shippingList = vendorOrderMapper.findWaitingBySellerNo(loginSeller.getSellerNo());
+
+		// 결제완료 후 2일 이상 지나도 출고 안 된 건 (VendorShippingDTO.isDelayed 기준)
+		long delayedCount = shippingList.stream().filter(VendorShippingDTO::isDelayed).count();
+
+		ModelAndView mav = new ModelAndView("vendor.shipping");
+		mav.addObject("menu", "shipping"); // 사이드바 활성 메뉴
+
+		mav.addObject("shippingList", shippingList);
+		mav.addObject("delayedCount", delayedCount);
+
+		return mav;
+	}
+
+	/*
+	 * 출고 처리 - '결제완료' 주문을 송장번호와 함께 '배송중'으로 전환 (기존 VendorOrderShipServlet, POST /vendor/order/ship).
+	 * "주문 목록"(order.jsp)과 "출고/운송장 관리"(shipping.jsp) 두 화면의 폼이 같이 쓴다.
+	 * 처리 후엔 폼의 redirectTo 화면으로 돌아가고, 송장번호 중복이면 ?shipError=duplicateInvoice 를 붙인다.
+	 */
+	@PostMapping(value = "/order/ship.htm")
+	public ModelAndView shipOrder(
+			@RequestParam(value = "orderNo", required = false) String orderNoParam,
+			@RequestParam(value = "invoiceNo", required = false) String invoiceNo,
+			@RequestParam(value = "redirectTo", required = false) String redirectTo,
+			HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		String redirectPath = resolveShipRedirectTo(redirectTo);
+
+		if (invoiceNo == null || invoiceNo.isBlank()) {
+			return new ModelAndView("redirect:" + redirectPath);
+		}
+
+		int orderNo;
+		try {
+			orderNo = Integer.parseInt(orderNoParam);
+		} catch (NumberFormatException e) {
+			// orderNo가 없거나 숫자가 아니면 아무 것도 바꾸지 않고 목록으로 돌려보낸다.
+			return new ModelAndView("redirect:" + redirectPath);
+		}
+
+		int sellerNo = loginSeller.getSellerNo();
+		String trimmedInvoiceNo = invoiceNo.trim();
+
+		ShipResult result = vendorOrderService.shipOrder(orderNo, sellerNo, trimmedInvoiceNo);
+
+		if (result == ShipResult.SUCCESS) {
+			// 로그 기록 실패가 출고 처리 자체를 되돌리면 안 되므로 트랜잭션 밖에서 따로 남긴다 (기존과 동일)
+			try {
+				vendorActionLogMapper.insertLog(sellerNo, "배송 처리", "ORDERS", orderNo, "송장번호 " + trimmedInvoiceNo);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		String shipErrorParam = (result == ShipResult.INVOICE_DUPLICATE) ? "?shipError=duplicateInvoice" : "";
+
+		return new ModelAndView("redirect:" + redirectPath + shipErrorParam);
+	}
+
+	// 처리 후 돌아갈 화면. 허용된 경로 외에는 무시하고 주문 목록으로 보낸다 - 오픈 리다이렉트 방지.
+	private String resolveShipRedirectTo(String redirectTo) {
+
+		if ("/vendor/shipping.htm".equals(redirectTo)) {
+			return redirectTo;
+		}
+
+		return "/vendor/order.htm";
+	}
+	
 }
