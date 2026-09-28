@@ -22,6 +22,10 @@
          <beans:constructor-arg
         	ref="memberMapper" />
         </beans:bean>
+        
+    <beans:bean
+	    id="customLogoutSuccessHandler"
+	    class="org.doit.goodpang.security.CustomLogoutSuccessHandler" />
 
 
     <!-- BCrypt -->
@@ -96,9 +100,9 @@
 
         <logout
             logout-url="/logout"
-            logout-success-url="/"
             invalidate-session="true"
-            delete-cookies="JSESSIONID" />
+            delete-cookies="JSESSIONID"
+            success-handler-ref="customLogoutSuccessHandler" />
 
     </http>
     
