@@ -6,7 +6,12 @@
         request/session 속성 "sellerGrade" 가 있을 때만 표시 (예) model.addAttribute("sellerGrade", "파워셀러" ); // 배지 표시 값을 안 넣으면 배지
         없음 (대부분의 페이지) Tiles의 insertAttribute는 동적 include라 layout.jsp의 스크립틀릿 지역변수가 이 파일에서 안 보임 → 반드시 request 속성 +
         EL(${sellerGrade})로 받아야 함=========================================================--%>
-<% String sellerGrade="파워셀러" ; String menu="orders" ; %>
+<%-- 판매자 등급: 아직 DB(SELLER)에 등급 컬럼이 없어서 임시로 하드코딩.
+     스크립틀릿 변수(<% String sellerGrade = ... %>)는 EL에서 안 보이므로 c:set으로 page 범위 변수를 만든다.
+     Controller/세션이 sellerGrade를 넘겨주면 그 값이 우선이고, 없을 때만 "파워셀러"로 채운다. --%>
+<c:if test="${empty sellerGrade}">
+	<c:set var="sellerGrade" value="파워셀러" />
+</c:if>
 
 <!-- 상단바 -->
 <header class="topbar">

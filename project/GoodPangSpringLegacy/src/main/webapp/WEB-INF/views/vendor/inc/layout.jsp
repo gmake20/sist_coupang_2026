@@ -24,6 +24,16 @@
 	<%  } %>  
 
   <title>굿팡 판매자 대시보드</title>
+  
+  <!-- 공통 css -->
+  <style>
+	.user-grade {
+	  font-size: 11px;
+	  color: #ff9f1c;
+	  font-weight: 600;
+	}  
+  </style>
+  
 </head>
 
 <body>
