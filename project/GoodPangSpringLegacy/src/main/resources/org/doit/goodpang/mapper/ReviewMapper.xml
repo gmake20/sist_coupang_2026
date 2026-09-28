@@ -355,15 +355,18 @@
 
 </select>
 
-<select id="getNextReviewNo"
-        resultType="int">
+<insert id="insertReview"
+ parameterType="org.doit.goodpang.domain.ReviewDTO2">
 
-    SELECT SEQ_REVIEW_NO.NEXTVAL
-    FROM DUAL
+	<selectKey
+        keyProperty="reviewNo"
+        resultType="int"
+        order="BEFORE">
 
-</select>
+        SELECT SEQ_REVIEW_NO.NEXTVAL
+        FROM DUAL
 
-<insert id="insertReview">
+    </selectKey>
 
     INSERT INTO REVIEW (
         REVIEW_NO,
@@ -376,7 +379,7 @@
         ORDER_DETAIL_NO
     )
     VALUES (
-        SEQ_REVIEW_NO.NEXTVAL,
+        #{reviewNo},
         #{productRating},
         #{serviceRating, jdbcType=NUMERIC},
         #{reviewContent, jdbcType=VARCHAR},

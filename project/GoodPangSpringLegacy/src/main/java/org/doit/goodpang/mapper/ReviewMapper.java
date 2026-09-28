@@ -37,6 +37,7 @@ public interface ReviewMapper {
     int insertReview(ReviewDTO2 dto);
     
     int insertReview(
+    		@Param("reviewNo") int reviewNo,
             @Param("memberNo") Long memberNo,
             @Param("orderDetailNo") int orderDetailNo,
             @Param("serviceRating") Integer serviceRating,
@@ -45,8 +46,6 @@ public interface ReviewMapper {
             @Param("reviewSummary") String reviewSummary
     );
     
-    int getNextReviewNo();
-
     int insertReviewImage(
             @Param("reviewNo") int reviewNo,
             @Param("imageUrl") String imageUrl,
