@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -87,7 +88,7 @@
 
 			<form action="${pageContext.request.contextPath}/wow/join"
 				method="post" id="wowJoinForm">
-
+				<sec:csrfInput/>
 				<section class="wow-payment-section">
 					<h2>결제수단</h2>
 
@@ -195,6 +196,7 @@
 
 			<form action="${pageContext.request.contextPath}/payment-method/add"
 				method="post" id="paymentAddForm">
+				<sec:csrfInput/>
 
 				<input type="hidden" name="redirect" value="/wow/join">
 
