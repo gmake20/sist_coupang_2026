@@ -29,4 +29,28 @@
             WHERE N.NOTICE_NO = #{noticeNo}
 	</select>
 
+	<!-- ===== 관리자 공지 등록/수정/삭제 (기존 NoticeDAO.insert / update / delete) ===== -->
+
+	<!-- public int insertNotice(NoticeDTO notice); -->
+	<!-- 새 번호(SEQ_NOTICE)를 먼저 받아 notice.noticeNo에 채운 뒤 INSERT - 호출한 쪽에서 notice.getNoticeNo()로 새 번호를 알 수 있음 -->
+	<insert id="insertNotice" parameterType="org.doit.goodpang.domain.NoticeDTO">
+            <selectKey keyProperty="noticeNo" resultType="int" order="BEFORE">
+                SELECT SEQ_NOTICE.NEXTVAL FROM DUAL
+            </selectKey>
+            INSERT INTO NOTICE (NOTICE_NO, TITLE, CONTENT, NOTICE_TYPE, ADMIN_NO, CREATED_DATE, UPDATED_DATE)
+            VALUES (#{noticeNo}, #{title}, #{content}, #{noticeType}, #{adminNo}, SYSDATE, SYSDATE)
+	</insert>
+
+	<!-- public int updateNotice(NoticeDTO notice); -->
+	<update id="updateNotice" parameterType="org.doit.goodpang.domain.NoticeDTO">
+            UPDATE NOTICE
+            SET TITLE = #{title}, CONTENT = #{content}, NOTICE_TYPE = #{noticeType}, UPDATED_DATE = SYSDATE
+            WHERE NOTICE_NO = #{noticeNo}
+	</update>
+
+	<!-- public int deleteNotice(int noticeNo); -->
+	<delete id="deleteNotice">
+            DELETE FROM NOTICE WHERE NOTICE_NO = #{noticeNo}
+	</delete>
+
 </mapper>

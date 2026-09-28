@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="org.doit.goodpang.mapper.AdminActionLogMapper">
+
+	<!-- public int insertLog(int adminNo, String actionType, String targetType, int targetNo, String reason); -->
+	<insert id="insertLog">
+            INSERT INTO ADMIN_ACTION_LOG (
+                ACTION_LOG_NO, ADMIN_NO, ACTION_TYPE, TARGET_TYPE, TARGET_NO, REASON, ACTION_DATE
+            ) VALUES (
+                SEQ_ADMIN_ACTION_LOG.NEXTVAL, #{adminNo}, #{actionType}, #{targetType}, #{targetNo},
+                #{reason, jdbcType=VARCHAR}, SYSDATE
+            )
+	</insert>
+
+</mapper>

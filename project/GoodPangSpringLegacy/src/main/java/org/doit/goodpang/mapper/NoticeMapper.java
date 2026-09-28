@@ -22,4 +22,15 @@ public interface NoticeMapper {
 	// 상세 - 본문(CONTENT) 포함. 없는 번호면 null
 	public NoticeDTO findByNoticeNo(@Param("noticeNo") int noticeNo);
 
+	// ===== 관리자 공지 등록/수정/삭제 =====
+
+	// 등록 - 성공하면 notice.noticeNo에 새 번호가 채워진다 (selectKey)
+	public int insertNotice(NoticeDTO notice);
+
+	// 수정 (제목/내용/구분). 없는 번호면 0
+	public int updateNotice(NoticeDTO notice);
+
+	// 삭제. 없는 번호면 0
+	public int deleteNotice(@Param("noticeNo") int noticeNo);
+
 }

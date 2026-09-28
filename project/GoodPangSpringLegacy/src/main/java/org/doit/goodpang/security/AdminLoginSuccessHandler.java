@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 /*
- * 관리자 로그인 성공 처리 (security-context.xml의 관리자 전용 <http> form-login에서 사용).
+ * 관리자 로그인 성공 처리(security-context.xml의 관리자 전용 <http> form-login에서 사용).
  *
  * 인증 자체(아이디/비밀번호/ROLE_ADMIN)는 Spring Security의 jdbc-user-service가 ADMIN 테이블로 처리하고,
  * 여기서는 기존 AdminLoginServlet이 세션에 넣던 값(loginAdmin/adminNo/adminName)을 그대로 채워준다 -
