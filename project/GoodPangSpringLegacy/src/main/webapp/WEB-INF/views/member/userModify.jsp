@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -25,7 +26,7 @@
 
 <body>
 
-	<jsp:include page="${pageContext.request.contextPath}/WEB-INF//inc/header.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<div class="user-modify-page">
 		<div class="user-modify-layout">
@@ -57,6 +58,7 @@
 							<form action="${pageContext.request.contextPath}/member/update"
 								method="post">
 
+								<sec:csrfInput/>
 								<input type="hidden" name="type" value="email"> <input
 									type="email" id="newEmail" name="newEmail" placeholder="새 이메일"
 									required>
@@ -96,11 +98,20 @@
 						<div id="phoneChangeForm" class="hidden-form">
 							<form action="${pageContext.request.contextPath}/member/update"
 								method="post">
+								
+								<sec:csrfInput/>
 
-								<input type="hidden" name="type" value="phone"> <input
-									type="text" id="newPhone" name="newPhone"
-									placeholder="010-0000-0000" required>
-
+								<input type="hidden" name="type" value="phone">
+								<input
+								    type="tel"
+								    id="newPhone"
+								    name="newPhone"
+								    placeholder="010-0000-0000"
+								    maxlength="13"
+								    pattern="010-[0-9]{4}-[0-9]{4}"
+								    oninput="formatPhone(this)"
+								    required
+								>
 								<button type="submit" class="small-btn">휴대폰 번호 변경</button>
 							</form>
 						</div>
@@ -117,6 +128,7 @@
 
 						<form action="${pageContext.request.contextPath}/member/password"
 							method="post" class="password-form" id="passwordForm">
+							<sec:csrfInput/>
 
 							<!-- 현재 비밀번호 -->
 							<div class="password-input-row">
@@ -209,11 +221,11 @@
 			</main>
 
 			<!-- 오른쪽 배너 -->
-			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/inc/right_banner.jsp" />
+			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/right_banner.jsp" />
 		</div>
 	</div>
 
-	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/inc/footer.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
 
 	<script>
 function toggleForm(id) {
@@ -282,5 +294,36 @@ passwordForm.addEventListener("submit", function (event) {
 });
 </script>
 
+<script>
+function formatPhone(input) {
+
+    let value = input.value.replace(/[^0-9]/g, '');
+
+    if (value.length > 11) {
+        value = value.substring(0, 11);
+    }
+
+    if (value.length <= 3) {
+
+        input.value = value;
+
+    } else if (value.length <= 7) {
+
+        input.value =
+            value.substring(0, 3)
+            + "-"
+            + value.substring(3);
+
+    } else {
+
+        input.value =
+            value.substring(0, 3)
+            + "-"
+            + value.substring(3, 7)
+            + "-"
+            + value.substring(7, 11);
+    }
+}
+</script>
 </body>
 </html>
