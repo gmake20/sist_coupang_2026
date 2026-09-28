@@ -12,15 +12,15 @@
 <meta charset="UTF-8">
 <title>와우 멤버십 가입</title>
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/wow_join.css">
+	href="${pageContext.request.contextPath}/resources/css/wow_join.css">
 </head>
 <body>
 
-	<jsp:include page="/inc/header.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<div class="wow-join-page">
 		<div class="wow-join-container">

@@ -29,7 +29,7 @@
 	<div class="mypang-layout">
 
 		<!-- 리뷰관리 메뉴 파란색 활성화 -->
-		<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views//inc/left_banner.jsp">
+		<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/left_banner.jsp">
 			<jsp:param name="activeMenu" value="review" />
 		</jsp:include>
 		<!-- 중앙 리뷰관리 -->
@@ -261,7 +261,7 @@
 		</main>
 
 		<aside class="review-right-banner">
-			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views//inc/right_banner.jsp" />
+			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/right_banner.jsp" />
 		</aside>
 	</div>
 

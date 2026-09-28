@@ -25,11 +25,11 @@
 </head>
 <body>
 
-	<jsp:include page="/inc/header.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<main class="addressbook-page">
 
-			<jsp:include page="/inc/left_banner.jsp">
+			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/left_banner.jsp">
 	    <jsp:param name="activeMenu" value="address" />
 	      </jsp:include>
 		<section class="content-area">
@@ -124,11 +124,11 @@
 		</section>
 
 		<aside class="address-right-area">
-			<jsp:include page="/inc/right_banner.jsp" />
+			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views//inc/right_banner.jsp" />
 		</aside>
 	</main>
 
-	<jsp:include page="/inc/footer.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views//inc/footer.jsp" />
 
 </body>
 </html>
