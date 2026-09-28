@@ -469,7 +469,7 @@ uri="http://www.springframework.org/security/tags" %>
 </script>
 
 
-	<script src="${pageContext.request.contextPath}/js/cart.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/cart.js"></script>
 
 </body>
 

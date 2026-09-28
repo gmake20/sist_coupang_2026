@@ -1375,15 +1375,18 @@
         const submitButtons = document.querySelectorAll('#topSubmitButton, .write-foot button[type="submit"]');
         submitButtons.forEach(function (btn) { btn.disabled = true; });
 
-        fetch("${pageContext.request.contextPath}/vendor/product/write", {
+        // multipart 요청은 Spring Security의 CsrfFilter가 본문(_csrf 파라미터)을 읽지 못해서 403이 나므로,
+        // CSRF 토큰은 헤더로 보낸다. Content-Type은 FormData가 boundary까지 알아서 붙이므로 지정하지 않음.
+        fetch("${pageContext.request.contextPath}/vendor/product_write.htm", {
           method: "POST",
+          headers: { "${_csrf.headerName}": "${_csrf.token}" },
           body: formData
         })
           .then(function (res) { return res.json(); })
           .then(function (result) {
             if (result.success) {
               alert("상품이 등록되었습니다. (상품번호 " + result.productNo + ")");
-              window.location.href = "${pageContext.request.contextPath}/vendor/product";
+              window.location.href = "${pageContext.request.contextPath}/vendor/product.htm";
             } else {
               alert(result.message || "상품 등록에 실패했습니다.");
             }

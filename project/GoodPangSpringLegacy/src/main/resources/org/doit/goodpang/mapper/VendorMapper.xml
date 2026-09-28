@@ -17,5 +17,81 @@
             FROM SELLER
             WHERE EMAIL = #{email}	
 	</select>
-	
+
+	<!-- public int updateBusinessInfo(SellerDTO dto); -->
+	<!--
+	  판매자 정보관리 제출 (기존 SellerDAO.updateBusinessInfo).
+	  '입점 대기'/'반려' 상태에서 제출하면 '심사 중'으로 바꾸고, '승인' 상태에서 수정하는 경우는 재심사로 되돌리지 않는다.
+	  null이 들어올 수 있는 값은 jdbcType 지정 (Oracle은 타입 없는 null 바인딩을 거부함)
+	-->
+	<update id="updateBusinessInfo">
+            UPDATE SELLER
+            SET
+                ZIPCODE = #{zipcode},
+                BUSINESS_ADDRESS = #{businessAddress},
+                BUSINESS_DETAIL_ADDRESS = #{businessDetailAddress, jdbcType=VARCHAR},
+                MAIL_ORDER_NO = #{mailOrderNo},
+                CATEGORY_NO = #{categoryNo, jdbcType=NUMERIC},
+                BANK_NAME = #{bankName},
+                ACCOUNT_NO = #{accountNo},
+                ACCOUNT_HOLDER = #{accountHolder},
+                BUSINESS_CERT_URL = #{businessCertUrl, jdbcType=VARCHAR},
+                MAIL_ORDER_CERT_URL = #{mailOrderCertUrl, jdbcType=VARCHAR},
+                APPROVAL_STATUS = CASE WHEN APPROVAL_STATUS IN ('입점 대기', '반려') THEN '심사 중' ELSE APPROVAL_STATUS END,
+                UPDATED_DATE = SYSDATE
+            WHERE SELLER_NO = #{sellerNo}
+	</update>
+
+	<!-- ===== 판매자 입점 신청(회원가입) - 기존 SellerDAO.existsByEmail / existsByBusinessNo / insertSeller ===== -->
+
+	<!-- public int countByEmail(String email); -->
+	<select id="countByEmail" resultType="int">
+            SELECT COUNT(*)
+            FROM SELLER
+            WHERE EMAIL = #{email}
+	</select>
+
+	<!-- public int countByBusinessNo(String businessNo); -->
+	<select id="countByBusinessNo" resultType="int">
+            SELECT COUNT(*)
+            FROM SELLER
+            WHERE BUSINESS_NO = #{businessNo}
+	</select>
+
+	<!-- public int insertSeller(SellerDTO dto); -->
+	<!-- 가입 직후 상태는 '입점 대기' - 사업장 주소/정산계좌/서류는 판매자 정보관리(business_info)에서 추가 입력 -->
+	<insert id="insertSeller">
+            INSERT INTO SELLER (
+                SELLER_NO,
+                EMAIL,
+                SELLER_PW,
+                MANAGER_NAME,
+                PHONE,
+                BUSINESS_NO,
+                BUSINESS_TYPE,
+                CEO_NAME,
+                STORE_NAME,
+                APPROVAL_STATUS,
+                CREATED_DATE,
+                UPDATED_DATE
+            )
+            VALUES (
+                SEQ_SELLER.NEXTVAL,
+                #{email}, #{sellerPw}, #{managerName}, #{phone},
+                #{businessNo}, #{businessType}, #{ceoName}, #{storeName},
+                '입점 대기',
+                SYSDATE, SYSDATE
+            )
+	</insert>
+
+	<!-- public int updateApprovalStatus(int sellerNo, String approvalStatus, String rejectReason); -->
+	<!-- 판매자 상태 변경 (기존 SellerDAO.updateApprovalStatus) - 탈퇴, 관리자 승인/반려/정지 등. rejectReason은 null 가능 -->
+	<update id="updateApprovalStatus">
+            UPDATE SELLER
+            SET APPROVAL_STATUS = #{approvalStatus},
+                REJECT_REASON = #{rejectReason, jdbcType=VARCHAR},
+                UPDATED_DATE = SYSDATE
+            WHERE SELLER_NO = #{sellerNo}
+	</update>
+
   </mapper>

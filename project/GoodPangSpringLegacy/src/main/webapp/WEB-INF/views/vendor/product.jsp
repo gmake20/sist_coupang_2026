@@ -357,6 +357,7 @@
 												<input type="hidden" name="productNo"
 													value="${product.productNo}"> <input type="hidden"
 													name="displayYn" value="Y">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 												<button class="btn btn-primary btn-sm" type="submit">숨김
 													해제</button>
 											</form>
@@ -372,6 +373,7 @@
 													<input type="hidden" name="productNo"
 														value="${product.productNo}"> <input type="hidden"
 														name="saleStatus" value="판매 중지">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 													<button class="btn btn-outline btn-sm" type="submit">판매중지</button>
 												</form>
 											</c:if>
@@ -382,6 +384,7 @@
 													<input type="hidden" name="productNo"
 														value="${product.productNo}"> <input type="hidden"
 														name="saleStatus" value="판매 중">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 													<button class="btn btn-primary btn-sm" type="submit">판매재개</button>
 												</form>
 											</c:if>
@@ -392,6 +395,7 @@
 												<input type="hidden" name="productNo"
 													value="${product.productNo}"> <input type="hidden"
 													name="displayYn" value="N">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 												<button class="btn btn-outline btn-sm" type="submit">숨김</button>
 											</form>
 										</c:otherwise>

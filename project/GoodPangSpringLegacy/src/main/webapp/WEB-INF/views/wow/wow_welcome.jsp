@@ -15,15 +15,15 @@ uri="http://www.springframework.org/security/tags" %>
 <meta charset="UTF-8">
 <title>와우 멤버십 가입 완료</title>
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/wow_welcome.css">
+	href="${pageContext.request.contextPath}/resources/css/wow_welcome.css">
 </head>
 <body>
 
-	<%--<jsp:include page="/inc/header.jsp" /> --%>
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<div class="wow-welcome-page">
 		<div class="wow-welcome-card">

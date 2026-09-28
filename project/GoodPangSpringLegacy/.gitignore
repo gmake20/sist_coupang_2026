@@ -6,6 +6,6 @@
 /.project
 /.settings/
 /.springBeans
-
+.factorypath
 #
 /src/main/resources/db.properties
