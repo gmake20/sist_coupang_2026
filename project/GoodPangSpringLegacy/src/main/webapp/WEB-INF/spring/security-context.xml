@@ -33,7 +33,10 @@
         id="passwordEncoder"
         class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
 
-
+	<beans:bean
+    id="customLoginFailureHandler"
+    class="org.doit.goodpang.security.CustomLoginFailureHandler" />
+    
     <!-- 인증 -->
     <authentication-manager>
 
@@ -104,8 +107,8 @@
 		    password-parameter="password"
 		    authentication-success-handler-ref=
 		        "customLoginSuccessHandler"
-		    authentication-failure-url=
-		        "/login?error=true" />
+		    authentication-failure-handler-ref=
+		    	"customLoginFailureHandler" />
 
         <logout
             logout-url="/logout"

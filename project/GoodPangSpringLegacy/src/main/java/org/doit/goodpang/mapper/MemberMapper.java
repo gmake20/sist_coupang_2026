@@ -31,4 +31,8 @@ public interface MemberMapper {
             @Param("memberNo") Long memberNo,
             @Param("encodedPassword") String encodedPassword
     );
+    
+    int withdrawMember(
+            @Param("memberNo") Long memberNo
+    );
 }

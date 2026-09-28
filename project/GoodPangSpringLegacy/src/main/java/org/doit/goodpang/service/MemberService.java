@@ -146,4 +146,65 @@ public class MemberService {
             );
         }
     }
+    
+    public void verifyWithdrawPassword(
+            Long memberNo,
+            String rawPassword) {
+
+        MemberVO member =
+                memberMapper.getMember(
+                        memberNo
+                );
+
+
+        if (member == null) {
+
+            throw new IllegalArgumentException(
+                    "회원 정보를 찾을 수 없습니다."
+            );
+        }
+
+
+        String encodedPassword =
+                member.getMemberPw();
+
+
+        if (encodedPassword == null
+                || encodedPassword.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "비밀번호 정보를 확인할 수 없습니다."
+            );
+        }
+
+
+        boolean passwordMatch =
+                passwordEncoder.matches(
+                        rawPassword,
+                        encodedPassword
+                );
+
+
+        if (!passwordMatch) {
+
+            throw new IllegalArgumentException(
+                    "비밀번호가 일치하지 않습니다."
+            );
+        }
+    }
+    
+    public void withdrawMember(Long memberNo) {
+
+        int result =
+                memberMapper.withdrawMember(
+                        memberNo
+                );
+
+        if (result != 1) {
+
+            throw new IllegalStateException(
+                    "회원 탈퇴 처리에 실패했습니다."
+            );
+        }
+    }
 }
