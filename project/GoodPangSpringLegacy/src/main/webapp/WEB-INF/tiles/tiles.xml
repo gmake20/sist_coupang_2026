@@ -74,6 +74,12 @@
 		template="/WEB-INF/views/admin/login.jsp">
 	</definition>
 
+	<!-- 관리자 화면 - 기존 GoodPang 관리자 페이지들은 공통 레이아웃 없이 각자 단독 화면이라 JSP를 그대로 template으로 씀.
+	     admin.dashboard → /WEB-INF/views/admin/dashboard.jsp -->
+	<definition name="admin.*"
+		template="/WEB-INF/views/admin/{1}.jsp">
+	</definition>
+
 </tiles-definitions>
 
 
