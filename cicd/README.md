@@ -47,7 +47,7 @@ Slash Command를 받을 수 있다. 방화벽/도메인 설정이 필요 없어 
 |---|---|
 | `SLACK_BOT_TOKEN` | `xoxb-...`, OAuth & Permissions → Install to Workspace 후 발급되는 Bot Token |
 | `SLACK_APP_TOKEN` | `xapp-...`, Basic Information → App-Level Tokens (`connections:write` 스코프)에서 발급 |
-| `RESTART_SCRIPT_PATH` | 실행할 스크립트 경로. `/root/restart.sh` |
+| `RESTART_SCRIPT_PATH` | `/restart old`(기존 GoodPang)가 실행할 스크립트. 기본 `/root/restart.sh` |
 | `ALLOWED_SLACK_USER_IDS` | `/restart` 실행을 허용할 Slack 멤버 ID 목록(콤마 구분). 비우면 누구나 실행 가능하므로 반드시 지정 |
 | `ALLOWED_SLACK_CHANNEL_ID` | (선택) 특정 채널에서만 실행 허용 |
 | `RESTART_TIMEOUT_SEC` | (선택, 기본 180) 빌드+재시작 스크립트 타임아웃(초) |
@@ -117,6 +117,41 @@ chmod +x /root/restart.sh
 - Tomcat 종료(최대 30초 대기) → 기존 `ROOT` 배포 삭제 → 새 war를 `ROOT.war`로 복사 → Tomcat 시작
 - `set -e`가 걸려있어 **컴파일 에러가 나면 Tomcat을 내리기 전에 스크립트가 중단**된다. 빌드 실패 시 기존 서비스는 그대로 유지된다.
 
+## GoodPangSpringLegacy 배포 (`/restart`)
+
+Spring Legacy 버전(`project/GoodPangSpringLegacy`)은 별도 Tomcat 9에 Maven으로 빌드해 배포한다.
+Spring 5.0.7이 `javax.servlet` 기반이라 Tomcat 10(jakarta)에서는 뜨지 않는다.
+
+| 구분 | GoodPang | GoodPangSpringLegacy |
+|---|---|---|
+| Slack 명령 | `/restart old` | `/restart` (기본) |
+| 스크립트 | `/root/restart.sh` | `/root/deploy_legacy.sh` |
+| 빌드 | `javac` + `jar` | `mvn clean package` |
+| Tomcat | `/opt/tomcat` (10), 8081 | `/opt/tomcat9` (9.0.x), 8080 |
+| JDK | 서버 기본 | 11 (`/usr/lib/jvm/java-11-openjdk-amd64`) |
+
+`deploy_legacy.sh` 동작:
+
+- `flock`으로 동시 실행 방지
+- `git fetch` + `git reset --hard origin/main` (서버 작업 디렉토리 로컬 변경은 버려짐)
+- `/root/goodpang-config/db.properties`(git 밖 시크릿)를 `src/main/resources/`로 복사 후 빌드
+- 기존 `ROOT.war`를 `/root/goodpang-backup/`에 백업 → Tomcat 교체 → `curl` 헬스체크(최대 120초)
+- 헬스체크 실패 시 백업 war로 자동 롤백 후 종료 코드 1
+
+서버 1회 준비:
+
+- JDK 11, Maven 설치 (`apt install -y openjdk-11-jdk maven`)
+- `/opt/tomcat9/bin/setenv.sh`: `JAVA_HOME`, `UPLOAD_BASE_DIR=/var/goodpang/upload`, `-Dfile.encoding=UTF-8`
+- `/opt/tomcat9/conf/Catalina/localhost/ROOT.xml`: `/upload`를 `/var/goodpang/upload`에 매핑(`PostResources`)
+- `/root/goodpang-config/db.properties` 작성 (`chmod 600`)
+- `.env`에 `LEGACY_SCRIPT_PATH`(기본 `/root/deploy_legacy.sh`), `LEGACY_TIMEOUT_SEC`(기본 600) 선택 설정. 기존 GoodPang은 `RESTART_SCRIPT_PATH`, `RESTART_TIMEOUT_SEC`
+
+주의:
+
+- `src/main/java` 아래의 `.xml` 등 비-Java 파일은 Maven 빌드 시 war에 포함되지 않는다.
+  MyBatis 설정/매퍼 XML은 반드시 `src/main/resources`에 둔다 (Eclipse에서는 동작해서 놓치기 쉬움).
+- 최초 배포는 Maven 의존성 다운로드로 수 분이 걸리므로 서버에서 직접 `bash /root/deploy_legacy.sh`로 실행.
+
 ## 신규 유저에게 `/restart` 권한 부여
 
 1. 대상 유저의 Slack 멤버 ID 확인 (Slack 프로필 → 더보기 → 멤버 ID 복사)
@@ -132,3 +167,11 @@ chmod +x /root/restart.sh
     (`Failed to load environment files: No such file or directory`).
   - 조치: 서비스 파일을 `User=root`, `/root/slack-restart-bot/...` 경로로 전체 재작성, `.env` 파일
     생성 후 `daemon-reload` + `restart`로 해결.
+
+- **Spring Legacy 배포 시 `FileNotFoundException: ... mybatis-config.xml`**
+  - 원인: 파일이 `src/main/java`에 있어서 Maven 빌드 결과 war에서 빠짐 (Eclipse 빌드는 복사해 줘서 로컬에선 정상).
+  - 조치: `src/main/resources/org/doit/goodpang/mapper/`로 이동.
+
+- **`deploy_legacy.sh` 실행 시 "이미 다른 배포가 진행 중입니다."가 계속 나옴**
+  - 원인: `startup.sh`로 띄운 Tomcat JVM이 flock 잠금 fd를 상속받아 잠금이 풀리지 않음.
+  - 조치: `startup.sh ... 9>&-`로 fd를 닫고 실행하도록 수정.
