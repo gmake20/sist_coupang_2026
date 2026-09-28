@@ -2,7 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%-- =========================================================
      admin/login.jsp — 관리자 로그인 (Tiles "admin.login", 레이아웃 없는 단독 화면)
-     로그인 실패 시 AdminController가 error를 넘겨준다 (forward 방식이라 request 속성 → ${error}).
+     폼은 /admin/loginProcess 로 POST → Spring Security(관리자 전용 <http>)가 인증 처리.
+     실패/로그아웃/권한없음 메시지는 AdminController.login()이 error/message로 넘겨준다.
      (기존 GoodPang admin-login.jsp - 스크립틀릿을 EL로 바꾸고 CSRF 토큰 추가)
 ========================================================= --%>
 <!DOCTYPE html>
@@ -54,6 +55,12 @@
       margin: 0 0 12px;
     }
 
+    .info {
+      color: #1a56db;
+      font-size: 13px;
+      margin: 0 0 12px;
+    }
+
     .btn-login {
       width: 100%;
       padding: 11px;
@@ -78,14 +85,16 @@
     <c:if test="${not empty error}">
       <p class="error"><c:out value="${error}" /></p>
     </c:if>
+    <c:if test="${not empty message}">
+      <p class="info"><c:out value="${message}" /></p>
+    </c:if>
 
-    <form method="post" action="${pageContext.request.contextPath}/admin/login.htm">
+    <form method="post" action="${pageContext.request.contextPath}/admin/loginProcess">
 
       <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 
       <div class="field">
-        <input type="text" name="adminId" placeholder="관리자 아이디" autocomplete="username" required autofocus
-          value="<c:out value='${param.adminId}' />">
+        <input type="text" name="adminId" placeholder="관리자 아이디" autocomplete="username" required autofocus>
       </div>
 
       <div class="field">
