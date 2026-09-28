@@ -84,6 +84,10 @@
         <intercept-url
 		    pattern="/member/**"
 		    access="isAuthenticated()" />
+		    
+		<intercept-url
+		    pattern="/payment-method/**"
+		    access="isAuthenticated()" />
 
 
         <!-- 나머지 -->

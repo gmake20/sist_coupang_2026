@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -261,6 +262,7 @@
 
 				<form action="${pageContext.request.contextPath}/wow/cancel"
 					method="post">
+					<sec:csrfInput/>
 					<div class="wow-cancel-buttons">
 						<button type="button" id="wowCancelKeepBtn"
 							class="wow-cancel-keep">멤버십 유지하기</button>
