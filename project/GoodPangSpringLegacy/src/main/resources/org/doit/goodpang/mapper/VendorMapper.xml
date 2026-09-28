@@ -17,5 +17,29 @@
             FROM SELLER
             WHERE EMAIL = #{email}	
 	</select>
-	
+
+	<!-- public int updateBusinessInfo(SellerDTO dto); -->
+	<!--
+	  판매자 정보관리 제출 (기존 SellerDAO.updateBusinessInfo).
+	  '입점 대기'/'반려' 상태에서 제출하면 '심사 중'으로 바꾸고, '승인' 상태에서 수정하는 경우는 재심사로 되돌리지 않는다.
+	  null이 들어올 수 있는 값은 jdbcType 지정 (Oracle은 타입 없는 null 바인딩을 거부함)
+	-->
+	<update id="updateBusinessInfo">
+            UPDATE SELLER
+            SET
+                ZIPCODE = #{zipcode},
+                BUSINESS_ADDRESS = #{businessAddress},
+                BUSINESS_DETAIL_ADDRESS = #{businessDetailAddress, jdbcType=VARCHAR},
+                MAIL_ORDER_NO = #{mailOrderNo},
+                CATEGORY_NO = #{categoryNo, jdbcType=NUMERIC},
+                BANK_NAME = #{bankName},
+                ACCOUNT_NO = #{accountNo},
+                ACCOUNT_HOLDER = #{accountHolder},
+                BUSINESS_CERT_URL = #{businessCertUrl, jdbcType=VARCHAR},
+                MAIL_ORDER_CERT_URL = #{mailOrderCertUrl, jdbcType=VARCHAR},
+                APPROVAL_STATUS = CASE WHEN APPROVAL_STATUS IN ('입점 대기', '반려') THEN '심사 중' ELSE APPROVAL_STATUS END,
+                UPDATED_DATE = SYSDATE
+            WHERE SELLER_NO = #{sellerNo}
+	</update>
+
   </mapper>

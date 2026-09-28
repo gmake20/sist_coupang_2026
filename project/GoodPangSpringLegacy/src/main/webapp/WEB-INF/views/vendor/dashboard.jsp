@@ -21,7 +21,7 @@
                 bannerColor = "#fff4e5";
                 bannerTitle = "입점 절차가 완료되지 않았습니다.";
                 bannerDesc = "사업장 정보, 정산계좌, 서류를 제출하셔야 상품 등록 및 판매가 가능합니다.";
-                actionUrl = request.getContextPath() + "/vendor/business-info.htm";
+                actionUrl = request.getContextPath() + "/vendor/business_info.htm";
                 actionLabel = "추가정보 입력하기";
                 break;
             case "심사 중":
@@ -35,7 +35,7 @@
                 bannerDesc = (loginSeller.getRejectReason() != null)
                         ? "사유: " + loginSeller.getRejectReason()
                         : "자세한 사유는 판매자 고객센터로 문의해주세요.";
-                actionUrl = request.getContextPath() + "/vendor/business-info.htm";
+                actionUrl = request.getContextPath() + "/vendor/business_info.htm";
                 actionLabel = "정보 다시 제출하기";
                 break;
             default:

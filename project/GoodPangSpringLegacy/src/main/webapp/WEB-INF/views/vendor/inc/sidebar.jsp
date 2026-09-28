@@ -103,7 +103,7 @@
           </nav>
 
           <div class="side-foot">
-            <a href="${pageContext.request.contextPath}/vendor/business-info.htm"
+            <a href="${pageContext.request.contextPath}/vendor/business_info.htm"
               class="side-item ${menu eq 'businessInfo' ? 'active' : ''}">
               <svg class="icon">
                 <use href="#ic-gear" />

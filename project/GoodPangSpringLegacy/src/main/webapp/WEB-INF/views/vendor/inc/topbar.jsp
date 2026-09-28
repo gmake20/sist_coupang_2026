@@ -58,7 +58,7 @@
 
 			<div class="user-menu-panel" id="userMenuPanel">
 				<a
-					href="${pageContext.request.contextPath}/vendor/business-info.htm">판매자
+					href="${pageContext.request.contextPath}/vendor/business_info.htm">판매자
 					정보 관리</a> <a
 					href="${pageContext.request.contextPath}/vendor/logout.htm">로그아웃</a>
 			</div>
