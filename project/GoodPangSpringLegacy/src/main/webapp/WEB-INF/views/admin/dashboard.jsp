@@ -45,7 +45,8 @@
     .top-bar { display: flex; align-items: center; justify-content: space-between; max-width: 900px; margin-bottom: 24px; }
     .top-bar h1 { margin: 0; }
     .top-bar .admin-name { font-size: 13px; color: #555; }
-    .top-bar .logout-link { margin-left: 12px; color: #888; text-decoration: none; }
+    .top-bar .logout-form { display: inline; margin: 0; }
+    .top-bar .logout-link { margin-left: 12px; color: #888; text-decoration: none; background: none; border: 0; padding: 0; font: inherit; font-size: 13px; cursor: pointer; }
     .top-bar .logout-link:hover { text-decoration: underline; }
   </style>
 
@@ -57,7 +58,11 @@
     <h1>관리자 대시보드</h1>
     <div>
       <span class="admin-name"><c:out value="${sessionScope.adminName}" />님</span>
-      <a class="logout-link" href="${pageContext.request.contextPath}/admin/logout.htm">로그아웃</a>
+      <%-- Spring Security 로그아웃은 CSRF 보호 때문에 POST만 받음 → 링크 대신 form + 토큰 --%>
+      <form class="logout-form" method="post" action="${pageContext.request.contextPath}/admin/logout.htm">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+        <button class="logout-link" type="submit">로그아웃</button>
+      </form>
     </div>
   </div>
 

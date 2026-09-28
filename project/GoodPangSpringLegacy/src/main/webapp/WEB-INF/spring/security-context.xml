@@ -34,8 +34,8 @@
         class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
 
 
-    <!-- 인증 -->
-    <authentication-manager>
+    <!-- 인증 (쇼핑몰 회원 - MEMBER 테이블, CustomUserDetailsService) -->
+    <authentication-manager id="memberAuthenticationManager">
 
         <authentication-provider
             user-service-ref="customUserDetailsService">
@@ -48,8 +48,74 @@
     </authentication-manager>
 
 
-    <!-- HTTP Security -->
-    <http use-expressions="true">
+    <!-- ================================================================
+         관리자 전용 보안 설정 (SL14_SECURITY2_JDBC 예제의 jdbc-user-service 방식)
+
+         - /admin/** 요청은 이 <http>가 처리하고, 나머지는 아래 회원용 <http>가 처리한다.
+           Spring Security는 pattern이 있는 <http>를 위에서부터 검사하므로 이 블록이 회원용보다 먼저 와야 함.
+         - 인증은 Java 코드 없이 ADMIN 테이블 SQL 두 개로 처리 (adminAuthenticationManager).
+           ADMIN 테이블에는 권한 컬럼/테이블이 없으므로 관리자는 모두 'ROLE_ADMIN' 고정.
+         - 로그인 성공 시 AdminLoginSuccessHandler가 기존 세션 값(loginAdmin/adminNo/adminName)을 채운다.
+         ================================================================ -->
+    <http pattern="/admin/**" use-expressions="true" authentication-manager-ref="adminAuthenticationManager"
+          security-context-repository-ref="adminSecurityContextRepository">
+
+        <intercept-url pattern="/admin/login.htm" access="permitAll" />
+        <intercept-url pattern="/admin/**" access="hasRole('ADMIN')" />
+
+        <!-- 로그인 폼(views/admin/login.jsp)은 /admin/loginProcess 로 POST - Controller 없이 Security 필터가 처리 -->
+        <form-login
+            login-page="/admin/login.htm"
+            login-processing-url="/admin/loginProcess"
+            username-parameter="adminId"
+            password-parameter="password"
+            authentication-success-handler-ref="adminLoginSuccessHandler"
+            authentication-failure-url="/admin/login.htm?error=true" />
+
+        <!-- CSRF 보호가 켜져 있어서 로그아웃은 POST만 받음 (대시보드의 로그아웃도 form + CSRF 토큰) -->
+        <logout
+            logout-url="/admin/logout.htm"
+            logout-success-url="/admin/login.htm?logout"
+            invalidate-session="true"
+            delete-cookies="JSESSIONID" />
+
+        <!-- 로그인은 했지만 관리자가 아닌 경우(예: 쇼핑몰 회원으로 로그인한 상태에서 /admin 접근) -->
+        <access-denied-handler error-page="/admin/login.htm?denied" />
+
+    </http>
+
+    <authentication-manager id="adminAuthenticationManager">
+        <authentication-provider>
+            <jdbc-user-service
+                data-source-ref="dataSource"
+                users-by-username-query="SELECT ADMIN_ID AS USERNAME, ADMIN_PW AS PASSWORD, 1 AS ENABLED FROM ADMIN WHERE ADMIN_ID = ?"
+                authorities-by-username-query="SELECT ADMIN_ID AS USERNAME, 'ROLE_ADMIN' AS AUTHORITY FROM ADMIN WHERE ADMIN_ID = ?" />
+            <password-encoder ref="passwordEncoder" />
+        </authentication-provider>
+    </authentication-manager>
+
+    <!--
+      관리자 로그인 정보는 세션의 별도 키(ADMIN_SPRING_SECURITY_CONTEXT)에 저장한다.
+      기본값(SPRING_SECURITY_CONTEXT)을 회원과 같이 쓰면
+        1) 관리자로 로그인하는 순간 회원 로그인이 관리자 로그인으로 덮어써지고
+        2) 쇼핑몰 화면(header.jsp의 principal.member.memberName)이 관리자 principal을 읽다가
+           NotReadablePropertyException으로 깨진다.
+      키를 나누면 /admin/** 에서는 관리자 로그인만, 나머지 화면에서는 회원 로그인만 보인다.
+    -->
+    <beans:bean id="adminSecurityContextRepository"
+        class="org.springframework.security.web.context.HttpSessionSecurityContextRepository">
+        <beans:property name="springSecurityContextKey" value="ADMIN_SPRING_SECURITY_CONTEXT" />
+    </beans:bean>
+
+    <beans:bean
+        id="adminLoginSuccessHandler"
+        class="org.doit.goodpang.security.AdminLoginSuccessHandler">
+        <beans:constructor-arg ref="adminMapper" />
+    </beans:bean>
+
+
+    <!-- HTTP Security (쇼핑몰 회원 + 그 외 전체) - pattern이 없으므로 반드시 맨 마지막 <http> -->
+    <http use-expressions="true" authentication-manager-ref="memberAuthenticationManager">
 
         <!-- 누구나 접근 -->
     <intercept-url pattern="/vendor/**" access="permitAll" />
@@ -70,14 +136,7 @@
             access="permitAll" />
 
 
-        <!-- 관리자 로그인/로그아웃은 누구나 접근 (/admin/** 규칙보다 먼저 와야 함 - 위에서부터 첫 번째로 맞는 규칙이 적용됨) -->
-        <intercept-url pattern="/admin/login.htm" access="permitAll" />
-        <intercept-url pattern="/admin/logout.htm" access="permitAll" />
-
-        <!-- 관리자 -->
-        <intercept-url
-            pattern="/admin/**"
-            access="hasRole('ADMIN')" />
+        <!-- 관리자(/admin/**)는 위의 관리자 전용 <http>가 먼저 가져가므로 여기서는 규칙 없음 -->
 
 
         <!-- 로그인 필요 -->
