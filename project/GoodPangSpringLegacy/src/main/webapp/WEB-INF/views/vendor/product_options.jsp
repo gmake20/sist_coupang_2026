@@ -124,6 +124,7 @@
           <form id="optionForm${option.optionId}" method="post"
                 action="${pageContext.request.contextPath}/vendor/product_option_update.htm">
             <input type="hidden" name="optionId" value="${option.optionId}">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
           </form>
         </c:forEach>
 
@@ -134,4 +135,4 @@
   </div>
 
 
-  <script src="${pageContext.request.contextPath}/js/vendor-common.js"></script>
+  <script src="${pageContext.request.contextPath}/resources/js/vendor-common.js"></script>
