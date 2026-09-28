@@ -146,7 +146,7 @@
             탈퇴하면 로그인이 즉시 차단되고, 등록하신 모든 상품이 고객 화면에서 사라집니다. 이 작업은 되돌릴 수 없습니다.
           </p>
 
-          <%-- 탈퇴 처리(VendorWithdrawServlet)는 아직 Spring으로 옮기기 전 - 옮길 때 /vendor/withdraw.htm POST 매핑 필요 --%>
+          <%-- 탈퇴 처리: VendorController.withdraw() (비밀번호 재확인 → 상태 탈퇴 + 상품 전부 숨김) --%>
           <form method="post" id="withdrawForm"
             action="${pageContext.request.contextPath}/vendor/withdraw.htm"
             onsubmit="return confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
