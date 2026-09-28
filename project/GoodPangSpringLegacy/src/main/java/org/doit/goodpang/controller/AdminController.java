@@ -83,4 +83,43 @@ public class AdminController {
 		return new ModelAndView("redirect:/admin/login.htm");
 	}
 
+	// 관리자 대시보드 - 각 관리 메뉴로 가는 카드 목록 (기존 AdminDashboardServlet)
+	@GetMapping(value = "/dashboard.htm")
+	public ModelAndView dashboard(HttpServletRequest request) {
+
+		ModelAndView loginRedirect = requireAdminLogin(request);
+		if (loginRedirect != null) {
+			return loginRedirect;
+		}
+
+		return new ModelAndView("admin.dashboard");
+	}
+
+	/*
+	 * 관리자 로그인 확인 (기존 AdminAuthFilter가 /admin/* 전체에 하던 일).
+	 * 로그인돼 있으면 null, 아니면 지금 가려던 주소를 세션(adminRedirectAfterLogin)에 기억해 두고
+	 * 로그인 화면으로 보내는 ModelAndView를 돌려준다 - 로그인 성공 후 그 주소로 돌아온다(login POST 참고).
+	 * 관리자 화면 메서드마다 맨 앞에서 호출한다.
+	 */
+	private ModelAndView requireAdminLogin(HttpServletRequest request) {
+
+		HttpSession session = request.getSession(false);
+
+		if (session != null && session.getAttribute("loginAdmin") != null) {
+			return null;
+		}
+
+		// redirect: 뒤에는 contextPath가 자동으로 붙으므로, 기억할 주소에서는 contextPath를 뺀다
+		String redirectUrl = request.getRequestURI().substring(request.getContextPath().length());
+		String queryString = request.getQueryString();
+
+		if (queryString != null && !queryString.isBlank()) {
+			redirectUrl += "?" + queryString;
+		}
+
+		request.getSession().setAttribute("adminRedirectAfterLogin", redirectUrl);
+
+		return new ModelAndView("redirect:/admin/login.htm");
+	}
+
 }
