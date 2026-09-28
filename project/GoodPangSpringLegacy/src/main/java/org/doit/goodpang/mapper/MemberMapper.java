@@ -13,4 +13,22 @@ public interface MemberMapper {
 	
 	int insert(MemberVO memberVO);
 	
+    MemberVO getMember(
+            @Param("memberNo") Long memberNo
+    );
+	
+    int updateEmail(
+            @Param("memberNo") Long memberNo,
+            @Param("newEmail") String newEmail
+    );
+
+    int updatePhone(
+            @Param("memberNo") Long memberNo,
+            @Param("newPhone") String newPhone
+    );
+    
+    int updatePassword(
+            @Param("memberNo") Long memberNo,
+            @Param("encodedPassword") String encodedPassword
+    );
 }

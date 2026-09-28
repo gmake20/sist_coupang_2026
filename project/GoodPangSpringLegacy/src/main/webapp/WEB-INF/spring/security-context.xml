@@ -80,12 +80,17 @@
         <intercept-url
             pattern="/mypage/**"
             access="isAuthenticated()" />
+            
+        <intercept-url
+		    pattern="/member/**"
+		    access="isAuthenticated()" />
 
 
         <!-- 나머지 -->
         <intercept-url
             pattern="/**"
             access="permitAll" />
+            
 
 
 		<form-login
