@@ -206,10 +206,11 @@
                           <a class="btn btn-outline btn-sm"
                              href="${pageContext.request.contextPath}/vendor/order/detail?orderNo=${order.orderNo}">상세보기</a>
                           <c:if test="${order.orderStatus == '결제완료'}">
-                            <form method="post" action="${pageContext.request.contextPath}/vendor/order/ship"
+                            <form method="post" action="${pageContext.request.contextPath}/vendor/order/ship.htm"
                                   style="display:inline-flex; gap:4px; align-items:center; margin-top:4px;"
                                   onsubmit="if (!this.invoiceNo.value.trim()) { alert('송장번호를 입력해주세요.'); return false; } return confirm('입력한 송장번호로 배송중 처리하시겠습니까?');">
                               <input type="hidden" name="orderNo" value="${order.orderNo}">
+                              <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
                               <input class="input input-sm" type="text" name="invoiceNo" placeholder="송장번호" style="width:110px;">
                               <button class="btn btn-primary btn-sm" type="submit">배송중으로 변경</button>
                             </form>

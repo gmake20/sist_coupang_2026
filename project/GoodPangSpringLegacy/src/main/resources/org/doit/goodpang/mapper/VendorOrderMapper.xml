@@ -136,4 +136,126 @@
             ORDER BY D.DELIVERY_START_DATE DESC
 	</select>
 
+	<!-- public List<VendorReturnDTO> findReturnsBySellerNo(int sellerNo); -->
+	<!--
+	  취소/반품/교환 관리 - 이 판매자 상품이 포함된 PRODUCT_RETURN 목록, 최근 신청순 (기존 VendorReturnDAO.findBySellerNo).
+	  PRODUCT_RETURN에는 유형 컬럼이 없어서 RETURN_STATUS가 '취소'/'반품'/'교환'으로 시작하는지로 RETURN_TYPE을 만든다.
+	  OPTION_LABEL: 기존 DAO의 buildOptionLabel()과 같은 규칙 - 값이 있는 옵션만 " / "로 이어붙임
+	               (앞에 붙은 첫 " / "는 SUBSTR(..., 4)로 잘라냄. 옵션이 하나도 없으면 NULL)
+	-->
+	<select id="findReturnsBySellerNo" resultType="org.doit.goodpang.domain.VendorReturnDTO">
+            SELECT
+                PR.RETURN_NO, PR.ORDER_DETAIL_NO, O.ORDER_NO,
+                PR.RETURN_QTY, PR.REFUND_AMOUNT, PR.RETURN_REASON, PR.RETURN_STATUS, PR.REQUEST_DATE,
+                CASE
+                    WHEN PR.RETURN_STATUS LIKE '취소%' THEN '취소'
+                    WHEN PR.RETURN_STATUS LIKE '반품%' THEN '반품'
+                    WHEN PR.RETURN_STATUS LIKE '교환%' THEN '교환'
+                    ELSE '기타'
+                END AS RETURN_TYPE,
+                P.PRODUCT_NAME,
+                SUBSTR(
+                    CASE WHEN TRIM(PO.OPTION1_VALUE) IS NOT NULL THEN ' / ' || PO.OPTION1_VALUE END ||
+                    CASE WHEN TRIM(PO.OPTION2_VALUE) IS NOT NULL THEN ' / ' || PO.OPTION2_VALUE END ||
+                    CASE WHEN TRIM(PO.OPTION3_VALUE) IS NOT NULL THEN ' / ' || PO.OPTION3_VALUE END,
+                    4) AS OPTION_LABEL,
+                M.MEMBER_NAME AS BUYER_NAME,
+                M.PHONE AS BUYER_PHONE,
+                IMG.IMAGE_URL AS THUMBNAIL_URL
+            FROM PRODUCT_RETURN PR
+                JOIN ORDER_DETAIL OD ON PR.ORDER_DETAIL_NO = OD.ORDER_DETAIL_NO
+                JOIN ORDERS O ON OD.ORDER_NO = O.ORDER_NO
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO
+                LEFT JOIN PRODUCT_OPTION PO ON OD.OPTION_ID = PO.OPTION_ID
+                LEFT JOIN (
+                    SELECT PRODUCT_NO, IMAGE_URL,
+                           ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID, IMAGE_ORDER) AS RN
+                    FROM PRODUCT_IMAGE
+                    WHERE IMAGE_PURPOSE = '대표'
+                ) IMG ON IMG.PRODUCT_NO = P.PRODUCT_NO AND IMG.RN = 1
+            WHERE P.SELLER_NO = #{sellerNo}
+            ORDER BY PR.REQUEST_DATE DESC
+	</select>
+
+	<!-- public List<VendorShippingDTO> findWaitingBySellerNo(int sellerNo); -->
+	<!--
+	  출고/운송장 관리 - '결제완료'(송장 등록/배송중 전환 전)이면서 이 판매자 상품이 포함된 주문,
+	  오래된 주문부터 (기존 VendorShippingDAO.findWaitingBySellerNo).
+	  PN 서브쿼리에서 이 판매자 몫만 상품명/개수/금액으로 집계. 구매자 정보는 DTO 필드에 맞춰 별칭.
+	-->
+	<select id="findWaitingBySellerNo" resultType="org.doit.goodpang.domain.VendorShippingDTO">
+            SELECT
+                O.ORDER_NO, O.ORDER_DATE,
+                M.MEMBER_NAME AS BUYER_NAME,
+                M.PHONE AS BUYER_PHONE,
+                PN.PRODUCT_NAME, PN.ITEM_COUNT, PN.TOTAL_AMOUNT
+            FROM ORDERS O
+                JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO
+                JOIN (
+                    SELECT
+                        OD.ORDER_NO,
+                        MIN(P.PRODUCT_NAME) KEEP (DENSE_RANK FIRST ORDER BY OD.ORDER_DETAIL_NO) AS PRODUCT_NAME,
+                        COUNT(*) AS ITEM_COUNT,
+                        SUM(OD.PRICE * OD.ORDER_QTY) AS TOTAL_AMOUNT
+                    FROM ORDER_DETAIL OD
+                        JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                    WHERE P.SELLER_NO = #{sellerNo}
+                    GROUP BY OD.ORDER_NO
+                ) PN ON PN.ORDER_NO = O.ORDER_NO
+            WHERE O.ORDER_STATUS = '결제완료'
+            ORDER BY O.ORDER_DATE ASC
+	</select>
+
+	<!-- ===== 출고 처리(결제완료 → 배송중 + DELIVERY 생성) - VendorOrderService.shipOrder에서 한 트랜잭션으로 호출 ===== -->
+
+	<!-- public String findDeliveryServiceCode(int orderNo, int sellerNo); -->
+	<!-- 이 판매자가 이 주문에 등록한 상품 중 하나의 택배사 코드를 대표로 사용. 이 판매자 상품이 없는 주문이면 NULL -->
+	<select id="findDeliveryServiceCode" resultType="string">
+            SELECT P.DELIVERY_SERVICE_CODE
+            FROM ORDER_DETAIL OD
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+            WHERE OD.ORDER_NO = #{orderNo}
+              AND P.SELLER_NO = #{sellerNo}
+              AND ROWNUM = 1
+	</select>
+
+	<!-- public int countDeliveryByInvoice(String deliveryServiceCode, String invoiceNo); -->
+	<!-- 같은 택배사에 이미 등록된 송장번호인지 (택배사가 다르면 번호가 겹쳐도 서로 다른 운송장이라 허용) -->
+	<select id="countDeliveryByInvoice" resultType="int">
+            SELECT COUNT(*)
+            FROM DELIVERY
+            WHERE DELIVERY_SERVICE_CODE = #{deliveryServiceCode}
+              AND INVOICE_NO = #{invoiceNo}
+	</select>
+
+	<!-- public int updateOrderStatusToShipping(int orderNo, int sellerNo); -->
+	<!-- ORDERS에는 seller_no가 없어서, 이 주문에 이 판매자 상품이 실제로 포함돼 있을 때만 전환 -->
+	<update id="updateOrderStatusToShipping">
+            UPDATE ORDERS
+            SET ORDER_STATUS = '배송중'
+            WHERE ORDER_NO = #{orderNo}
+              AND ORDER_STATUS = '결제완료'
+              AND EXISTS (
+                    SELECT 1
+                    FROM ORDER_DETAIL OD
+                        JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                    WHERE OD.ORDER_NO = ORDERS.ORDER_NO
+                      AND P.SELLER_NO = #{sellerNo}
+              )
+	</update>
+
+	<!-- public int insertDelivery(int orderNo, String deliveryServiceCode, String invoiceNo); -->
+	<insert id="insertDelivery">
+            INSERT INTO DELIVERY (
+                DELIVERY_NO, ORDER_NO, DELIVERY_SERVICE_CODE, INVOICE_NO,
+                DELIVERY_STATUS, DELIVERY_START_DATE, DELIVERY_END_DATE,
+                CREATED_DATE, UPDATED_DATE
+            ) VALUES (
+                SEQ_DELIVERY.NEXTVAL, #{orderNo}, #{deliveryServiceCode}, #{invoiceNo},
+                '배송중', SYSDATE, NULL,
+                SYSDATE, SYSDATE
+            )
+	</insert>
+
   </mapper>
