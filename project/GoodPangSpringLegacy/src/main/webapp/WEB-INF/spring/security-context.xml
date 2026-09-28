@@ -130,6 +130,10 @@
     <intercept-url pattern="/order/**" access="isAuthenticated()" />
     
     <intercept-url pattern="/wow/**" access="isAuthenticated()" />
+    
+    <intercept-url
+    pattern="/review/**"
+    access="isAuthenticated()" />
 
         <intercept-url
             pattern="/resources/**"

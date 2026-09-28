@@ -42,11 +42,31 @@ public class ReviewService {
 
     @Transactional
     public int insertReview(
-            ReviewDTO dto) {
+           ReviewDTO2 dto) {
 
-        reviewMapper.insertReview(dto);
+    	reviewMapper.insertReview(dto);
 
         return dto.getReviewNo();
+    }
+    
+    @Transactional
+    public void insertReview(
+            Long memberNo,
+            int orderDetailNo,
+            Integer serviceRating,
+            int productRating,
+            String reviewContent,
+            String reviewSummary) {
+    	        
+        reviewMapper.insertReview(
+                memberNo,
+                orderDetailNo,
+                serviceRating,
+                productRating,
+                reviewContent,
+                reviewSummary
+        );
+
     }
 
     @Transactional
@@ -154,7 +174,7 @@ public class ReviewService {
 
     @Transactional
     public int updateReview(
-            ReviewDTO dto,
+            ReviewDTO2 dto,
             Long memberNo) {
 
         return reviewMapper.updateReview(
