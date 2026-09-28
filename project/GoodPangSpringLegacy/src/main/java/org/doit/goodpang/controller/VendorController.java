@@ -29,6 +29,7 @@ import org.doit.goodpang.domain.VendorReturnDTO;
 import org.doit.goodpang.domain.VendorSettlementDTO;
 import org.doit.goodpang.domain.VendorSettlementDetailDTO;
 import org.doit.goodpang.domain.VendorShippingDTO;
+import org.doit.goodpang.mapper.NoticeMapper;
 import org.doit.goodpang.mapper.VendorActionLogMapper;
 import org.doit.goodpang.mapper.VendorDashboardMapper;
 import org.doit.goodpang.mapper.VendorMapper;
@@ -61,6 +62,7 @@ public class VendorController {
 	private final VendorActionLogMapper vendorActionLogMapper;
 	private final VendorOrderService vendorOrderService;
 	private final VendorSettlementMapper vendorSettlementMapper;
+	private final NoticeMapper noticeMapper;
 	// private final MemberShipService memberShipService;
 
 	// 차트 데이터를 JS에 넘길 JSON 변환용 (기존 서블릿의 Gson 대신 pom.xml에 이미 있는 Jackson 사용)
@@ -659,5 +661,69 @@ public class VendorController {
 		} catch (DateTimeParseException e) {
 			return null;
 		}
-	}	
+	}
+	
+	/*
+	 * 공지사항 목록 - 조회 전용, 등록/수정/삭제는 관리자만 가능.
+	 * (기존에는 VendorAuthFilter가 로그인을 확인했는데, 아직 Interceptor가 없어서 여기서 직접 확인)
+	 */
+	@GetMapping(value = "/notice.htm")
+	public ModelAndView notice(
+			@RequestParam(value = "page", required = false) String pageParam,
+			HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		int page = parsePage(pageParam);
+
+		List<NoticeDTO> noticeList = noticeMapper.findAll((page - 1) * PAGE_SIZE, PAGE_SIZE);
+		int totalCount = noticeMapper.countAll();
+		int totalPages = Math.max(1, (int) Math.ceil(totalCount / (double) PAGE_SIZE));
+
+		ModelAndView mav = new ModelAndView("vendor.notice");
+		mav.addObject("menu", "notice"); // 사이드바 활성 메뉴
+
+		mav.addObject("noticeList", noticeList);
+		mav.addObject("page", page);
+		mav.addObject("totalPages", totalPages);
+		mav.addObject("totalCount", totalCount);
+
+		return mav;
+	}
+	
+	// 공지사항 상세 - 조회 전용. 번호가 잘못됐거나 없는 공지면 목록으로 돌려보낸다.
+	@GetMapping(value = "/notice_detail.htm")
+	public ModelAndView noticeDetail(
+			@RequestParam(value = "noticeNo", required = false) String noticeNoParam,
+			HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		int noticeNo;
+		try {
+			noticeNo = Integer.parseInt(noticeNoParam);
+		} catch (NumberFormatException e) {
+			return new ModelAndView("redirect:/vendor/notice.htm");
+		}
+
+		NoticeDTO notice = noticeMapper.findByNoticeNo(noticeNo);
+
+		if (notice == null) {
+			return new ModelAndView("redirect:/vendor/notice.htm");
+		}
+
+		ModelAndView mav = new ModelAndView("vendor.notice_detail");
+		mav.addObject("menu", "notice"); // 사이드바 활성 메뉴
+		mav.addObject("notice", notice);
+
+		return mav;
+	}
 }
