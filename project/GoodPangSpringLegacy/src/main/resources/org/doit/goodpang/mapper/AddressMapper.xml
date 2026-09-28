@@ -137,7 +137,25 @@
           AND MEMBER_NO = #{memberNo}
 
     </update>
+    
+<select id="getAddressForEdit"
+        resultType="org.doit.goodpang.domain.AddressDTO">
 
+    SELECT
+        ADDRESS_NO      AS addressNo,
+        MEMBER_NO       AS memberNo,
+        RECEIVER_NAME   AS receiverName,
+        TEL             AS tel,
+        ZIPCODE         AS zipcode,
+        ADDRESS         AS address,
+        DETAIL_ADDRESS  AS detailAddress,
+        REQUEST_MSG     AS requestMsg,
+        ADDRESS_DEFAULT AS addressDefault
+    FROM DELIVERY_ADDRESS
+    WHERE ADDRESS_NO = #{addressNo}
+      AND MEMBER_NO = #{memberNo}
+
+</select>
     
 
 </mapper>
