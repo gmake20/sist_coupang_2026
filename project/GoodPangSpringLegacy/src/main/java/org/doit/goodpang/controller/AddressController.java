@@ -25,7 +25,6 @@ public class AddressController {
 
     private final AddressService addressService;
 
-
     // 배송지 추가 화면
     @GetMapping("/add")
     public String addForm(
@@ -44,7 +43,7 @@ public class AddressController {
         model.addAttribute("checkoutNo", checkoutNo);
         model.addAttribute("from", from);
 
-        return "address_add";
+        return "address/address_add";
     }
 
 

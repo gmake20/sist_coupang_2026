@@ -13,4 +13,8 @@ public interface MemberMapper {
 	
 	int insert(MemberVO memberVO);
 	
+    MemberVO getMember(
+            @Param("memberNo") int memberNo
+    );
+	
 }

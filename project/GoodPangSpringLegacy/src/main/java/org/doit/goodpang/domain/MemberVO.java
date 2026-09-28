@@ -1,5 +1,6 @@
 package org.doit.goodpang.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -12,7 +13,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Builder
-public class MemberVO {
+public class MemberVO implements Serializable{
+	
+      private static final long serialVersionUID = 1L;
 	
 	  private Long memberNo;
       private String memberId;
