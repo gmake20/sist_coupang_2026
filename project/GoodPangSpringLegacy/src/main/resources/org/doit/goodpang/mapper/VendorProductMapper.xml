@@ -92,4 +92,182 @@
             ORDER BY P.CREATED_DATE DESC, P.PRODUCT_NO DESC
 	</select>
 
+	<!-- ===== 상품 상세 - VendorProductService.getProductDetail에서 세 쿼리 결과를 하나로 조립 ===== -->
+
+	<!-- public VendorProductDetailDTO selectProductDetail(int productNo, int sellerNo); -->
+	<!-- seller_no까지 같이 확인해서, 다른 판매자의 상품번호를 URL에 넣어도 조회되지 않게 한다 (없으면 null) -->
+	<select id="selectProductDetail" resultType="org.doit.goodpang.domain.VendorProductDetailDTO">
+            SELECT
+                P.PRODUCT_NO, P.SELLER_NO,
+                C1.CATEGORY_NAME AS MAIN_CATEGORY_NAME,
+                C2.CATEGORY_NAME AS MID_CATEGORY_NAME,
+                C3.CATEGORY_NAME AS SUB_CATEGORY_NAME,
+                P.SALE_METHOD, P.BRAND_NAME, P.NO_BRAND_YN, P.PRODUCT_NAME, P.INTERNAL_NAME, P.PRODUCT_PRICE,
+                P.DETAIL_TYPE, P.PRODUCT_DESC,
+                P.SHIPPING_ZIPCODE, P.SHIPPING_ADDRESS, P.SHIPPING_DETAIL_ADDRESS, P.JEJU_SHIPPING_YN,
+                P.DELIVERY_SERVICE_CODE, P.DELIVERY_METHOD, P.BUNDLE_SHIPPING_YN,
+                P.SHIPPING_FEE_TYPE, P.SHIPPING_FEE,
+                P.LEAD_TIME_INPUT_TYPE, P.LEAD_TIME_DAYS, P.SAME_DAY_SHIP_YN, P.SAME_DAY_CUTOFF_TIME,
+                P.SALE_STATUS, P.DISPLAY_YN, P.CREATED_DATE, P.UPDATED_DATE
+            FROM PRODUCT P
+                JOIN CATEGORY C3 ON P.SUB_CATEGORY_NO = C3.CATEGORY_NO
+                LEFT JOIN CATEGORY C2 ON C2.CATEGORY_NO = C3.PARENT_CATEGORY_NO
+                LEFT JOIN CATEGORY C1 ON C1.CATEGORY_NO = C2.PARENT_CATEGORY_NO
+            WHERE P.PRODUCT_NO = #{productNo}
+              AND P.SELLER_NO = #{sellerNo}
+	</select>
+
+	<!-- public List<VendorProductOptionDetailDTO> selectOptionDetails(int productNo); -->
+	<!-- mainImageUrl/extraImageUrls는 여기서 안 채우고 Service에서 이미지 목록을 보고 채운다 -->
+	<select id="selectOptionDetails" resultType="org.doit.goodpang.domain.VendorProductOptionDetailDTO">
+            SELECT
+                OPTION_ID,
+                OPTION1_TYPE, OPTION1_VALUE, OPTION2_TYPE, OPTION2_VALUE, OPTION3_TYPE, OPTION3_VALUE,
+                NORMAL_PRICE, PRICE, AUTO_PRICE_ADJUST_YN, QUANTITY,
+                SELLER_PRODUCT_CODE, MODEL_NO, BARCODE, STATUS
+            FROM PRODUCT_OPTION
+            WHERE PRODUCT_NO = #{productNo}
+            ORDER BY OPTION_ID
+	</select>
+
+	<!-- public List<ProductImageDTO> selectProductImages(int productNo); -->
+	<!-- OPTION_ID가 NULL이면 상세설명 이미지, 있으면 그 옵션의 대표/추가 이미지 -->
+	<select id="selectProductImages" resultType="org.doit.goodpang.domain.ProductImageDTO">
+            SELECT OPTION_ID, IMAGE_PURPOSE, IMAGE_ORDER, IMAGE_URL
+            FROM PRODUCT_IMAGE
+            WHERE PRODUCT_NO = #{productNo}
+            ORDER BY OPTION_ID, IMAGE_PURPOSE, IMAGE_ORDER
+	</select>
+
+	<!-- public int updateDisplayYn(int productNo, int sellerNo, String displayYn); -->
+	<!--
+	  상품 노출여부 변경(소프트 삭제/복원) - 행을 지우지 않고 DISPLAY_YN만 바꿔서 판매자 상품 목록에서만 안 보이게 한다.
+	  SELLER_NO 조건으로 다른 판매자의 상품은 바뀌지 않음 (그 경우 0건)
+	-->
+	<update id="updateDisplayYn">
+            UPDATE PRODUCT
+            SET DISPLAY_YN = #{displayYn},
+                UPDATED_DATE = SYSDATE
+            WHERE PRODUCT_NO = #{productNo}
+              AND SELLER_NO = #{sellerNo}
+	</update>
+
+	<!-- public int updateSaleStatus(int productNo, int sellerNo, String saleStatus); -->
+	<!--
+	  판매중지/판매재개 토글 - '판매 중' <-> '판매 중지'만 전환한다.
+	  '승인 대기'/'품절' 상태인 상품이나 다른 판매자의 상품은 바뀌지 않음 (그 경우 0건)
+	-->
+	<update id="updateSaleStatus">
+            UPDATE PRODUCT
+            SET SALE_STATUS = #{saleStatus},
+                UPDATED_DATE = SYSDATE
+            WHERE PRODUCT_NO = #{productNo}
+              AND SELLER_NO = #{sellerNo}
+              AND SALE_STATUS IN ('판매 중', '판매 중지')
+	</update>
+
+	<!-- public int updateOption(int optionId, int sellerNo, int price, Integer normalPrice, int quantity, String status); -->
+	<!--
+	  상품 옵션 관리 - 옵션 하나의 판매가/정상가/재고수량/상태 수정.
+	  PRODUCT_OPTION에는 seller_no가 없어서, 이 옵션의 상품이 이 판매자 것일 때만 수정 (아니면 0건)
+	  normalPrice는 비워두면 null → Oracle은 타입 없는 null 바인딩을 거부하므로 jdbcType=NUMERIC 지정
+	-->
+	<update id="updateOption">
+            UPDATE PRODUCT_OPTION
+            SET PRICE = #{price},
+                NORMAL_PRICE = #{normalPrice, jdbcType=NUMERIC},
+                QUANTITY = #{quantity},
+                STATUS = #{status}
+            WHERE OPTION_ID = #{optionId}
+              AND EXISTS (
+                    SELECT 1 FROM PRODUCT P
+                    WHERE P.PRODUCT_NO = PRODUCT_OPTION.PRODUCT_NO
+                      AND P.SELLER_NO = #{sellerNo}
+              )
+	</update>
+
+	<!-- ===== 상품 등록 - VendorProductService.registerProduct에서 한 트랜잭션으로 호출 =====
+	     (기존 ProductWriteDAO.insertProduct - PRODUCT + PRODUCT_OPTION + PRODUCT_IMAGE)
+	     null이 들어올 수 있는 값은 jdbcType을 지정 (Oracle은 타입 없는 null 바인딩을 거부함) -->
+
+	<!-- public int nextProductNo(); -->
+	<select id="nextProductNo" resultType="int">
+            SELECT SEQ_PRODUCT.NEXTVAL FROM DUAL
+	</select>
+
+	<!-- public int nextOptionId(); -->
+	<select id="nextOptionId" resultType="int">
+            SELECT SEQ_OPTION.NEXTVAL FROM DUAL
+	</select>
+
+	<!-- public int insertProduct(int productNo, ProductWriteDTO dto); -->
+	<insert id="insertProduct">
+            INSERT INTO PRODUCT (
+                product_no, seller_no, sub_category_no,
+                sale_method, brand_name, no_brand_yn, product_name, internal_name,
+                option_yn, product_price, quantity,
+                detail_type, product_desc,
+                shipping_zipcode, shipping_address, shipping_detail_address, jeju_shipping_yn,
+                delivery_service_code, delivery_method, bundle_shipping_yn,
+                shipping_fee_type, shipping_fee,
+                lead_time_input_type, lead_time_days, same_day_ship_yn, same_day_cutoff_time,
+                sale_status, created_date, updated_date
+            ) VALUES (
+                #{productNo}, #{dto.sellerNo}, #{dto.subCategoryNo},
+                #{dto.saleMethod, jdbcType=VARCHAR}, #{dto.brandName, jdbcType=VARCHAR}, #{dto.noBrandYn, jdbcType=VARCHAR},
+                #{dto.productName, jdbcType=VARCHAR}, #{dto.internalName, jdbcType=VARCHAR},
+                #{dto.optionYn, jdbcType=VARCHAR}, #{dto.productPrice}, 0,
+                #{dto.detailType, jdbcType=VARCHAR}, NULL,
+                #{dto.shippingZipcode, jdbcType=VARCHAR}, #{dto.shippingAddress, jdbcType=VARCHAR},
+                #{dto.shippingDetailAddress, jdbcType=VARCHAR}, #{dto.jejuShippingYn, jdbcType=VARCHAR},
+                #{dto.deliveryServiceCode, jdbcType=VARCHAR}, #{dto.deliveryMethod, jdbcType=VARCHAR}, #{dto.bundleShippingYn, jdbcType=VARCHAR},
+                #{dto.shippingFeeType, jdbcType=VARCHAR}, 0,
+                #{dto.leadTimeInputType, jdbcType=VARCHAR}, #{dto.leadTimeDays, jdbcType=NUMERIC},
+                #{dto.sameDayShipYn, jdbcType=VARCHAR}, #{dto.sameDayCutoffTime, jdbcType=VARCHAR},
+                #{dto.saleStatus, jdbcType=VARCHAR}, SYSDATE, SYSDATE
+            )
+	</insert>
+
+	<!-- public int insertOption(int optionId, int productNo, ProductOptionWriteDTO option); -->
+	<!-- STATUS: 재고가 있으면 Y(정상), 0이면 N(품절) -->
+	<insert id="insertOption">
+            INSERT INTO PRODUCT_OPTION (
+                OPTION_ID, product_no,
+                OPTION1_TYPE, OPTION1_VALUE, OPTION2_TYPE, OPTION2_VALUE, OPTION3_TYPE, OPTION3_VALUE,
+                normal_price, PRICE, auto_price_adjust_yn, quantity,
+                seller_product_code, model_no, barcode, STATUS
+            ) VALUES (
+                #{optionId}, #{productNo},
+                #{option.option1Type, jdbcType=VARCHAR}, #{option.option1Value, jdbcType=VARCHAR},
+                #{option.option2Type, jdbcType=VARCHAR}, #{option.option2Value, jdbcType=VARCHAR},
+                #{option.option3Type, jdbcType=VARCHAR}, #{option.option3Value, jdbcType=VARCHAR},
+                #{option.normalPrice, jdbcType=NUMERIC}, #{option.salePrice},
+                #{option.autoPriceAdjustYn, jdbcType=VARCHAR}, #{option.quantity},
+                #{option.sellerProductCode, jdbcType=VARCHAR}, #{option.modelNo, jdbcType=VARCHAR},
+                #{option.barcode, jdbcType=VARCHAR},
+                CASE WHEN #{option.quantity} &gt; 0 THEN 'Y' ELSE 'N' END
+            )
+	</insert>
+
+	<!-- public int insertImage(int productNo, Integer optionId, String purpose, int imageOrder, String imageUrl); -->
+	<!-- optionId가 null이면 상세설명 이미지 -->
+	<insert id="insertImage">
+            INSERT INTO PRODUCT_IMAGE (
+                image_no, product_no, OPTION_ID, image_purpose, image_order, image_url, created_date
+            ) VALUES (
+                SEQ_PRODUCT_IMAGE.NEXTVAL, #{productNo}, #{optionId, jdbcType=NUMERIC},
+                #{purpose}, #{imageOrder}, #{imageUrl}, SYSDATE
+            )
+	</insert>
+
+	<!-- public int hideAllBySeller(int sellerNo); -->
+	<!-- 판매자 탈퇴 시 이 판매자의 노출 중인 상품을 전부 숨김 (기존 ProductListDAO.hideAllBySeller) -->
+	<update id="hideAllBySeller">
+            UPDATE PRODUCT
+            SET DISPLAY_YN = 'N',
+                UPDATED_DATE = SYSDATE
+            WHERE SELLER_NO = #{sellerNo}
+              AND DISPLAY_YN = 'Y'
+	</update>
+
 </mapper>
