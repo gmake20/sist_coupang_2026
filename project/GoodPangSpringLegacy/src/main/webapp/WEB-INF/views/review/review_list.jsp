@@ -7,6 +7,7 @@
 <%@ taglib prefix="fmt"
     uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 
 <main class="review-page">
 
@@ -163,11 +164,15 @@
 
                                         <a
                                             href="${pageContext.request.contextPath}/product?productNo=${review.productNo}">
-
-                                            <img
+                                            <%-- <img
                                                 src="${pageContext.request.contextPath}/${review.productImage}"
                                                 alt="${review.productName}"
-                                                onerror="this.style.display='none';">
+                                                onerror="this.style.display='none';"> --%>
+                                                
+                                                <img
+												    src="${img:url(review.productImage)}"
+												    alt="${review.productName}"
+												    onerror="this.style.display='none';">
 
                                         </a>
 
@@ -357,10 +362,14 @@
 
                                             <div class="written-review-photo">
 
-                                                <img
+                                                <%-- <img
                                                     src="${pageContext.request.contextPath}${imageUrl}"
                                                     alt="리뷰 사진"
-                                                    onclick="openReviewImage(this.src)">
+                                                    onclick="openReviewImage(this.src)"> --%>
+                                                    <img
+													    src="${img:url(imageUrl)}"
+													    alt="리뷰 사진"
+													    onclick="openReviewImage(this.src)">
 
                                             </div>
 

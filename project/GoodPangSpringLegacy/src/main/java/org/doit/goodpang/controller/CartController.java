@@ -46,8 +46,6 @@ public class CartController {
             HttpServletResponse response,
             Model model) {
 
-        log.info(">>>> GET /cart");
-
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", 0);
