@@ -12,7 +12,7 @@ public class MemberService {
 
     private final MemberMapper memberMapper;
 
-    public MemberVO getMember(int memberNo) {
+    public MemberVO getMember(Long memberNo) {
 
         return memberMapper.getMember(memberNo);
     }
