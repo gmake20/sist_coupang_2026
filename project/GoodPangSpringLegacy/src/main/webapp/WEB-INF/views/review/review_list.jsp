@@ -23,8 +23,9 @@
                 👤
             </div>
 
+
             <div class="member-name">
-                ${sessionScope.loginMember.memberName}
+				${memberName}
             </div>
 
         </div>

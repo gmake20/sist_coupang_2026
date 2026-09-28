@@ -299,8 +299,6 @@ public class ReviewController {
             Authentication authentication,
             Model model) {
 
-        log.info(">>>> GET /review/list");
-
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || !(authentication.getPrincipal() instanceof CustomUser)) {
@@ -407,6 +405,8 @@ public class ReviewController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
+        
+        model.addAttribute("memberName", customUser.getMember().getMemberName() );
 
         return "review.list";
     }

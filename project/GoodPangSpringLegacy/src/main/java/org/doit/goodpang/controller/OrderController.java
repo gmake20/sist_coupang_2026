@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.doit.goodpang.domain.AddressDTO;
 import org.doit.goodpang.domain.CheckoutDTO;
+import org.doit.goodpang.domain.CheckoutItemDTO;
 import org.doit.goodpang.domain.OrderCompleteDTO;
 import org.doit.goodpang.domain.OrderDetailDTO;
 import org.doit.goodpang.domain.OrderItemDTO;
@@ -403,6 +404,12 @@ public class OrderController {
       List<PaymentMethodDTO> cardMethods =
       paymentMethodService.getCardMethods(memberNo);
       
+      List<CheckoutItemDTO> checkoutItems =
+	        checkoutService.getCheckoutItemsPRODUCT(
+	                checkoutNo
+	        );
+
+      
       CheckoutDTO checkout =
                checkoutService.getCheckout(
                        checkoutNo,
@@ -413,18 +420,14 @@ public class OrderController {
                 "address",
                 address
         );
-
-        model.addAttribute(
-                "addressList",
-                addressList
-        );
-
-      
-      model.addAttribute( "paymentMethods", paymentMethods );
+   
         
-      model.addAttribute( "cardMethods", cardMethods );
+        model.addAttribute("checkoutItems", checkoutItems);
+        model.addAttribute("addressList", addressList);
+        model.addAttribute("paymentMethods", paymentMethods );
+        model.addAttribute("cardMethods", cardMethods );
       
-       model.addAttribute(
+        model.addAttribute(
                "checkout",
                checkout
        );

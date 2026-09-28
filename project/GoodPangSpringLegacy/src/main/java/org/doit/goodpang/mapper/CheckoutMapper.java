@@ -93,4 +93,7 @@ public interface CheckoutMapper {
 	    );
 
 
+	    List<CheckoutItemDTO> getCheckoutItemsPRODUCT(
+	            @Param("checkoutNo") int checkoutNo
+	    );
 }
