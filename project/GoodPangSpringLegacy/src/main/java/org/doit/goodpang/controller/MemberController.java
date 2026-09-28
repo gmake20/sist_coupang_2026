@@ -33,7 +33,7 @@ public class MemberController {
                 (CustomUser) authentication.getPrincipal();
 
         // CustomUser 구조에 따라 getter 이름은 맞춰주세요.
-        int memberNo =
+        Long memberNo =
                 customUser.getMember().getMemberNo();
 
         log.info("회원정보 수정 memberNo : " + memberNo);
