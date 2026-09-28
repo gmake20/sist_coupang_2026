@@ -213,4 +213,47 @@ public class PaymentMethodService {
 
         return result;
     }
+    
+    @Transactional
+    public void setDefaultPaymentMethod(
+            Long memberNo,
+            int paymentMethodNo) {
+
+        // 본인 결제수단인지 확인
+        PaymentMethodDTO paymentMethod =
+                paymentMethodMapper.findPaymentMethod(
+                        memberNo,
+                        paymentMethodNo
+                );
+
+        if (paymentMethod == null) {
+
+            throw new IllegalArgumentException(
+                    "사용할 수 없는 결제수단입니다."
+            );
+        }
+
+
+        // 같은 종류의 기존 기본 결제수단 해제
+        paymentMethodMapper.clearDefault(
+                memberNo,
+                paymentMethod.getPaymentType()
+        );
+
+
+        // 선택한 결제수단을 기본으로 변경
+        int result =
+                paymentMethodMapper.setDefault(
+                        memberNo,
+                        paymentMethodNo
+                );
+
+
+        if (result != 1) {
+
+            throw new IllegalStateException(
+                    "기본 결제수단 설정에 실패했습니다."
+            );
+        }
+    }
 }

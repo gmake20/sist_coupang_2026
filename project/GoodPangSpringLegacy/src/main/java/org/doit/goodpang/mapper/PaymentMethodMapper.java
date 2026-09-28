@@ -60,4 +60,10 @@ public interface PaymentMethodMapper {
             @Param("memberNo") Long memberNo,
             @Param("paymentMethodNo") int paymentMethodNo
     );
+    
+    PaymentMethodDTO findPaymentMethod(
+            @Param("memberNo") Long memberNo,
+            @Param("paymentMethodNo") Long paymentMethodNo
+    );
+
 }
