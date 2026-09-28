@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import org.doit.goodpang.domain.AddressDTO;
+import org.doit.goodpang.domain.DeliveryLogDTO;
 import org.doit.goodpang.domain.OrderCompleteDTO;
 import org.doit.goodpang.domain.OrderDetailDTO;
 import org.doit.goodpang.domain.OrderItemDTO;
@@ -26,6 +27,11 @@ public interface OrderMapper {
 
      //order_list_detail
 	 
+	// 1. 배송 조회 기본 정보 (수령인, 송장번호 등)
+	 OrderDetailDTO getTrackingHeaderInfo(@Param("orderNo") int orderNo);
+
+	 // 2. 시간대별 배송 이력 목록 (최신순)
+	 List<DeliveryLogDTO> getDeliveryLogList(@Param("orderNo") int orderNo);
 	 
 
     Integer findOrderNoByCheckout(

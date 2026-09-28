@@ -47,4 +47,9 @@ public class OrderCancelService {
         int endRow = curPage * pageSize;
         return orderCancelMapper.getCancelHistoryPaged(memberNo, startRow, endRow);
     }
+    // 주문 상세 내역 조회
+
+    public List<OrderDetailDTO> getCancelDetailList(int orderNo) {
+        return orderCancelMapper.getCancelDetailList(orderNo);
+    }
 }

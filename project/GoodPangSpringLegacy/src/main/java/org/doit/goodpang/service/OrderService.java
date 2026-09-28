@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.doit.goodpang.domain.DeliveryLogDTO;
 import org.doit.goodpang.domain.OrderCompleteDTO;
 import org.doit.goodpang.domain.OrderDetailDTO;
 import org.doit.goodpang.domain.OrderItemDTO;
@@ -21,6 +22,21 @@ import lombok.extern.log4j.Log4j;
 @Log4j
 @RequiredArgsConstructor
 public class OrderService {
+	//tracking
+	
+	@Transactional(readOnly = true)
+	public OrderDetailDTO getTrackingInfo(int orderNo) {
+	    // 1. 배송 기본 헤더 정보 조회
+	    OrderDetailDTO trackingInfo = orderMapper.getTrackingHeaderInfo(orderNo);
+	    
+	    // 2. 배송 이력 리스트 조회 후 DTO 내부 logList에 세팅
+	    if (trackingInfo != null) {
+	        List<DeliveryLogDTO> logList = orderMapper.getDeliveryLogList(orderNo);
+	        trackingInfo.setLogList(logList);
+	    }
+	    
+	    return trackingInfo;
+	}
 	
 //  order_list	
 	

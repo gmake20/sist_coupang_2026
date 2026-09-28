@@ -1,9 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!-- ★ 팀원들이 만든 커스텀 TLD 태그라이브러리 추가 -->
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 
 
-	<div class="order-detail-wrap">
+<!-- 
+	<div class="order-detail-wrap"> -->
 
 		<!-- =========================
          [2열] 가운데 본문
@@ -38,13 +41,10 @@
 						<div class="product-row" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
 
 							<!-- 상품 이미지 영역 -->
-							<div class="product-image" style="width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 6px; overflow: hidden; margin-right: 15px; flex-shrink: 0;">
-							    <c:choose>
-							        <c:when test="${not empty item.imageUrl}">
-							            <img src="${pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 100%; height: 100%; object-fit: cover;" />
-							        </c:when>
-							    </c:choose>
-							</div>
+									<!-- 상품 이미지 영역 -->
+								<div class="product-image">
+                                      <img src="${img:url(item.imageUrl)}" alt="${item.productName}" />
+                               </div>
 
 							<!-- 상품 정보 -->
 							<div class="product-info" style="flex: 1;">
@@ -354,5 +354,6 @@
 				</div>
 			</div>
 
+        
 		</main>
-
+		

@@ -1,6 +1,15 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!-- ★ 팀원들이 만든 커스텀 TLD 태그라이브러리 추가 -->
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
+
+
+<!-- 공통 CSS 및 전용 CSS -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/reset.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/order_cancel.css">
+
 
 <div class="cancel-wrap">
 

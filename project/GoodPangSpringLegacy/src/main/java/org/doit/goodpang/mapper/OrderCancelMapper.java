@@ -33,6 +33,10 @@ public interface OrderCancelMapper {
         @Param("startRow") int startRow,
         @Param("endRow") int endRow
     );
+    
+    //cancel_detail
+
+    List<OrderDetailDTO> getCancelDetailList(@Param("orderNo") int orderNo);
 
 
 

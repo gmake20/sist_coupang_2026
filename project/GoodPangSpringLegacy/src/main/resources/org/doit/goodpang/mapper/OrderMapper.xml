@@ -5,6 +5,43 @@
 
 <mapper namespace="org.doit.goodpang.mapper.OrderMapper">
 
+
+<!-- 배송조회 -->
+
+<!-- OrderMapper.xml 에 추가 -->
+
+<!-- 1. 배송지 기본 정보 + 운송장번호 조회 (TrackingDAO.getTrackingHeaderInfo 대응) -->
+<select id="getTrackingHeaderInfo" resultType="org.doit.goodpang.domain.OrderDetailDTO">
+    SELECT 
+        o.order_no,
+                o.order_date,
+                o.order_status,
+                oa.receiver_name AS memberName,
+                oa.tel AS phone,
+                oa.address AS address,
+                oa.detail_address AS detailAddress,
+                oa.request_msg AS requestMsg,
+                d.invoice_no,
+        oa.RECEIVE_LOCATION AS receiveLocation
+    FROM ORDERS o
+    JOIN ORDER_ADDRESS oa ON o.ORDER_ADDRESS_NO = oa.ORDER_ADDRESS_NO
+    LEFT JOIN DELIVERY d ON o.ORDER_NO = d.ORDER_NO
+    WHERE o.ORDER_NO = #{orderNo}
+</select>
+
+<!-- 2. 시간대별 배송 이력 목록 조회 (TrackingDAO.getDeliveryLogList 대응) -->
+<select id="getDeliveryLogList" resultType="org.doit.goodpang.domain.DeliveryLogDTO">
+    SELECT 
+        log_no
+        , order_no
+        , log_time
+        , current_location
+        , delivery_status
+    FROM DELIVERY_LOG
+    WHERE ORDER_NO = #{orderNo}
+    ORDER BY LOG_TIME DESC
+</select>
+
 <!-- order_list -->
      <!-- 1. 필터 조건(최근6개월 / 년도)에 따른 회원 총 주문 건수 조회 -->
     <select id="getOrderCount" resultType="int">
