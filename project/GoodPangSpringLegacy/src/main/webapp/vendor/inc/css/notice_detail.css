@@ -208,12 +208,6 @@ ul {
   color: #333;
 }
 
-.user-grade {
-  font-size: 11px;
-  color: #ff9f1c;
-  font-weight: 600;
-}
-
 .chevron {
   width: 14px;
   height: 14px;
@@ -612,13 +606,40 @@ ul {
   height: 16px;
 }
 
-.stat-icon-blue { background: #e8f0ff; color: #4285f4; }
-.stat-icon-green { background: #e5f9ee; color: #17c964; }
-.stat-icon-orange { background: #fff2e2; color: #ff9f1c; }
-.stat-icon-red { background: #fdeceb; color: #f4514a; }
-.stat-icon-purple { background: #f2eafd; color: #9b5de5; }
-.stat-icon-violet { background: #ece9fd; color: #6c5ce7; }
-.stat-icon-teal { background: #e1f7f5; color: #14b8a6; }
+.stat-icon-blue {
+  background: #e8f0ff;
+  color: #4285f4;
+}
+
+.stat-icon-green {
+  background: #e5f9ee;
+  color: #17c964;
+}
+
+.stat-icon-orange {
+  background: #fff2e2;
+  color: #ff9f1c;
+}
+
+.stat-icon-red {
+  background: #fdeceb;
+  color: #f4514a;
+}
+
+.stat-icon-purple {
+  background: #f2eafd;
+  color: #9b5de5;
+}
+
+.stat-icon-violet {
+  background: #ece9fd;
+  color: #6c5ce7;
+}
+
+.stat-icon-teal {
+  background: #e1f7f5;
+  color: #14b8a6;
+}
 
 .stat-value {
   margin-bottom: 6px;
@@ -1224,10 +1245,21 @@ th.col-check input {
   flex: none;
 }
 
-.dot-blue { background: #4285f4; }
-.dot-green { background: #17c964; }
-.dot-orange { background: #ff9f1c; }
-.dot-gray { background: #c9ccd3; }
+.dot-blue {
+  background: #4285f4;
+}
+
+.dot-green {
+  background: #17c964;
+}
+
+.dot-orange {
+  background: #ff9f1c;
+}
+
+.dot-gray {
+  background: #c9ccd3;
+}
 
 /* =========================================================
    공지사항
@@ -1415,10 +1447,48 @@ th.col-check input {
 /* =========================================================
    ETC
 ========================================================= */
-    .notice-detail .back-link { display: inline-block; margin-bottom: 16px; color: #555; text-decoration: none; }
-    .notice-detail h1 { font-size: 22px; margin: 0 0 8px; }
-    .notice-detail .meta { color: #888; font-size: 13px; margin-bottom: 20px; }
-    .notice-detail .content { border-top: 1px solid #eee; padding-top: 20px; font-size: 14px; line-height: 1.7; white-space: pre-wrap; }
-    .notice-tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-right: 6px; vertical-align: middle; }
-    .tag-notice { background: #fdeceb; color: #f4514a; }
-    .tag-info { background: #eef1f6; color: #777; }
+.notice-detail .back-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #555;
+  text-decoration: none;
+}
+
+.notice-detail h1 {
+  font-size: 22px;
+  margin: 0 0 8px;
+}
+
+.notice-detail .meta {
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.notice-detail .content {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.notice-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.tag-notice {
+  background: #fdeceb;
+  color: #f4514a;
+}
+
+.tag-info {
+  background: #eef1f6;
+  color: #777;
+}
