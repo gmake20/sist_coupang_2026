@@ -3,6 +3,7 @@
 	pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 
 <i class="arrow"></i>
 
@@ -17,10 +18,20 @@
 					href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
 						<div class="cart-preview-image">
 							<c:choose>
+							<%-- 
 								<c:when test="${not empty item.imageUrl}">
 									<c:url var="previewImageUrl" value="/${item.imageUrl}" />
 									<img src="${previewImageUrl}" alt="${item.productName}">
 								</c:when>
+								 --%>
+								<c:when test="${not empty item.imageUrl}">
+								    <p>${item.imageUrl}</p>
+								    <p>${img:url(item.imageUrl)}</p>
+								
+								    <img src="${img:url(item.imageUrl)}"
+								         alt="${item.productName}">
+								</c:when>
+								
 								<c:otherwise>
 									<span>이미지</span>
 								</c:otherwise>

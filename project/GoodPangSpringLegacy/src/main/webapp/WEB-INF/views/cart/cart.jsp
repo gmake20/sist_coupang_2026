@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 <%@ taglib prefix="sec"
 uri="http://www.springframework.org/security/tags" %>
 
@@ -64,8 +65,12 @@ uri="http://www.springframework.org/security/tags" %>
 									<c:when test="${not empty item.imageUrl}">
 										<a
 											href="${pageContext.request.contextPath}/product?productNo=${item.productNo}">
-											<img src="${pageContext.request.contextPath}/${item.imageUrl}"
-											alt="${item.productName}" class="cart-item-img">
+											<%-- <img src="${pageContext.request.contextPath}/${item.imageUrl}"
+											alt="${item.productName}" class="cart-item-img"> --%>
+											
+											<img src="${img:url(item.imageUrl)}"
+											     alt="${item.productName}"
+											     class="cart-item-img">
 										</a>
 									</c:when>
 
