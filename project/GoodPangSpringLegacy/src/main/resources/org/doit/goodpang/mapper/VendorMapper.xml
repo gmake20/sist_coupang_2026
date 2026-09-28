@@ -94,4 +94,37 @@
             WHERE SELLER_NO = #{sellerNo}
 	</update>
 
+	<!-- ===== 관리자 판매자 입점 심사 (기존 SellerDAO.findAll / findBySellerNo) =====
+	     관리자 화면에는 비밀번호 해시가 필요 없어서 SELLER_PW는 조회하지 않는다 -->
+
+	<!-- public List<SellerDTO> findAllSellers(); -->
+	<select id="findAllSellers" resultType="org.doit.goodpang.domain.SellerDTO">
+            SELECT
+                SELLER_NO, EMAIL, MANAGER_NAME, PHONE,
+                BUSINESS_NO, BUSINESS_TYPE, CEO_NAME, STORE_NAME,
+                ZIPCODE, BUSINESS_ADDRESS, BUSINESS_DETAIL_ADDRESS,
+                MAIL_ORDER_NO, CATEGORY_NO,
+                BANK_NAME, ACCOUNT_NO, ACCOUNT_HOLDER,
+                BUSINESS_CERT_URL, MAIL_ORDER_CERT_URL,
+                APPROVAL_STATUS, REJECT_REASON,
+                CREATED_DATE, UPDATED_DATE
+            FROM SELLER
+            ORDER BY SELLER_NO DESC
+	</select>
+
+	<!-- public SellerDTO findBySellerNo(int sellerNo); -->
+	<select id="findBySellerNo" resultType="org.doit.goodpang.domain.SellerDTO">
+            SELECT
+                SELLER_NO, EMAIL, MANAGER_NAME, PHONE,
+                BUSINESS_NO, BUSINESS_TYPE, CEO_NAME, STORE_NAME,
+                ZIPCODE, BUSINESS_ADDRESS, BUSINESS_DETAIL_ADDRESS,
+                MAIL_ORDER_NO, CATEGORY_NO,
+                BANK_NAME, ACCOUNT_NO, ACCOUNT_HOLDER,
+                BUSINESS_CERT_URL, MAIL_ORDER_CERT_URL,
+                APPROVAL_STATUS, REJECT_REASON,
+                CREATED_DATE, UPDATED_DATE
+            FROM SELLER
+            WHERE SELLER_NO = #{sellerNo}
+	</select>
+
   </mapper>

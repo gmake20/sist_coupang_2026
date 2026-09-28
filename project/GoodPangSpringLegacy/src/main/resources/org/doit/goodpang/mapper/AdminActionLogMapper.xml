@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="org.doit.goodpang.mapper.AdminActionLogMapper">
+
+	<!-- public int insertLog(int adminNo, String actionType, String targetType, int targetNo, String reason); -->
+	<insert id="insertLog">
+            INSERT INTO ADMIN_ACTION_LOG (
+                ACTION_LOG_NO, ADMIN_NO, ACTION_TYPE, TARGET_TYPE, TARGET_NO, REASON, ACTION_DATE
+            ) VALUES (
+                SEQ_ADMIN_ACTION_LOG.NEXTVAL, #{adminNo}, #{actionType}, #{targetType}, #{targetNo},
+                #{reason, jdbcType=VARCHAR}, SYSDATE
+            )
+	</insert>
+
+	<!-- public List<AdminActionLogDTO> findAll(int offset, int pageSize); -->
+	<!-- 관리자 액션 로그 - 최신순 (기존 AdminActionLogDAO.findAll) -->
+	<select id="findAll" resultType="org.doit.goodpang.domain.AdminActionLogDTO">
+            SELECT L.ACTION_LOG_NO, L.ADMIN_NO, A.ADMIN_NAME,
+                   L.ACTION_TYPE, L.TARGET_TYPE, L.TARGET_NO, L.REASON, L.ACTION_DATE
+            FROM ADMIN_ACTION_LOG L
+                JOIN ADMIN A ON L.ADMIN_NO = A.ADMIN_NO
+            ORDER BY L.ACTION_LOG_NO DESC
+            OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+	</select>
+
+	<!-- public int countAll(); -->
+	<select id="countAll" resultType="int">
+            SELECT COUNT(*) FROM ADMIN_ACTION_LOG
+	</select>
+
+</mapper>

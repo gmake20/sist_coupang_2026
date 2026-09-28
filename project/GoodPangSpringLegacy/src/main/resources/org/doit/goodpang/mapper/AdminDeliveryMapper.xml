@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="org.doit.goodpang.mapper.AdminDeliveryMapper">
+
+	<!-- public List<AdminDeliveryDTO> findShipping(); -->
+	<!--
+	  배송중인 전체 주문. 주문에 상품이 여러 개면 첫 상품(ORDER_DETAIL_NO 가장 작은 것)의 이름/판매자/대표이미지를 대표로 보여주고
+	  ITEM_COUNT로 "외 N건" 표시. 구매자/배송지 컬럼은 DTO 필드명에 맞춰 별칭.
+	-->
+	<select id="findShipping" resultType="org.doit.goodpang.domain.AdminDeliveryDTO">
+            SELECT
+                D.DELIVERY_NO, D.ORDER_NO, D.DELIVERY_SERVICE_CODE, D.INVOICE_NO,
+                D.DELIVERY_STATUS, D.DELIVERY_START_DATE,
+                M.MEMBER_NAME AS BUYER_NAME,
+                M.PHONE AS BUYER_PHONE,
+                DA.ZIPCODE, DA.ADDRESS, DA.DETAIL_ADDRESS,
+                PN.PRODUCT_NAME, PN.STORE_NAME, PN.ITEM_COUNT, IMG.IMAGE_URL AS PRODUCT_IMAGE_URL
+            FROM DELIVERY D
+                JOIN ORDERS O ON D.ORDER_NO = O.ORDER_NO
+                JOIN MEMBER M ON O.MEMBER_NO = M.MEMBER_NO
+                LEFT JOIN ORDER_ADDRESS DA ON O.ORDER_ADDRESS_NO = DA.ORDER_ADDRESS_NO
+                JOIN (
+                    SELECT
+                        OD.ORDER_NO,
+                        MIN(OD.PRODUCT_NO) KEEP (DENSE_RANK FIRST ORDER BY OD.ORDER_DETAIL_NO) AS PRODUCT_NO,
+                        MIN(P.PRODUCT_NAME) KEEP (DENSE_RANK FIRST ORDER BY OD.ORDER_DETAIL_NO) AS PRODUCT_NAME,
+                        MIN(S.STORE_NAME) KEEP (DENSE_RANK FIRST ORDER BY OD.ORDER_DETAIL_NO) AS STORE_NAME,
+                        COUNT(*) AS ITEM_COUNT
+                    FROM ORDER_DETAIL OD
+                        JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+                        JOIN SELLER S ON P.SELLER_NO = S.SELLER_NO
+                    GROUP BY OD.ORDER_NO
+                ) PN ON PN.ORDER_NO = D.ORDER_NO
+                LEFT JOIN (
+                    SELECT PRODUCT_NO, IMAGE_URL,
+                           ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID, IMAGE_ORDER) AS RN
+                    FROM PRODUCT_IMAGE
+                    WHERE IMAGE_PURPOSE = '대표'
+                ) IMG ON IMG.PRODUCT_NO = PN.PRODUCT_NO AND IMG.RN = 1
+            WHERE D.DELIVERY_STATUS = '배송중'
+            ORDER BY D.DELIVERY_START_DATE DESC
+	</select>
+
+	<!-- ===== 배송완료 처리 - AdminDeliveryService.completeDelivery에서 한 트랜잭션으로 호출 ===== -->
+
+	<!-- public int updateDeliveryDone(int deliveryNo); -->
+	<update id="updateDeliveryDone">
+            UPDATE DELIVERY
+            SET DELIVERY_STATUS = '배송완료',
+                DELIVERY_END_DATE = SYSDATE,
+                UPDATED_DATE = SYSDATE
+            WHERE DELIVERY_NO = #{deliveryNo}
+              AND DELIVERY_STATUS = '배송중'
+	</update>
+
+	<!-- public Integer findOrderNoByDeliveryNo(int deliveryNo); -->
+	<select id="findOrderNoByDeliveryNo" resultType="java.lang.Integer">
+            SELECT ORDER_NO FROM DELIVERY WHERE DELIVERY_NO = #{deliveryNo}
+	</select>
+
+	<!-- public int updateOrderDone(int orderNo); -->
+	<update id="updateOrderDone">
+            UPDATE ORDERS
+            SET ORDER_STATUS = '배송완료'
+            WHERE ORDER_NO = #{orderNo}
+              AND ORDER_STATUS = '배송중'
+	</update>
+
+	<!-- public List<Integer> findSellerNosByOrderNo(int orderNo); -->
+	<select id="findSellerNosByOrderNo" resultType="java.lang.Integer">
+            SELECT DISTINCT P.SELLER_NO
+            FROM ORDER_DETAIL OD
+                JOIN PRODUCT P ON OD.PRODUCT_NO = P.PRODUCT_NO
+            WHERE OD.ORDER_NO = #{orderNo}
+	</select>
+
+</mapper>

@@ -15,4 +15,45 @@
             )
 	</insert>
 
+	<!-- ===== 관리자 판매자 액션 로그 조회 (기존 VendorActionLogDAO.findAll / countAll) =====
+	     검색 조건은 값이 있을 때만 붙는다 - 기존 DAO의 appendSearchCondition()을 MyBatis <where>/<if>로 옮김 -->
+	<sql id="searchCondition">
+            <where>
+                <if test="search.storeName != null and search.storeName.trim() != ''">
+                    AND S.STORE_NAME LIKE '%' || #{search.storeName} || '%'
+                </if>
+                <if test="search.actionType != null and search.actionType != ''">
+                    AND L.ACTION_TYPE = #{search.actionType}
+                </if>
+                <if test="search.targetType != null and search.targetType != ''">
+                    AND L.TARGET_TYPE = #{search.targetType}
+                </if>
+                <if test="search.startDate != null">
+                    AND TRUNC(L.ACTION_DATE) &gt;= #{search.startDate}
+                </if>
+                <if test="search.endDate != null">
+                    AND TRUNC(L.ACTION_DATE) &lt;= #{search.endDate}
+                </if>
+            </where>
+	</sql>
+
+	<!-- public List<VendorActionLogDTO> findAll(VendorActionLogSearchDTO search, int offset, int pageSize); -->
+	<select id="findAll" resultType="org.doit.goodpang.domain.VendorActionLogDTO">
+            SELECT L.ACTION_LOG_NO, L.SELLER_NO, S.STORE_NAME,
+                   L.ACTION_TYPE, L.TARGET_TYPE, L.TARGET_NO, L.DETAIL, L.ACTION_DATE
+            FROM VENDOR_ACTION_LOG L
+                JOIN SELLER S ON L.SELLER_NO = S.SELLER_NO
+            <include refid="searchCondition" />
+            ORDER BY L.ACTION_LOG_NO DESC
+            OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+	</select>
+
+	<!-- public int countAll(VendorActionLogSearchDTO search); -->
+	<select id="countAll" resultType="int">
+            SELECT COUNT(*)
+            FROM VENDOR_ACTION_LOG L
+                JOIN SELLER S ON L.SELLER_NO = S.SELLER_NO
+            <include refid="searchCondition" />
+	</select>
+
 </mapper>
