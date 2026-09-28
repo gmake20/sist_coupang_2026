@@ -1,12 +1,26 @@
 package org.doit.goodpang.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.doit.goodpang.domain.AdminActionLogDTO;
+import org.doit.goodpang.domain.AdminDeliveryDTO;
+import org.doit.goodpang.domain.AdminProductApprovalDTO;
 import org.doit.goodpang.domain.NoticeDTO;
+import org.doit.goodpang.domain.SellerDTO;
+import org.doit.goodpang.domain.VendorActionLogDTO;
+import org.doit.goodpang.domain.VendorActionLogSearchDTO;
 import org.doit.goodpang.mapper.AdminActionLogMapper;
+import org.doit.goodpang.mapper.AdminDeliveryMapper;
+import org.doit.goodpang.mapper.AdminProductMapper;
 import org.doit.goodpang.mapper.NoticeMapper;
+import org.doit.goodpang.mapper.VendorActionLogMapper;
+import org.doit.goodpang.mapper.VendorMapper;
+import org.doit.goodpang.service.AdminDeliveryService;
+import org.doit.goodpang.service.AdminDeliveryService.CompleteResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +48,11 @@ public class AdminController {
 
 	private final NoticeMapper noticeMapper;
 	private final AdminActionLogMapper adminActionLogMapper;
+	private final AdminProductMapper adminProductMapper;
+	private final AdminDeliveryMapper adminDeliveryMapper;
+	private final AdminDeliveryService adminDeliveryService;
+	private final VendorActionLogMapper vendorActionLogMapper;
+	private final VendorMapper vendorMapper;
 
 	private static final int PAGE_SIZE = 20; // 목록 한 페이지 행 수
 
@@ -65,6 +84,276 @@ public class AdminController {
 	@GetMapping(value = "/dashboard.htm")
 	public ModelAndView dashboard() {
 		return new ModelAndView("admin.dashboard");
+	}
+
+	// ===================================================================
+	// 상품 승인 관리 (기존 AdminProductListServlet / AdminProductApprovalServlet)
+	// 판매자가 등록한 상품은 '승인 대기'로 들어오고, 여기서 승인('판매 중') 또는 반려('판매 중지')한다.
+	// ===================================================================
+
+	// 상품 목록 - 승인 대기 상품이 맨 위
+	@GetMapping(value = "/products.htm")
+	public ModelAndView products() {
+
+		List<AdminProductApprovalDTO> productList = adminProductMapper.findAll();
+
+		ModelAndView mav = new ModelAndView("admin.products");
+		mav.addObject("productList", productList);
+		return mav;
+	}
+
+	/*
+	 * 상품 승인/반려 (목록의 승인·반려 버튼 - POST + CSRF 토큰).
+	 * action=approve → '판매 중', action=reject → '판매 중지'. '승인 대기' 상품만 바뀐다.
+	 * 기존 서블릿은 실제로 바뀌지 않았어도(이미 처리된 상품 등) 로그를 남겼는데, 여기서는 바뀐 경우에만 남긴다.
+	 */
+	@PostMapping(value = "/product_approve.htm")
+	public ModelAndView productApprove(
+			@RequestParam(value = "productNo", required = false) String productNoParam,
+			@RequestParam(value = "action", required = false) String action,
+			HttpSession session) {
+
+		Integer productNo = parseNo(productNoParam);
+
+		if (productNo == null) {
+			return new ModelAndView("redirect:/admin/products.htm");
+		}
+
+		String saleStatus;
+		String actionType;
+
+		if ("approve".equals(action)) {
+			saleStatus = "판매 중";
+			actionType = "상품 승인";
+		} else if ("reject".equals(action)) {
+			saleStatus = "판매 중지";
+			actionType = "상품 반려";
+		} else {
+			return new ModelAndView("redirect:/admin/products.htm");
+		}
+
+		if (adminProductMapper.updateApprovalStatus(productNo, saleStatus) == 1) {
+			writeAdminLog((Integer) session.getAttribute("adminNo"), actionType, "PRODUCT", productNo);
+		}
+
+		return new ModelAndView("redirect:/admin/products.htm");
+	}
+
+	// ===================================================================
+	// 배송 관리 (기존 AdminDeliveryListServlet / AdminDeliveryCompleteServlet)
+	// 실제 배송완료는 배송기사가 처리해야 할 일이지만, 지금은 관리자가 여기서 대행한다.
+	// ===================================================================
+
+	// 배송중인 주문 목록 - 배송 시작일 최신순
+	@GetMapping(value = "/deliveries.htm")
+	public ModelAndView deliveries() {
+
+		List<AdminDeliveryDTO> deliveryList = adminDeliveryMapper.findShipping();
+
+		ModelAndView mav = new ModelAndView("admin.deliveries");
+		mav.addObject("deliveryList", deliveryList);
+		return mav;
+	}
+
+	/*
+	 * 배송완료 처리 (목록의 버튼 - POST + CSRF 토큰).
+	 * DELIVERY/ORDERS를 한 트랜잭션으로 '배송완료'로 바꾼 뒤(AdminDeliveryService), 기존과 같이
+	 * 관리자 로그 1건 + 이 주문에 상품이 있는 판매자마다 판매자 로그 1건씩 남긴다.
+	 * 로그는 트랜잭션 밖이라, 로그 기록이 실패해도 배송완료는 유지된다.
+	 */
+	@PostMapping(value = "/delivery_complete.htm")
+	public ModelAndView deliveryComplete(
+			@RequestParam(value = "deliveryNo", required = false) String deliveryNoParam,
+			HttpSession session) {
+
+		Integer deliveryNo = parseNo(deliveryNoParam);
+
+		if (deliveryNo == null) {
+			// deliveryNo가 없거나 숫자가 아니면 아무 것도 바꾸지 않고 목록으로 돌려보낸다.
+			return new ModelAndView("redirect:/admin/deliveries.htm");
+		}
+
+		CompleteResult result = adminDeliveryService.completeDelivery(deliveryNo);
+
+		if (result != null) {
+			writeAdminLog((Integer) session.getAttribute("adminNo"), "배송완료 처리", "DELIVERY", deliveryNo);
+
+			for (int sellerNo : result.getSellerNos()) {
+				try {
+					vendorActionLogMapper.insertLog(sellerNo, "배송 완료", "ORDERS", result.getOrderNo(), null);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return new ModelAndView("redirect:/admin/deliveries.htm");
+	}
+
+	// ===================================================================
+	// 판매자 입점 심사 (기존 SellerListServlet / SellerDetailServlet / SellerApprovalServlet)
+	// ===================================================================
+
+	// 전체 판매자 목록 - 최근 가입순. 행을 누르면 상세로
+	@GetMapping(value = "/sellers.htm")
+	public ModelAndView sellers() {
+
+		List<SellerDTO> sellerList = vendorMapper.findAllSellers();
+
+		ModelAndView mav = new ModelAndView("admin.sellers");
+		mav.addObject("sellerList", sellerList);
+		return mav;
+	}
+
+	// 판매자 상세 (사업자/정산계좌/첨부서류 + 승인·반려·정지 버튼). 번호가 잘못됐거나 없는 판매자면 목록으로
+	@GetMapping(value = "/seller_detail.htm")
+	public ModelAndView sellerDetail(@RequestParam(value = "sellerNo", required = false) String sellerNoParam) {
+
+		Integer sellerNo = parseNo(sellerNoParam);
+		SellerDTO seller = (sellerNo == null) ? null : vendorMapper.findBySellerNo(sellerNo);
+
+		if (seller == null) {
+			return new ModelAndView("redirect:/admin/sellers.htm");
+		}
+
+		ModelAndView mav = new ModelAndView("admin.seller_detail");
+		mav.addObject("seller", seller);
+		return mav;
+	}
+
+	/*
+	 * 판매자 승인/반려/정지/정지해제 (상세 화면의 버튼들 - POST + CSRF 토큰). 처리 후 같은 판매자 상세로 돌아간다.
+	 *   approve    → '승인'
+	 *   reject     → '반려' + 반려 사유(rejectReason, 비었으면 기본 문구)
+	 *   suspend    → '정지' + 정지 사유(suspendReason) - REJECT_REASON 컬럼을 정지 사유에도 재사용 (기존과 동일)
+	 *   reactivate → '승인' (정지 해제)
+	 * 판매자 탈퇴와 같은 VendorMapper.updateApprovalStatus를 쓴다. 로그는 실제로 바뀐 경우에만 남긴다.
+	 */
+	@PostMapping(value = "/seller_approve.htm")
+	public ModelAndView sellerApprove(
+			@RequestParam(value = "sellerNo", required = false) String sellerNoParam,
+			@RequestParam(value = "action", required = false) String action,
+			@RequestParam(value = "rejectReason", required = false) String rejectReason,
+			@RequestParam(value = "suspendReason", required = false) String suspendReason,
+			HttpSession session) {
+
+		Integer sellerNo = parseNo(sellerNoParam);
+
+		if (sellerNo == null) {
+			return new ModelAndView("redirect:/admin/sellers.htm");
+		}
+
+		String approvalStatus;
+		String reason = null;
+		String actionType;
+
+		if ("approve".equals(action)) {
+			approvalStatus = "승인";
+			actionType = "판매자 승인";
+		} else if ("reject".equals(action)) {
+			approvalStatus = "반려";
+			reason = (rejectReason == null || rejectReason.isBlank()) ? "사유가 입력되지 않았습니다." : rejectReason;
+			actionType = "판매자 반려";
+		} else if ("suspend".equals(action)) {
+			approvalStatus = "정지";
+			reason = (suspendReason == null || suspendReason.isBlank()) ? "사유가 입력되지 않았습니다." : suspendReason;
+			actionType = "판매자 정지";
+		} else if ("reactivate".equals(action)) {
+			approvalStatus = "승인";
+			actionType = "판매자 정지해제";
+		} else {
+			return new ModelAndView("redirect:/admin/seller_detail.htm?sellerNo=" + sellerNo);
+		}
+
+		if (vendorMapper.updateApprovalStatus(sellerNo, approvalStatus, reason) == 1) {
+			Integer adminNo = (Integer) session.getAttribute("adminNo");
+			if (adminNo != null) {
+				try {
+					adminActionLogMapper.insertLog(adminNo, actionType, "SELLER", sellerNo, reason);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return new ModelAndView("redirect:/admin/seller_detail.htm?sellerNo=" + sellerNo);
+	}
+
+	// ===================================================================
+	// 로그 조회 (기존 AdminActionLogListServlet / AdminVendorActionLogListServlet)
+	// ===================================================================
+
+	// 관리자 액션 로그 - 최신순, 20건씩
+	@GetMapping(value = "/action_logs.htm")
+	public ModelAndView actionLogs(@RequestParam(value = "page", required = false) String pageParam) {
+
+		int page = parsePage(pageParam);
+
+		List<AdminActionLogDTO> logList = adminActionLogMapper.findAll((page - 1) * PAGE_SIZE, PAGE_SIZE);
+		int totalCount = adminActionLogMapper.countAll();
+		int totalPages = Math.max(1, (int) Math.ceil(totalCount / (double) PAGE_SIZE));
+
+		ModelAndView mav = new ModelAndView("admin.action_logs");
+		mav.addObject("logList", logList);
+		mav.addObject("page", page);
+		mav.addObject("totalPages", totalPages);
+		mav.addObject("totalCount", totalCount);
+		return mav;
+	}
+
+	/*
+	 * 판매자 액션 로그 - 스토어명(부분일치)/작업종류/대상종류/기간으로 검색, 최신순 20건씩.
+	 * 검색값은 그대로 되돌려줘서 검색폼에 남기고, 페이지 링크에도 이어붙인다.
+	 */
+	@GetMapping(value = "/vendor_action_logs.htm")
+	public ModelAndView vendorActionLogs(
+			@RequestParam(value = "page", required = false) String pageParam,
+			@RequestParam(value = "storeName", required = false) String storeName,
+			@RequestParam(value = "actionType", required = false) String actionType,
+			@RequestParam(value = "targetType", required = false) String targetType,
+			@RequestParam(value = "startDate", required = false) String startDate,
+			@RequestParam(value = "endDate", required = false) String endDate) {
+
+		int page = parsePage(pageParam);
+
+		VendorActionLogSearchDTO search = new VendorActionLogSearchDTO();
+		search.setStoreName(storeName == null ? null : storeName.trim());
+		search.setActionType(actionType);
+		search.setTargetType(targetType);
+		search.setStartDate(parseDate(startDate));
+		search.setEndDate(parseDate(endDate));
+
+		List<VendorActionLogDTO> logList = vendorActionLogMapper.findAll(search, (page - 1) * PAGE_SIZE, PAGE_SIZE);
+		int totalCount = vendorActionLogMapper.countAll(search);
+		int totalPages = Math.max(1, (int) Math.ceil(totalCount / (double) PAGE_SIZE));
+
+		ModelAndView mav = new ModelAndView("admin.vendor_action_logs");
+		mav.addObject("logList", logList);
+		mav.addObject("page", page);
+		mav.addObject("totalPages", totalPages);
+		mav.addObject("totalCount", totalCount);
+
+		// 검색폼에 입력값을 그대로 남겨두고, 페이지네이션 링크에도 검색조건을 이어붙이기 위함
+		mav.addObject("searchStoreName", search.getStoreName());
+		mav.addObject("searchActionType", actionType);
+		mav.addObject("searchTargetType", targetType);
+		mav.addObject("searchStartDate", startDate);
+		mav.addObject("searchEndDate", endDate);
+		return mav;
+	}
+
+	// yyyy-MM-dd 파싱. 없거나 형식이 잘못됐으면 null(조건 안 붙임)
+	private LocalDate parseDate(String value) {
+
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+
+		try {
+			return LocalDate.parse(value.trim());
+		} catch (DateTimeParseException e) {
+			return null;
+		}
 	}
 
 	// ===================================================================
@@ -124,7 +413,7 @@ public class AdminController {
 		notice.setAdminNo(adminNo);
 
 		if (noticeMapper.insertNotice(notice) == 1) {
-			writeAdminLog(adminNo, "공지 등록", notice.getNoticeNo());
+			writeAdminLog(adminNo, "공지 등록", "NOTICE", notice.getNoticeNo());
 		}
 
 		return new ModelAndView("redirect:/admin/notices.htm");
@@ -134,7 +423,7 @@ public class AdminController {
 	@GetMapping(value = "/notice_edit.htm")
 	public ModelAndView noticeEdit(@RequestParam(value = "noticeNo", required = false) String noticeNoParam) {
 
-		Integer noticeNo = parseNoticeNo(noticeNoParam);
+		Integer noticeNo = parseNo(noticeNoParam);
 		NoticeDTO notice = (noticeNo == null) ? null : noticeMapper.findByNoticeNo(noticeNo);
 
 		if (notice == null) {
@@ -158,7 +447,7 @@ public class AdminController {
 			@RequestParam(value = "noticeType", required = false) String noticeType,
 			HttpSession session) {
 
-		Integer noticeNo = parseNoticeNo(noticeNoParam);
+		Integer noticeNo = parseNo(noticeNoParam);
 
 		if (noticeNo == null) {
 			return new ModelAndView("redirect:/admin/notices.htm");
@@ -180,7 +469,7 @@ public class AdminController {
 		notice.setTitle(title.trim());
 
 		if (noticeMapper.updateNotice(notice) == 1) {
-			writeAdminLog((Integer) session.getAttribute("adminNo"), "공지 수정", noticeNo);
+			writeAdminLog((Integer) session.getAttribute("adminNo"), "공지 수정", "NOTICE", noticeNo);
 		}
 
 		return new ModelAndView("redirect:/admin/notices.htm");
@@ -192,10 +481,10 @@ public class AdminController {
 			@RequestParam(value = "noticeNo", required = false) String noticeNoParam,
 			HttpSession session) {
 
-		Integer noticeNo = parseNoticeNo(noticeNoParam);
+		Integer noticeNo = parseNo(noticeNoParam);
 
 		if (noticeNo != null && noticeMapper.deleteNotice(noticeNo) == 1) {
-			writeAdminLog((Integer) session.getAttribute("adminNo"), "공지 삭제", noticeNo);
+			writeAdminLog((Integer) session.getAttribute("adminNo"), "공지 삭제", "NOTICE", noticeNo);
 		}
 
 		return new ModelAndView("redirect:/admin/notices.htm");
@@ -207,22 +496,25 @@ public class AdminController {
 		return title != null && !title.isBlank() && content != null && !content.isBlank() && validType;
 	}
 
-	// 공지 관련 관리자 액션 로그. 로그 기록 실패가 공지 처리 자체를 되돌리면 안 되므로 예외는 삼킨다 (기존과 동일)
-	private void writeAdminLog(Integer adminNo, String actionType, int noticeNo) {
+	/*
+	 * 관리자 액션 로그 (ADMIN_ACTION_LOG). targetType 예: "NOTICE", "PRODUCT".
+	 * 로그 기록 실패가 실제 처리(공지 등록, 상품 승인 등)를 되돌리면 안 되므로 예외는 삼킨다 (기존과 동일).
+	 */
+	private void writeAdminLog(Integer adminNo, String actionType, String targetType, int targetNo) {
 
 		if (adminNo == null) {
 			return;
 		}
 
 		try {
-			adminActionLogMapper.insertLog(adminNo, actionType, "NOTICE", noticeNo, null);
+			adminActionLogMapper.insertLog(adminNo, actionType, targetType, targetNo, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	// noticeNo 파싱. 없거나 숫자가 아니면 null
-	private Integer parseNoticeNo(String value) {
+	// 번호 파라미터(noticeNo, productNo 등) 파싱. 없거나 숫자가 아니면 null
+	private Integer parseNo(String value) {
 		if (value == null || value.isBlank()) {
 			return null;
 		}

@@ -1,6 +1,7 @@
 package org.doit.goodpang.mapper;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.doit.goodpang.domain.SellerDTO;
@@ -39,5 +40,13 @@ public interface VendorMapper {
 	// 판매자 상태 변경 ('탈퇴', 관리자 승인/반려/정지 등). rejectReason은 null 가능
 	public int updateApprovalStatus(@Param("sellerNo") int sellerNo, @Param("approvalStatus") String approvalStatus,
 			@Param("rejectReason") String rejectReason);
+
+	// ===== 관리자 판매자 입점 심사 (비밀번호 해시는 조회하지 않음) =====
+
+	// 전체 판매자 - 최근 가입순
+	public List<SellerDTO> findAllSellers();
+
+	// 판매자 1명. 없으면 null
+	public SellerDTO findBySellerNo(@Param("sellerNo") int sellerNo);
 
 }

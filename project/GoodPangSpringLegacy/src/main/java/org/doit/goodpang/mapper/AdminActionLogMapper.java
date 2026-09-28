@@ -1,6 +1,9 @@
 package org.doit.goodpang.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
+import org.doit.goodpang.domain.AdminActionLogDTO;
 import org.springframework.stereotype.Repository;
 
 /*
@@ -14,5 +17,11 @@ public interface AdminActionLogMapper {
 	public int insertLog(@Param("adminNo") int adminNo, @Param("actionType") String actionType,
 			@Param("targetType") String targetType, @Param("targetNo") int targetNo,
 			@Param("reason") String reason);
+
+	// 관리자 액션 로그 목록 - 최신순. offset = (page - 1) * pageSize
+	public List<AdminActionLogDTO> findAll(@Param("offset") int offset, @Param("pageSize") int pageSize);
+
+	// 페이지네이션용 전체 건수
+	public int countAll();
 
 }

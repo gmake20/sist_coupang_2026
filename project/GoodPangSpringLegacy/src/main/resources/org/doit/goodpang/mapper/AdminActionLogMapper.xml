@@ -15,4 +15,20 @@
             )
 	</insert>
 
+	<!-- public List<AdminActionLogDTO> findAll(int offset, int pageSize); -->
+	<!-- 관리자 액션 로그 - 최신순 (기존 AdminActionLogDAO.findAll) -->
+	<select id="findAll" resultType="org.doit.goodpang.domain.AdminActionLogDTO">
+            SELECT L.ACTION_LOG_NO, L.ADMIN_NO, A.ADMIN_NAME,
+                   L.ACTION_TYPE, L.TARGET_TYPE, L.TARGET_NO, L.REASON, L.ACTION_DATE
+            FROM ADMIN_ACTION_LOG L
+                JOIN ADMIN A ON L.ADMIN_NO = A.ADMIN_NO
+            ORDER BY L.ACTION_LOG_NO DESC
+            OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+	</select>
+
+	<!-- public int countAll(); -->
+	<select id="countAll" resultType="int">
+            SELECT COUNT(*) FROM ADMIN_ACTION_LOG
+	</select>
+
 </mapper>
