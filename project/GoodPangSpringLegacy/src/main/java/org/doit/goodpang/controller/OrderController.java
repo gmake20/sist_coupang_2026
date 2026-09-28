@@ -51,13 +51,13 @@ public class OrderController {
             Model model) {
 
         // 세션 또는 스프링 시큐리티 처리 전 임시 테스트용 회원번호
-          int memberNo = 1; 
+        //  int memberNo = 1; 
     	
-		/*
-		 * CustomUser customUser = (CustomUser) authentication.getPrincipal();
-		 * 
-		 * Long memberNo = customUser.getMember() .getMemberNo();
-		 */
+		
+		 CustomUser customUser = (CustomUser) authentication.getPrincipal();
+		 
+		 Long memberNo = customUser.getMember() .getMemberNo();
+		 
 
         int pageSize = 5;
        // System.out.println("😍😍😍yearFilter" +yearFilter);
@@ -88,7 +88,11 @@ public class OrderController {
     	
     	log.info("========== OrderController 주문상세  진입 ==========");
 
-        int memberNo = 1; // 임시 회원번호
+       // int memberNo = 1; // 임시 회원번호
+    	
+         CustomUser customUser = (CustomUser) authentication.getPrincipal();
+		 
+		 Long memberNo = customUser.getMember() .getMemberNo();
 
         List<OrderDetailDTO> detailList = orderService.getOrderDetailList(memberNo, orderNo);
         OrderDetailDTO orderInfo = null;
@@ -176,7 +180,40 @@ public class OrderController {
     public String orderCancelConfirm() {
         return "order/cancel_confirm"; // cancel_confirm.jsp 전달
     }
+   // 취소내역조회
+    
+ // OrderController.java 내 추가
+   
+    @GetMapping("/cancel_history")
+    public String getCancelHistory(
+            Authentication authentication,
+            @RequestParam(value = "page", defaultValue = "1") int curPage,
+            Model model) {
 
+        log.info("========== OrderController 취소 내역 진입 ==========");
+
+        // 1. 로그인 인증 및 회원번호 추출
+        CustomUser customUser = (CustomUser) authentication.getPrincipal();
+        long memberNo = customUser.getMember().getMemberNo();
+
+        // 2. 페이지당 5개 설정 (기존 서블릿 로직 동일)
+        int pageSize = 5;
+
+        int totalCount = orderCancelService.getCancelHistoryCount(memberNo);
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+        if (totalPages == 0) totalPages = 1;
+
+        // 3. 목록 조회
+        List<OrderDetailDTO> cancelList = orderCancelService.getCancelHistoryPaged(memberNo, curPage, pageSize);
+
+        // 4. Model 바인딩
+        model.addAttribute("cancelList", cancelList);
+        model.addAttribute("curPage", curPage);
+        model.addAttribute("totalPages", totalPages);
+
+        // 5. Tiles Definition 반환
+        return "order.cancel_history";
+    }
     
 
     @PostMapping("/checkout")

@@ -59,11 +59,20 @@
         <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
     </definition>
     
+    <!-- 2. 주문 목록 페이지 정의 (OrderController가 "order.order_list"를 리턴함) -->
     <definition name="order.order_detail" extends="order-layout">
         <put-attribute name="css" value="/resources/css/order_detail.css"/>
         <put-attribute name="content" value="/WEB-INF/views/order/order_detail.jsp" />
-        <put-attribute name="title" value="주문상세 - GoodPang" />
+        <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
     </definition>
+    
+    <!-- 2. 주문 목록 페이지 정의 (OrderController가 "order.order_list"를 리턴함) -->
+    <definition name="order.cancel_history" extends="order-layout">
+        <put-attribute name="css" value="/resources/css/cancel_history.css"/>
+        <put-attribute name="content" value="/WEB-INF/views/order/cancel_history.jsp" />
+        <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
+    </definition>
+    
     
 </tiles-definitions>
 

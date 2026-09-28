@@ -33,4 +33,18 @@ public class OrderCancelService {
 		
 		return orderCancelMapper.selectOrderDetailList(orderNo);
 	}
+
+	// 취소내역 조회
+    public int getCancelHistoryCount(long memberNo) {
+        return orderCancelMapper.getCancelHistoryCount(memberNo);
+    }
+    
+    /**
+     * 회원의 취소/반품 내역 페이징 목록 조회[cite: 4, 5]
+     */
+    public List<OrderDetailDTO> getCancelHistoryPaged(long memberNo, int curPage, int pageSize) {
+        int startRow = (curPage - 1) * pageSize + 1;
+        int endRow = curPage * pageSize;
+        return orderCancelMapper.getCancelHistoryPaged(memberNo, startRow, endRow);
+    }
 }
