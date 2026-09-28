@@ -69,6 +69,11 @@
         <put-attribute name="title" value="주문상세 - GoodPang" />
     </definition>
     
+	<!-- 관리자 로그인 - 레이아웃 없는 단독 화면 (AdminController.login) -->
+	<definition name="admin.login"
+		template="/WEB-INF/views/admin/login.jsp">
+	</definition>
+
 </tiles-definitions>
 
 
