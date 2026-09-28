@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!-- ★ 팀원들이 만든 커스텀 TLD 태그라이브러리 추가 -->
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -10,7 +12,7 @@
      본문
      ========================= -->
 
-<div class="page-wrap">
+<!-- <div class="page-wrap"> -->
 
 
     <!-- =========================

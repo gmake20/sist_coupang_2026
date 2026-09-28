@@ -41,13 +41,13 @@
     <!-- HEADER -->
     <tiles:insertAttribute name="header" />
     
-    <div class="mypage-container">
+     <div class="mypage-container"> 
     
     
     <tiles:insertAttribute name="leftbanner" />
     <!-- 본문 영역 (tiles.xml에 작성된 content JSP가 여기에 들어옵니다) -->
     
-      <!--  <main class="page-content"> -->
+       <!-- <main class="page-content"> -->
        
         <tiles:insertAttribute name="content" />
         
@@ -55,8 +55,8 @@
      
      <tiles:insertAttribute name="rightbanner" />
      
-     </div>
-    
+      </div>
+     
     
      
      

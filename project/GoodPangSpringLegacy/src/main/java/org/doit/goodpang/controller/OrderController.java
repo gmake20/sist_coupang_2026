@@ -215,7 +215,58 @@ public class OrderController {
         // 5. Tiles Definition 반환
         return "order.cancel_history";
     }
+    //취소상세
+ 
+
+    @GetMapping("/cancel_detail")
+    public String getCancelDetail(
+            Authentication authentication,
+            @RequestParam("orderNo") int orderNo,
+            Model model) {
+
+        log.info("========== OrderController 취소상세 진입 - orderNo: " + orderNo + " ==========");
+
+        // 1. 취소 상세 상품 목록 및 대표 정보 조회[cite: 3, 7]
+        List<OrderDetailDTO> cancelDetailList = orderCancelService.getCancelDetailList(orderNo);
+        OrderDetailDTO cancelInfo2 = null;
+
+        if (cancelDetailList != null && !cancelDetailList.isEmpty()) {
+            cancelInfo2 = cancelDetailList.get(0); // 공통 대표 정보 객체[cite: 3]
+        }
+
+        // 2. Model 데이터 바인딩[cite: 3]
+        model.addAttribute("cancelDetailList", cancelDetailList);
+        model.addAttribute("cancelInfo2", cancelInfo2);
+
+        // 3. Tiles Definition 이름 반환
+        return "order.cancel_detail";
+    }
     
+    //order_tracking
+    
+    @GetMapping("/order_tracking")
+    public String getOrderTracking(
+            Authentication authentication,
+            @RequestParam("orderNo") int orderNo,
+            Model model) {
+
+        log.info("========== OrderController 배송 조회 진입 - orderNo: " + orderNo + " ==========");
+
+        // 1. 로그인 회원 정보 검증 (Spring Security)
+        CustomUser customUser = (CustomUser) authentication.getPrincipal();
+        Long memberNo = customUser.getMember().getMemberNo();
+
+        // 2. 배송 추적 데이터 서비스 호출
+        OrderDetailDTO trackingInfo = orderService.getTrackingInfo(orderNo);
+
+        // 3. Model 바인딩
+        model.addAttribute("trackingInfo", trackingInfo);
+
+        // 4. Tiles Definition 이름 리턴
+        return "order.order_tracking";
+    }
+    
+    // 끝이요
 
     @PostMapping("/checkout")
     public String checkout(

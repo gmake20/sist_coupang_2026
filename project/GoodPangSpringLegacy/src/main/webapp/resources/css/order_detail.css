@@ -36,6 +36,15 @@ button {
     box-sizing: border-box;
 }
 
+.mypage-container {
+    width: 1024px;
+    margin: 20px auto 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    box-sizing: border-box;
+}
+
 /* =========================================
    [2열] 가운데 본문 영역
 ========================================= */
@@ -484,7 +493,7 @@ button {
 
 /* 반응형 모바일/태블릿 */
 @media (max-width: 1180px) {
-    .order-detail-wrap {
+    .order-detail-wrap, .mypage-container {
         width: calc(100% - 24px);
     }
     .order-side-banner, .right-banner {

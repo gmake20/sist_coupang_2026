@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!-- ★ 팀원들이 만든 커스텀 TLD 태그라이브러리 추가 -->
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
+
 
 
 <!-- 파비콘 설정 -->
@@ -14,7 +17,8 @@
 	var contextPath = "${pageContext.request.contextPath}";
 </script>
 
-
+ <div class="mypage-container">
+ 
 		<main class="mypage-main">
 
 			<!-- 쿠페이/쿠팡캐시 배너 -->
@@ -191,13 +195,9 @@
 								style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #f0f0f0;">
 
 								<!-- 상품 이미지 영역 -->
-								<div class="product-image" style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 6px; overflow: hidden; margin-right: 15px; flex-shrink: 0;">
-								    <c:choose>
-								        <c:when test="${not empty item.imageUrl}">
-								            <img src="${pageContext.request.contextPath}/${item.imageUrl}" alt="${item.productName}" style="width: 100%; height: 100%; object-fit: cover;" />
-								        </c:when>
-								    </c:choose>
-								</div>
+								<div class="product-image">
+                                      <img src="${img:url(item.imageUrl)}" alt="${item.productName}" />
+                               </div>
 
 								<!-- 의류 상품 정보 명세 -->
 								<div class="product-info" style="flex: 1;">
@@ -393,7 +393,7 @@
 			</div>
 
 		</main>
-
+</div>
 	<script>
 		$(document).ready(function() {
 			var currentYear = "${empty yearFilter ? 'recent' : yearFilter}";

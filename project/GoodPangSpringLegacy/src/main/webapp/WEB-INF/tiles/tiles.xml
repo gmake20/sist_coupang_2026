@@ -196,6 +196,19 @@
         <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
     </definition>
     
+    <!-- tiles.xml -->
+  <definition name="order.cancel_detail" extends="order-layout">
+    <put-attribute name="css" value="/resources/css/cancel_detail.css"/>
+    <put-attribute name="content" value="/WEB-INF/views/order/cancel_detail.jsp" />
+    <put-attribute name="title" value="취소/반품/교환 상세 - GoodPang" />
+  </definition>
+  
+  <!-- tiles.xml 에 추가 -->
+<definition name="order.order_tracking" extends="order-layout">
+    <put-attribute name="css" value="/resources/css/order_tracking.css"/>
+    <put-attribute name="content" value="/WEB-INF/views/order/order_tracking.jsp" />
+    <put-attribute name="title" value="배송 조회 - GoodPang" />
+</definition>
     
 	<!-- 관리자 로그인 - 레이아웃 없는 단독 화면 (AdminController.login) -->
 	<definition name="admin.login"
