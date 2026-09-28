@@ -6,9 +6,11 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -24,12 +26,15 @@ import org.doit.goodpang.domain.VendorProductListDTO;
 import org.doit.goodpang.domain.VendorProductOptionDTO;
 import org.doit.goodpang.domain.VendorProductOptionGroupDTO;
 import org.doit.goodpang.domain.VendorReturnDTO;
+import org.doit.goodpang.domain.VendorSettlementDTO;
+import org.doit.goodpang.domain.VendorSettlementDetailDTO;
 import org.doit.goodpang.domain.VendorShippingDTO;
 import org.doit.goodpang.mapper.VendorActionLogMapper;
 import org.doit.goodpang.mapper.VendorDashboardMapper;
 import org.doit.goodpang.mapper.VendorMapper;
 import org.doit.goodpang.mapper.VendorOrderMapper;
 import org.doit.goodpang.mapper.VendorProductMapper;
+import org.doit.goodpang.mapper.VendorSettlementMapper;
 import org.doit.goodpang.service.VendorOrderService;
 import org.doit.goodpang.service.VendorOrderService.ShipResult;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -55,6 +60,7 @@ public class VendorController {
 	private final VendorOrderMapper vendorOrderMapper;
 	private final VendorActionLogMapper vendorActionLogMapper;
 	private final VendorOrderService vendorOrderService;
+	private final VendorSettlementMapper vendorSettlementMapper;
 	// private final MemberShipService memberShipService;
 
 	// 차트 데이터를 JS에 넘길 JSON 변환용 (기존 서블릿의 Gson 대신 pom.xml에 이미 있는 Jackson 사용)
@@ -558,4 +564,100 @@ public class VendorController {
 		return "/vendor/order.htm";
 	}
 	
+	
+	/*
+	 * 정산관리 - 정산내역 리스트. 실제 수수료율/정산주기 데이터가 없어 근사치로 계산한다
+	 * (VendorSettlementDTO 주석 참고).
+	 */
+	@GetMapping(value = "/settlement.htm")
+	public ModelAndView settlement(HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		List<VendorSettlementDTO> settlementList = vendorSettlementMapper.findBySellerNo(loginSeller.getSellerNo());
+
+		// 상단 카드 - 전체 회차의 정산금액(매출 - 수수료) 합계
+		long totalSettlementAmount = settlementList.stream().mapToLong(VendorSettlementDTO::getSettlementAmount).sum();
+
+		ModelAndView mav = new ModelAndView("vendor.settlement");
+		mav.addObject("menu", "settlement"); // 사이드바 활성 메뉴
+
+		mav.addObject("settlementList", settlementList);
+		mav.addObject("totalSettlementAmount", totalSettlementAmount);
+
+		return mav;
+	}
+	
+	/*
+	 * 정산관리 - 정산상세. "정산내역 리스트"의 한 정산기간(주 단위) 행을 클릭했을 때,
+	 * 그 안에 포함된 주문라인을 하나씩 펼쳐서 보여준다.
+	 */
+	@GetMapping(value = "/settlement_detail.htm")
+	public ModelAndView settlementDetail(
+			@RequestParam(value = "periodStart", required = false) String periodStartParam,
+			HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		LocalDate periodStart = parseLocalDate(periodStartParam);
+
+		if (periodStart == null) {
+			return new ModelAndView("redirect:/vendor/settlement.htm");
+		}
+
+		List<VendorSettlementDetailDTO> detailList = vendorSettlementMapper.findDetailBySellerNo(loginSeller.getSellerNo(), periodStart);
+
+		VendorSettlementDTO summary = buildSettlementSummary(periodStart, detailList);
+
+		ModelAndView mav = new ModelAndView("vendor.settlement_detail");
+		mav.addObject("menu", "settlement"); // 사이드바 활성 메뉴
+
+		mav.addObject("summary", summary);
+		mav.addObject("detailList", detailList);
+
+		return mav;
+	}
+
+	// 정산내역 리스트(findBySellerNo)가 GROUP BY로 만드는 요약을, 이미 조회한 detailList로부터 그대로 다시 만든다
+	// (같은 정산기간을 다시 쿼리하지 않기 위함)
+	private VendorSettlementDTO buildSettlementSummary(LocalDate periodStart, List<VendorSettlementDetailDTO> detailList) {
+
+		VendorSettlementDTO summary = new VendorSettlementDTO();
+		summary.setPeriodStart(periodStart);
+
+		Set<Integer> orderNos = new HashSet<>();
+		long salesAmount = 0;
+
+		for (VendorSettlementDetailDTO detail : detailList) {
+			orderNos.add(detail.getOrderNo());
+			salesAmount += detail.getLineAmount();
+		}
+
+		summary.setOrderCount(orderNos.size());
+		summary.setSalesAmount(salesAmount);
+
+		return summary;
+	}
+
+	// yyyy-MM-dd 파싱. 없거나 형식이 잘못됐으면 null
+	private LocalDate parseLocalDate(String value) {
+
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+
+		try {
+			return LocalDate.parse(value.trim());
+		} catch (DateTimeParseException e) {
+			return null;
+		}
+	}	
 }
