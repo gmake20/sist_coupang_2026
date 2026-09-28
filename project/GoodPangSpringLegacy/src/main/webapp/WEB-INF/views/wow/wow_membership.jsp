@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -13,21 +14,21 @@
 <meta charset="UTF-8">
 <title>와우 멤버십 관리</title>
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/wow_membership.css">
 </head>
 <body>
 
-	<%--<jsp:include page="/inc/header.jsp" /> --%>
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<div class="wow-page">
 				<!-- 개인정보확인/수정 메뉴 파란색 활성화 -->
-		<%-- <jsp:include page="/inc/left_banner.jsp">
+		<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/left_banner.jsp">
 		    <jsp:param name="activeMenu" value="wow" />
-		</jsp:include> --%>
+		</jsp:include>
 
 		<main class="wow-content">
 			<div class="wow-summary-bar">
@@ -261,6 +262,7 @@
 
 				<form action="${pageContext.request.contextPath}/wow/cancel"
 					method="post">
+					<sec:csrfInput/>
 					<div class="wow-cancel-buttons">
 						<button type="button" id="wowCancelKeepBtn"
 							class="wow-cancel-keep">멤버십 유지하기</button>

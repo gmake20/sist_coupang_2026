@@ -3439,7 +3439,7 @@ uri="http://www.springframework.org/security/tags" %>
 			<form id="paymentAddForm">
 				<input type="hidden" id="paymentType" name="paymentType"
 					value="BANK">
-
+				<sec:csrfInput/>
 				<div id="bankPaymentArea">
 					<div class="payment-form-row">
 						<label for="bankCode">은행</label> <select id="bankCode"
@@ -3843,6 +3843,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const paymentDefault = paymentAddForm.querySelector("[name='paymentDefault']");
         params.set("paymentDefault", paymentDefault && paymentDefault.checked ? "Y" : "N");
+        
+        const csrfInput =
+            paymentAddForm.querySelector("input[name='_csrf']");
+
+        if (csrfInput) {
+            params.set(
+                csrfInput.name,
+                csrfInput.value
+            );
+        }
 
         if (selectedType === "BANK") {
             const bankCode = document.getElementById("bankCode");

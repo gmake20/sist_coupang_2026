@@ -7,10 +7,11 @@
 
 <%-- 상세페이지 전용 CSS (reset/common 은 layout_shop.jsp 에 있음) --%>
 <link rel="stylesheet"
+      href="${pageContext.request.contextPath}/resources/css/main.css">
+<link rel="stylesheet"
       href="${pageContext.request.contextPath}/resources/css/product.css">
 <link rel="stylesheet"
       href="${pageContext.request.contextPath}/resources/css/product_wow_modal.css">
-
 
 <%-- <!DOCTYPE html>
 <html lang="ko">

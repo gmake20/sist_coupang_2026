@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -12,15 +13,15 @@
 <meta charset="UTF-8">
 <title>와우 멤버십 가입</title>
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/wow_join.css">
+	href="${pageContext.request.contextPath}/resources/css/wow_join.css">
 </head>
 <body>
 
-	<jsp:include page="/inc/header.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<div class="wow-join-page">
 		<div class="wow-join-container">
@@ -87,7 +88,7 @@
 
 			<form action="${pageContext.request.contextPath}/wow/join"
 				method="post" id="wowJoinForm">
-
+				<sec:csrfInput/>
 				<section class="wow-payment-section">
 					<h2>결제수단</h2>
 
@@ -195,6 +196,7 @@
 
 			<form action="${pageContext.request.contextPath}/payment-method/add"
 				method="post" id="paymentAddForm">
+				<sec:csrfInput/>
 
 				<input type="hidden" name="redirect" value="/wow/join">
 

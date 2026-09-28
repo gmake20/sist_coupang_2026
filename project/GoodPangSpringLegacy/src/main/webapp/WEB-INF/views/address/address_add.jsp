@@ -19,18 +19,18 @@
 <title>GoodPang | 배송지 추가</title>
 
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/address_add.css">
+	href="${pageContext.request.contextPath}/resources/css/address_add.css">
 </head>
 
 <body>
 
-	<jsp:include page="${pageContext.request.contextPath}/inc/header.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<main class="address-add-page">
 
@@ -158,7 +158,7 @@
 
 	</main>
 
-	<jsp:include page="${pageContext.request.contextPath}/inc/footer.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
 
 
 	<script

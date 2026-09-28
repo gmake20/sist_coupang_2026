@@ -45,10 +45,6 @@
       <form class="form" id="loginForm" novalidate method="post"
         action="${pageContext.request.contextPath}/vendor/login.htm">
 
-        <% if (request.getAttribute("error") != null) { %>
-          <p class="message error show"><%= request.getAttribute("error") %></p>
-        <% } %>
-
         <div class="field">
           <input class="input" id="email" name="email" type="email" placeholder="아이디(이메일)를 입력해주세요"
             autocomplete="username" value="modernwear@naver.com">
@@ -59,7 +55,9 @@
             autocomplete="current-password" value="abcd1234">
         </div>
 
-        <p id="loginMessage" class="message error"></p>
+        <%-- 로그인 실패 시 VendorController가 redirect:/vendor/login.htm?error=... 로 보냄 → URL 파라미터라 ${param.error}로 읽는다
+             (redirect라서 request 속성으로는 전달되지 않음). JS 입력값 검사(showError)도 같은 자리를 쓴다. --%>
+        <p id="loginMessage" class="message error ${not empty param.error ? 'show' : ''}"><c:out value="${param.error}" /></p>
 
         <button class="submit" id="submitButton" type="submit">
           로그인

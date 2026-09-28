@@ -45,5 +45,53 @@
             #{status}
         )
     </insert>
+    
+    <select id="getMember"
+        resultType="org.doit.goodpang.domain.MemberVO">
 
+    SELECT
+        MEMBER_NO,
+        MEMBER_ID,
+        MEMBER_PW,
+        MEMBER_NAME,
+        PHONE,
+        EMAIL,
+        RANK,
+        STATUS
+    FROM MEMBER
+    WHERE MEMBER_NO = #{memberNo}
+
+</select>
+
+
+<update id="updateEmail">
+    UPDATE MEMBER
+    SET EMAIL = #{newEmail}
+    WHERE MEMBER_NO = #{memberNo}
+</update>
+
+
+<update id="updatePhone">
+    UPDATE MEMBER
+    SET PHONE = #{newPhone}
+    WHERE MEMBER_NO = #{memberNo}
+</update>
+
+<update id="updatePassword">
+
+    UPDATE MEMBER
+    SET MEMBER_PW = #{encodedPassword}
+    WHERE MEMBER_NO = #{memberNo}
+
+</update>
+
+<update id="withdrawMember">
+
+    UPDATE MEMBER
+
+    SET STATUS = 0
+
+    WHERE MEMBER_NO = #{memberNo}
+
+</update>
 </mapper>

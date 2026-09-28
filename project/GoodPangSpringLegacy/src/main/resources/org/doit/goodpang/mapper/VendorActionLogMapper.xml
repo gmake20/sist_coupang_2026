@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="org.doit.goodpang.mapper.VendorActionLogMapper">
+
+	<!-- public int insertLog(int sellerNo, String actionType, String targetType, int targetNo, String detail); -->
+	<insert id="insertLog">
+            INSERT INTO VENDOR_ACTION_LOG (
+                ACTION_LOG_NO, SELLER_NO, ACTION_TYPE, TARGET_TYPE, TARGET_NO, DETAIL, ACTION_DATE
+            ) VALUES (
+                SEQ_VENDOR_ACTION_LOG.NEXTVAL, #{sellerNo}, #{actionType}, #{targetType}, #{targetNo},
+                #{detail, jdbcType=VARCHAR}, SYSDATE
+            )
+	</insert>
+
+</mapper>
