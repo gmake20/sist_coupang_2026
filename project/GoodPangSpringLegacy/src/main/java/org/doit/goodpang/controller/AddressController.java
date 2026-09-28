@@ -41,8 +41,6 @@ public class AddressController {
 
             Model model) {
 
-        log.info("AddressAddController.addForm()");
-
         model.addAttribute("checkoutNo", checkoutNo);
         model.addAttribute("from", from);
 

@@ -16,11 +16,11 @@
 <title>GoodPang | 배송지 관리</title>
 
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/goodpang_addressbook.css">
+	href="${pageContext.request.contextPath}/resources/css/goodpang_addressbook.css">
 
 </head>
 <body>
@@ -124,11 +124,11 @@
 		</section>
 
 		<aside class="address-right-area">
-			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views//inc/right_banner.jsp" />
+			<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/right_banner.jsp" />
 		</aside>
 	</main>
 
-	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views//inc/footer.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
 
 </body>
 </html>
