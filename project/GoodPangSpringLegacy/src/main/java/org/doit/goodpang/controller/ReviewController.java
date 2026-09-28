@@ -165,6 +165,7 @@ public class ReviewController {
                 reviewNo,
                 imageUrls
         );
+        
 
         rttr.addFlashAttribute(
                 "message",
@@ -280,7 +281,7 @@ public class ReviewController {
             file.transferTo(savedFile);
 
             imageUrls.add(
-                    "/upload/review/"
+                    "upload/review/"
                     + reviewNo
                     + "/"
                     + savedName

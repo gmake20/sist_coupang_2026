@@ -48,26 +48,7 @@ public class ReviewService {
 
         return dto.getReviewNo();
     }
-    
-    @Transactional
-    public void insertReview(
-            Long memberNo,
-            int orderDetailNo,
-            Integer serviceRating,
-            int productRating,
-            String reviewContent,
-            String reviewSummary) {
-    	        
-        reviewMapper.insertReview(
-                memberNo,
-                orderDetailNo,
-                serviceRating,
-                productRating,
-                reviewContent,
-                reviewSummary
-        );
-
-    }
+   
 
     @Transactional
     public void insertReviewImages(
