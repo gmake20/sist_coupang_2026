@@ -91,6 +91,56 @@
 
 </definition>
 
+	<!-- 리뷰 layout -->
+<definition name="review-layout"
+    template="/WEB-INF/views/inc/review_layout.jsp">
+
+    <put-attribute name="header"
+        value="/WEB-INF/views/inc/header.jsp" />
+
+    <put-attribute name="footer"
+        value="/WEB-INF/views/inc/footer.jsp" />
+
+    <put-attribute name="rightbanner"
+        value="/WEB-INF/views/inc/right_banner.jsp" />
+
+    <put-attribute name="leftbanner"
+        value="/WEB-INF/views/inc/left_banner.jsp" />
+
+    <put-attribute name="title"
+        value="GoodPang" />
+
+</definition>
+
+		<definition name="review.list"
+	    extends="review-layout">
+	
+	    <put-attribute name="css"
+	        value="/resources/css/review_list.css" />
+	
+	    <put-attribute name="content"
+	        value="/WEB-INF/views/review/review_list.jsp" />
+	
+	    <put-attribute name="title"
+	        value="배송지 관리 - GoodPang" />
+	
+	</definition>
+	
+	<definition name="review.write"
+	    extends="review-layout">
+	
+	    <put-attribute name="css"
+	        value="/resources/css/review_write.css" />
+	
+	    <put-attribute name="content"
+	        value="/WEB-INF/views/review/review_write.jsp" />
+	
+	    <put-attribute name="title"
+	        value="배송지 관리 - GoodPang" />
+	
+	</definition>
+
+
 	
 	<!-- 배송지 목록 -->
 	<definition name="address.list"
