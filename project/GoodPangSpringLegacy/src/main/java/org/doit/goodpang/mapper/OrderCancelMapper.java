@@ -23,5 +23,18 @@ public interface OrderCancelMapper {
             @Param("refundAmount") long refundAmount,
             @Param("orderDetailNo") long orderDetailNo
     );
+    
+ // cancel_history
+
+   int getCancelHistoryCount(@Param("memberNo") long memberNo);
+
+    List<OrderDetailDTO> getCancelHistoryPaged(
+        @Param("memberNo") long memberNo,
+        @Param("startRow") int startRow,
+        @Param("endRow") int endRow
+    );
+
+
+
 
 }

@@ -2,20 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>주문 취소 - GoodPang</title>
-
-    <!-- 파비콘 및 CSS -->
-    <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.jpg" type="image/jpeg">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reset.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/common.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/order_cancel.css">
-</head>
-<body>
-
 <div class="cancel-wrap">
 
     <!-- 상단 헤더 -->
@@ -119,7 +105,7 @@
 <script>
 function cancelOrder(orderNo, memberNo) {
     const reasonSelect = document.getElementById("cancelReason");
-    const reason = reasonSelect.options[reasonSelect.selectedIndex].text; // 선택한 텍스트 또는 value
+    const reason = reasonSelect.options[reasonSelect.selectedIndex].text;
 
     if (!reasonSelect.value) {
         alert("취소 사유를 선택해주세요.");
@@ -131,14 +117,7 @@ function cancelOrder(orderNo, memberNo) {
         return;
     }
 
-    // Hidden Form 데이터 채우기 및 POST 제출
-    document.getElementById("formOrderNo").value = orderNo;
-    document.getElementById("formMemberNo").value = memberNo;
-    document.getElementById("formCancelReason").value = reason;
-
-    document.getElementById("cancelForm").submit();
+    // 서버로 Form을 제출하지 않고 직접 취소 완료 페이지로 이동
+    location.href = "${pageContext.request.contextPath}/order/cancel_confirm?orderNo=" + orderNo;
 }
 </script>
-
-</body>
-</html>

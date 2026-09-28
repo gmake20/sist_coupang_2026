@@ -36,7 +36,7 @@ public class OrderService {
     }
 
 
-    public List<OrderDetailDTO>  getOrderDetailList(int memberNo, int orderNo) {
+    public List<OrderDetailDTO>  getOrderDetailList(Long memberNo, int orderNo) {
         return orderMapper.getOrderDetail(memberNo, orderNo);
     }
 

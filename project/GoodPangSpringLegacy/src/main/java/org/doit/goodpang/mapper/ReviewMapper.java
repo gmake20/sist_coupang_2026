@@ -34,7 +34,18 @@ public interface ReviewMapper {
     int existsByOrderDetailNo(
             @Param("orderDetailNo") Integer orderDetailNo);
 
-    int insertReview(ReviewDTO dto);
+    int insertReview(ReviewDTO2 dto);
+    
+    int insertReview(
+            @Param("memberNo") Long memberNo,
+            @Param("orderDetailNo") int orderDetailNo,
+            @Param("serviceRating") Integer serviceRating,
+            @Param("productRating") int productRating,
+            @Param("reviewContent") String reviewContent,
+            @Param("reviewSummary") String reviewSummary
+    );
+    
+    int getNextReviewNo();
 
     int insertReviewImage(
             @Param("reviewNo") int reviewNo,
@@ -60,7 +71,7 @@ public interface ReviewMapper {
             @Param("memberNo") Long memberNo);
 
     int updateReview(
-            @Param("review") ReviewDTO review,
+            @Param("review") ReviewDTO2 review,
             @Param("memberNo") Long memberNo);
     
     List<ReviewDTO2> selectReviewsByProductNo(

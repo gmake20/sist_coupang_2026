@@ -81,7 +81,7 @@ public class ReviewController {
         model.addAttribute("reviewCount", reviewCount);
         model.addAttribute("reviewItem", reviewItem);
 
-        return "review/review_write";
+        return "review.write";
     }
 
     @PostMapping("/write")
@@ -139,7 +139,7 @@ public class ReviewController {
             );
         }
 
-        ReviewDTO dto = new ReviewDTO();
+        ReviewDTO2 dto = new ReviewDTO2();
 
         dto.setOrderDetailNo(orderDetailNo);
         dto.setMemberNo(memberNo.intValue());
@@ -299,8 +299,6 @@ public class ReviewController {
             Authentication authentication,
             Model model) {
 
-        log.info(">>>> GET /review/list");
-
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || !(authentication.getPrincipal() instanceof CustomUser)) {
@@ -407,8 +405,10 @@ public class ReviewController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
+        
+        model.addAttribute("memberName", customUser.getMember().getMemberName() );
 
-        return "review/review_list";
+        return "review.list";
     }
     
     @PostMapping("/delete")
@@ -561,7 +561,7 @@ public class ReviewController {
         Long memberNo =
                 customUser.getMember().getMemberNo();
 
-        ReviewDTO dto = new ReviewDTO();
+        ReviewDTO2 dto = new ReviewDTO2();
 
         dto.setReviewNo(reviewNo);
         dto.setProductRating(productRating);

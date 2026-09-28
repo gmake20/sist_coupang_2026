@@ -84,4 +84,14 @@
     WHERE MEMBER_NO = #{memberNo}
 
 </update>
+
+<update id="withdrawMember">
+
+    UPDATE MEMBER
+
+    SET STATUS = 0
+
+    WHERE MEMBER_NO = #{memberNo}
+
+</update>
 </mapper>

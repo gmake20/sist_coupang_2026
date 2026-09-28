@@ -63,11 +63,139 @@
         <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
     </definition>
     
+    <!-- 2. 주문 목록 페이지 정의 (OrderController가 "order.order_list"를 리턴함) -->
     <definition name="order.order_detail" extends="order-layout">
         <put-attribute name="css" value="/resources/css/order_detail.css"/>
         <put-attribute name="content" value="/WEB-INF/views/order/order_detail.jsp" />
-        <put-attribute name="title" value="주문상세 - GoodPang" />
+        <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
     </definition>
+    
+    <!-- 배송지 전용 레이아웃 -->
+<definition name="address-layout"
+    template="/WEB-INF/views/inc/address_layout.jsp">
+
+    <put-attribute name="header"
+        value="/WEB-INF/views/inc/header.jsp" />
+
+    <put-attribute name="footer"
+        value="/WEB-INF/views/inc/footer.jsp" />
+
+    <put-attribute name="rightbanner"
+        value="/WEB-INF/views/inc/right_banner.jsp" />
+
+    <put-attribute name="leftbanner"
+        value="/WEB-INF/views/inc/left_banner.jsp" />
+
+    <put-attribute name="title"
+        value="GoodPang" />
+
+</definition>
+
+	<!-- 리뷰 layout -->
+<definition name="review-layout"
+    template="/WEB-INF/views/inc/review_layout.jsp">
+
+    <put-attribute name="header"
+        value="/WEB-INF/views/inc/header.jsp" />
+
+    <put-attribute name="footer"
+        value="/WEB-INF/views/inc/footer.jsp" />
+
+    <put-attribute name="rightbanner"
+        value="/WEB-INF/views/inc/right_banner.jsp" />
+
+    <put-attribute name="leftbanner"
+        value="/WEB-INF/views/inc/left_banner.jsp" />
+
+    <put-attribute name="title"
+        value="GoodPang" />
+
+</definition>
+
+		<definition name="review.list"
+	    extends="review-layout">
+	
+	    <put-attribute name="css"
+	        value="/resources/css/review_list.css" />
+	
+	    <put-attribute name="content"
+	        value="/WEB-INF/views/review/review_list.jsp" />
+	
+	    <put-attribute name="title"
+	        value="배송지 관리 - GoodPang" />
+	
+	</definition>
+	
+	<definition name="review.write"
+	    extends="review-layout">
+	
+	    <put-attribute name="css"
+	        value="/resources/css/review_write.css" />
+	
+	    <put-attribute name="content"
+	        value="/WEB-INF/views/review/review_write.jsp" />
+	
+	    <put-attribute name="title"
+	        value="배송지 관리 - GoodPang" />
+	
+	</definition>
+
+
+	
+	<!-- 배송지 목록 -->
+	<definition name="address.list"
+	    extends="address-layout">
+	
+	    <put-attribute name="css"
+	        value="/resources/css/goodpang_addressbook.css" />
+	
+	    <put-attribute name="content"
+	        value="/WEB-INF/views/address/addressbook.jsp" />
+	
+	    <put-attribute name="title"
+	        value="배송지 관리 - GoodPang" />
+	
+	</definition>
+	
+	
+	<!-- 배송지 추가 -->
+	<definition name="address.add"
+	    extends="address-layout">
+	
+	    <put-attribute name="css"
+	        value="/resources/css/address_add.css" />
+	
+	    <put-attribute name="content"
+	        value="/WEB-INF/views/address/address_add.jsp" />
+	
+	    <put-attribute name="title"
+	        value="배송지 추가 - GoodPang" />
+	
+	</definition>
+	
+	
+	<!-- 배송지 수정 -->
+	<definition name="address.edit"
+	    extends="address-layout">
+	
+	    <put-attribute name="css"
+	        value="/resources/css/address_add.css" />
+	
+	    <put-attribute name="content"
+	        value="/WEB-INF/views/address/address_edit.jsp" />
+	
+	    <put-attribute name="title"
+	        value="배송지 수정 - GoodPang" />
+	
+	</definition>
+    
+    <!-- 2. 주문 목록 페이지 정의 (OrderController가 "order.order_list"를 리턴함) -->
+    <definition name="order.cancel_history" extends="order-layout">
+        <put-attribute name="css" value="/resources/css/cancel_history.css"/>
+        <put-attribute name="content" value="/WEB-INF/views/order/cancel_history.jsp" />
+        <put-attribute name="title" value="주문목록/배송조회 - GoodPang" />
+    </definition>
+    
     
 	<!-- 관리자 로그인 - 레이아웃 없는 단독 화면 (AdminController.login) -->
 	<definition name="admin.login"

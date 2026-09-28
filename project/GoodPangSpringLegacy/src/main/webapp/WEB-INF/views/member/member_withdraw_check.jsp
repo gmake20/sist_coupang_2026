@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -195,6 +196,7 @@
 					action="${pageContext.request.contextPath}/member/withdraw/complete"
 					method="post">
 
+ 					<sec:csrfInput/>
 					<label class="final-agree"> <input type="checkbox"
 						id="finalAgree"> <span>위 이용내역과 소멸 예정 혜택을 확인하였으며 회원
 							탈퇴에 동의합니다.</span>

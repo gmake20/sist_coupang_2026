@@ -354,4 +354,54 @@
     WHERE od.PRODUCT_NO = #{productNo}
 
 </select>
+
+<select id="getNextReviewNo"
+        resultType="int">
+
+    SELECT SEQ_REVIEW_NO.NEXTVAL
+    FROM DUAL
+
+</select>
+
+<insert id="insertReview">
+
+    INSERT INTO REVIEW (
+        REVIEW_NO,
+        PRODUCT_RATING,
+        SERVICE_RATING,
+        REVIEW_CONTENT,
+        REVIEW_SUMMARY,
+        REVIEW_DATE,
+        MEMBER_NO,
+        ORDER_DETAIL_NO
+    )
+    VALUES (
+        SEQ_REVIEW_NO.NEXTVAL,
+        #{productRating},
+        #{serviceRating, jdbcType=NUMERIC},
+        #{reviewContent, jdbcType=VARCHAR},
+        #{reviewSummary, jdbcType=VARCHAR},
+        SYSDATE,
+        #{memberNo},
+        #{orderDetailNo}
+    )
+
+</insert>
+
+<insert id="insertReviewImage">
+
+    INSERT INTO REVIEW_IMAGE (
+        REVIEW_IMAGE_NO,
+        REVIEW_NO,
+        IMAGE_URL,
+        IMAGE_ORDER
+    )
+    VALUES (
+        SEQ_REVIEW_IMAGE_NO.NEXTVAL,
+        #{reviewNo},
+        #{imageUrl},
+        #{imageOrder}
+    )
+
+</insert>
 </mapper>
