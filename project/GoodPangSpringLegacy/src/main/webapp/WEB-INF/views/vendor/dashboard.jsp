@@ -226,7 +226,7 @@
 
           <div class="panel-head">
             <h2>공지사항</h2>
-            <a href="${pageContext.request.contextPath}/vendor/notice" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
+            <a href="${pageContext.request.contextPath}/vendor/notice.htm" class="more-link">더보기 <svg class="icon"><use href="#ic-chevron-down" /></svg></a>
           </div>
 
           <ul class="notice-list">
@@ -240,7 +240,7 @@
               <c:otherwise>
                 <c:forEach var="notice" items="${recentNotices}">
                   <li>
-                    <a href="${pageContext.request.contextPath}/vendor/notice/detail?noticeNo=${notice.noticeNo}"
+                    <a href="${pageContext.request.contextPath}/vendor/notice_detail.htm?noticeNo=${notice.noticeNo}"
                        style="display:contents; color:inherit; text-decoration:none;">
                       <span class="notice-tag ${notice.noticeType == '공지' ? 'tag-notice' : 'tag-info'}">${notice.noticeType}</span>
                       <span class="notice-title">${notice.title}</span>

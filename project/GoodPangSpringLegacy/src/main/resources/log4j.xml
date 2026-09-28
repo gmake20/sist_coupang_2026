@@ -10,6 +10,27 @@
 		</layout>
 	</appender>
 	
+	
+	<!-- jdbc 전용 appender : CategoryMapper.xml 쿼리 로그 제외 -->
+	<appender name="jdbcConsole" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p: %c - %m%n" />
+		</layout>
+		<!-- selectCategoryTree : SQL과 결과표 헤더에 img_url 포함 -->
+		<filter class="org.apache.log4j.varia.StringMatchFilter">
+			<param name="StringToMatch" value="img_url" />
+			<param name="AcceptOnMatch" value="false" />
+		</filter>
+		<!-- searchLeafByKeyword : SQL과 결과표 헤더에 category_path 포함 -->
+		<filter class="org.apache.log4j.varia.StringMatchFilter">
+			<param name="StringToMatch" value="category_path" />
+			<param name="AcceptOnMatch" value="false" />
+		</filter>
+	</appender>
+	
+		
+	
 	<!-- Application Loggers -->
 	<logger name="org.doit.ik">
 		<level value="info" />
@@ -30,6 +51,39 @@
 
 	<logger name="org.springframework.web">
 		<level value="info" />
+	</logger>
+
+	<!-- log4jdbc Loggers -->
+	<!-- 실행된 SQL + 실행시간 (CategoryMapper 쿼리는 jdbcConsole 필터로 제외) -->
+	<logger name="jdbc.sqltiming" additivity="false">
+		<level value="info" />
+		<appender-ref ref="jdbcConsole" />
+	</logger>
+
+	<!-- 조회 결과 테이블 (CategoryMapper 결과는 jdbcConsole 필터로 제외) -->
+	<logger name="jdbc.resultsettable" additivity="false">
+		<level value="info" />
+		<appender-ref ref="jdbcConsole" />
+	</logger>
+
+	<!-- sqltiming과 중복되는 SQL 출력 끄기 -->
+	<logger name="jdbc.sqlonly">
+		<level value="warn" />
+	</logger>
+
+	<!-- ResultSet.getXXX() 호출 로그 끄기 (컬럼 단위라 필터로 거를 수 없음) -->
+	<logger name="jdbc.resultset">
+		<level value="warn" />
+	</logger>
+
+	<!-- JDBC API 호출 로그 끄기 -->
+	<logger name="jdbc.audit">
+		<level value="warn" />
+	</logger>
+
+	<!-- Connection open/close 로그 끄기 -->
+	<logger name="jdbc.connection">
+		<level value="warn" />
 	</logger>
 
 	<!-- Root Logger -->
