@@ -42,4 +42,56 @@
             WHERE SELLER_NO = #{sellerNo}
 	</update>
 
+	<!-- ===== 판매자 입점 신청(회원가입) - 기존 SellerDAO.existsByEmail / existsByBusinessNo / insertSeller ===== -->
+
+	<!-- public int countByEmail(String email); -->
+	<select id="countByEmail" resultType="int">
+            SELECT COUNT(*)
+            FROM SELLER
+            WHERE EMAIL = #{email}
+	</select>
+
+	<!-- public int countByBusinessNo(String businessNo); -->
+	<select id="countByBusinessNo" resultType="int">
+            SELECT COUNT(*)
+            FROM SELLER
+            WHERE BUSINESS_NO = #{businessNo}
+	</select>
+
+	<!-- public int insertSeller(SellerDTO dto); -->
+	<!-- 가입 직후 상태는 '입점 대기' - 사업장 주소/정산계좌/서류는 판매자 정보관리(business_info)에서 추가 입력 -->
+	<insert id="insertSeller">
+            INSERT INTO SELLER (
+                SELLER_NO,
+                EMAIL,
+                SELLER_PW,
+                MANAGER_NAME,
+                PHONE,
+                BUSINESS_NO,
+                BUSINESS_TYPE,
+                CEO_NAME,
+                STORE_NAME,
+                APPROVAL_STATUS,
+                CREATED_DATE,
+                UPDATED_DATE
+            )
+            VALUES (
+                SEQ_SELLER.NEXTVAL,
+                #{email}, #{sellerPw}, #{managerName}, #{phone},
+                #{businessNo}, #{businessType}, #{ceoName}, #{storeName},
+                '입점 대기',
+                SYSDATE, SYSDATE
+            )
+	</insert>
+
+	<!-- public int updateApprovalStatus(int sellerNo, String approvalStatus, String rejectReason); -->
+	<!-- 판매자 상태 변경 (기존 SellerDAO.updateApprovalStatus) - 탈퇴, 관리자 승인/반려/정지 등. rejectReason은 null 가능 -->
+	<update id="updateApprovalStatus">
+            UPDATE SELLER
+            SET APPROVAL_STATUS = #{approvalStatus},
+                REJECT_REASON = #{rejectReason, jdbcType=VARCHAR},
+                UPDATED_DATE = SYSDATE
+            WHERE SELLER_NO = #{sellerNo}
+	</update>
+
   </mapper>

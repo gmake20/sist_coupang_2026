@@ -1,5 +1,6 @@
 package org.doit.goodpang.service;
 
+import org.doit.goodpang.domain.VendorOrderDetailDTO;
 import org.doit.goodpang.mapper.VendorOrderMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,5 +54,22 @@ public class VendorOrderService {
 		vendorOrderMapper.insertDelivery(orderNo, deliveryServiceCode, invoiceNo);
 
 		return ShipResult.SUCCESS;
+	}
+
+	/*
+	 * 주문 상세 - 주문/배송지/배송이력 한 건 + 이 판매자 상품 라인 목록을 조립한다 (기존 VendorOrderDetailDAO.findByOrderNo).
+	 * 이 판매자 상품이 들어 있지 않은 주문이면 null.
+	 */
+	public VendorOrderDetailDTO getOrderDetail(int orderNo, int sellerNo) {
+
+		VendorOrderDetailDTO order = vendorOrderMapper.selectOrderDetail(orderNo, sellerNo);
+
+		if (order == null) {
+			return null;
+		}
+
+		order.getItems().addAll(vendorOrderMapper.selectOrderItems(orderNo, sellerNo));
+
+		return order;
 	}
 }

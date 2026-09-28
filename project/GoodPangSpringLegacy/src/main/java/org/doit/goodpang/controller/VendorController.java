@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.doit.goodpang.domain.NoticeDTO;
@@ -26,6 +27,7 @@ import org.doit.goodpang.domain.VendorDailySalesDTO;
 import org.doit.goodpang.domain.VendorDailyTrafficDTO;
 import org.doit.goodpang.domain.VendorDashboardStatDTO;
 import org.doit.goodpang.domain.VendorDeliveryDTO;
+import org.doit.goodpang.domain.VendorOrderDetailDTO;
 import org.doit.goodpang.domain.VendorOrderListDTO;
 import org.doit.goodpang.domain.VendorOrderStatSummaryDTO;
 import org.doit.goodpang.domain.VendorProductDetailDTO;
@@ -43,6 +45,7 @@ import org.doit.goodpang.mapper.VendorMapper;
 import org.doit.goodpang.mapper.VendorOrderMapper;
 import org.doit.goodpang.mapper.VendorProductMapper;
 import org.doit.goodpang.mapper.VendorSettlementMapper;
+import org.doit.goodpang.service.VendorAccountService;
 import org.doit.goodpang.service.VendorOrderService;
 import org.doit.goodpang.service.VendorProductService;
 import org.doit.goodpang.service.VendorOrderService.ShipResult;
@@ -53,6 +56,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,6 +81,7 @@ public class VendorController {
 	private final VendorSettlementMapper vendorSettlementMapper;
 	private final NoticeMapper noticeMapper;
 	private final VendorProductService vendorProductService;
+	private final VendorAccountService vendorAccountService;
 	// private final MemberShipService memberShipService;
 
 	// 차트 데이터를 JS에 넘길 JSON 변환용 (기존 서블릿의 Gson 대신 pom.xml에 이미 있는 Jackson 사용)
@@ -88,7 +93,7 @@ public class VendorController {
 
 	// [2]
 	@GetMapping(value = "/login.htm")
-	public ModelAndView noticeDetail(@RequestParam(value = "seq", defaultValue = "1") String seq)
+	public ModelAndView login(@RequestParam(value = "seq", defaultValue = "1") String seq)
 			throws ClassNotFoundException, SQLException {
 		System.out.println("VendorController.login()...");
 
@@ -148,6 +153,25 @@ public class VendorController {
 		}
 		return new ModelAndView("redirect:/vendor/dashboard.htm");
 	}
+	
+	
+	/*
+	 * 판매자 로그아웃 - 세션을 통째로 무효화하고 로그인 화면으로 (기존 VendorLogoutServlet과 동일).
+	 * 상단바 메뉴는 링크(GET)로 부르고, 기존 서블릿처럼 POST로 와도 같은 처리를 한다.
+	 * getSession(false): 세션이 없으면 새로 만들지 않도록 HttpSession 대신 request에서 꺼낸다.
+	 */
+	@RequestMapping(value = "/logout.htm", method = { RequestMethod.GET, RequestMethod.POST })
+	public ModelAndView logout(HttpServletRequest request) {
+
+		HttpSession session = request.getSession(false);
+
+		if (session != null) {
+			session.invalidate();
+		}
+
+		return new ModelAndView("redirect:/vendor/login.htm");
+	}
+		
 
 	@GetMapping(value = "/dashboard.htm")
 	public ModelAndView dashboard(
@@ -663,6 +687,38 @@ public class VendorController {
 		mav.addObject("searchOrderStatus", orderStatus);
 		mav.addObject("searchDeliveryStatus", deliveryStatus);
 		mav.addObject("searchPaymentStatus", paymentStatus);
+
+		return mav;
+	}
+	
+	// 주문 상세 - 번호가 잘못됐거나 이 판매자 상품이 없는 주문이면 주문 목록으로 돌려보낸다.
+	@GetMapping(value = "/order_detail.htm")
+	public ModelAndView orderDetail(
+			@RequestParam(value = "orderNo", required = false) String orderNoParam,
+			HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		int orderNo;
+		try {
+			orderNo = Integer.parseInt(orderNoParam);
+		} catch (NumberFormatException e) {
+			return new ModelAndView("redirect:/vendor/order.htm");
+		}
+
+		VendorOrderDetailDTO order = vendorOrderService.getOrderDetail(orderNo, loginSeller.getSellerNo());
+
+		if (order == null) {
+			return new ModelAndView("redirect:/vendor/order.htm");
+		}
+
+		ModelAndView mav = new ModelAndView("vendor.order_detail");
+		mav.addObject("menu", "orders"); // 사이드바 활성 메뉴 (주문 목록)
+		mav.addObject("order", order);
 
 		return mav;
 	}
@@ -1292,4 +1348,128 @@ public class VendorController {
 		return "upload/" + sellerNo + "/" + savedName;
 	}
 	
+	// 판매자 입점 신청(회원가입) 화면 - 로그인 화면처럼 판매자센터 레이아웃 없이 단독 화면 (tiles.xml vendor.signup)
+	@GetMapping(value = "/signup.htm")
+	public ModelAndView signup() {
+		return new ModelAndView("vendor.signup");
+	}
+
+	/*
+	 * 판매자 입점 신청 처리 (기존 VendorSignupServlet.doPost).
+	 * 필수값/비밀번호/사업자유형/이메일·사업자번호 중복을 확인하고, 비밀번호는 BCrypt로 해시해서 '입점 대기' 상태로 저장한다.
+	 * 성공하면 쇼핑몰 메인으로(기존과 동일), 실패하면 같은 화면에 error를 보여준다.
+	 */
+	@PostMapping(value = "/signup.htm")
+	public ModelAndView signupPost(
+			@RequestParam(value = "bizType", required = false) String bizType,
+			@RequestParam(value = "bizNumber", required = false) String bizNumber,
+			@RequestParam(value = "companyName", required = false) String companyName,
+			@RequestParam(value = "ceoName", required = false) String ceoName,
+			@RequestParam(value = "managerName", required = false) String managerName,
+			@RequestParam(value = "email", required = false) String email,
+			@RequestParam(value = "password", required = false) String password,
+			@RequestParam(value = "passwordConfirm", required = false) String passwordConfirm,
+			@RequestParam(value = "phone", required = false) String phone) {
+
+		// 1. 필수값 검사
+		if (isBlank(bizType) || isBlank(bizNumber) || isBlank(companyName) || isBlank(ceoName)
+				|| isBlank(managerName) || isBlank(email) || isBlank(password)
+				|| isBlank(passwordConfirm) || isBlank(phone)) {
+			return signupView("필수 입력값을 모두 입력해주세요.");
+		}
+
+		// 2. 비밀번호 확인
+		if (!password.equals(passwordConfirm)) {
+			return signupView("비밀번호가 일치하지 않습니다.");
+		}
+
+		if (password.length() < 8) {
+			return signupView("비밀번호는 8자 이상 입력해주세요.");
+		}
+
+		// 3. 사업자유형 값 변환 (individual/corporate → 개인사업자/법인사업자)
+		String businessType;
+
+		if ("individual".equals(bizType)) {
+			businessType = "개인사업자";
+		} else if ("corporate".equals(bizType)) {
+			businessType = "법인사업자";
+		} else {
+			return signupView("사업자 유형을 확인해주세요.");
+		}
+
+		// 4. 이메일 중복 검사
+		if (vendorMapper.countByEmail(email) > 0) {
+			return signupView("이미 가입된 이메일입니다.");
+		}
+
+		// 5. 사업자등록번호 중복 검사
+		if (vendorMapper.countByBusinessNo(bizNumber) > 0) {
+			return signupView("이미 입점 신청된 사업자등록번호입니다.");
+		}
+
+		SellerDTO dto = new SellerDTO();
+
+		dto.setEmail(email);
+		dto.setSellerPw(BCrypt.hashpw(password, BCrypt.gensalt()));
+		dto.setManagerName(managerName);
+		dto.setPhone(phone);
+		dto.setBusinessNo(bizNumber);
+		dto.setBusinessType(businessType);
+		dto.setCeoName(ceoName);
+		dto.setStoreName(companyName);
+
+		if (vendorMapper.insertSeller(dto) != 1) {
+			return signupView("입점 신청에 실패했습니다.");
+		}
+
+		return new ModelAndView("redirect:/");
+	}
+
+	// 입점 신청 화면 (error가 있으면 폼 위에 표시)
+	private ModelAndView signupView(String error) {
+
+		ModelAndView mav = new ModelAndView("vendor.signup");
+
+		if (error != null) {
+			mav.addObject("error", error);
+		}
+
+		return mav;
+	}	
+	
+	/*
+	 * 판매자 자진 탈퇴 (판매자 정보관리 화면 하단 폼). 비밀번호 재확인 후, 상태를 '탈퇴'로 바꾸고 상품을 전부 숨긴 뒤
+	 * 세션을 끊고 쇼핑몰 메인으로 보낸다 (기존 VendorWithdrawServlet과 동일).
+	 * 비밀번호가 틀리면 판매자 정보관리 화면에 error를 보여준다.
+	 */
+	@PostMapping(value = "/withdraw.htm")
+	public ModelAndView withdraw(
+			@RequestParam(value = "password", required = false) String password,
+			HttpSession session) {
+
+		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
+
+		if (loginSeller == null) {
+			return new ModelAndView("redirect:/vendor/login.htm");
+		}
+
+		if (password == null || !BCrypt.checkpw(password, loginSeller.getSellerPw())) {
+			return businessInfoView("비밀번호가 일치하지 않습니다.");
+		}
+
+		int sellerNo = loginSeller.getSellerNo();
+
+		vendorAccountService.withdraw(sellerNo);
+
+		try {
+			vendorActionLogMapper.insertLog(sellerNo, "판매자 탈퇴", "SELLER", sellerNo, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		session.invalidate();
+
+		return new ModelAndView("redirect:/");
+	}		
 }

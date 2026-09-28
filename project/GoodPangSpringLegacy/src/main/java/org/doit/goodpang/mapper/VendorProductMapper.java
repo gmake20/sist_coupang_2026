@@ -76,4 +76,7 @@ public interface VendorProductMapper {
 	public int insertImage(@Param("productNo") int productNo, @Param("optionId") Integer optionId,
 			@Param("purpose") String purpose, @Param("imageOrder") int imageOrder, @Param("imageUrl") String imageUrl);
 
+	// 판매자 탈퇴 시 노출 중인 상품 전부 숨김. 바뀐 상품 수를 돌려줌
+	public int hideAllBySeller(@Param("sellerNo") int sellerNo);
+
 }

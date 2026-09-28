@@ -34,6 +34,10 @@
 		template="/WEB-INF/views/vendor/login.jsp">
 	</definition>
 
+	<definition name="vendor.signup"
+		template="/WEB-INF/views/vendor/signup.jsp">
+	</definition>
+
 	<definition name="vendor.*"  template="/WEB-INF/views/vendor/inc/layout.jsp">
 		<put-attribute name="css" value="/vendor/inc/css/{1}.css"/>
 		<put-attribute name="iconsprite" value="/WEB-INF/views/vendor/inc/icon-sprite.jsp"/>
