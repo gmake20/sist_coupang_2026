@@ -19,18 +19,18 @@
 <title>GoodPang | 배송지 수정</title>
 
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/reset.css">
+	href="${pageContext.request.contextPath}/resources/css/reset.css">
 
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/common.css">
+	href="${pageContext.request.contextPath}/resources/css/common.css">
 
 <!-- address_add.jsp와 동일한 폼 스타일 재사용 -->
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/address_add.css">
+	href="${pageContext.request.contextPath}/resources/css/address_add.css">
 </head>
 <body>
 
-	<jsp:include page="${pageContext.request.contextPath}/inc/header.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<main class="address-add-page">
 
@@ -149,7 +149,7 @@
 
 	</main>
 
-	<jsp:include page="${pageContext.request.contextPath}/inc/footer.jsp" />
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
 
 	<script
 		src="//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>

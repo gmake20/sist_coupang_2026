@@ -23,7 +23,7 @@ uri="http://www.springframework.org/security/tags" %>
 </head>
 <body>
 
-	<%--<jsp:include page="/inc/header.jsp" /> --%>
+	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/header.jsp" />
 
 	<div class="wow-welcome-page">
 		<div class="wow-welcome-card">
