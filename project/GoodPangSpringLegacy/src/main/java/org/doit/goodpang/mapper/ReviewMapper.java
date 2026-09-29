@@ -20,6 +20,7 @@ public interface ReviewMapper {
             @Param("memberNo") Long memberNo,
             @Param("offset") int offset,
             @Param("pageSize") int pageSize);
+    
 
     List<ReviewItemDTO> selectAvailableReviewsByMemberNo(
             @Param("memberNo") Long memberNo,
@@ -80,4 +81,9 @@ public interface ReviewMapper {
     ReviewRatingSummaryDTO getRatingSummary(
             @Param("productNo")
             Integer productNo);
+    
+    List<String> selectReviewImageUrls(
+            @Param("reviewNo") int reviewNo
+    );
 }
+

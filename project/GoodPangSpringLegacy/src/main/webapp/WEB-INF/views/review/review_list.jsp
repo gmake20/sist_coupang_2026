@@ -9,6 +9,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 
+
 <main class="review-page">
 
     <h1 class="review-title">
