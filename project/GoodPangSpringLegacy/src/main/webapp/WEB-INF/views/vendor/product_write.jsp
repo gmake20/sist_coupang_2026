@@ -1377,7 +1377,8 @@
 
         // multipart 요청은 Spring Security의 CsrfFilter가 본문(_csrf 파라미터)을 읽지 못해서 403이 나므로,
         // CSRF 토큰은 헤더로 보낸다. Content-Type은 FormData가 boundary까지 알아서 붙이므로 지정하지 않음.
-        fetch("${pageContext.request.contextPath}/vendor/product_write.htm", {
+        // 등록 처리는 JSON 응답이라 .json 주소 (.htm이면 Spring이 HTML 요청으로 보고 406을 냄 - VendorController 주석 참고)
+        fetch("${pageContext.request.contextPath}/vendor/product_write.json", {
           method: "POST",
           headers: { "${_csrf.headerName}": "${_csrf.token}" },
           body: formData

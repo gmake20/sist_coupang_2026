@@ -362,7 +362,9 @@ public class VendorController {
 	 * JSON {success, message, productNo}를 받는다. 이미지는 먼저 디스크에 저장한 뒤,
 	 * 저장된 URL과 함께 PRODUCT/PRODUCT_OPTION/PRODUCT_IMAGE를 한 트랜잭션으로 INSERT한다(VendorProductService).
 	 */
-	@PostMapping(value = "/product_write.htm", produces = "application/json;charset=UTF-8")
+	// 주소를 .htm이 아니라 .json으로 둔 이유: Spring 5.0 기본 설정은 URL 확장자로 응답 형식을 정하는데(favorPathExtension),
+	// .htm이면 "HTML을 원하는 요청"으로 보고 JSON 응답(produces=application/json)과 맞지 않아 406 Not Acceptable이 난다.
+	@PostMapping(value = "/product_write.json", produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> productWritePost(MultipartHttpServletRequest request, HttpSession session) {
 
