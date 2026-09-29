@@ -39,7 +39,6 @@ import org.doit.goodpang.domain.VendorSettlementDTO;
 import org.doit.goodpang.domain.VendorSettlementDetailDTO;
 import org.doit.goodpang.domain.VendorShippingDTO;
 import org.doit.goodpang.mapper.NoticeMapper;
-import org.doit.goodpang.mapper.VendorActionLogMapper;
 import org.doit.goodpang.mapper.VendorDashboardMapper;
 import org.doit.goodpang.mapper.VendorMapper;
 import org.doit.goodpang.mapper.VendorOrderMapper;
@@ -77,7 +76,6 @@ public class VendorController {
 	private final VendorDashboardMapper vendorDashboardMapper;
 	private final VendorProductMapper vendorProductMapper;
 	private final VendorOrderMapper vendorOrderMapper;
-	private final VendorActionLogMapper vendorActionLogMapper;
 	private final VendorOrderService vendorOrderService;
 	private final VendorSettlementMapper vendorSettlementMapper;
 	private final NoticeMapper noticeMapper;
@@ -401,13 +399,8 @@ public class VendorController {
 				return writeResult(400, false, "옵션을 최소 1개 이상 추가해주세요.", 0);
 			}
 
+			// 판매자 액션 로그("상품 등록")는 ActionLogAspect가 남긴다
 			int productNo = vendorProductService.registerProduct(dto);
-
-			try {
-				vendorActionLogMapper.insertLog(loginSeller.getSellerNo(), "상품 등록", "PRODUCT", productNo, dto.getProductName());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 
 			return writeResult(200, true, null, productNo);
 
@@ -858,16 +851,8 @@ public class VendorController {
 		int sellerNo = loginSeller.getSellerNo();
 		String trimmedInvoiceNo = invoiceNo.trim();
 
+		// 성공(SUCCESS)하면 판매자 액션 로그("배송 처리")는 ActionLogAspect가 트랜잭션 commit 뒤에 남긴다
 		ShipResult result = vendorOrderService.shipOrder(orderNo, sellerNo, trimmedInvoiceNo);
-
-		if (result == ShipResult.SUCCESS) {
-			// 로그 기록 실패가 출고 처리 자체를 되돌리면 안 되므로 트랜잭션 밖에서 따로 남긴다 (기존과 동일)
-			try {
-				vendorActionLogMapper.insertLog(sellerNo, "배송 처리", "ORDERS", orderNo, "송장번호 " + trimmedInvoiceNo);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 
 		String shipErrorParam = (result == ShipResult.INVOICE_DUPLICATE) ? "?shipError=duplicateInvoice" : "";
 
@@ -1110,14 +1095,8 @@ public class VendorController {
 
 		int sellerNo = loginSeller.getSellerNo();
 
-		if (vendorProductMapper.updateDisplayYn(productNo, sellerNo, displayYn) == 1) {
-			String actionType = "Y".equals(displayYn) ? "상품 노출" : "상품 숨김";
-			try {
-				vendorActionLogMapper.insertLog(sellerNo, actionType, "PRODUCT", productNo, null);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		// 바뀌었으면 판매자 액션 로그("상품 노출"/"상품 숨김")는 ActionLogAspect가 남긴다
+		vendorProductService.changeDisplayYn(productNo, sellerNo, displayYn);
 
 		return new ModelAndView("redirect:/vendor/product.htm");
 	}
@@ -1152,14 +1131,8 @@ public class VendorController {
 
 		int sellerNo = loginSeller.getSellerNo();
 
-		if (vendorProductMapper.updateSaleStatus(productNo, sellerNo, saleStatus) == 1) {
-			String actionType = "판매 중".equals(saleStatus) ? "판매 재개" : "판매 중지";
-			try {
-				vendorActionLogMapper.insertLog(sellerNo, actionType, "PRODUCT", productNo, null);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		// 바뀌었으면 판매자 액션 로그("판매 재개"/"판매 중지")는 ActionLogAspect가 남긴다
+		vendorProductService.changeSaleStatus(productNo, sellerNo, saleStatus);
 
 		return new ModelAndView("redirect:/vendor/product.htm");
 	}
@@ -1196,14 +1169,8 @@ public class VendorController {
 
 			int sellerNo = loginSeller.getSellerNo();
 
-			if (vendorProductMapper.updateOption(optionId, sellerNo, price, normalPrice, quantity, status) == 1) {
-				String detail = "판매가 " + price + "원, 재고 " + quantity + "개, 상태 " + ("Y".equals(status) ? "정상" : "품절");
-				try {
-					vendorActionLogMapper.insertLog(sellerNo, "옵션 수정", "PRODUCT_OPTION", optionId, detail);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+			// 바뀌었으면 판매자 액션 로그("옵션 수정")는 ActionLogAspect가 남긴다
+			vendorProductService.updateOption(optionId, sellerNo, price, normalPrice, quantity, status);
 
 		} catch (NumberFormatException e) {
 			// 값이 없거나 숫자가 아니면 아무 것도 바꾸지 않고 목록으로 돌려보낸다.
@@ -1473,13 +1440,8 @@ public class VendorController {
 
 		int sellerNo = loginSeller.getSellerNo();
 
+		// 판매자 액션 로그("판매자 탈퇴")는 ActionLogAspect가 남긴다
 		vendorAccountService.withdraw(sellerNo);
-
-		try {
-			vendorActionLogMapper.insertLog(sellerNo, "판매자 탈퇴", "SELLER", sellerNo, null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 		session.invalidate();
 
