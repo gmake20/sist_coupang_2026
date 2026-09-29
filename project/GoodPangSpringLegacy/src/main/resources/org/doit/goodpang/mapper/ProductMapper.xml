@@ -79,6 +79,7 @@
 <select id="selectRecommendedProducts"
         resultType="org.doit.goodpang.domain.ProductDTO">
 
+
     SELECT
         P.PRODUCT_NO,
         P.PRODUCT_NAME,
@@ -98,23 +99,29 @@
 
     FROM PRODUCT P
 
-    LEFT JOIN PRODUCT_IMAGE PI
+    LEFT JOIN (
+        SELECT PRODUCT_NO, IMAGE_URL
+        FROM (
+            SELECT
+                PRODUCT_NO,
+                IMAGE_URL,
+                ROW_NUMBER() OVER (
+                    PARTITION BY PRODUCT_NO
+                    ORDER BY DBMS_RANDOM.VALUE
+                ) AS RN
+            FROM PRODUCT_IMAGE
+            WHERE IMAGE_PURPOSE = '대표'
+        )
+        WHERE RN = 1
+    ) PI
         ON P.PRODUCT_NO = PI.PRODUCT_NO
-       AND PI.IMAGE_PURPOSE = '대표'
-       AND PI.IMAGE_ORDER = (
-           SELECT MIN(PI2.IMAGE_ORDER)
-           FROM PRODUCT_IMAGE PI2
-           WHERE PI2.PRODUCT_NO = P.PRODUCT_NO
-             AND PI2.IMAGE_PURPOSE = '대표'
-       )
 
     WHERE P.SALE_STATUS != '승인 대기'
       AND P.DISPLAY_YN = 'Y'
 
-    ORDER BY P.PRODUCT_NO DESC
+    ORDER BY DBMS_RANDOM.VALUE
 
     FETCH FIRST 5 ROWS ONLY
 
 </select>
-	
   </mapper>
