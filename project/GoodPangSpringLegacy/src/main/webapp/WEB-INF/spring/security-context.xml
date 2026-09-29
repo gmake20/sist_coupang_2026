@@ -52,6 +52,17 @@
 
 
     <!-- ================================================================
+         배송 앱용 JSON API (DeliveryController) - 보안 필터를 아예 거치지 않음
+         - 로그인 없이 조회(GET /deliveries/json)와 배송완료 처리(POST /delivery-complete/json)가 되어야 하고,
+           앱은 CSRF 토큰을 보낼 수 없으므로 security="none"으로 Spring Security 필터 체인에서 제외한다.
+         - 원래는 배송 앱 쪽 인증이 필요하지만, 앱 인증이 아직 없어서 이 프로젝트 범위에서는 보안 없이 연다.
+         - pattern이 있는 <http>는 위에서부터 검사하므로 맨 위에 둔다.
+         ================================================================ -->
+    <http pattern="/deliveries/json" security="none" />
+    <http pattern="/delivery-complete/json" security="none" />
+
+
+    <!-- ================================================================
          관리자 전용 보안 설정 (SL14_SECURITY2_JDBC 예제의 jdbc-user-service 방식)
 
          - /admin/** 요청은 이 <http>가 처리하고, 나머지는 아래 회원용 <http>가 처리한다.
