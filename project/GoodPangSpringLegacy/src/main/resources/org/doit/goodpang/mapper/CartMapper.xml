@@ -405,5 +405,15 @@
               #{memberNo}
 
     </delete>
+    
+    <delete id="deleteOrderedCartItems">
+    DELETE FROM CART
+    WHERE MEMBER_NO = #{memberNo}
+      AND OPTION_ID IN (
+          SELECT OPTION_ID
+          FROM CHECKOUT_ITEM
+          WHERE CHECKOUT_NO = #{checkoutNo}
+      )
+</delete>
 
 </mapper>

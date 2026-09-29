@@ -48,4 +48,9 @@ public interface CartMapper {
     int clearCart(
             @Param("memberNo") Long memberNo
     );
+    
+    int deleteOrderedCartItems(
+            @Param("memberNo") Long memberNo,
+            @Param("checkoutNo") int checkoutNo
+    );
 }
