@@ -62,6 +62,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -1229,10 +1230,12 @@ public class VendorController {
 	/*
 	 * 판매자 정보관리 제출 (multipart - 서류 이미지 첨부). '입점 대기'/'반려' 상태에서 제출하면 '심사 중'으로 바뀌고,
 	 * '승인' 상태에서 수정하는 경우는 재심사로 되돌리지 않는다(VendorMapper.updateBusinessInfo).
-	 * 성공하면 세션의 loginSeller를 DB 최신값으로 갱신하고 대시보드로, 실패하면 같은 화면에 error를 보여준다.
+	 * 성공하면 세션의 loginSeller를 DB 최신값으로 갱신하고 같은 화면으로 돌아와 저장 완료 메시지(flash)를,
+	 * 실패하면 같은 화면에 error를 보여준다.
 	 */
 	@PostMapping(value = "/business_info.htm")
-	public ModelAndView businessInfoPost(MultipartHttpServletRequest request, HttpSession session) throws Exception {
+	public ModelAndView businessInfoPost(MultipartHttpServletRequest request, HttpSession session,
+			RedirectAttributes redirectAttributes) throws Exception {
 
 		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
 
@@ -1295,7 +1298,15 @@ public class VendorController {
 		SellerDTO refreshed = vendorMapper.findByEmail(loginSeller.getEmail());
 		session.setAttribute("loginSeller", refreshed);
 
-		return new ModelAndView("redirect:/vendor/dashboard.htm");
+		// 기존에는 안내 없이 대시보드로 보내서, 저장이 됐는지 알 수 없었다 (특히 이미 '승인'된 판매자는 화면 변화가 없음).
+		// 같은 화면으로 돌아와 저장 완료 메시지와 방금 올린 서류를 바로 확인할 수 있게 한다.
+		// flash 속성은 redirect 뒤 한 번만 보이고 사라지므로 새로고침해도 메시지가 반복되지 않는다.
+		String savedMessage = "심사 중".equals(refreshed.getApprovalStatus()) && !"심사 중".equals(loginSeller.getApprovalStatus())
+				? "판매자 정보가 제출되었습니다. 입점 심사가 완료되면 상품을 등록할 수 있습니다."
+				: "판매자 정보가 저장되었습니다.";
+		redirectAttributes.addFlashAttribute("message", savedMessage);
+
+		return new ModelAndView("redirect:/vendor/business_info.htm");
 	}
 
 	// 판매자 정보관리 화면 (error가 있으면 상단에 표시)

@@ -1823,3 +1823,10 @@ button {
    들어올 때는 전체화면 카드 전제(.page/.vendor-signup)를 걷어내고 폭만 맞춰서 씀 */
 .business-info-card { max-width: 640px; margin-bottom: 16px; }
 .business-info-card .field-group:first-child { margin-top: 0; }
+
+/* 이미 등록된 서류 미리보기 (클릭하면 새 탭에서 원본) */
+.business-info-card .doc-preview { display: inline-flex; flex-direction: column; gap: 6px; margin-top: 8px;
+  color: #346aff; font-size: 12px; text-decoration: none; }
+.business-info-card .doc-preview img { width: 160px; height: 110px; object-fit: cover;
+  border: 1px solid #e5e5e5; border-radius: 6px; background: #f5f5f5; }
+.business-info-card .doc-preview:hover span { text-decoration: underline; }
