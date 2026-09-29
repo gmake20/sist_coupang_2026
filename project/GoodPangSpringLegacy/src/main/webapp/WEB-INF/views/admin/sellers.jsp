@@ -72,13 +72,13 @@
             <tr class="row-link"
               onclick="location.href='${pageContext.request.contextPath}/admin/seller_detail.htm?sellerNo=${seller.sellerNo}'">
               <td>${seller.sellerNo}</td>
-              <td>${seller.storeName}</td>
-              <td>${seller.ceoName}</td>
-              <td>${seller.managerName}</td>
-              <td>${seller.email}</td>
-              <td>${seller.phone}</td>
-              <td>${seller.businessNo}</td>
-              <td>${seller.businessType}</td>
+              <td><c:out value="${seller.storeName}" /></td>
+              <td><c:out value="${seller.ceoName}" /></td>
+              <td><c:out value="${seller.managerName}" /></td>
+              <td><c:out value="${seller.email}" /></td>
+              <td><c:out value="${seller.phone}" /></td>
+              <td><c:out value="${seller.businessNo}" /></td>
+              <td><c:out value="${seller.businessType}" /></td>
               <td>
                 <c:choose>
                   <c:when test="${seller.approvalStatus == '입점 대기'}">
@@ -100,7 +100,7 @@
                     <span class="badge badge-withdrawn">탈퇴</span>
                   </c:when>
                   <c:otherwise>
-                    ${seller.approvalStatus}
+                    <c:out value="${seller.approvalStatus}" />
                   </c:otherwise>
                 </c:choose>
               </td>

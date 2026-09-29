@@ -15,7 +15,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>판매자 상세 - ${seller.storeName}</title>
+  <title>판매자 상세 - <c:out value="${seller.storeName}" /></title>
 
   <style>
     body { font-family: Arial, "Malgun Gothic", sans-serif; margin: 24px; color: #111; }
@@ -61,7 +61,7 @@
 
   <a class="back-link" href="${pageContext.request.contextPath}/admin/sellers.htm">&larr; 목록으로</a>
 
-  <h1>${seller.storeName}</h1>
+  <h1><c:out value="${seller.storeName}" /></h1>
   <p class="sub">판매자번호 ${seller.sellerNo}</p>
 
   <div class="section">
@@ -88,13 +88,13 @@
           <c:when test="${seller.approvalStatus == '탈퇴'}">
             <span class="badge badge-withdrawn">탈퇴</span>
           </c:when>
-          <c:otherwise>${seller.approvalStatus}</c:otherwise>
+          <c:otherwise><c:out value="${seller.approvalStatus}" /></c:otherwise>
         </c:choose>
       </dd>
 
       <c:if test="${not empty seller.rejectReason}">
         <dt>${seller.approvalStatus == '정지' ? '정지 사유' : '반려 사유'}</dt>
-        <dd>${seller.rejectReason}</dd>
+        <dd><c:out value="${seller.rejectReason}" /></dd>
       </c:if>
 
       <dt>가입일</dt>
@@ -157,11 +157,11 @@
     <h2>계정 / 담당자 정보</h2>
     <dl class="grid">
       <dt>이메일(아이디)</dt>
-      <dd>${seller.email}</dd>
+      <dd><c:out value="${seller.email}" /></dd>
       <dt>담당자명</dt>
-      <dd>${seller.managerName}</dd>
+      <dd><c:out value="${seller.managerName}" /></dd>
       <dt>휴대폰번호</dt>
-      <dd>${seller.phone}</dd>
+      <dd><c:out value="${seller.phone}" /></dd>
     </dl>
   </div>
 
@@ -169,22 +169,22 @@
     <h2>사업자 정보</h2>
     <dl class="grid">
       <dt>사업자유형</dt>
-      <dd>${seller.businessType}</dd>
+      <dd><c:out value="${seller.businessType}" /></dd>
       <dt>사업자등록번호</dt>
-      <dd>${seller.businessNo}</dd>
+      <dd><c:out value="${seller.businessNo}" /></dd>
       <dt>대표자명</dt>
-      <dd>${seller.ceoName}</dd>
+      <dd><c:out value="${seller.ceoName}" /></dd>
       <dt>상호명</dt>
-      <dd>${seller.storeName}</dd>
+      <dd><c:out value="${seller.storeName}" /></dd>
       <dt>대표 판매 카테고리</dt>
-      <dd>${not empty seller.categoryNo ? seller.categoryNo : "미입력"}</dd>
+      <dd><c:out value="${not empty seller.categoryNo ? seller.categoryNo : '미입력'}" /></dd>
       <dt>통신판매업신고번호</dt>
-      <dd>${not empty seller.mailOrderNo ? seller.mailOrderNo : "미입력"}</dd>
+      <dd><c:out value="${not empty seller.mailOrderNo ? seller.mailOrderNo : '미입력'}" /></dd>
       <dt>사업장 주소</dt>
       <dd>
         <c:choose>
           <c:when test="${not empty seller.businessAddress}">
-            (${seller.zipcode}) ${seller.businessAddress} ${seller.businessDetailAddress}
+            (<c:out value="${seller.zipcode}" />) <c:out value="${seller.businessAddress}" /> <c:out value="${seller.businessDetailAddress}" />
           </c:when>
           <c:otherwise>미입력</c:otherwise>
         </c:choose>
@@ -196,11 +196,11 @@
     <h2>정산계좌</h2>
     <dl class="grid">
       <dt>은행명</dt>
-      <dd>${not empty seller.bankName ? seller.bankName : "미입력"}</dd>
+      <dd><c:out value="${not empty seller.bankName ? seller.bankName : '미입력'}" /></dd>
       <dt>계좌번호</dt>
-      <dd>${not empty seller.accountNo ? seller.accountNo : "미입력"}</dd>
+      <dd><c:out value="${not empty seller.accountNo ? seller.accountNo : '미입력'}" /></dd>
       <dt>예금주명</dt>
-      <dd>${not empty seller.accountHolder ? seller.accountHolder : "미입력"}</dd>
+      <dd><c:out value="${not empty seller.accountHolder ? seller.accountHolder : '미입력'}" /></dd>
     </dl>
   </div>
 
