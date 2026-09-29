@@ -308,9 +308,6 @@ public class CartController {
             Authentication authentication,
             HttpSession session) {
 
-        log.info(">>>> POST /cart/delete");
-        log.info(">>>> optionId = " + optionId);
-
         if (optionId == null) {
             throw new IllegalArgumentException(
                     "삭제할 상품 정보가 없습니다."
