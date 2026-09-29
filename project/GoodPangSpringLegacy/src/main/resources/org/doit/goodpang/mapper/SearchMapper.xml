@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 검색 결과 페이지(/search) 조회 — 구버전 SearchDAO 의 SQL 을 옮김 -->
+<mapper namespace="org.doit.goodpang.mapper.SearchMapper">
+
+	<!--
+	  목록/개수 공통 조건 — 두 쿼리가 반드시 같아야 페이지 수가 안 어긋남 (구버전 BASE_FROM_HEAD 의 WHERE 부분).
+	  노출 조건은 카테고리 목록(CategoryProductMapper.xml visibleProduct)과 맞춤:
+	  구버전 검색은 '승인 대기'만 뺐는데, 그러면 판매자가 '판매 중지'한 상품이 검색에는 계속 나와서 같이 뺌.
+	  '품절'은 카테고리와 같이 목록에 남기고 카드에서 회색 처리.
+	-->
+	<sql id="keywordWhere">
+		WHERE P.PRODUCT_NAME LIKE '%' || #{keyword} || '%'
+		  AND P.SALE_STATUS NOT IN ('승인 대기', '판매 중지')
+		  AND P.DISPLAY_YN = 'Y'
+	</sql>
+
+	<!-- public int countByKeyword(SearchDTO search); -->
+	<select id="countByKeyword" resultType="int">
+		SELECT COUNT(*)
+		FROM PRODUCT P
+		<include refid="keywordWhere"/>
+	</select>
+
+	<!-- public List<CategoryProductDTO> findByKeyword(SearchDTO search); -->
+	<select id="findByKeyword" resultType="org.doit.goodpang.domain.CategoryProductDTO">
+		SELECT
+			P.PRODUCT_NO,
+			P.PRODUCT_NAME,
+			OPT.OPTION_ID,
+			IMG.IMAGE_URL AS THUMBNAIL_URL,
+			NVL(P.PRODUCT_PRICE, 0) + NVL(OPT.PRICE, 0) AS SALE_PRICE,
+			CASE WHEN OPT.NORMAL_PRICE IS NOT NULL
+			     THEN NVL(P.PRODUCT_PRICE, 0) + OPT.NORMAL_PRICE END AS NORMAL_PRICE,
+			<!-- 품절: 1/0 숫자로 (MyBatis 가 boolean 으로 바꿀 수 있게 — 카테고리 목록과 같은 방식) -->
+			CASE WHEN P.SALE_STATUS = '품절' THEN 1 ELSE 0 END AS SOLD_OUT,
+			NVL(RV.AVG_RATING, 0) AS AVG_RATING,
+			NVL(RV.REVIEW_COUNT, 0) AS REVIEW_COUNT,
+			NVL(SC.SALE_COUNT, 0) AS SALE_COUNT
+		FROM PRODUCT P
+		<!-- OPT: 상품마다 첫 옵션 1개 (가격 + 카드 링크의 optionId) -->
+		LEFT JOIN (
+			SELECT PRODUCT_NO, OPTION_ID, PRICE, NORMAL_PRICE
+			FROM (
+				SELECT PRODUCT_NO, OPTION_ID, PRICE, NORMAL_PRICE,
+				       ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID) AS RN
+				FROM PRODUCT_OPTION
+			)
+			WHERE RN = 1
+		) OPT ON OPT.PRODUCT_NO = P.PRODUCT_NO
+		<!-- IMG: 상품마다 대표 사진 1장 -->
+		LEFT JOIN (
+			SELECT PRODUCT_NO, IMAGE_URL,
+			       ROW_NUMBER() OVER (PARTITION BY PRODUCT_NO ORDER BY OPTION_ID, IMAGE_ORDER) AS RN
+			FROM PRODUCT_IMAGE
+			WHERE IMAGE_PURPOSE = '대표'
+		) IMG ON IMG.PRODUCT_NO = P.PRODUCT_NO AND IMG.RN = 1
+		<!-- RV: 상품마다 평균 별점 + 리뷰 수 -->
+		LEFT JOIN (
+			SELECT od.PRODUCT_NO,
+			       ROUND(AVG(r.PRODUCT_RATING), 1) AS AVG_RATING,
+			       COUNT(*) AS REVIEW_COUNT
+			FROM REVIEW r
+			JOIN ORDER_DETAIL od ON r.ORDER_DETAIL_NO = od.ORDER_DETAIL_NO
+			GROUP BY od.PRODUCT_NO
+		) RV ON RV.PRODUCT_NO = P.PRODUCT_NO
+		<!-- SC: 상품마다 판매량 (주문취소 제외) → 판매량순 -->
+		LEFT JOIN (
+			SELECT od.PRODUCT_NO, SUM(od.ORDER_QTY) AS SALE_COUNT
+			FROM ORDER_DETAIL od
+			JOIN ORDERS o ON od.ORDER_NO = o.ORDER_NO
+			WHERE o.ORDER_STATUS != '주문취소'
+			GROUP BY od.PRODUCT_NO
+		) SC ON SC.PRODUCT_NO = P.PRODUCT_NO
+		<include refid="keywordWhere"/>
+		<!-- 정렬: sort 값은 SearchDTO.normalize() 에서 이미 4개로 걸러짐. 여기서도 4개만 받음(${} 안 씀) -->
+		ORDER BY
+		<choose>
+			<when test="sort == 'PRICE_ASC'">  NVL(P.PRODUCT_PRICE, 0) + NVL(OPT.PRICE, 0) ASC,  P.PRODUCT_NO DESC</when>
+			<when test="sort == 'PRICE_DESC'"> NVL(P.PRODUCT_PRICE, 0) + NVL(OPT.PRICE, 0) DESC, P.PRODUCT_NO DESC</when>
+			<when test="sort == 'SALE_COUNT'"> NVL(SC.SALE_COUNT, 0) DESC, P.PRODUCT_NO DESC</when>
+			<otherwise> P.CREATED_DATE DESC, P.PRODUCT_NO DESC</otherwise>
+		</choose>
+		<!-- 페이징: offset 개 건너뛰고 listSize 개만 -->
+		OFFSET #{offset} ROWS FETCH NEXT #{listSize} ROWS ONLY
+	</select>
+
+</mapper>
