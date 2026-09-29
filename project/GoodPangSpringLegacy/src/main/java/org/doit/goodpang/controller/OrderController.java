@@ -423,7 +423,7 @@ public class OrderController {
             );
         }
         
-        cartService.clearCart(memberNo);
+        // cartService.clearCart(memberNo);
 
         model.addAttribute(
                 "orderComplete",

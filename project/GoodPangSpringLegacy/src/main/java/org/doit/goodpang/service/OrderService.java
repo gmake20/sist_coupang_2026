@@ -24,6 +24,10 @@ import lombok.extern.log4j.Log4j;
 public class OrderService {
 	//tracking
 	
+	  private final OrderMapper orderMapper;
+	  private final CartMapper cartMapper;
+
+	
 	@Transactional(readOnly = true)
 	public OrderDetailDTO getTrackingInfo(int orderNo) {
 	    // 1. 배송 기본 헤더 정보 조회
@@ -58,9 +62,7 @@ public class OrderService {
 
 //   order_list
 
-    private final OrderMapper orderMapper;
-    private final CartMapper cartMapper;
-
+  
     @Transactional
     public OrderResult createOrder(
             int checkoutNo,
@@ -224,6 +226,11 @@ public class OrderService {
                     stockFail
             );
         }
+        
+        cartMapper.deleteOrderedCartItems(
+                memberNo,
+                checkoutNo
+        );
 
         orderMapper.deleteCheckoutItems(
                 checkoutNo

@@ -136,49 +136,36 @@
     <intercept-url pattern="/vendor/**" access="permitAll" />
 
     <intercept-url pattern="/login**" access="permitAll" />
+    
     <intercept-url pattern="/signup**" access="permitAll" />
     
     <intercept-url pattern="/order/**" access="isAuthenticated()" />
     
     <intercept-url pattern="/wow/**" access="isAuthenticated()" />
     
-    <intercept-url
-    pattern="/review/**"
-    access="isAuthenticated()" />
+    <intercept-url pattern="/review/**" access="isAuthenticated()" />
 
-        <intercept-url
-            pattern="/resources/**"
-            access="permitAll" />
+    <intercept-url pattern="/resources/**" access="permitAll" />
 
-        <intercept-url
-            pattern="/images/**"
-            access="permitAll" />
+	<intercept-url pattern="/images/**" access="permitAll" />
+	
+	<intercept-url pattern="/member/**" access="isAuthenticated()" />
+		    
+	<intercept-url pattern="/payment-method/**" access="isAuthenticated()" />
+
+
+    <!-- 나머지 -->
+    <intercept-url pattern="/**" access="permitAll" />
 
 
         <!-- 관리자(/admin/**)는 위의 관리자 전용 <http>가 먼저 가져가므로 여기서는 규칙 없음 -->
 
 
-        <!-- 로그인 필요 -->
+<!--         로그인 필요
         <intercept-url
             pattern="/mypage/**"
             access="isAuthenticated()" />
-            
-        <intercept-url
-		    pattern="/member/**"
-		    access="isAuthenticated()" />
-		    
-		<intercept-url
-		    pattern="/payment-method/**"
-		    access="isAuthenticated()" />
-
-
-        <!-- 나머지 -->
-        <intercept-url
-            pattern="/**"
-            access="permitAll" />
-            
-
-
+ -->            
 		<form-login
 		    login-page="/login"
 		    login-processing-url="/loginProcess"
@@ -197,10 +184,7 @@
 
     </http>
     
-    <beans:bean
-    id="customLoginSuccessHandler"
-    class=
-    "org.doit.goodpang.security.CustomLoginSuccessHandler">
+    <beans:bean id="customLoginSuccessHandler" class="org.doit.goodpang.security.CustomLoginSuccessHandler">
 
     <beans:constructor-arg
         ref="cartService" />
@@ -208,6 +192,6 @@
     <beans:constructor-arg
         ref="wowMembershipService" />
 
-</beans:bean>
+	</beans:bean>
 
 </beans:beans>
