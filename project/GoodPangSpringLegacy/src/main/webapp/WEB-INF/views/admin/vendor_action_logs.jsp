@@ -82,7 +82,7 @@
 
     <div class="search-field">
       <label for="storeName">스토어명</label>
-      <input type="text" id="storeName" name="storeName" value="${searchStoreName}" placeholder="스토어명 검색">
+      <input type="text" id="storeName" name="storeName" value="<c:out value='${searchStoreName}' />" placeholder="스토어명 검색">
     </div>
 
     <div class="search-field">
@@ -114,12 +114,12 @@
 
     <div class="search-field">
       <label for="startDate">시작일</label>
-      <input type="date" id="startDate" name="startDate" value="${searchStartDate}">
+      <input type="date" id="startDate" name="startDate" value="<c:out value='${searchStartDate}' />">
     </div>
 
     <div class="search-field">
       <label for="endDate">종료일</label>
-      <input type="date" id="endDate" name="endDate" value="${searchEndDate}">
+      <input type="date" id="endDate" name="endDate" value="<c:out value='${searchEndDate}' />">
     </div>
 
     <div class="search-buttons">
@@ -151,10 +151,10 @@
           <c:forEach var="log" items="${logList}">
             <tr>
               <td><fmt:formatDate value="${log.actionDate}" pattern="yyyy-MM-dd HH:mm" /></td>
-              <td>${log.storeName} (#${log.sellerNo})</td>
-              <td>${log.actionType}</td>
-              <td><span class="target-tag">${log.targetType} #${log.targetNo}</span></td>
-              <td class="detail">${not empty log.detail ? log.detail : '-'}</td>
+              <td><c:out value="${log.storeName}" /> (#${log.sellerNo})</td>
+              <td><c:out value="${log.actionType}" /></td>
+              <td><span class="target-tag"><c:out value="${log.targetType}" /> #${log.targetNo}</span></td>
+              <td class="detail"><c:out value="${not empty log.detail ? log.detail : '-'}" /></td>
             </tr>
           </c:forEach>
         </tbody>
