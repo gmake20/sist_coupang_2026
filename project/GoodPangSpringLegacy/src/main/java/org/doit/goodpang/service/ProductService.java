@@ -55,6 +55,10 @@ public class ProductService {
     private final ProductOptionMapper productOptionMapper;
     
     private final ProductImageMapper productImageMapper;
+    
+    public List<ProductDTO> getRecommendedProducts() {
+        return productMapper.selectRecommendedProducts();
+    }
 
 	/* private final ReviewDAO reviewDAO = new ReviewDAO(); */
 	/* private final ProductViewLogDAO viewLogDAO = new ProductViewLogDAO(); */

@@ -14,6 +14,7 @@ import org.doit.goodpang.domain.security.CustomUser;
 import org.doit.goodpang.service.CartService;
 import org.doit.goodpang.service.CartSessionService;
 import org.doit.goodpang.service.CheckoutService;
+import org.doit.goodpang.service.ProductService;
 import org.doit.goodpang.service.WowMembershipService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -38,6 +39,7 @@ public class CartController {
     private final WowMembershipService wowMembershipService;
     private final CheckoutService checkoutService;
     private final CartSessionService cartSessionService;
+    private final ProductService productService;
 
     @GetMapping
     public String cart(
@@ -69,6 +71,7 @@ public class CartController {
                     wowMembershipService.isWowMember(memberNo);
 
             model.addAttribute("isWowMember", isWowMember);
+            
 
         } else {
 
@@ -104,6 +107,7 @@ public class CartController {
         model.addAttribute("cartItems", cartItems);
         model.addAttribute("cartCount", cartCount);
         model.addAttribute("totalPrice", totalPrice);
+        model.addAttribute("recommendedProducts", productService.getRecommendedProducts());
 
         return "/cart/cart";
     }
