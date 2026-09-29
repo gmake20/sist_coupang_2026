@@ -11,6 +11,7 @@ import org.doit.goodpang.domain.OrderItemDTO;
 import org.doit.goodpang.domain.PaymentMethodDTO;
 import org.doit.goodpang.domain.security.CustomUser;
 import org.doit.goodpang.service.AddressService;
+import org.doit.goodpang.service.CartService;
 import org.doit.goodpang.service.CheckoutService;
 import org.doit.goodpang.service.OrderCancelService;
 import org.doit.goodpang.service.OrderService;
@@ -41,6 +42,7 @@ public class OrderController {
     private final AddressService addressService;
     private final PaymentMethodService paymentMethodService;
     private final CheckoutService checkoutService;
+    private final CartService cartService;
     
     
     // 1. 주문 목록 페이지 (/order/order_list)
@@ -415,6 +417,8 @@ public class OrderController {
                     "주문 정보를 찾을 수 없습니다."
             );
         }
+        
+        cartService.clearCart(memberNo);
 
         model.addAttribute(
                 "orderComplete",
