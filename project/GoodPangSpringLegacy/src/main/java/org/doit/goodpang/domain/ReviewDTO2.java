@@ -38,4 +38,25 @@ public class ReviewDTO2 {
     private int productNo;
     
     private List<String> imageUrls = new ArrayList<>();
+    
+    public String getMaskedName() {
+
+        if (memberName == null || memberName.isBlank()) {
+            return "";
+        }
+
+        String name = memberName.trim();
+
+        if (name.length() == 1) {
+            return name;
+        }
+
+        if (name.length() == 2) {
+            return name.substring(0, 1) + "*";
+        }
+
+        return name.substring(0, 1)
+                + "*".repeat(name.length() - 2)
+                + name.substring(name.length() - 1);
+    }
 }
