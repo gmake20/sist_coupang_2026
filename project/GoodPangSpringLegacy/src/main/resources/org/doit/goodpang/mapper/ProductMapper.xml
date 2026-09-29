@@ -75,6 +75,46 @@
      FETCH FIRST 1 ROW ONLY
   
   </select>
- 
+  
+<select id="selectRecommendedProducts"
+        resultType="org.doit.goodpang.domain.ProductDTO">
+
+    SELECT
+        P.PRODUCT_NO,
+        P.PRODUCT_NAME,
+
+        P.PRODUCT_PRICE
+        + NVL((
+            SELECT PO.PRICE
+            FROM PRODUCT_OPTION PO
+            WHERE PO.PRODUCT_NO = P.PRODUCT_NO
+            ORDER BY PO.OPTION_ID
+            FETCH FIRST 1 ROW ONLY
+        ), 0) AS PRODUCT_PRICE,
+
+        P.QUANTITY,
+        P.SALE_STATUS,
+        PI.IMAGE_URL AS IMAGE_URL
+
+    FROM PRODUCT P
+
+    LEFT JOIN PRODUCT_IMAGE PI
+        ON P.PRODUCT_NO = PI.PRODUCT_NO
+       AND PI.IMAGE_PURPOSE = '대표'
+       AND PI.IMAGE_ORDER = (
+           SELECT MIN(PI2.IMAGE_ORDER)
+           FROM PRODUCT_IMAGE PI2
+           WHERE PI2.PRODUCT_NO = P.PRODUCT_NO
+             AND PI2.IMAGE_PURPOSE = '대표'
+       )
+
+    WHERE P.SALE_STATUS != '승인 대기'
+      AND P.DISPLAY_YN = 'Y'
+
+    ORDER BY P.PRODUCT_NO DESC
+
+    FETCH FIRST 5 ROWS ONLY
+
+</select>
 	
   </mapper>

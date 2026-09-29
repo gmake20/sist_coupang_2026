@@ -1,5 +1,7 @@
 package org.doit.goodpang.mapper;
 
+import java.util.List;
+
 import org.doit.goodpang.domain.ProductDTO;
 
 public interface ProductMapper {
@@ -9,5 +11,8 @@ public interface ProductMapper {
 	
 	/** 이 상품의 첫 옵션 ID (OPTION_ID 순). 없으면 null */
 	public Integer getDefaultOptionId(int productNo);
+	
+	public List<ProductDTO> selectRecommendedProducts();
+	
 	
 }
