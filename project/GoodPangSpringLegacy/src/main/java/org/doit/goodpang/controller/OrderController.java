@@ -51,6 +51,7 @@ public class OrderController {
     		Authentication authentication,
             @RequestParam(value = "year", defaultValue = "recent") String yearFilter,
             @RequestParam(value = "page", defaultValue = "1") int page,
+            
             Model model) {
 
         // 세션 또는 스프링 시큐리티 처리 전 임시 테스트용 회원번호
@@ -70,6 +71,8 @@ public class OrderController {
         if (totalPages == 0) totalPages = 1;
 
         List<OrderItemDTO> orderList = orderService.getOrderListPaged(memberNo, yearFilter, page, pageSize);
+        
+   
         
         System.out.println("orderList size = " +
                 (orderList == null ? "null" : orderList.size()));
@@ -135,12 +138,25 @@ public class OrderController {
     // 주문 취소 처리
     
     @GetMapping("/order_cancel")
-    public String orderCancelForm(@RequestParam("orderNo") int orderNo, Model model) {
+    public String orderCancelForm(@RequestParam("orderNo") int orderNo
+    		                      , Authentication authentication
+    		                      , RedirectAttributes rttr 
+    		                      , Model model) {
         log.info("> 주문 취소 페이지(Form) 진입 - orderNo: " + orderNo);
 
      // 주문번호에 해당하는 모든 상품 목록 조회
         List<OrderDetailDTO> cancelList = orderCancelService.getCancelInfo(orderNo);
-
+        
+        CustomUser customUser = (CustomUser) authentication.getPrincipal();
+		 
+		 Long memberNo = customUser.getMember() .getMemberNo();
+        
+			/*
+			 * // 3. 본인 주문 검증: list가 비어있거나 타인의 주문인 경우 차단 if (cancelList == null ||
+			 * cancelList.isEmpty() || cancelList.get(0).getMemberNo() != memberNo) {
+			 * rttr.addFlashAttribute("msg", "잘못된 접근이거나 본인의 주문 정보가 아닙니다."); return
+			 * "redirect:/order/order_list"; // 주문 목록으로 리다이렉트 }
+			 */
         if (cancelList != null && !cancelList.isEmpty()) {
             model.addAttribute("cancelList", cancelList); // ⭕ 리스트 전체 전달
 			/*
