@@ -16,8 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 /*
- * 판매자센터 상품 - 여러 쿼리 결과를 조립하거나 트랜잭션이 필요한 작업만 여기 둔다.
+ * 판매자센터 상품 - 여러 쿼리 결과를 조립하거나 트랜잭션이 필요한 작업, 그리고 판매자 액션 로그를 남기는 처리.
  * (단순 조회는 Controller에서 VendorProductMapper를 바로 호출)
+ *
+ * 등록/노출변경/판매상태변경/옵션수정의 판매자 액션 로그는 ActionLogAspect가 반환값을 보고 남긴다 (@AfterReturning).
  */
 @Service
 @RequiredArgsConstructor
@@ -106,5 +108,20 @@ public class VendorProductService {
 		}
 
 		return productNo;
+	}
+
+	// 노출여부 변경 ("Y" 노출 / "N" 숨김) - 소프트 삭제/복원. 이 판매자 상품이 아니면 false
+	public boolean changeDisplayYn(int productNo, int sellerNo, String displayYn) {
+		return vendorProductMapper.updateDisplayYn(productNo, sellerNo, displayYn) == 1;
+	}
+
+	// 판매중지/판매재개 ("판매 중" <-> "판매 중지"). 승인 대기/품절 상품이거나 이 판매자 상품이 아니면 false
+	public boolean changeSaleStatus(int productNo, int sellerNo, String saleStatus) {
+		return vendorProductMapper.updateSaleStatus(productNo, sellerNo, saleStatus) == 1;
+	}
+
+	// 옵션 하나의 판매가/정상가/재고/상태(Y 정상, N 품절) 수정. 이 판매자 상품의 옵션이 아니면 false
+	public boolean updateOption(int optionId, int sellerNo, int price, Integer normalPrice, int quantity, String status) {
+		return vendorProductMapper.updateOption(optionId, sellerNo, price, normalPrice, quantity, status) == 1;
 	}
 }

@@ -20,7 +20,8 @@ import org.doit.goodpang.mapper.NoticeMapper;
 import org.doit.goodpang.mapper.VendorActionLogMapper;
 import org.doit.goodpang.mapper.VendorMapper;
 import org.doit.goodpang.service.AdminDeliveryService;
-import org.doit.goodpang.service.AdminDeliveryService.CompleteResult;
+import org.doit.goodpang.service.AdminService;
+import org.doit.goodpang.service.AdminService.SellerStatusAction;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +52,7 @@ public class AdminController {
 	private final AdminProductMapper adminProductMapper;
 	private final AdminDeliveryMapper adminDeliveryMapper;
 	private final AdminDeliveryService adminDeliveryService;
+	private final AdminService adminService;
 	private final VendorActionLogMapper vendorActionLogMapper;
 	private final VendorMapper vendorMapper;
 
@@ -105,13 +107,12 @@ public class AdminController {
 	/*
 	 * 상품 승인/반려 (목록의 승인·반려 버튼 - POST + CSRF 토큰).
 	 * action=approve → '판매 중', action=reject → '판매 중지'. '승인 대기' 상품만 바뀐다.
-	 * 기존 서블릿은 실제로 바뀌지 않았어도(이미 처리된 상품 등) 로그를 남겼는데, 여기서는 바뀐 경우에만 남긴다.
+	 * 기존 서블릿은 실제로 바뀌지 않았어도(이미 처리된 상품 등) 로그를 남겼는데, 여기서는 바뀐 경우에만 남긴다(ActionLogAspect).
 	 */
 	@PostMapping(value = "/product_approve.htm")
 	public ModelAndView productApprove(
 			@RequestParam(value = "productNo", required = false) String productNoParam,
-			@RequestParam(value = "action", required = false) String action,
-			HttpSession session) {
+			@RequestParam(value = "action", required = false) String action) {
 
 		Integer productNo = parseNo(productNoParam);
 
@@ -119,22 +120,12 @@ public class AdminController {
 			return new ModelAndView("redirect:/admin/products.htm");
 		}
 
-		String saleStatus;
-		String actionType;
-
-		if ("approve".equals(action)) {
-			saleStatus = "판매 중";
-			actionType = "상품 승인";
-		} else if ("reject".equals(action)) {
-			saleStatus = "판매 중지";
-			actionType = "상품 반려";
-		} else {
+		if (!"approve".equals(action) && !"reject".equals(action)) {
 			return new ModelAndView("redirect:/admin/products.htm");
 		}
 
-		if (adminProductMapper.updateApprovalStatus(productNo, saleStatus) == 1) {
-			writeAdminLog((Integer) session.getAttribute("adminNo"), actionType, "PRODUCT", productNo);
-		}
+		// 바뀌었으면 관리자 액션 로그("상품 승인"/"상품 반려")는 ActionLogAspect가 남긴다
+		adminService.decideProductApproval(productNo, "approve".equals(action));
 
 		return new ModelAndView("redirect:/admin/products.htm");
 	}
@@ -157,14 +148,13 @@ public class AdminController {
 
 	/*
 	 * 배송완료 처리 (목록의 버튼 - POST + CSRF 토큰).
-	 * DELIVERY/ORDERS를 한 트랜잭션으로 '배송완료'로 바꾼 뒤(AdminDeliveryService), 기존과 같이
-	 * 관리자 로그 1건 + 이 주문에 상품이 있는 판매자마다 판매자 로그 1건씩 남긴다.
-	 * 로그는 트랜잭션 밖이라, 로그 기록이 실패해도 배송완료는 유지된다.
+	 * DELIVERY/ORDERS를 한 트랜잭션으로 '배송완료'로 바꾼다(AdminDeliveryService). 기존과 같이
+	 * 관리자 로그 1건 + 이 주문에 상품이 있는 판매자마다 판매자 로그 1건씩 남는데, 이 로그는 ActionLogAspect가
+	 * commit 뒤에 남기므로 로그 기록이 실패해도 배송완료는 유지된다.
 	 */
 	@PostMapping(value = "/delivery_complete.htm")
 	public ModelAndView deliveryComplete(
-			@RequestParam(value = "deliveryNo", required = false) String deliveryNoParam,
-			HttpSession session) {
+			@RequestParam(value = "deliveryNo", required = false) String deliveryNoParam) {
 
 		Integer deliveryNo = parseNo(deliveryNoParam);
 
@@ -173,19 +163,8 @@ public class AdminController {
 			return new ModelAndView("redirect:/admin/deliveries.htm");
 		}
 
-		CompleteResult result = adminDeliveryService.completeDelivery(deliveryNo);
-
-		if (result != null) {
-			writeAdminLog((Integer) session.getAttribute("adminNo"), "배송완료 처리", "DELIVERY", deliveryNo);
-
-			for (int sellerNo : result.getSellerNos()) {
-				try {
-					vendorActionLogMapper.insertLog(sellerNo, "배송 완료", "ORDERS", result.getOrderNo(), null);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		// 처리됐으면 관리자 로그 + 판매자별 로그는 ActionLogAspect가 트랜잭션 commit 뒤에 남긴다
+		adminDeliveryService.completeDelivery(deliveryNo);
 
 		return new ModelAndView("redirect:/admin/deliveries.htm");
 	}
@@ -227,15 +206,14 @@ public class AdminController {
 	 *   reject     → '반려' + 반려 사유(rejectReason, 비었으면 기본 문구)
 	 *   suspend    → '정지' + 정지 사유(suspendReason) - REJECT_REASON 컬럼을 정지 사유에도 재사용 (기존과 동일)
 	 *   reactivate → '승인' (정지 해제)
-	 * 판매자 탈퇴와 같은 VendorMapper.updateApprovalStatus를 쓴다. 로그는 실제로 바뀐 경우에만 남긴다.
+	 * 처리는 AdminService.changeSellerStatus, 로그는 실제로 바뀐 경우에만 ActionLogAspect가 남긴다.
 	 */
 	@PostMapping(value = "/seller_approve.htm")
 	public ModelAndView sellerApprove(
 			@RequestParam(value = "sellerNo", required = false) String sellerNoParam,
 			@RequestParam(value = "action", required = false) String action,
 			@RequestParam(value = "rejectReason", required = false) String rejectReason,
-			@RequestParam(value = "suspendReason", required = false) String suspendReason,
-			HttpSession session) {
+			@RequestParam(value = "suspendReason", required = false) String suspendReason) {
 
 		Integer sellerNo = parseNo(sellerNoParam);
 
@@ -243,38 +221,25 @@ public class AdminController {
 			return new ModelAndView("redirect:/admin/sellers.htm");
 		}
 
-		String approvalStatus;
+		SellerStatusAction statusAction;
 		String reason = null;
-		String actionType;
 
 		if ("approve".equals(action)) {
-			approvalStatus = "승인";
-			actionType = "판매자 승인";
+			statusAction = SellerStatusAction.APPROVE;
 		} else if ("reject".equals(action)) {
-			approvalStatus = "반려";
+			statusAction = SellerStatusAction.REJECT;
 			reason = (rejectReason == null || rejectReason.isBlank()) ? "사유가 입력되지 않았습니다." : rejectReason;
-			actionType = "판매자 반려";
 		} else if ("suspend".equals(action)) {
-			approvalStatus = "정지";
+			statusAction = SellerStatusAction.SUSPEND;
 			reason = (suspendReason == null || suspendReason.isBlank()) ? "사유가 입력되지 않았습니다." : suspendReason;
-			actionType = "판매자 정지";
 		} else if ("reactivate".equals(action)) {
-			approvalStatus = "승인";
-			actionType = "판매자 정지해제";
+			statusAction = SellerStatusAction.REACTIVATE;
 		} else {
 			return new ModelAndView("redirect:/admin/seller_detail.htm?sellerNo=" + sellerNo);
 		}
 
-		if (vendorMapper.updateApprovalStatus(sellerNo, approvalStatus, reason) == 1) {
-			Integer adminNo = (Integer) session.getAttribute("adminNo");
-			if (adminNo != null) {
-				try {
-					adminActionLogMapper.insertLog(adminNo, actionType, "SELLER", sellerNo, reason);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		// 바뀌었으면 관리자 액션 로그(판매자 승인/반려/정지/정지해제 + 사유)는 ActionLogAspect가 남긴다
+		adminService.changeSellerStatus(sellerNo, statusAction, reason);
 
 		return new ModelAndView("redirect:/admin/seller_detail.htm?sellerNo=" + sellerNo);
 	}
@@ -412,9 +377,8 @@ public class AdminController {
 		notice.setNoticeType(noticeType);
 		notice.setAdminNo(adminNo);
 
-		if (noticeMapper.insertNotice(notice) == 1) {
-			writeAdminLog(adminNo, "공지 등록", "NOTICE", notice.getNoticeNo());
-		}
+		// 등록됐으면 관리자 액션 로그("공지 등록")는 ActionLogAspect가 남긴다
+		adminService.registerNotice(notice);
 
 		return new ModelAndView("redirect:/admin/notices.htm");
 	}
@@ -444,8 +408,7 @@ public class AdminController {
 			@RequestParam(value = "noticeNo", required = false) String noticeNoParam,
 			@RequestParam(value = "title", required = false) String title,
 			@RequestParam(value = "content", required = false) String content,
-			@RequestParam(value = "noticeType", required = false) String noticeType,
-			HttpSession session) {
+			@RequestParam(value = "noticeType", required = false) String noticeType) {
 
 		Integer noticeNo = parseNo(noticeNoParam);
 
@@ -468,9 +431,8 @@ public class AdminController {
 
 		notice.setTitle(title.trim());
 
-		if (noticeMapper.updateNotice(notice) == 1) {
-			writeAdminLog((Integer) session.getAttribute("adminNo"), "공지 수정", "NOTICE", noticeNo);
-		}
+		// 수정됐으면 관리자 액션 로그("공지 수정")는 ActionLogAspect가 남긴다
+		adminService.updateNotice(notice);
 
 		return new ModelAndView("redirect:/admin/notices.htm");
 	}
@@ -478,13 +440,13 @@ public class AdminController {
 	// 공지 삭제 (목록의 삭제 버튼 - POST + CSRF 토큰). 번호가 잘못됐으면 아무것도 지우지 않고 목록으로
 	@PostMapping(value = "/notice_delete.htm")
 	public ModelAndView noticeDelete(
-			@RequestParam(value = "noticeNo", required = false) String noticeNoParam,
-			HttpSession session) {
+			@RequestParam(value = "noticeNo", required = false) String noticeNoParam) {
 
 		Integer noticeNo = parseNo(noticeNoParam);
 
-		if (noticeNo != null && noticeMapper.deleteNotice(noticeNo) == 1) {
-			writeAdminLog((Integer) session.getAttribute("adminNo"), "공지 삭제", "NOTICE", noticeNo);
+		// 삭제됐으면 관리자 액션 로그("공지 삭제")는 ActionLogAspect가 남긴다
+		if (noticeNo != null) {
+			adminService.deleteNotice(noticeNo);
 		}
 
 		return new ModelAndView("redirect:/admin/notices.htm");
@@ -494,23 +456,6 @@ public class AdminController {
 	private boolean isValidNotice(String title, String content, String noticeType) {
 		boolean validType = "공지".equals(noticeType) || "안내".equals(noticeType);
 		return title != null && !title.isBlank() && content != null && !content.isBlank() && validType;
-	}
-
-	/*
-	 * 관리자 액션 로그 (ADMIN_ACTION_LOG). targetType 예: "NOTICE", "PRODUCT".
-	 * 로그 기록 실패가 실제 처리(공지 등록, 상품 승인 등)를 되돌리면 안 되므로 예외는 삼킨다 (기존과 동일).
-	 */
-	private void writeAdminLog(Integer adminNo, String actionType, String targetType, int targetNo) {
-
-		if (adminNo == null) {
-			return;
-		}
-
-		try {
-			adminActionLogMapper.insertLog(adminNo, actionType, targetType, targetNo, null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	// 번호 파라미터(noticeNo, productNo 등) 파싱. 없거나 숫자가 아니면 null
