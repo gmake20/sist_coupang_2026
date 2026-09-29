@@ -119,10 +119,6 @@ public class CartController {
             Authentication authentication,
             HttpSession session) {
 
-        log.info(">>>> POST /cart/add");
-        log.info(">>>> optionId = " + optionId);
-        log.info(">>>> quantity = " + quantity);
-
         if (quantity == null || quantity < 1) {
             quantity = 1;
         }
@@ -183,8 +179,6 @@ public class CartController {
             HttpSession session,
             HttpServletResponse response)
             throws IOException {
-
-        log.info(">>>> POST /cart/checkout");
 
         if (authentication == null
                 || !authentication.isAuthenticated()
@@ -313,9 +307,6 @@ public class CartController {
             @RequestParam("optionId") Integer optionId,
             Authentication authentication,
             HttpSession session) {
-
-        log.info(">>>> POST /cart/delete");
-        log.info(">>>> optionId = " + optionId);
 
         if (optionId == null) {
             throw new IllegalArgumentException(

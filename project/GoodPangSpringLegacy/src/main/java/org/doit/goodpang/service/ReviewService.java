@@ -243,4 +243,52 @@ public class ReviewService {
 
         return sb.toString();
     }
+    
+    @Transactional(readOnly = true)
+    public List<ReviewDTO2> getWrittenReviews(
+            Long memberNo,
+            int offset,
+            int pageSize) {
+
+        List<ReviewDTO2> reviews =
+                reviewMapper.selectReviewsByMemberNo(
+                        memberNo,
+                        offset,
+                        pageSize
+                );
+
+        for (ReviewDTO2 review : reviews) {
+
+            List<String> imageUrls =
+                    reviewMapper.selectReviewImageUrls(
+                            review.getReviewNo()
+                    );
+
+            review.setImageUrls(imageUrls);
+        }
+
+        return reviews;
+    }
+    
+    @Transactional(readOnly = true)
+    public List<ReviewDTO2> getReviewsWithImagesByProductNo(
+            int productNo) {
+
+        List<ReviewDTO2> reviews =
+                reviewMapper.selectReviewsByProductNo(
+                        productNo
+                );
+
+        for (ReviewDTO2 review : reviews) {
+
+            List<String> imageUrls =
+                    reviewMapper.selectReviewImageUrls(
+                            review.getReviewNo()
+                    );
+
+            review.setImageUrls(imageUrls);
+        }
+
+        return reviews;
+    }
 }

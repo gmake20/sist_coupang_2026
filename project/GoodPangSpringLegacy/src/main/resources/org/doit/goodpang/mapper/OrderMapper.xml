@@ -533,39 +533,6 @@
 
     </update>
 
-<!--    <select id="getOrderComplete"
-        resultType="org.doit.goodpang.domain.OrderCompleteDTO">
-
-    SELECT
-        o.ORDER_NO              AS orderNo,
-        o.MEMBER_NO             AS memberNo,
-        o.ORDER_DATE            AS orderDate,
-        o.DELIVERY_FEE          AS shippingFee,
-        o.TOTAL_PRICE           AS paymentAmount,
-        o.ORDER_STATUS          AS orderStatus,
-        o.PRODUCT_AMOUNT        AS orderAmount,
-        o.INSTANT_DISCOUNT      AS instantDiscount,
-        o.COUPON_DISCOUNT       AS couponDiscount,
-        o.CASH_USED             AS cashUsed,
-
-        d.RECEIVER_NAME         AS receiverName,
-        d.TEL                   AS receiverPhone,
-        d.ZIPCODE               AS zipcode,
-        d.ADDRESS               AS address,
-        d.DETAIL_ADDRESS        AS detailAddress,
-        d.REQUEST_MSG           AS requestMsg
-
-    FROM ORDERS o
-
-    JOIN ORDER_ADDRESS d
-      ON o.ORDER_ADDRESS_NO =
-         d.ORDER_ADDRESS_NO
-
-    WHERE o.ORDER_NO = #{orderNo}
-      AND o.MEMBER_NO = #{memberNo}
-
-</select>
- -->
 <select id="getOrderComplete"
         resultType="org.doit.goodpang.domain.OrderCompleteDTO">
 

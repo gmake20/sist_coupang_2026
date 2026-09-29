@@ -122,7 +122,7 @@
 	        value="/WEB-INF/views/review/review_list.jsp" />
 	
 	    <put-attribute name="title"
-	        value="배송지 관리 - GoodPang" />
+	        value="GoodPang" />
 	
 	</definition>
 	
@@ -136,7 +136,7 @@
 	        value="/WEB-INF/views/review/review_write.jsp" />
 	
 	    <put-attribute name="title"
-	        value="배송지 관리 - GoodPang" />
+	        value="GoodPang" />
 	
 	</definition>
 

@@ -100,6 +100,26 @@ public class AddressController {
         Long memberNo =
                 customUser.getMember()
                           .getMemberNo();
+        
+        if (requestMsg == null || requestMsg.isBlank()) {
+
+            model.addAttribute(
+                    "error",
+                    "배송 요청사항을 입력해주세요."
+            );
+
+            model.addAttribute(
+                    "checkoutNo",
+                    checkoutNo
+            );
+
+            model.addAttribute(
+                    "from",
+                    from
+            );
+
+            return "address.add";
+        }
 
         AddressDTO dto = new AddressDTO();
 
@@ -309,6 +329,44 @@ public class AddressController {
         Long memberNo =
                 customUser.getMember()
                           .getMemberNo();
+        
+        if (requestMsg == null || requestMsg.isBlank()) {
+
+            AddressDTO addressDto =
+                    new AddressDTO();
+
+            addressDto.setAddressNo(addressNo);
+            addressDto.setMemberNo(memberNo);
+            addressDto.setReceiverName(receiverName);
+            addressDto.setTel(tel);
+            addressDto.setZipcode(zipcode);
+            addressDto.setAddress(address);
+            addressDto.setDetailAddress(detailAddress);
+            addressDto.setRequestMsg(requestMsg);
+            addressDto.setAddressDefault(addressDefault);
+
+            model.addAttribute(
+                    "error",
+                    "배송 요청사항을 입력해주세요."
+            );
+
+            model.addAttribute(
+                    "address",
+                    addressDto
+            );
+
+            model.addAttribute(
+                    "checkoutNo",
+                    checkoutNo
+            );
+
+            model.addAttribute(
+                    "from",
+                    from
+            );
+
+            return "address.edit";
+        }
 
         AddressDTO dto =
                 new AddressDTO();

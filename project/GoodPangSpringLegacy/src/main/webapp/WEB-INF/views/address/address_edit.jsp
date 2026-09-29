@@ -177,7 +177,8 @@
 
                 <select id="requestMsg"
                     name="requestMsg"
-                    class="form-select">
+                    class="form-select"
+                    required>
 
                     <option value=""
                         ${empty address.requestMsg ? 'selected' : ''}>
@@ -247,6 +248,12 @@
     </section>
 
 </main>
+
+<c:if test="${not empty error}">
+    <script>
+        alert("${error}");
+    </script>
+</c:if>
 
 
 <script

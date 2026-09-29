@@ -97,6 +97,6 @@ uri="http://www.springframework.org/security/tags" %>
 			</div>
 		</div>
 	</div>
-
+<script src="${pageContext.request.contextPath}/resources/js/header.js"></script>
 </body>
 </html>
