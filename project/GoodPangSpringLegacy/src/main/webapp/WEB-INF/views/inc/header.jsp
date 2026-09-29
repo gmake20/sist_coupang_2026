@@ -774,7 +774,7 @@
 								<span class="wrapper"> <i class="arrow"></i> <a
 									href="${pageContext.request.contextPath}/order/order_list">
 
-										주문목록 </a> <a href="#"> 취소/반품 </a> <a href="#"> 찜 리스트 </a>
+										주문목록 </a> <a href="${pageContext.request.contextPath}/order/cancel_history"> 취소/반품 </a> <a href="#"> 찜 리스트 </a>
 
 								</span>
 
