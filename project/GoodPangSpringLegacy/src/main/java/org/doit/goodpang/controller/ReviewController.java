@@ -6,13 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
-import org.doit.goodpang.domain.ReviewDTO;
 import org.doit.goodpang.domain.ReviewDTO2;
 import org.doit.goodpang.domain.ReviewItemDTO;
 import org.doit.goodpang.domain.security.CustomUser;
 import org.doit.goodpang.service.ReviewService;
+import org.doit.goodpang.util.UploadPaths;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -37,6 +38,7 @@ public class ReviewController {
     private static final int PAGE_BLOCK = 5;
 
     private final ReviewService reviewService;
+    private final ServletContext servletContext;
     
     @Value("${upload.base-dir}")
     private String uploadBaseDir;
@@ -174,7 +176,7 @@ public class ReviewController {
 
         return "redirect:/review/list?tab=written";
     }
-
+    
     private List<String> saveUploadedFiles(
             List<MultipartFile> reviewImages,
             int reviewNo)
@@ -202,22 +204,6 @@ public class ReviewController {
                 );
             }
 
-            if (file.getSize() > 10 * 1024 * 1024) {
-                throw new IllegalArgumentException(
-                        "이미지 한 장의 최대 크기는 10MB입니다."
-                );
-            }
-
-            String contentType =
-                    file.getContentType();
-
-            if (contentType == null
-                    || !contentType.startsWith("image/")) {
-                throw new IllegalArgumentException(
-                        "이미지 파일만 업로드할 수 있습니다."
-                );
-            }
-
             String originalName =
                     file.getOriginalFilename();
 
@@ -227,8 +213,7 @@ public class ReviewController {
             }
 
             originalName =
-                    new File(originalName)
-                        .getName();
+                    new File(originalName).getName();
 
             String ext = "";
 
@@ -237,24 +222,18 @@ public class ReviewController {
 
             if (dotIndex >= 0) {
                 ext =
-                    originalName
-                        .substring(dotIndex)
-                        .toLowerCase();
-            }
-
-            if (!ext.equals(".jpg")
-                    && !ext.equals(".jpeg")
-                    && !ext.equals(".png")
-                    && !ext.equals(".gif")
-                    && !ext.equals(".webp")) {
-
-                throw new IllegalArgumentException(
-                        "jpg, jpeg, png, gif, webp 이미지만 업로드할 수 있습니다."
-                );
+                        originalName
+                                .substring(dotIndex)
+                                .toLowerCase();
             }
 
             String savedName =
                     UUID.randomUUID() + ext;
+
+            String uploadBaseDir =
+                    UploadPaths.resolveBaseDir(
+                            servletContext
+                    );
 
             File uploadDir =
                     new File(
@@ -292,6 +271,70 @@ public class ReviewController {
 
         return imageUrls;
     }
+
+	/*
+	 * private List<String> saveUploadedFiles( List<MultipartFile> reviewImages, int
+	 * reviewNo) throws IOException {
+	 * 
+	 * List<String> imageUrls = new ArrayList<>();
+	 * 
+	 * if (reviewImages == null || reviewImages.isEmpty()) { return imageUrls; }
+	 * 
+	 * int count = 0;
+	 * 
+	 * for (MultipartFile file : reviewImages) {
+	 * 
+	 * if (file == null || file.isEmpty()) { continue; }
+	 * 
+	 * if (count >= 10) { throw new IllegalArgumentException(
+	 * "사진은 최대 10장까지 첨부할 수 있습니다." ); }
+	 * 
+	 * if (file.getSize() > 10 * 1024 * 1024) { throw new IllegalArgumentException(
+	 * "이미지 한 장의 최대 크기는 10MB입니다." ); }
+	 * 
+	 * String contentType = file.getContentType();
+	 * 
+	 * if (contentType == null || !contentType.startsWith("image/")) { throw new
+	 * IllegalArgumentException( "이미지 파일만 업로드할 수 있습니다." ); }
+	 * 
+	 * String originalName = file.getOriginalFilename();
+	 * 
+	 * if (originalName == null || originalName.isBlank()) { continue; }
+	 * 
+	 * originalName = new File(originalName) .getName();
+	 * 
+	 * String ext = "";
+	 * 
+	 * int dotIndex = originalName.lastIndexOf('.');
+	 * 
+	 * if (dotIndex >= 0) { ext = originalName .substring(dotIndex) .toLowerCase();
+	 * }
+	 * 
+	 * if (!ext.equals(".jpg") && !ext.equals(".jpeg") && !ext.equals(".png") &&
+	 * !ext.equals(".gif") && !ext.equals(".webp")) {
+	 * 
+	 * throw new IllegalArgumentException(
+	 * "jpg, jpeg, png, gif, webp 이미지만 업로드할 수 있습니다." ); }
+	 * 
+	 * String savedName = UUID.randomUUID() + ext;
+	 * 
+	 * File uploadDir = new File( uploadBaseDir, "review" + File.separator +
+	 * reviewNo );
+	 * 
+	 * if (!uploadDir.exists() && !uploadDir.mkdirs()) {
+	 * 
+	 * throw new IOException( "리뷰 이미지 저장 폴더를 생성할 수 없습니다." ); }
+	 * 
+	 * File savedFile = new File( uploadDir, savedName );
+	 * 
+	 * file.transferTo(savedFile);
+	 * 
+	 * imageUrls.add( "/upload/review/" + reviewNo + "/" + savedName );
+	 * 
+	 * count++; }
+	 * 
+	 * return imageUrls; }
+	 */
 
     @GetMapping("/list")
     public String reviewList(
@@ -375,13 +418,13 @@ public class ReviewController {
 
         } else {
 
-            List<ReviewDTO2> writtenReviewList =
-                    reviewService
-                        .selectReviewsByMemberNo(
-                                memberNo,
-                                offset,
-                                PAGE_SIZE
-                        );
+        	List<ReviewDTO2> writtenReviewList =
+        	        reviewService
+        	            .getWrittenReviews(
+        	                    memberNo,
+        	                    offset,
+        	                    PAGE_SIZE
+        	            );
 
             model.addAttribute(
                     "writtenReviewList",

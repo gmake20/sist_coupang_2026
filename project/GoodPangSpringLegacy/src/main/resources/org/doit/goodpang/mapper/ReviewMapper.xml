@@ -407,4 +407,15 @@
     )
 
 </insert>
+
+<select id="selectReviewImageUrls"
+        resultType="string">
+
+    SELECT IMAGE_URL
+    FROM REVIEW_IMAGE
+    WHERE REVIEW_NO = #{reviewNo}
+    ORDER BY IMAGE_ORDER ASC
+
+</select>
+
 </mapper>
