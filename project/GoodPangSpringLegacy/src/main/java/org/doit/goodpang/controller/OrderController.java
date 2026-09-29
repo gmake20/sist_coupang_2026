@@ -151,19 +151,24 @@ public class OrderController {
 		 
 		 Long memberNo = customUser.getMember() .getMemberNo();
         
-			/*
-			 * // 3. 본인 주문 검증: list가 비어있거나 타인의 주문인 경우 차단 if (cancelList == null ||
-			 * cancelList.isEmpty() || cancelList.get(0).getMemberNo() != memberNo) {
-			 * rttr.addFlashAttribute("msg", "잘못된 접근이거나 본인의 주문 정보가 아닙니다."); return
-			 * "redirect:/order/order_list"; // 주문 목록으로 리다이렉트 }
-			 */
+			
+			  // 3. 본인 주문 검증: list가 비어있거나 타인의 주문인 경우 차단 
+		    if (cancelList == null ||
+			  cancelList.isEmpty() || cancelList.get(0).getMemberNo() != memberNo) {
+			  rttr.addFlashAttribute("msg", "잘못된 접근이거나 본인의 주문 정보가 아닙니다."); return
+			  "redirect:/order/order_list"; // 주문 목록으로 리다이렉트 
+			  }
+			 
+		
         if (cancelList != null && !cancelList.isEmpty()) {
             model.addAttribute("cancelList", cancelList); // ⭕ 리스트 전체 전달
 			/*
 			 * model.addAttribute("cancelList", cancelList.get(0)); // 공통 대표 정보 (주문일, 배송비 등)
 			 */        }
+		    
 
         return "order/order_cancel";
+		    
     }
          
 
