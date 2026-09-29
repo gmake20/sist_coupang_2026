@@ -136,29 +136,34 @@ public class OrderController {
     public String orderCancelForm(@RequestParam("orderNo") int orderNo, Model model) {
         log.info("> 주문 취소 페이지(Form) 진입 - orderNo: " + orderNo);
 
-        // TODO: 취소 화면에 보여줄 주문/상품 정보(cancelInfo)를 DB에서 조회하여 Model에 담습니다.
-        List<OrderDetailDTO> list = orderCancelService.getCancelInfo(orderNo);
-     // 2. 리스트가 비어있지 않다면 첫 번째 DTO 객체를 꺼내서 cancelInfo로 전달
-        if (list != null && !list.isEmpty()) {
-            OrderDetailDTO cancelInfo = list.get(0);
-            model.addAttribute("cancelInfo", cancelInfo);
-        }
-        
+     // 주문번호에 해당하는 모든 상품 목록 조회
+        List<OrderDetailDTO> cancelList = orderCancelService.getCancelInfo(orderNo);
+
+        if (cancelList != null && !cancelList.isEmpty()) {
+            model.addAttribute("cancelList", cancelList); // ⭕ 리스트 전체 전달
+			/*
+			 * model.addAttribute("cancelList", cancelList.get(0)); // 공통 대표 정보 (주문일, 배송비 등)
+			 */        }
+
+        return "order/order_cancel";
+    }
          
 
-        // Tiles를 사용하는 경우 tiles.xml의 definition 이름 또는 WEB-INF/views/order/order_cancel.jsp
-        return "order/order_cancel"; 
-    }
+      
     
     @PostMapping("/order_cancel")
     public String orderCancelAction(
             @RequestParam("orderNo") int orderNo,
-            @RequestParam("memberNo") long memberNo,
+          
             @RequestParam("cancelReason") String cancelReason,
+            Authentication authentication,
             RedirectAttributes rttr // 리다이렉트 시 1회성 메시지 전달용[cite: 7]
     ) {
-        log.info("> 주문 취소 컨트롤러 진입 - orderNo: " + orderNo + ", memberNo: " + memberNo + ", reason: " + cancelReason);
-
+        log.info("> 주문 취소 컨트롤러 진입 - orderNo: " + orderNo + ", reason: " + cancelReason);
+        
+        CustomUser customUser = (CustomUser) authentication.getPrincipal();
+        long memberNo = customUser.getMember().getMemberNo();
+        
         // 1. 주문 취소 비즈니스 로직 수행
         Integer result = orderCancelService.orderCancelAction(orderNo, memberNo, cancelReason);
 
@@ -211,7 +216,7 @@ public class OrderController {
         model.addAttribute("cancelList", cancelList);
         model.addAttribute("curPage", curPage);
         model.addAttribute("totalPages", totalPages);
-
+   
         // 5. Tiles Definition 반환
         return "order.cancel_history";
     }
