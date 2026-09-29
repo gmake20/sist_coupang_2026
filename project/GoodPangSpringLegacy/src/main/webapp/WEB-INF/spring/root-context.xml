@@ -5,9 +5,11 @@
 	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/tx https://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
@@ -61,6 +63,11 @@
            servlet-context 에 두면 루트에서 만들어진 서비스는 프록시가 안 씌워져
            @Transactional 이 에러 없이 조용히 무시됨-->
    <tx:annotation-driven transaction-manager="transactionManager" />
+
+   <!-- @Aspect 클래스(org.doit.goodpang.aop.ActionLogAspect - 판매자/관리자 액션 로그)를 동작시키는 프록시 생성기.
+        tx:annotation-driven과 같은 이유로 @Service가 만들어지는 루트 컨텍스트에 있어야 한다.
+        (SL06_AOP aop4 예제의 <aop:aspectj-autoproxy/>와 같은 설정) -->
+   <aop:aspectj-autoproxy />
 
 	<!-- p514 트랜잭션 템플릿 -->
 	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
