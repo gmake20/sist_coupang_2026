@@ -41,11 +41,11 @@ public class OrderCancelService {
                 orderCancelMapper.insertProductReturn(
                     detail.getQuantity(),       // returnQty
                     cancelReason,               // returnReason
-                    detail.getItemPrice(),      // refundAmount
+                    detail.getItemPrice() * detail.getQuantity(), // refundAmount
                     detail.getOrderDetailNo()   // orderDetailNo
                 );
             }
-
+            
             // [Step 4] 오라클 재고 복원 프로시저(PRC_ORDER_STOCK_IN) 호출[cite: 1]
             Map<String, Object> params = new HashMap<>();
             params.put("orderNo", orderNo);
