@@ -63,5 +63,6 @@
     <tiles:insertAttribute name="footer" />
 
 </body>
+<script src="${pageContext.request.contextPath}/resources/js/header.js"></script>
 
 </html>

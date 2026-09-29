@@ -226,6 +226,8 @@
 	</div>
 
 	<jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
+	
+	<script src="${pageContext.request.contextPath}/resources/js/header.js"></script>
 
 <script>
 const form = document.getElementById("withdrawCheckForm");
@@ -245,6 +247,7 @@ form.addEventListener("submit", function(e) {
     }
 });
 </script>
+
 
 </body>
 </html>
