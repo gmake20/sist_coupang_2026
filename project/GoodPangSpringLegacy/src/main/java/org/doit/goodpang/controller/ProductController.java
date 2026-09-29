@@ -135,8 +135,11 @@ public class ProductController {
 		 * model.addAttribute("reviewCount", 0); model.addAttribute("avgRating", 0.0);
 		 */
 		
-		List<ReviewDTO2> reviews =
+		/*List<ReviewDTO2> reviews =
 		        reviewService.selectReviewsByProductNo(productNo);
+		*/
+		List<ReviewDTO2> reviews = reviewService.getReviewsWithImagesByProductNo(
+                productNo);
 
 		ReviewRatingSummaryDTO reviewStats =
 		        reviewService.getRatingSummary(productNo);

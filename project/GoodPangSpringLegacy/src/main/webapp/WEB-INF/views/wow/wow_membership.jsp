@@ -298,6 +298,8 @@
     </script>
 	</c:if>
 
+	<script src="${pageContext.request.contextPath}/resources/js/header.js"></script>
+	
 	<script>
 document.addEventListener("DOMContentLoaded", function() {
     const wowCancelOpenBtn = document.getElementById("wowCancelOpenBtn");
@@ -336,6 +338,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
+
 
 </body>
 </html>

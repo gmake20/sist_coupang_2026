@@ -30,6 +30,11 @@
              <put-attribute name="topBanner" value="/WEB-INF/views/inc/top_banner.jsp" />
     </definition>
 
+	<!-- 검색 결과. SearchController 가 "search.list" 를 리턴함 (구버전 search_list.jsp 처럼 상단 띠배너 없음) -->
+	<definition name="search.list" extends="shop">
+		<put-attribute name="content" value="/WEB-INF/views/search_list.jsp" />
+	</definition>
+
 	<definition name="vendor.login"
 		template="/WEB-INF/views/vendor/login.jsp">
 	</definition>
@@ -122,7 +127,7 @@
 	        value="/WEB-INF/views/review/review_list.jsp" />
 	
 	    <put-attribute name="title"
-	        value="배송지 관리 - GoodPang" />
+	        value="GoodPang" />
 	
 	</definition>
 	
@@ -136,7 +141,7 @@
 	        value="/WEB-INF/views/review/review_write.jsp" />
 	
 	    <put-attribute name="title"
-	        value="배송지 관리 - GoodPang" />
+	        value="GoodPang" />
 	
 	</definition>
 

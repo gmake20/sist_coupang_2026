@@ -151,7 +151,7 @@
 
     </div>
 </div>
-
+<script src="${pageContext.request.contextPath}/resources/js/header.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const paymentTypes = document.querySelectorAll('input[name="paymentType"]');

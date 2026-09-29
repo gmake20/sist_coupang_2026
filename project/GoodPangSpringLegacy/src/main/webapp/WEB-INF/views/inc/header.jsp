@@ -774,7 +774,7 @@
 								<span class="wrapper"> <i class="arrow"></i> <a
 									href="${pageContext.request.contextPath}/order/order_list">
 
-										주문목록 </a> <a href="#"> 취소/반품 </a> <a href="#"> 찜 리스트 </a>
+										주문목록 </a> <a href="${pageContext.request.contextPath}/order/cancel_history"> 취소/반품 </a> <a href="#"> 찜 리스트 </a>
 
 								</span>
 
@@ -805,10 +805,13 @@
 															<div class="cart-preview-image">
 																<c:choose>
 																	<c:when test="${not empty item.imageUrl}">
-																		<img
+																		<%-- <img
 																			src="${pageContext.request.contextPath}/${item.imageUrl}"
-																			alt="${item.productName}">
-																	</c:when>
+																			alt="${item.productName}"> --%>
+																			    <img
+																			        src="${img:url(item.imageUrl)}"
+																			        alt="${item.productName}">
+																			</c:when>
 																	<c:otherwise>
 																		<span>이미지</span>
 																	</c:otherwise>
@@ -835,7 +838,8 @@
 										<c:otherwise>
 											<div class="cart-preview-empty">장바구니에 담은 상품이 없습니다.</div>
 										</c:otherwise>
-									</c:choose> <a href="${pageContext.request.contextPath}/cart"
+									</c:choose> 
+									<a href="${pageContext.request.contextPath}/cart"
 									class="cart-btn"> <span> 장바구니 전체보기 <!-- <i
 											class="blue-arrow"></i> -->
 									</span>
@@ -1124,6 +1128,8 @@
 <script>
 (function() {
     const cartContextPath = '${pageContext.request.contextPath}';
+    
+    const cartImageBaseUrl = 'http://scym3.cafe24.com:8080';
     /* const isLoggedIn = ${not empty sessionScope.loginMember ? 'true' : 'false'}; */
     
      let isLoggedIn = false;
@@ -1230,12 +1236,31 @@
         }
     }
 
-    function getCartImageUrl(imageUrl) {
+/*     function getCartImageUrl(imageUrl) {
         if (!imageUrl) return '';
 
         imageUrl = String(imageUrl).replace(/^\/+/, '');
 
         return window.location.origin + cartContextPath + '/' + imageUrl;
+    }
+     */
+    function getCartImageUrl(imageUrl) {
+
+        if (!imageUrl) {
+            return '';
+        }
+
+        imageUrl = String(imageUrl).trim();
+
+        if (imageUrl.startsWith('http://')
+                || imageUrl.startsWith('https://')) {
+            return imageUrl;
+        }
+
+        imageUrl =
+            imageUrl.replace(/^\/+/, '');
+
+        return cartImageBaseUrl + '/' + imageUrl;
     }
 
     function escapeHtml(value) {

@@ -119,6 +119,8 @@ chmod +x /root/restart.sh
 
 ## GoodPangSpringLegacy 배포 (`/restart`)
 
+> 서버 설정, 스크립트 동작, 트러블슈팅 상세는 [cicd_springlegacy.md](cicd_springlegacy.md) 참고.
+
 Spring Legacy 버전(`project/GoodPangSpringLegacy`)은 별도 Tomcat 9에 Maven으로 빌드해 배포한다.
 Spring 5.0.7이 `javax.servlet` 기반이라 Tomcat 10(jakarta)에서는 뜨지 않는다.
 

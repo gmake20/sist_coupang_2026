@@ -240,8 +240,15 @@
         </form>
 
     </section>
+    
+    <c:if test="${not empty error}">
+    <script>
+        alert("${error}");
+    </script>
+</c:if>
 
 </main>
+
 
 
 <script

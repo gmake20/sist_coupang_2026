@@ -1,10 +1,12 @@
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld"%>
 <%-- =========================================================
      business_info.jsp — 판매자 정보관리 (Tiles "vendor.business_info"의 content)
      '입점 대기'/'반려' 판매자는 입점 심사용 정보를 제출하고, '승인' 판매자는 같은 정보를 수정한다.
-     값은 세션의 loginSeller에서 채우고, 제출 실패 시 VendorController가 error 메시지를 넘겨준다.
+     값은 세션의 loginSeller에서 채우고, 제출 실패 시 VendorController가 error 메시지를,
+     저장 성공 시에는 redirect 후 flash 속성으로 message를 넘겨준다.
      (기존 GoodPang vendor-business-info.jsp의 본문 부분 - 스크립틀릿을 EL로 바꿈)
 ========================================================= --%>
 <c:set var="seller" value="${sessionScope.loginSeller}" />
@@ -23,6 +25,9 @@
 
       <c:if test="${not empty error}">
         <p class="message error show"><c:out value="${error}" /></p>
+      </c:if>
+      <c:if test="${not empty message}">
+        <p class="message success show"><c:out value="${message}" /></p>
       </c:if>
 
       <section class="panel business-info-card">
@@ -113,7 +118,12 @@
               <label class="label" for="businessCert">사업자등록증</label>
               <input class="input" id="businessCert" name="businessCert" type="file" accept=".jpg,.jpeg,.png">
               <c:if test="${not empty seller.businessCertUrl}">
-                <p class="message">기존 첨부파일이 있습니다. 새로 첨부하지 않으면 기존 파일이 유지됩니다.</p>
+                <%-- .message는 show가 있어야 보인다 (없으면 display:none) --%>
+                <p class="message show">기존 첨부파일이 있습니다. 새로 첨부하지 않으면 기존 파일이 유지됩니다.</p>
+                <a class="doc-preview" href="${img:url(seller.businessCertUrl)}" target="_blank" rel="noopener">
+                  <img src="${img:url(seller.businessCertUrl)}" alt="현재 등록된 사업자등록증">
+                  <span>현재 등록된 사업자등록증 보기</span>
+                </a>
               </c:if>
             </div>
 
@@ -121,7 +131,11 @@
               <label class="label" for="mailOrderCert">통신판매신고증</label>
               <input class="input" id="mailOrderCert" name="mailOrderCert" type="file" accept=".jpg,.jpeg,.png">
               <c:if test="${not empty seller.mailOrderCertUrl}">
-                <p class="message">기존 첨부파일이 있습니다. 새로 첨부하지 않으면 기존 파일이 유지됩니다.</p>
+                <p class="message show">기존 첨부파일이 있습니다. 새로 첨부하지 않으면 기존 파일이 유지됩니다.</p>
+                <a class="doc-preview" href="${img:url(seller.mailOrderCertUrl)}" target="_blank" rel="noopener">
+                  <img src="${img:url(seller.mailOrderCertUrl)}" alt="현재 등록된 통신판매신고증">
+                  <span>현재 등록된 통신판매신고증 보기</span>
+                </a>
               </c:if>
             </div>
 

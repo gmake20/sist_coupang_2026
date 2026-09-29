@@ -142,7 +142,10 @@
 		<h3>MY 정보</h3>
 		<a href="${pageContext.request.contextPath}/member/modify" 
 		   class="${param.activeMenu eq 'member_modify' ? 'active' : ''}">개인정보확인/수정</a>
-		<a href="#" class="${param.activeMenu eq 'pay' ? 'active' : ''}">결제수단·쿠페이 관리</a>
+		   
+		<a href="${pageContext.request.contextPath}/payment-method/list"
+		 class="${param.activeMenu eq 'pay' ? 'active' : ''}">결제수단·쿠페이 관리</a>
+		
 		<a href="${pageContext.request.contextPath}/address/list" 
 		   class="${param.activeMenu eq 'address' ? 'active' : ''}">배송지 관리</a>
 		<a href="#" class="${param.activeMenu eq 'passkey' ? 'active' : ''}">패스키 관리</a>

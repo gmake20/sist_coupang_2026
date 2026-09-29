@@ -39,7 +39,6 @@ import org.doit.goodpang.domain.VendorSettlementDTO;
 import org.doit.goodpang.domain.VendorSettlementDetailDTO;
 import org.doit.goodpang.domain.VendorShippingDTO;
 import org.doit.goodpang.mapper.NoticeMapper;
-import org.doit.goodpang.mapper.VendorActionLogMapper;
 import org.doit.goodpang.mapper.VendorDashboardMapper;
 import org.doit.goodpang.mapper.VendorMapper;
 import org.doit.goodpang.mapper.VendorOrderMapper;
@@ -62,6 +61,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,7 +76,6 @@ public class VendorController {
 	private final VendorDashboardMapper vendorDashboardMapper;
 	private final VendorProductMapper vendorProductMapper;
 	private final VendorOrderMapper vendorOrderMapper;
-	private final VendorActionLogMapper vendorActionLogMapper;
 	private final VendorOrderService vendorOrderService;
 	private final VendorSettlementMapper vendorSettlementMapper;
 	private final NoticeMapper noticeMapper;
@@ -361,7 +360,9 @@ public class VendorController {
 	 * JSON {success, message, productNo}를 받는다. 이미지는 먼저 디스크에 저장한 뒤,
 	 * 저장된 URL과 함께 PRODUCT/PRODUCT_OPTION/PRODUCT_IMAGE를 한 트랜잭션으로 INSERT한다(VendorProductService).
 	 */
-	@PostMapping(value = "/product_write.htm", produces = "application/json;charset=UTF-8")
+	// 주소를 .htm이 아니라 .json으로 둔 이유: Spring 5.0 기본 설정은 URL 확장자로 응답 형식을 정하는데(favorPathExtension),
+	// .htm이면 "HTML을 원하는 요청"으로 보고 JSON 응답(produces=application/json)과 맞지 않아 406 Not Acceptable이 난다.
+	@PostMapping(value = "/product_write.json", produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> productWritePost(MultipartHttpServletRequest request, HttpSession session) {
 
@@ -398,13 +399,8 @@ public class VendorController {
 				return writeResult(400, false, "옵션을 최소 1개 이상 추가해주세요.", 0);
 			}
 
+			// 판매자 액션 로그("상품 등록")는 ActionLogAspect가 남긴다
 			int productNo = vendorProductService.registerProduct(dto);
-
-			try {
-				vendorActionLogMapper.insertLog(loginSeller.getSellerNo(), "상품 등록", "PRODUCT", productNo, dto.getProductName());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 
 			return writeResult(200, true, null, productNo);
 
@@ -855,16 +851,8 @@ public class VendorController {
 		int sellerNo = loginSeller.getSellerNo();
 		String trimmedInvoiceNo = invoiceNo.trim();
 
+		// 성공(SUCCESS)하면 판매자 액션 로그("배송 처리")는 ActionLogAspect가 트랜잭션 commit 뒤에 남긴다
 		ShipResult result = vendorOrderService.shipOrder(orderNo, sellerNo, trimmedInvoiceNo);
-
-		if (result == ShipResult.SUCCESS) {
-			// 로그 기록 실패가 출고 처리 자체를 되돌리면 안 되므로 트랜잭션 밖에서 따로 남긴다 (기존과 동일)
-			try {
-				vendorActionLogMapper.insertLog(sellerNo, "배송 처리", "ORDERS", orderNo, "송장번호 " + trimmedInvoiceNo);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 
 		String shipErrorParam = (result == ShipResult.INVOICE_DUPLICATE) ? "?shipError=duplicateInvoice" : "";
 
@@ -1107,14 +1095,8 @@ public class VendorController {
 
 		int sellerNo = loginSeller.getSellerNo();
 
-		if (vendorProductMapper.updateDisplayYn(productNo, sellerNo, displayYn) == 1) {
-			String actionType = "Y".equals(displayYn) ? "상품 노출" : "상품 숨김";
-			try {
-				vendorActionLogMapper.insertLog(sellerNo, actionType, "PRODUCT", productNo, null);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		// 바뀌었으면 판매자 액션 로그("상품 노출"/"상품 숨김")는 ActionLogAspect가 남긴다
+		vendorProductService.changeDisplayYn(productNo, sellerNo, displayYn);
 
 		return new ModelAndView("redirect:/vendor/product.htm");
 	}
@@ -1149,14 +1131,8 @@ public class VendorController {
 
 		int sellerNo = loginSeller.getSellerNo();
 
-		if (vendorProductMapper.updateSaleStatus(productNo, sellerNo, saleStatus) == 1) {
-			String actionType = "판매 중".equals(saleStatus) ? "판매 재개" : "판매 중지";
-			try {
-				vendorActionLogMapper.insertLog(sellerNo, actionType, "PRODUCT", productNo, null);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		// 바뀌었으면 판매자 액션 로그("판매 재개"/"판매 중지")는 ActionLogAspect가 남긴다
+		vendorProductService.changeSaleStatus(productNo, sellerNo, saleStatus);
 
 		return new ModelAndView("redirect:/vendor/product.htm");
 	}
@@ -1193,14 +1169,8 @@ public class VendorController {
 
 			int sellerNo = loginSeller.getSellerNo();
 
-			if (vendorProductMapper.updateOption(optionId, sellerNo, price, normalPrice, quantity, status) == 1) {
-				String detail = "판매가 " + price + "원, 재고 " + quantity + "개, 상태 " + ("Y".equals(status) ? "정상" : "품절");
-				try {
-					vendorActionLogMapper.insertLog(sellerNo, "옵션 수정", "PRODUCT_OPTION", optionId, detail);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+			// 바뀌었으면 판매자 액션 로그("옵션 수정")는 ActionLogAspect가 남긴다
+			vendorProductService.updateOption(optionId, sellerNo, price, normalPrice, quantity, status);
 
 		} catch (NumberFormatException e) {
 			// 값이 없거나 숫자가 아니면 아무 것도 바꾸지 않고 목록으로 돌려보낸다.
@@ -1229,10 +1199,12 @@ public class VendorController {
 	/*
 	 * 판매자 정보관리 제출 (multipart - 서류 이미지 첨부). '입점 대기'/'반려' 상태에서 제출하면 '심사 중'으로 바뀌고,
 	 * '승인' 상태에서 수정하는 경우는 재심사로 되돌리지 않는다(VendorMapper.updateBusinessInfo).
-	 * 성공하면 세션의 loginSeller를 DB 최신값으로 갱신하고 대시보드로, 실패하면 같은 화면에 error를 보여준다.
+	 * 성공하면 세션의 loginSeller를 DB 최신값으로 갱신하고 같은 화면으로 돌아와 저장 완료 메시지(flash)를,
+	 * 실패하면 같은 화면에 error를 보여준다.
 	 */
 	@PostMapping(value = "/business_info.htm")
-	public ModelAndView businessInfoPost(MultipartHttpServletRequest request, HttpSession session) throws Exception {
+	public ModelAndView businessInfoPost(MultipartHttpServletRequest request, HttpSession session,
+			RedirectAttributes redirectAttributes) throws Exception {
 
 		SellerDTO loginSeller = (SellerDTO) session.getAttribute("loginSeller");
 
@@ -1295,7 +1267,15 @@ public class VendorController {
 		SellerDTO refreshed = vendorMapper.findByEmail(loginSeller.getEmail());
 		session.setAttribute("loginSeller", refreshed);
 
-		return new ModelAndView("redirect:/vendor/dashboard.htm");
+		// 기존에는 안내 없이 대시보드로 보내서, 저장이 됐는지 알 수 없었다 (특히 이미 '승인'된 판매자는 화면 변화가 없음).
+		// 같은 화면으로 돌아와 저장 완료 메시지와 방금 올린 서류를 바로 확인할 수 있게 한다.
+		// flash 속성은 redirect 뒤 한 번만 보이고 사라지므로 새로고침해도 메시지가 반복되지 않는다.
+		String savedMessage = "심사 중".equals(refreshed.getApprovalStatus()) && !"심사 중".equals(loginSeller.getApprovalStatus())
+				? "판매자 정보가 제출되었습니다. 입점 심사가 완료되면 상품을 등록할 수 있습니다."
+				: "판매자 정보가 저장되었습니다.";
+		redirectAttributes.addFlashAttribute("message", savedMessage);
+
+		return new ModelAndView("redirect:/vendor/business_info.htm");
 	}
 
 	// 판매자 정보관리 화면 (error가 있으면 상단에 표시)
@@ -1460,13 +1440,8 @@ public class VendorController {
 
 		int sellerNo = loginSeller.getSellerNo();
 
+		// 판매자 액션 로그("판매자 탈퇴")는 ActionLogAspect가 남긴다
 		vendorAccountService.withdraw(sellerNo);
-
-		try {
-			vendorActionLogMapper.insertLog(sellerNo, "판매자 탈퇴", "SELLER", sellerNo, null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 		session.invalidate();
 

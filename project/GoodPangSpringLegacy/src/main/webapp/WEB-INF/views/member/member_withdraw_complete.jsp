@@ -71,6 +71,7 @@
 </div>
 
 <jsp:include page="${pageContext.request.contextPath}/WEB-INF/views/inc/footer.jsp" />
+<script src="${pageContext.request.contextPath}/resources/js/header.js"></script>
 
 </body>
 </html>

@@ -200,11 +200,11 @@
         ) VALUES (
             (SELECT NVL(MAX(return_no), 0) + 1 FROM PRODUCT_RETURN), 
             SYSDATE, 
-            #{return_qty}, 
-            #{return_reason}, 
+            #{returnQty}, 
+            #{returnReason}, 
             '취소완료', 
-            #{refund_amount}, 
-            #{order_detail_no}
+            #{refundAmount}, 
+            #{orderDetailNo}
         )
     </insert>
 

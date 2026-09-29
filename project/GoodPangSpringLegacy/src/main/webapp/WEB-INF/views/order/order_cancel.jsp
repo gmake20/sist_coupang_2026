@@ -145,15 +145,16 @@
 </div>
 
 <!-- 취소 액션 제출용 동적 폼 -->
+<%-- 
 <form id="cancelForm" action="${pageContext.request.contextPath}/order/cancel_action" method="post">
-    <!-- Spring Security CSRF 토큰 태그 (사용 중이라면 주석 해제) -->
-    <%-- <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/> --%>
+     Spring Security CSRF 토큰 태그 (사용 중이라면 주석 해제) 
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
     <input type="hidden" name="orderNo" id="formOrderNo" />
     <input type="hidden" name="memberNo" id="formMemberNo" />
     <input type="hidden" name="cancelReason" id="formCancelReason" />
     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 </form>
-
+ --%>
 
 <script>
 function cancelOrder(orderNo) {
@@ -175,7 +176,7 @@ function cancelOrder(orderNo) {
 
     // 3. Hidden Form에 값 바인딩 후 POST 제출 (백엔드 로직 호출)
     document.getElementById("formOrderNo").value = orderNo;
-    document.getElementById("formMemberNo").value = memberNo;
+    // document.getElementById("formMemberNo").value = memberNo;
     document.getElementById("formCancelReason").value = reasonText;
 
     // ⭕ 폼 제출 -> 컨트롤러(@PostMapping("/order_cancel")) -> DB 3단 처리 -> cancel_confirm 이동
