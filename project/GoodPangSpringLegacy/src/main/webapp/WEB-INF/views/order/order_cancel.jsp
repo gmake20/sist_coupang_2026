@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+
 <!-- ★ 팀원들이 만든 커스텀 TLD 태그라이브러리 추가 -->
 <%@ taglib prefix="img" uri="/WEB-INF/goodpang-functions.tld" %>
 
@@ -22,10 +23,12 @@
     <!-- 주문 상품 정보 -->
     <section class="cancel-section">
         <h2>주문 상품</h2>
+        <c:forEach var="cancelInfo" items="${cancelList}">
         <div class="product-box">
-            <div class="product-img">
-                <div class="clothes-icon">👕</div>
-            </div>
+         <!-- 상품 이미지 출력 영역 -->
+				<div class="product-img">
+				    <img src="${img:url(cancelInfo.imageUrl)}" alt="${cancelInfo.productName}" />
+				</div>
             <div class="product-info">
                 <p class="product-name">
                     <span class="rocket-badge">🚀 로켓배송</span> ${cancelInfo.productName}
@@ -44,10 +47,11 @@
                 </c:if>
                 <p class="product-count">수량 : ${cancelInfo.quantity}개</p>
                 <strong class="product-price">
-                    <fmt:formatNumber value="${cancelInfo.itemPrice}" pattern="#,###" />원
+                    <fmt:formatNumber value="${cancelInfo.itemPrice * cancelInfo.quantity}" pattern="#,###" />원
                 </strong>
             </div>
         </div>
+        </c:forEach>
     </section>
 
     <!-- 취소 사유 선택 -->
@@ -63,26 +67,56 @@
         </select>
     </section>
 
-    <!-- 환불 정보 -->
+    <%-- <!-- 환불 정보 -->
     <section class="cancel-section">
         <h2>환불 정보</h2>
+      
         <div class="refund-box">
             <div class="refund-row">
                 <span>상품 금액</span>
-                <strong><fmt:formatNumber value="${cancelInfo.totalPrice - cancelInfo.deliveryFee}" pattern="#,###" />원</strong>
+                <strong><fmt:formatNumber value="${cancelList.totalPrice - cancelList.deliveryFee}" pattern="#,###" />원</strong>
             </div>
             <div class="refund-row">
                 <span>배송비</span>
-                <strong><fmt:formatNumber value="${cancelInfo.deliveryFee}" pattern="#,###" />원</strong>
+                <strong><fmt:formatNumber value="${cancelList.deliveryFee}" pattern="#,###" />원</strong>
             </div>
             <div class="refund-line"></div>
             <div class="refund-row total">
                 <span>환불 예정 금액</span>
-                <strong class="total-price"><fmt:formatNumber value="${cancelInfo.totalPrice}" pattern="#,###" />원</strong>
+                <strong class="total-price"><fmt:formatNumber value="${cancelList.totalPrice}" pattern="#,###" />원</strong>
             </div>
         </div>
-    </section>
+    </section>  --%>
+    
+    <!-- 1. 리스트를 돌면서 총 환불금액 계산 -->
+<c:set var="totalProductPrice" value="0" />
+<c:set var="deliveryFee" value="${cancelList[0].deliveryFee}" />
 
+<c:forEach var="item" items="${cancelList}">
+    <c:set var="totalProductPrice" value="${totalProductPrice + (item.itemPrice * item.quantity)}" />
+</c:forEach>
+
+<!-- 2. 환불 정보 영역 출력 -->
+<section class="cancel-section">
+    <h2>환불 정보</h2>
+    <div class="refund-box">
+        <div class="refund-row">
+            <span>상품 금액</span>
+            <strong><fmt:formatNumber value="${totalProductPrice}" pattern="#,###" />원</strong>
+        </div>
+        <div class="refund-row">
+            <span>배송비</span>
+            <strong><fmt:formatNumber value="${deliveryFee}" pattern="#,###" />원</strong>
+        </div>
+        <div class="refund-line"></div>
+        <div class="refund-row total">
+            <span>환불 예정 금액</span>
+            <strong class="total-price"><fmt:formatNumber value="${totalProductPrice + deliveryFee}" pattern="#,###" />원</strong>
+        </div>
+    </div>
+</section>
+    
+   
     <!-- 주문 취소 안내 -->
     <section class="notice">
         <h3>주문 취소 안내</h3>
@@ -93,12 +127,20 @@
         </ul>
     </section>
 
-    <!-- 버튼 영역 -->
-    <div class="button-area">
-        <button type="button" class="cancel-submit" onclick="cancelOrder(${cancelInfo.orderNo}, ${cancelInfo.memberNo});">
-            주문 취소하기
-        </button>
-    </div>
+    <!-- 취소 버튼 영역 -->
+<div class="button-area">
+    <button type="button" class="cancel-submit" onclick="cancelOrder(${cancelList[0].orderNo});">
+        주문 취소하기
+    </button>
+</div>
+
+<!-- 서버로 전송할 Hidden Form (페이지 하단에 위치) -->
+<form id="cancelForm" action="${pageContext.request.contextPath}/order/order_cancel" method="post">
+    <input type="hidden" id="formOrderNo" name="orderNo" value="" />
+    <input type="hidden" id="formCancelReason" name="cancelReason" value="" />
+    <!-- Spring Security 사용 시 CSRF 토큰 태그 -->
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+</form>
 
 </div>
 
@@ -109,24 +151,34 @@
     <input type="hidden" name="orderNo" id="formOrderNo" />
     <input type="hidden" name="memberNo" id="formMemberNo" />
     <input type="hidden" name="cancelReason" id="formCancelReason" />
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 </form>
 
-<script>
-function cancelOrder(orderNo, memberNo) {
-    const reasonSelect = document.getElementById("cancelReason");
-    const reason = reasonSelect.options[reasonSelect.selectedIndex].text;
 
-    if (!reasonSelect.value) {
+<script>
+function cancelOrder(orderNo) {
+    const reasonSelect = document.getElementById("cancelReason");
+    
+    // 1. 유효성 검사
+    if (!reasonSelect || !reasonSelect.value) {
         alert("취소 사유를 선택해주세요.");
-        reasonSelect.focus();
+        if (reasonSelect) reasonSelect.focus();
         return;
     }
 
+    const reasonText = reasonSelect.options[reasonSelect.selectedIndex].text;
+
+    // 2. 컨펌 창
     if (!confirm("정말 주문을 취소하시겠습니까?")) {
         return;
     }
 
-    // 서버로 Form을 제출하지 않고 직접 취소 완료 페이지로 이동
-    location.href = "${pageContext.request.contextPath}/order/cancel_confirm?orderNo=" + orderNo;
+    // 3. Hidden Form에 값 바인딩 후 POST 제출 (백엔드 로직 호출)
+    document.getElementById("formOrderNo").value = orderNo;
+    document.getElementById("formMemberNo").value = memberNo;
+    document.getElementById("formCancelReason").value = reasonText;
+
+    // ⭕ 폼 제출 -> 컨트롤러(@PostMapping("/order_cancel")) -> DB 3단 처리 -> cancel_confirm 이동
+    document.getElementById("cancelForm").submit();
 }
 </script>

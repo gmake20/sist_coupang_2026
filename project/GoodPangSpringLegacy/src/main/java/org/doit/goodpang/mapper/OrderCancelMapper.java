@@ -1,6 +1,8 @@
 package org.doit.goodpang.mapper;
 
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 import org.doit.goodpang.domain.OrderDetailDTO;
 
@@ -23,6 +25,8 @@ public interface OrderCancelMapper {
             @Param("refundAmount") long refundAmount,
             @Param("orderDetailNo") long orderDetailNo
     );
+ // 4. ★ 재고 복원 프로시저(PRC_ORDER_STOCK_IN) 호출
+    void restoreStock(Map<String, Object> params);
     
  // cancel_history
 
