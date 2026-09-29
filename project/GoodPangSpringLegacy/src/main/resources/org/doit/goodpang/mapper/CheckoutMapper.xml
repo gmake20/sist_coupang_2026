@@ -563,6 +563,121 @@
     </select>
     
     <select id="getCheckoutItemsPRODUCT"
+        resultType="org.doit.goodpang.domain.CheckoutItemDTO">
+
+    SELECT
+        ci.CHECKOUT_ITEM_NO AS checkoutItemNo,
+        ci.CHECKOUT_NO      AS checkoutNo,
+        ci.PRODUCT_NO       AS productNo,
+        ci.OPTION_ID        AS optionId,
+        ci.ORDER_QTY        AS orderQty,
+        ci.PRICE            AS price,
+
+        p.PRODUCT_NAME      AS productName,
+
+        (
+            SELECT pi.IMAGE_URL
+            FROM PRODUCT_IMAGE pi
+            WHERE pi.PRODUCT_NO = p.PRODUCT_NO
+
+            ORDER BY
+                CASE
+                    WHEN pi.OPTION_ID = ci.OPTION_ID
+                         AND pi.IMAGE_PURPOSE = '대표'
+                    THEN 0
+
+                    WHEN pi.OPTION_ID = ci.OPTION_ID
+                    THEN 1
+
+                    WHEN pi.IMAGE_PURPOSE = '대표'
+                    THEN 2
+
+                    ELSE 3
+                END
+
+            FETCH FIRST 1 ROW ONLY
+        ) AS productImage,
+
+        RTRIM(
+            CASE
+                WHEN po.OPTION1_VALUE IS NOT NULL
+                     AND TRIM(po.OPTION1_VALUE) IS NOT NULL
+                THEN
+                    CASE
+                        WHEN po.OPTION1_TYPE IS NOT NULL
+                        THEN po.OPTION1_TYPE || ' : '
+                        ELSE ''
+                    END
+                    || po.OPTION1_VALUE
+                ELSE ''
+            END
+
+            ||
+
+            CASE
+                WHEN po.OPTION2_VALUE IS NOT NULL
+                     AND TRIM(po.OPTION2_VALUE) IS NOT NULL
+                THEN
+                    CASE
+                        WHEN po.OPTION1_VALUE IS NOT NULL
+                             AND TRIM(po.OPTION1_VALUE) IS NOT NULL
+                        THEN ' / '
+                        ELSE ''
+                    END
+                    ||
+                    CASE
+                        WHEN po.OPTION2_TYPE IS NOT NULL
+                        THEN po.OPTION2_TYPE || ' : '
+                        ELSE ''
+                    END
+                    || po.OPTION2_VALUE
+                ELSE ''
+            END
+
+            ||
+
+            CASE
+                WHEN po.OPTION3_VALUE IS NOT NULL
+                     AND TRIM(po.OPTION3_VALUE) IS NOT NULL
+                THEN
+                    CASE
+                        WHEN (
+                            po.OPTION1_VALUE IS NOT NULL
+                            AND TRIM(po.OPTION1_VALUE) IS NOT NULL
+                        )
+                        OR (
+                            po.OPTION2_VALUE IS NOT NULL
+                            AND TRIM(po.OPTION2_VALUE) IS NOT NULL
+                        )
+                        THEN ' / '
+                        ELSE ''
+                    END
+                    ||
+                    CASE
+                        WHEN po.OPTION3_TYPE IS NOT NULL
+                        THEN po.OPTION3_TYPE || ' : '
+                        ELSE ''
+                    END
+                    || po.OPTION3_VALUE
+                ELSE ''
+            END
+        ) AS optionName
+
+    FROM CHECKOUT_ITEM ci
+
+    JOIN PRODUCT p
+      ON ci.PRODUCT_NO = p.PRODUCT_NO
+
+    LEFT JOIN PRODUCT_OPTION po
+      ON ci.OPTION_ID = po.OPTION_ID
+
+    WHERE ci.CHECKOUT_NO = #{checkoutNo}
+
+    ORDER BY ci.CHECKOUT_ITEM_NO
+
+</select>
+    
+    <!-- <select id="getCheckoutItemsPRODUCT"
             resultType="org.doit.goodpang.domain.CheckoutItemDTO">
 
         SELECT
@@ -664,6 +779,6 @@
 
         ORDER BY ci.CHECKOUT_ITEM_NO
 
-    </select>
+    </select> -->
 
 </mapper>
