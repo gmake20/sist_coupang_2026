@@ -263,12 +263,6 @@ public class ReviewService {
                     reviewMapper.selectReviewImageUrls(
                             review.getReviewNo()
                     );
-            System.out.println(
-                    "reviewNo = "
-                    + review.getReviewNo()
-                    + ", imageUrls = "
-                    + review.getImageUrls()
-            );
 
             review.setImageUrls(imageUrls);
         }
