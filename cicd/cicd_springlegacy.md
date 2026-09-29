@@ -252,6 +252,9 @@ bash /root/deploy_legacy.sh
 
 실패 시 Slack에는 로그의 **뒷부분**(최대 3500자)이 표시된다. 에러 원인은 보통 로그 끝에 있기 때문이다.
 
+
+![Slack](../docs/capture/scm/slack.png)
+
 ## 6. 운영
 
 | 작업 | 방법 |
