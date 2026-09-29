@@ -565,3 +565,59 @@ AOP는 **DI 덕분에 동작함**
 - 프록시가 트랜잭션·로그를 처리한 뒤 진짜 Service를 호출
 - `new VendorProductService()`로 직접 만들면 프록시를 거치지 않아 로그도 트랜잭션도 동작하지 않음
 - 같은 클래스 안에서 자기 메서드를 호출할 때 AOP가 안 걸리는 것도 같은 이유
+
+---
+
+## 부록. root-context.xml과 servlet-context.xml에 둘 다 component-scan이 있는 이유
+
+Spring Legacy에는 **컨테이너(ApplicationContext)가 두 개** 있고, 각자 자기 빈을 따로 등록함 → 같은 패키지를 스캔하되 **필터로 나눠서 겹치지 않게** 함
+
+### 컨테이너가 두 개인 이유
+
+| 설정 파일 | 누가 읽는가 | 컨테이너 | 담당 |
+|---|---|---|---|
+| `root-context.xml` | `ContextLoaderListener` | **Root(부모)** | Service, Mapper, DataSource, 트랜잭션, AOP, Security |
+| `servlet-context.xml` | `DispatcherServlet` | **Servlet(자식)** | Controller, ViewResolver(Tiles), multipartResolver 등 웹 관련 |
+
+```
+Root 컨텍스트 (부모)        ← Service, Mapper, Aspect
+   └ Servlet 컨텍스트 (자식) ← Controller
+```
+
+- **자식은 부모의 빈을 볼 수 있음** → Controller가 Service를 주입받을 수 있음
+- **부모는 자식의 빈을 볼 수 없음** → Service는 Controller를 모름
+
+### 이 프로젝트의 나눔
+
+```xml
+<!-- root-context.xml : Controller만 빼고 전부 -->
+<context:component-scan base-package="org.doit.goodpang">
+    <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+</context:component-scan>
+
+<!-- servlet-context.xml : Controller만 -->
+<context:component-scan base-package="org.doit.goodpang" use-default-filters="false">
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+</context:component-scan>
+```
+
+- `use-default-filters="false"`가 중요 - 없으면 기본 필터(`@Component`, `@Service` 등)가 그대로 살아 있어 include 필터를 줘도 **전부** 스캔됨
+
+### 한쪽에서 전부 스캔하면 생기는 문제
+
+**servlet-context.xml에서 전체를 스캔하면** → Service가 **두 벌** 생김 (부모에 하나, 자식에 하나)
+1. Controller는 가까운 **자식 컨텍스트의 Service**를 주입받음
+2. `<tx:annotation-driven>`, `<aop:aspectj-autoproxy>`는 **root-context.xml에만** 있음
+3. 자식 쪽 Service는 프록시가 아닌 **진짜 객체** → **`@Transactional`과 ActionLogAspect가 조용히 동작하지 않음**
+
+(9번의 "`<tx:annotation-driven>`은 root-context.xml에 있어야 동작"과 같은 이유 - 이 설정들은 **자기 컨테이너 안의 빈에만** 적용됨)
+
+**root-context.xml에서 Controller까지 스캔하면** → `DispatcherServlet`은 자식 컨텍스트에서 Controller를 찾기 때문에 URL 매핑이 안 되거나 중복 빈이 생길 수 있음
+
+### 요약
+
+| | root-context.xml | servlet-context.xml |
+|---|---|---|
+| 스캔 대상 | Controller **제외** 전부 | Controller **만** |
+| 이유 | 트랜잭션·AOP가 적용되는 곳에 Service가 있어야 함 | DispatcherServlet이 자기 컨텍스트에서 Controller를 찾음 |
+| 겹치면 | 빈이 두 벌 생기고, 트랜잭션·AOP가 안 걸린 쪽이 주입될 수 있음 | |
