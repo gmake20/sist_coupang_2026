@@ -250,41 +250,49 @@ uri="http://www.springframework.org/security/tags" %>
 							style="text-decoration:none; color:inherit; display:block;">
 
 							
-								<div class="item-img-placeholder"
-								     style="width:100%;
-								            height:160px;
-								            border-radius:6px;
-								            background:#f8f8f8;
-								            overflow:hidden;
-								            display:flex;
-								            align-items:center;
-								            justify-content:center;
-								            margin-bottom:10px;
-								            box-sizing:border-box;">
-								
-								    <c:choose>
-								
-								        <c:when test="${not empty product.imageUrl}">
-								            <img src="${img:url(product.imageUrl)}"
-								                 alt="${product.productName}"
-								                 style="width:100%;
-								                        height:100%;
-								                        max-width:100%;
-								                        max-height:100%;
-								                        object-fit:cover;
-								                        display:block;">
-								        </c:when>
-								
-								        <c:otherwise>
-								            <span style="font-size:13px; color:#aaa;">
-								                이미지 없음
-								            </span>
-								        </c:otherwise>
-								
-								    </c:choose>
-								
-								</div>
+                        <div class="recommend-img"
+						     style="width:100%;
+						            height:160px;
+						            margin:0 0 10px 0;
+						            padding:0;
+						            border-radius:6px;
+						            background:#f8f8f8;
+						            overflow:hidden;
+						            display:flex;
+						            align-items:center;
+						            justify-content:center;
+						            box-sizing:border-box;">
 
+    <c:choose>
+
+        <c:when test="${not empty product.imageUrl}">
+
+            <img src="${img:url(product.imageUrl)}"
+                 alt="${product.productName}"
+                 style="width:100%;
+                        height:100%;
+                        max-width:100%;
+                        max-height:100%;
+                        object-fit:cover;
+                        object-position:center;
+                        display:block;
+                        margin:0;
+                        padding:0;">
+
+        </c:when>
+
+        <c:otherwise>
+
+            <span style="font-size:13px;
+                         color:#aaa;">
+                이미지 없음
+            </span>
+
+        </c:otherwise>
+
+    </c:choose>
+
+</div>
 							<span class="ad-name"
 								style="font-size:13px; color:#333;
 								display:-webkit-box;
