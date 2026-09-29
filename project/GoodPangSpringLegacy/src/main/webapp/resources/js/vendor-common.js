@@ -89,3 +89,17 @@ document.addEventListener("click", function () {
     panel.classList.remove("open");
   });
 });
+
+/*
+ * 숫자 입력칸(type="number")이 마우스 휠로 바뀌지 않게 막는다.
+ * 브라우저 기본 동작으로, 숫자칸에 커서가 있는 채로 페이지를 스크롤하려고 휠을 굴리면
+ * 값이 1씩 바뀐다 (예: 상품가격 50000 입력 후 휠 3칸 → 49997로 저장됨).
+ * 휠을 굴리는 순간 포커스를 빼서, 값은 그대로 두고 페이지만 스크롤되게 한다.
+ * (키보드 ↑/↓로 값을 바꾸는 건 의도한 조작이라 그대로 둔다)
+ */
+document.addEventListener("wheel", function (event) {
+  var target = event.target;
+  if (target && target.tagName === "INPUT" && target.type === "number" && document.activeElement === target) {
+    target.blur();
+  }
+}, { passive: true });
