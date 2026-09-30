@@ -363,8 +363,8 @@
 											</form>
 										</c:when>
 										<c:otherwise>
-											<button class="btn btn-outline btn-sm" type="button" disabled
-												title="준비 중인 기능입니다">수정</button>
+											<%-- '수정' 버튼은 기존 GoodPang부터 기능 없이 disabled("준비 중인 기능입니다")로만 있어서 제거함.
+											     상품 수정 기능을 만들면 여기에 다시 추가 --%>
 											<c:if test="${product.saleStatus == '판매 중'}">
 												<form method="post"
 													action="${pageContext.request.contextPath}/vendor/product_status.htm"

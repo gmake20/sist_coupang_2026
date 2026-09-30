@@ -63,10 +63,10 @@
           <c:forEach var="log" items="${logList}">
             <tr>
               <td><fmt:formatDate value="${log.actionDate}" pattern="yyyy-MM-dd HH:mm" /></td>
-              <td>${log.adminName}</td>
-              <td>${log.actionType}</td>
-              <td><span class="target-tag">${log.targetType} #${log.targetNo}</span></td>
-              <td class="reason">${not empty log.reason ? log.reason : '-'}</td>
+              <td><c:out value="${log.adminName}" /></td>
+              <td><c:out value="${log.actionType}" /></td>
+              <td><span class="target-tag"><c:out value="${log.targetType}" /> #${log.targetNo}</span></td>
+              <td class="reason"><c:out value="${not empty log.reason ? log.reason : '-'}" /></td>
             </tr>
           </c:forEach>
         </tbody>
