@@ -1088,7 +1088,7 @@
 													</span>
 													<!-- <span class="date"> ${r.reviewDate} </span>-->
 													<span class="date">
-													    <fmt:formatDate value="${r.reviewDate}" pattern="yyyy-MM-dd HH:mm"/>
+													    <fmt:formatDate value="${r.reviewDate}" pattern="yyyy-MM-dd"/>
 													</span>
 												</div>
 											</div>

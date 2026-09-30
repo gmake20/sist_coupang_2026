@@ -18,7 +18,6 @@
         id="customUserDetailsService"
         class="org.doit.goodpang.security.CustomUserDetailsService" >
         
-        
          <beans:constructor-arg
         	ref="memberMapper" />
         </beans:bean>
