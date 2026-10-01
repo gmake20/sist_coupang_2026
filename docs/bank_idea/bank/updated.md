@@ -275,6 +275,139 @@ README 변경 사항에 맞춰 화면 설계도 수정했습니다.
 
 ---
 
+## 팀원1 테이블 설계 (team1-draft/)
+
+팀원1 담당 테이블의 DDL, 시드 데이터, JPA Entity, Repository 초안을 `team1-draft/` 폴더에 만들었습니다. 사용법은 `team1-draft/README.md`를 참고하세요.
+
+### 대상 테이블
+- `MEMBER`, `IDENTITY_VERIFICATION`, `LOGIN_LOG`, `BRANCH`
+- **`TRANSFER_LIMIT_REQUEST` (신규)**: 마이페이지의 이체한도 변경 신청(13.5)을 저장할 테이블이 README에 없어서 추가했습니다. 신청은 팀원1, 승인은 팀원4, 한도 반영은 팀원2가 맡습니다.
+
+### 주요 설계
+- **회원 탈퇴**는 행을 남기고 상태만 `WITHDRAWN`으로 바꿉니다. 이메일·휴대폰은 마스킹해서 같은 번호로 재가입할 수 있게 합니다.
+- **로그인 5회 실패 잠금**: `LOGIN_FAIL_COUNT`, `LOGIN_LOCKED_AT` 컬럼, 비밀번호 재설정 시 해제합니다.
+- **"대기 1건" 규칙**을 DB에서도 보장합니다. 본인확인은 회원당, 한도 변경은 계좌당 심사 대기 건이 1개만 존재하도록 함수 기반 유니크 인덱스를 사용합니다.
+- **CHECK 제약**으로 반려 시 사유 필수, 심사 완료 건은 심사 관리자·일시 필수를 강제합니다.
+- 1원 인증 계좌번호는 **마스킹 값만 저장**합니다.
+- 상태 변경은 Entity 메서드(`approve()`, `reject()`, `recordLoginFailure()`, `withdraw()` 등)로만 하도록 만들었습니다.
+
+### 시드 데이터
+- 테스트 계정 4개: `admin`(관리자), `user1`(본인확인 완료), `user2`(본인확인 전), `user3`(심사중)
+- 지점 5개, ATM 4개 (모의 데이터)
+
+### README.md 변경
+- 10장 테이블 목록: `MEMBER`, `IDENTITY_VERIFICATION`, `LOGIN_LOG`, `BRANCH` 설명 보강, `TRANSFER_LIMIT_REQUEST` 추가
+- **10-1장 "테이블 작성 공통 규칙"** 신설: 이름 규칙, PK·시퀀스, `VARCHAR2(n CHAR)`, 금액·날짜·상태값·Y/N 타입, 연관관계, 삭제 정책, 스키마 관리 방법
+- 11장 관계 설명에 `TRANSFER_LIMIT_REQUEST` 추가, 12장 팀원1 담당 테이블에 추가
+
+### 검증
+- JDK 21로 컴파일 성공, 도메인 규칙 24개 검사 통과
+- Oracle DB에서의 DDL 실행과 `ddl-auto: validate` 확인은 아직 하지 않았습니다 (로컬에 Oracle 없음)
+
+---
+
+## 고객·직원 분리와 직원 권한 3단계
+
+**문제**: 관리자를 고객과 같은 `MEMBER` 테이블에 `ROLE = ADMIN`으로 저장하고 있었습니다. 실제 은행은 고객용 인터넷뱅킹과 직원용 내부 시스템을 따로 운영하고, 직원도 직무에 따라 권한이 다릅니다. 기존 구조에서는 직원 정보(사번, 소속 지점, 직급)를 넣을 곳이 없었고, 모든 관리자가 모든 승인을 할 수 있었습니다.
+
+**결정**: 은행 직원을 `EMPLOYEE` 테이블로 분리하고, 권한을 3단계로 나눕니다.
+
+| 권한 | 할 수 있는 일 |
+|---|---|
+| `STAFF` 일반 직원 | 회원·계좌·거래 조회, 본인확인 심사, 1:1 문의 답변, 공지/FAQ 관리 |
+| `MANAGER` 책임자 | STAFF 업무 + 회원 정지/해제, 계좌 동결/해제·잠금 해제, 이체한도 승인, 대출 심사, 카드 발급 승인, 상품 관리 |
+| `SYSTEM_ADMIN` 시스템 관리자 | 직원 계정 관리, 지점/ATM 관리, 활동 로그 조회 (직무 분리 원칙에 따라 고객 업무는 하지 않음) |
+
+### 테이블 변경 (team1-draft/)
+- `MEMBER`에서 `ROLE` 컬럼을 삭제해 고객 전용 테이블로 바꿨습니다.
+- **`EMPLOYEE` 신설**: 사번(로그인 아이디), 소속 지점(→ `BRANCH`), 직급(표시용), 권한, 상태(재직/휴직/퇴사), 임시 비밀번호 여부, 로그인 잠금, 입사일/퇴사일
+- **`EMPLOYEE_LOGIN_LOG` 신설**: 직원 로그인 이력
+- `IDENTITY_VERIFICATION`, `TRANSFER_LIMIT_REQUEST`의 심사자 컬럼을 `REVIEWED_ADMIN_ID → MEMBER`에서 **`REVIEWED_EMPLOYEE_ID → EMPLOYEE`**로 바꿨습니다.
+- `BRANCH`가 직원 소속 지점으로도 쓰이게 되어 `EMPLOYEE`보다 먼저 생성하고, 본점 데이터를 추가했습니다.
+- 시드 계정: 고객 `user1~3`, 직원 `E0001`(SYSTEM_ADMIN, 본점) / `E0002`(MANAGER, 강남지점) / `E0003`(STAFF, 강남지점)
+
+### 코드 변경
+- 로그인 5회 실패 잠금을 `LoginLock`(@Embeddable)으로 분리해 `Member`와 `Employee`가 함께 씁니다.
+- `Employee` Entity: 권한 확인(`hasAuthority`), 임시 비밀번호, 비밀번호 초기화, 권한 변경, 지점 이동(ATM 불가), 휴직/복직/퇴사
+- 본인확인 심사는 STAFF 이상, 이체한도 심사는 MANAGER만 할 수 있도록 Entity에서도 검사합니다. 휴직·퇴사 직원과 SYSTEM_ADMIN은 심사할 수 없습니다.
+- 도메인 규칙 31개 검사 통과 (Oracle 실행은 아직)
+
+### README.md 변경
+| 장 | 변경 |
+|---|---|
+| 0장 | 인증 방식에 고객·직원 로그인 분리, 직원 권한 3단계 추가 |
+| 6장 | 관리자 행에 직원 전용 로그인과 권한 3단계, 관리자 심화에 직원 관리 추가 |
+| 8장 | 관리자 메뉴 항목마다 필요한 권한 표기, 14.0 직원 로그인, 14.13 직원 관리 추가 |
+| 8-1장 | 고객/직원 분리 표, 권한 3단계 표, 고객 기능 접근 표로 재구성, `SecurityFilterChain` 2개 예시 |
+| 9장 | 화면 43(직원 로그인), 44(직원 관리) 추가 |
+| 10장 | `EMPLOYEE`, `EMPLOYEE_LOGIN_LOG` 추가. `LOAN`, `NOTICE`, `INQUIRY`, `ADMIN_LOG`의 처리자 컬럼을 직원FK(→ `EMPLOYEE`)로 변경 |
+| 10-1장 | "처리한 직원 컬럼은 `..._EMPLOYEE_ID`로 통일" 규칙 추가 |
+| 11장 | 관리자 관련 관계를 모두 `EMPLOYEE` 기준으로 변경, `MEMBER.ROLE` 설명 삭제 |
+| 12장 | 팀원1에 직원 로그인·직원 계정 로직과 테이블 2개 추가, 1주차에 `MEMBER`·`BRANCH`·`EMPLOYEE` 먼저 공유 |
+| 14장 | 1주차 공유, 2주차 직원 로그인 추가 |
+| 15장 | 발표 포인트에 고객·직원 분리와 직무 분리 추가, 시연 시나리오의 "관리자 계정"을 STAFF/MANAGER 계정으로 구체화 |
+
+### wireframes.html 변경
+- 관리자 화면(31~42번)의 사용자 표시를 "관리자"에서 필요한 권한(STAFF/MANAGER/SYSTEM_ADMIN)으로 바꿨습니다.
+- 3번 고객 로그인 화면에서 관리자 이동을 없앴고, 40번 활동 로그에 직원 로그인 이력 탭을 추가했습니다.
+- **43번 직원 로그인 화면 `[핵심]`**, **44번 직원 관리 화면 `[심화]`**을 추가했습니다 (총 44개).
+
+### 다른 팀원 영향
+- 팀원3: `LOAN.REVIEWED_EMPLOYEE_ID → EMPLOYEE`, 대출 승인은 MANAGER
+- 팀원4: `ADMIN_LOG.EMPLOYEE_ID`, `NOTICE.EMPLOYEE_ID`, `INQUIRY.ANSWERED_EMPLOYEE_ID → EMPLOYEE`, 직원 관리 화면 구현
+
+---
+
+## 지점/ATM 이용 가능 업무 테이블 분리 (BRANCH_SERVICE)
+
+**문제**: `BRANCH.SERVICES` 컬럼에 "입금,출금,이체" 같은 자유 문자열을 저장하고 있었습니다. 값이 통일되지 않고, "입금 가능한 ATM" 같은 업무별 필터를 만들기 어려웠으며, 범위에서 제외한 `외환상담`이 시드에 섞여 있었습니다. 실제 쓰이는 곳도 화면 표시뿐이었습니다.
+
+**결정 (B안)**: 업무를 별도 테이블 `BRANCH_SERVICE(BRANCH_ID, SERVICE_CODE)`로 분리하고, 업무 코드 7개를 고정했습니다.
+
+| 코드 | 표시명 | ATM 가능 |
+|---|---|:---:|
+| `DEPOSIT` / `WITHDRAW` / `TRANSFER` / `BALANCE_INQUIRY` | 입금 / 출금 / 이체 / 잔액조회 | O |
+| `ACCOUNT_OPENING` / `LOAN_CONSULTING` / `CARD_ISSUANCE` | 계좌개설 / 대출상담 / 카드발급 | X (창구 업무) |
+
+### 변경 내용
+- **DDL**: `BRANCH.SERVICES` 컬럼 삭제, `BRANCH_SERVICE` 테이블 추가 (PK로 중복 방지, CHECK로 코드 7개만 허용, 업무별 검색 인덱스)
+- **시드**: 업무를 코드로 다시 입력, `외환상담` 제거
+- **Java**: `BranchServiceType` enum(표시명, 창구 업무 여부), `Branch.services`를 `@ElementCollection`으로 매핑. ATM에 창구 업무 등록 불가, 업무 1개 이상 필수
+- **검색**: `BranchRepository.search()`에 업무 필터와 24시간 필터 추가, 업무 목록을 함께 조회(join fetch)해서 N+1 방지
+- **문서**: table.md에 `BRANCH_SERVICE` 섹션 추가, faq.md의 BRANCH 답변 수정과 업무 관련 질문 추가, README 6·8·9·10·11·12장, wireframes 41·42번 화면 반영
+- 도메인 규칙 검사 39개 통과 (지점 업무 규칙 8개 추가)
+
+---
+
+## EMPLOYEE 컬럼명 변경
+
+- `PASSWORD_CHANGE_REQUIRED_YN` → **`TEMP_PW_YN`** (임시 비밀번호 여부). 이름이 너무 길어서 줄였습니다.
+- CHECK 제약 이름도 `CK_EMPLOYEE_PW_CHANGE` → `CK_EMPLOYEE_TEMP_PW`로 바꿨습니다.
+- 반영 파일: `schema-team1.sql`, `data-team1.sql`, `Employee.java`(@Column 이름), `table.md`
+- Java 필드명 `passwordChangeRequired`는 코드에서 뜻이 더 분명해서 그대로 두었습니다.
+
+---
+
+## 이체한도 변경: 감액은 즉시 반영, 증액만 심사
+
+**문제**: 이체한도를 올리든 내리든 모두 MANAGER 승인이 필요했습니다. 실제 은행은 한도를 내리는 것은 더 안전해지므로 바로 반영합니다. 또 심사 중에 계좌 한도가 바뀌면 신청 당시 한도와 실제 한도가 어긋나는 문제가 있었습니다.
+
+**결정**
+| 구분 | 처리 |
+|---|---|
+| 감액 (희망 < 현재) | 신청 즉시 `APPROVED`, ACCOUNT 한도 바로 변경, 심사 직원 없음 |
+| 증액 (희망 > 현재) | `PENDING` → MANAGER 승인/반려 |
+| 심사 중 새 신청 | 같은 계좌에 심사 중인 신청이 있으면 감액 포함 새 신청 불가 |
+| 승인 시 재확인 | 계좌의 현재 한도가 신청 당시와 다르면 승인 불가 → 반려 후 재신청 |
+
+### 변경 내용
+- **DDL**: `CK_TLR_DECREASE_AUTO` 추가 (감액은 항상 승인 상태, 심사 직원·일시 없음), `CK_TLR_REVIEWED` 수정 (처리된 증액 건만 심사 직원·일시 필수)
+- **Java**: `TransferLimitRequest.request()`가 감액이면 바로 `APPROVED`. `isIncrease()`, `isAutoApproved()` 추가. `approve(reviewer, accountLimitNow)`로 승인 시 현재 한도 확인
+- **문서**: table.md, faq.md(결정 사항 반영), README 8·10·11장, wireframes 30·33번 화면
+- 도메인 규칙 검사 45개 통과 (이체한도 규칙 6개 추가)
+
+---
+
 ## 다음 단계
 
 1. 팀원들과 이 수정 내역을 리뷰해 최종 확정
