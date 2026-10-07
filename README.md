@@ -93,3 +93,18 @@
 
 ![scm_15](docs/project_capture/scm_15.png)
 
+### 16. 관리자 - 액션 로그
+
+![scm_16](docs/project_capture/scm_16.png)
+
+### 17. 관리자 - 판매자 액션 로그
+
+![scm_17](docs/project_capture/scm_17.png)
+
+### 18. 관리자 - 공지사항 관리
+
+![scm_18](docs/project_capture/scm_18.png)
+
+### 19. 배송기사 앱 - 배송현황
+
+![scm_19](docs/project_capture/scm_19.png)
