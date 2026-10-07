@@ -30,3 +30,66 @@
 ## 배송 JSON API (로그인 불필요)
 
 `/deliveries/json`, `/delivery-complete/json` 등 로그인 없이 호출 가능한 JSON API 문서는 [readme_json.md](readme_json.md)로 분리했습니다.
+
+## 프로젝트 화면 캡처
+
+### 1. 쇼핑몰 메인 화면
+
+![scm_01](docs/project_capture/scm_01.png)
+
+### 2. 판매자 로그인
+
+![scm_02](docs/project_capture/scm_02.png)
+
+### 3. 판매자 대시보드
+
+![scm_03](docs/project_capture/scm_03.png)
+
+### 4. 상품 관리 (상품 목록)
+
+![scm_04](docs/project_capture/scm_04.png)
+
+### 5. 상품 옵션 관리
+
+![scm_05](docs/project_capture/scm_05.png)
+
+### 6. 상품 등록
+
+![scm_06](docs/project_capture/scm_06.png)
+
+### 7. 주문/배송 관리 (주문 목록)
+
+![scm_07](docs/project_capture/scm_07.png)
+
+### 8. 배송 관리
+
+![scm_08](docs/project_capture/scm_08.png)
+
+### 9. 취소/반품/교환 관리
+
+![scm_09](docs/project_capture/scm_09.png)
+
+### 10. 출고/운송장 관리
+
+![scm_10](docs/project_capture/scm_10.png)
+
+### 11. 정산내역 리스트
+
+![scm_11](docs/project_capture/scm_11.png)
+
+### 12. 판매자 공지사항
+
+![scm_12](docs/project_capture/scm_12.png)
+
+### 13. 관리자 대시보드
+
+![scm_13](docs/project_capture/scm_13.png)
+
+### 14. 관리자 - 상품 목록
+
+![scm_14](docs/project_capture/scm_14.png)
+
+### 15. 관리자 - 판매자 목록
+
+![scm_15](docs/project_capture/scm_15.png)
+
